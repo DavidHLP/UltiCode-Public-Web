@@ -1,4 +1,4 @@
-import router from '@/router/index';
+import router, {LOGIN_ROUTE_NAME, REGISTER_ROUTE_NAME} from '@/router/index';
 import {useAuthStore} from '@/stores/auth';
 import {
   ensureSensitiveActionToken,
@@ -38,8 +38,8 @@ export interface RequestConfig extends AxiosRequestConfig {
 const API_BASE_URL =
   import.meta.env?.VITE_API_BASE_URL ?? (import.meta.env?.DEV ? 'http://localhost:9999' : '/');
 const AUTH_REFRESH_ENDPOINT = '/api/auth/refresh';
-const LOGIN_ROUTE_NAME = 'login';
 const REFRESH_FAILURE_MESSAGE = '登录状态已过期，请重新登录';
+const PUBLIC_AUTH_ROUTE_NAMES = new Set<string>([LOGIN_ROUTE_NAME, REGISTER_ROUTE_NAME]);
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -99,12 +99,14 @@ function redirectToLogin() {
   const authStore = useAuthStore();
   authStore.clearAuthData();
   const currentRoute = router.currentRoute.value;
-  if (currentRoute.name !== LOGIN_ROUTE_NAME) {
-    const redirect = currentRoute.fullPath;
-    router.push({name: LOGIN_ROUTE_NAME, query: {redirect}}).catch(() => {
-      /* noop */
-    });
+  const currentName = typeof currentRoute.name === 'string' ? currentRoute.name : null;
+  if (currentName && PUBLIC_AUTH_ROUTE_NAMES.has(currentName)) {
+    return;
   }
+  const redirect = currentRoute.fullPath;
+  router.push({name: LOGIN_ROUTE_NAME, query: {redirect}}).catch(() => {
+    /* noop */
+  });
 }
 
 const service: AxiosInstance = axios.create({
