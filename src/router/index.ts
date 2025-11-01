@@ -29,6 +29,12 @@ const router = createRouter({
       component: () => import('@/pages/main/index.vue'),
       meta: {requiresAuth: true},
     },
+    {
+      path: '/tasks',
+      name: 'tasks',
+      component: () => import('@/pages/main/tasks/index.vue'),
+      meta: {requiresAuth: true},
+    }
   ],
 })
 
