@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Table } from '@tanstack/vue-table'
-import type { Task } from '../data/schema'
+import type { ProblemCard } from '@/api/problem/problems'
+
 import ChevronLeftIcon from '~icons/radix-icons/chevron-left'
 import ChevronRightIcon from '~icons/radix-icons/chevron-right'
 import DoubleArrowLeftIcon from '~icons/radix-icons/double-arrow-left'
@@ -15,21 +16,23 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-interface DataTablePaginationProps {
-  table: Table<Task>
+interface ProblemsDataTablePaginationProps {
+  table: Table<ProblemCard>
 }
-defineProps<DataTablePaginationProps>()
+
+defineProps<ProblemsDataTablePaginationProps>()
 </script>
 
 <template>
   <div class="flex items-center justify-between px-2">
     <div class="flex-1 text-sm text-muted-foreground">
-      {{ table.getFilteredSelectedRowModel().rows.length }} of
-      {{ table.getFilteredRowModel().rows.length }} row(s) selected.
+      已选择 {{ table.getFilteredSelectedRowModel().rows.length }} 道题目， 共
+      {{ table.getFilteredRowModel().rows.length }} 道题目
     </div>
     <div class="flex items-center space-x-6 lg:space-x-8">
+      <!-- 每页显示数量 -->
       <div class="flex items-center space-x-2">
-        <p class="text-sm font-medium">Rows per page</p>
+        <p class="text-sm font-medium">每页显示</p>
         <Select
           :model-value="`${table.getState().pagination.pageSize}`"
           @update:model-value="table.setPageSize as any"
@@ -48,10 +51,13 @@ defineProps<DataTablePaginationProps>()
           </SelectContent>
         </Select>
       </div>
-      <div class="flex w-[100px] items-center justify-center text-sm font-medium">
-        Page {{ table.getState().pagination.pageIndex + 1 }} of
-        {{ table.getPageCount() }}
+
+      <!-- 页码信息 -->
+      <div class="flex w-[150px] items-center justify-center text-sm font-medium">
+        第 {{ table.getState().pagination.pageIndex + 1 }} 页， 共 {{ table.getPageCount() }} 页
       </div>
+
+      <!-- 分页按钮 -->
       <div class="flex items-center space-x-2">
         <Button
           variant="outline"
@@ -59,7 +65,7 @@ defineProps<DataTablePaginationProps>()
           :disabled="!table.getCanPreviousPage()"
           @click="table.setPageIndex(0)"
         >
-          <span class="sr-only">Go to first page</span>
+          <span class="sr-only">首页</span>
           <DoubleArrowLeftIcon class="h-4 w-4" />
         </Button>
         <Button
@@ -68,7 +74,7 @@ defineProps<DataTablePaginationProps>()
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
-          <span class="sr-only">Go to previous page</span>
+          <span class="sr-only">上一页</span>
           <ChevronLeftIcon class="h-4 w-4" />
         </Button>
         <Button
@@ -77,7 +83,7 @@ defineProps<DataTablePaginationProps>()
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >
-          <span class="sr-only">Go to next page</span>
+          <span class="sr-only">下一页</span>
           <ChevronRightIcon class="h-4 w-4" />
         </Button>
         <Button
@@ -86,7 +92,7 @@ defineProps<DataTablePaginationProps>()
           :disabled="!table.getCanNextPage()"
           @click="table.setPageIndex(table.getPageCount() - 1)"
         >
-          <span class="sr-only">Go to last page</span>
+          <span class="sr-only">末页</span>
           <DoubleArrowRightIcon class="h-4 w-4" />
         </Button>
       </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Table } from '@tanstack/vue-table'
-import type { Task } from '../data/schema'
+import type { ProblemCard } from '@/api/problem/problems'
 import { computed } from 'vue'
 import MixerHorizontalIcon from '~icons/radix-icons/mixer-horizontal'
 
@@ -14,17 +14,31 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-interface DataTableViewOptionsProps {
-  table: Table<Task>
+interface ProblemsDataTableViewOptionsProps {
+  table: Table<ProblemCard>
 }
 
-const props = defineProps<DataTableViewOptionsProps>()
+const props = defineProps<ProblemsDataTableViewOptionsProps>()
 
 const columns = computed(() =>
   props.table
     .getAllColumns()
     .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide()),
 )
+
+function getColumnDisplayName(columnId: string): string {
+  const nameMap: Record<string, string> = {
+    id: 'ID',
+    title: '题目',
+    difficulty: '难度',
+    tags: '标签',
+    'stats.timeLimitMs': '时间限制',
+    'stats.memoryLimitKb': '内存限制',
+    metadata: '统计信息',
+    actions: '操作',
+  }
+  return nameMap[columnId] || columnId
+}
 </script>
 
 <template>
@@ -32,11 +46,11 @@ const columns = computed(() =>
     <DropdownMenuTrigger as-child>
       <Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
         <MixerHorizontalIcon class="mr-2 h-4 w-4" />
-        View
+        视图
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" class="w-[150px]">
-      <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+    <DropdownMenuContent align="end" class="w-[200px]">
+      <DropdownMenuLabel>显示列</DropdownMenuLabel>
       <DropdownMenuSeparator />
 
       <DropdownMenuCheckboxItem
@@ -46,7 +60,7 @@ const columns = computed(() =>
         :model-value="column.getIsVisible()"
         @update:model-value="(value) => column.toggleVisibility(!!value)"
       >
-        {{ column.id }}
+        {{ getColumnDisplayName(column.id) }}
       </DropdownMenuCheckboxItem>
     </DropdownMenuContent>
   </DropdownMenu>

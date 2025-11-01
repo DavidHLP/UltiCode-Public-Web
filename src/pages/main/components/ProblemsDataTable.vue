@@ -5,8 +5,6 @@ import type {
   SortingState,
   VisibilityState,
 } from '@tanstack/vue-table'
-import type { Task } from '../data/schema'
-
 import {
   FlexRender,
   getCoreRowModel,
@@ -17,6 +15,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
+import type { ProblemCard } from '@/api/problem/problems'
 import { ref } from 'vue'
 import { valueUpdater } from '@/lib/utils'
 import {
@@ -27,13 +26,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import DataTablePagination from './DataTablePagination.vue'
-import DataTableToolbar from './DataTableToolbar.vue'
+
+import ProblemsDataTableToolbar from './ProblemsDataTableToolbar.vue'
+import ProblemsDataTablePagination from './ProblemsDataTablePagination.vue'
+import { defaultVisibleColumns } from './problemsData'
 
 interface DataTableProps {
-  columns: ColumnDef<Task, any>[]
-  data: Task[]
+  columns: ColumnDef<ProblemCard, any>[]
+  data: ProblemCard[]
 }
+
 const props = defineProps<DataTableProps>()
 
 const sorting = ref<SortingState>([])
@@ -74,11 +76,23 @@ const table = useVueTable({
   getFacetedRowModel: getFacetedRowModel(),
   getFacetedUniqueValues: getFacetedUniqueValues(),
 })
+
+// 初始化默认可见列
+if (Object.keys(columnVisibility.value).length === 0) {
+  const defaultVisibility: VisibilityState = {}
+  defaultVisibleColumns.forEach((col) => {
+    defaultVisibility[col] = true
+  })
+  columnVisibility.value = defaultVisibility
+}
 </script>
 
 <template>
   <div class="space-y-4">
-    <DataTableToolbar :table="table" />
+    <!-- 工具栏 -->
+    <ProblemsDataTableToolbar :table="table" />
+
+    <!-- 表格 -->
     <div class="rounded-md border">
       <Table>
         <TableHeader>
@@ -98,6 +112,7 @@ const table = useVueTable({
               v-for="row in table.getRowModel().rows"
               :key="row.id"
               :data-state="row.getIsSelected() && 'selected'"
+              class="hover:bg-muted/50 cursor-pointer transition-colors"
             >
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                 <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
@@ -106,12 +121,18 @@ const table = useVueTable({
           </template>
 
           <TableRow v-else>
-            <TableCell :colspan="columns.length" class="h-24 text-center"> No results. </TableCell>
+            <TableCell :colspan="columns.length" class="h-24 text-center">
+              <div class="flex flex-col items-center justify-center space-y-2">
+                <p class="text-sm font-medium text-muted-foreground">没有找到匹配的题目</p>
+                <p class="text-xs text-muted-foreground">请尝试调整搜索条件或清除过滤</p>
+              </div>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
     </div>
 
-    <DataTablePagination :table="table" />
+    <!-- 分页 -->
+    <ProblemsDataTablePagination :table="table" />
   </div>
 </template>

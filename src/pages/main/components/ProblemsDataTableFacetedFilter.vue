@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Column } from '@tanstack/vue-table'
 import type { Component } from 'vue'
-import type { Task } from '../data/schema'
+import type { ProblemCard } from '@/api/problem/problems'
 import { computed } from 'vue'
 import CheckIcon from '~icons/radix-icons/check'
 import PlusCircledIcon from '~icons/radix-icons/plus-circled'
@@ -22,8 +22,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 
-interface DataTableFacetedFilter {
-  column?: Column<Task, any>
+interface ProblemsDataTableFacetedFilterProps {
+  column?: Column<ProblemCard, any>
   title?: string
   options: {
     label: string
@@ -32,10 +32,25 @@ interface DataTableFacetedFilter {
   }[]
 }
 
-const props = defineProps<DataTableFacetedFilter>()
+const props = defineProps<ProblemsDataTableFacetedFilterProps>()
 
 const facets = computed(() => props.column?.getFacetedUniqueValues())
 const selectedValues = computed(() => new Set(props.column?.getFilterValue() as string[]))
+
+function handleSelect(option: any) {
+  const isSelected = selectedValues.value.has(option.value)
+  if (isSelected) {
+    selectedValues.value.delete(option.value)
+  } else {
+    selectedValues.value.add(option.value)
+  }
+  const filterValues = Array.from(selectedValues.value)
+  props.column?.setFilterValue(filterValues.length ? filterValues : undefined)
+}
+
+function clearFilter() {
+  props.column?.setFilterValue(undefined)
+}
 </script>
 
 <template>
@@ -55,7 +70,7 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
               variant="secondary"
               class="rounded-sm px-1 font-normal"
             >
-              {{ selectedValues.size }} selected
+              {{ selectedValues.size }} 已选择
             </Badge>
 
             <template v-else>
@@ -74,27 +89,15 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
     </PopoverTrigger>
     <PopoverContent class="w-[200px] p-0" align="start">
       <Command>
-        <CommandInput :placeholder="title" />
+        <CommandInput :placeholder="`搜索${title}...`" />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>没有找到匹配的选项</CommandEmpty>
           <CommandGroup>
             <CommandItem
               v-for="option in options"
               :key="option.value"
               :value="option"
-              @select="
-                (e) => {
-                  console.log(e.detail.value)
-                  const isSelected = selectedValues.has(option.value)
-                  if (isSelected) {
-                    selectedValues.delete(option.value)
-                  } else {
-                    selectedValues.add(option.value)
-                  }
-                  const filterValues = Array.from(selectedValues)
-                  column?.setFilterValue(filterValues.length ? filterValues : undefined)
-                }
-              "
+              @select="handleSelect(option)"
             >
               <div
                 :class="
@@ -127,11 +130,11 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
             <CommandSeparator />
             <CommandGroup>
               <CommandItem
-                :value="{ label: 'Clear filters' }"
+                :value="{ label: '清除过滤' }"
                 class="justify-center text-center"
-                @select="column?.setFilterValue(undefined)"
+                @select="clearFilter"
               >
-                Clear filters
+                清除过滤
               </CommandItem>
             </CommandGroup>
           </template>
