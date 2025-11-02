@@ -4,6 +4,10 @@ import { Input } from '@/components/ui/input'
 
 <template>
   <div>
-    <Input type="search" placeholder="Search..." class="md:w-[100px] lg:w-[300px]" />
+    <Input
+      type="search"
+      placeholder="搜索题目、标签或用户..."
+      class="md:w-[100px] lg:w-[300px]"
+    />
   </div>
 </template>
