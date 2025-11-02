@@ -18,6 +18,8 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.16",
     "@tanstack/vue-table": "^8.21.3",
+    "@unovis/ts": "^1.6.1",
+    "@unovis/vue": "^1.6.1",
     "@vueuse/core": "^14.0.0",
     "axios": "^1.13.1",
     "class-variance-authority": "^0.7.1",
