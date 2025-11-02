@@ -141,7 +141,7 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
       return h(Badge, {
         variant: 'secondary',
         class: className
-      }, label)
+      }, () => label)
     },
     filterFn: (row, id, value) => {
       const difficulty = row.getValue(id) as any
@@ -159,7 +159,7 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
           h(Badge, {
             variant: 'outline',
             class: 'text-xs'
-          }, tag.name)
+          }, () => tag.name)
         )
       )
     },
