@@ -17,6 +17,7 @@ import {
 } from '@tanstack/vue-table'
 import type { ProblemCard } from '@/api/problem/problems'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { valueUpdater } from '@/lib/utils'
 import {
   Table,
@@ -37,6 +38,8 @@ interface DataTableProps {
 }
 
 const props = defineProps<DataTableProps>()
+
+const router = useRouter()
 
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
@@ -85,6 +88,15 @@ if (Object.keys(columnVisibility.value).length === 0) {
   })
   columnVisibility.value = defaultVisibility
 }
+
+function handleRowClick(problem: ProblemCard) {
+  if (!problem?.slug) {
+    return
+  }
+  router.push({ name: 'problem-editor', params: { slug: problem.slug } }).catch(() => {
+    /* 路由跳转失败时忽略 */
+  })
+}
 </script>
 
 <template>
@@ -113,6 +125,7 @@ if (Object.keys(columnVisibility.value).length === 0) {
               :key="row.id"
               :data-state="row.getIsSelected() && 'selected'"
               class="hover:bg-muted/50 cursor-pointer transition-colors"
+              @click="handleRowClick(row.original)"
             >
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                 <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />

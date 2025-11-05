@@ -35,6 +35,12 @@ const router = createRouter({
       component: () => import('@/view/dashboard/index.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/problems/:slug',
+      name: 'problem-editor',
+      component: () => import('@/view/editer/index.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
