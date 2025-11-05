@@ -24,11 +24,11 @@ function getSortIcon(direction: false | 'asc' | 'desc') {
   return ArrowDown
 }
 
-function getSortLabel(direction: false | 'asc' | 'desc') {
-  if (direction === false) return '排序'
-  if (direction === 'asc') return '升序'
-  return '降序'
-}
+// function getSortLabel(direction: false | 'asc' | 'desc') {
+//   if (direction === false) return '排序'
+//   if (direction === 'asc') return '升序'
+//   return '降序'
+// }
 </script>
 
 <template>

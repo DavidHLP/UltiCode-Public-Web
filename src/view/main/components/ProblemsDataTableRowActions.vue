@@ -32,22 +32,22 @@ const emit = defineEmits<{
   code: [problem: ProblemCard]
 }>()
 
-const difficultyLabel = computed(() => {
-  if (!props.problem.difficulty) return '未知'
-  if (props.problem.difficulty.label) return props.problem.difficulty.label
-
-  const code = props.problem.difficulty.code?.toLowerCase()
-  switch (code) {
-    case 'easy':
-      return '简单'
-    case 'medium':
-      return '中等'
-    case 'hard':
-      return '困难'
-    default:
-      return '未知'
-  }
-})
+// const difficultyLabel = computed(() => {
+//   if (!props.problem.difficulty) return '未知'
+//   if (props.problem.difficulty.label) return props.problem.difficulty.label
+//
+//   const code = props.problem.difficulty.code?.toLowerCase()
+//   switch (code) {
+//     case 'easy':
+//       return '简单'
+//     case 'medium':
+//       return '中等'
+//     case 'hard':
+//       return '困难'
+//     default:
+//       return '未知'
+//   }
+// })
 
 function handleView() {
   emit('view', props.problem)

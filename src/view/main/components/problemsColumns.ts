@@ -118,15 +118,14 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
       const problem = row.original
       return h('div', { class: 'flex flex-col space-y-1' }, [
         h('div', { class: 'font-medium' }, problem.title),
-        h('div', { class: 'text-xs text-muted-foreground' }, problem.slug)
+        h('div', { class: 'text-xs text-muted-foreground' }, problem.slug),
       ])
     },
     filterFn: (row, id, value) => {
       const title = row.getValue(id) as string
       const slug = (row.original as any).slug as string
       const searchValue = value.toLowerCase()
-      return title.toLowerCase().includes(searchValue) ||
-             slug.toLowerCase().includes(searchValue)
+      return title.toLowerCase().includes(searchValue) || slug.toLowerCase().includes(searchValue)
     },
   },
   {
@@ -137,10 +136,14 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
       const label = difficultyLabel(difficulty)
       const className = difficultyClass(difficulty?.code)
 
-      return h(Badge, {
-        variant: 'secondary',
-        class: className
-      }, () => label)
+      return h(
+        Badge,
+        {
+          variant: 'secondary',
+          class: className,
+        },
+        () => label,
+      )
     },
     filterFn: (row, id, value) => {
       const difficulty = row.getValue(id) as any
@@ -153,13 +156,19 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
     header: ({ column }) => h(DataTableColumnHeader, { column, title: '标签' }),
     cell: ({ row }) => {
       const tags = row.original.tags || []
-      return h('div', { class: 'flex flex-wrap gap-1' },
-        tags.slice(0, 3).map(tag =>
-          h(Badge, {
-            variant: 'outline',
-            class: 'text-xs'
-          }, () => tag.name)
-        )
+      return h(
+        'div',
+        { class: 'flex flex-wrap gap-1' },
+        tags.slice(0, 3).map((tag) =>
+          h(
+            Badge,
+            {
+              variant: 'outline',
+              class: 'text-xs',
+            },
+            () => tag.name,
+          ),
+        ),
       )
     },
   },
@@ -171,7 +180,7 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
       const formatted = formatTimeLimit(timeLimit)
       return h('div', { class: 'flex items-center space-x-1' }, [
         h(Timer, { class: 'h-3 w-3 text-muted-foreground' }),
-        h('span', { class: 'text-sm' }, formatted)
+        h('span', { class: 'text-sm' }, formatted),
       ])
     },
   },
@@ -183,7 +192,7 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
       const formatted = formatMemory(memoryLimit)
       return h('div', { class: 'flex items-center space-x-1' }, [
         h(HardDrive, { class: 'h-3 w-3 text-muted-foreground' }),
-        h('span', { class: 'text-sm' }, formatted)
+        h('span', { class: 'text-sm' }, formatted),
       ])
     },
   },
@@ -195,7 +204,7 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
       const formatted = formatMetadata(metadata)
       return h('div', { class: 'flex items-center space-x-1' }, [
         h(Activity, { class: 'h-3 w-3 text-muted-foreground' }),
-        h('span', { class: 'text-sm text-muted-foreground' }, formatted)
+        h('span', { class: 'text-sm text-muted-foreground' }, formatted),
       ])
     },
   },
@@ -228,7 +237,7 @@ export const problemsColumns: ColumnDef<ProblemCard>[] = [
           console.log('View solutions:', problem.id)
           // 这里可以添加查看题解逻辑
           // router.push(`/problems/${problem.id}/solutions`)
-        }
+        },
       })
     },
   },

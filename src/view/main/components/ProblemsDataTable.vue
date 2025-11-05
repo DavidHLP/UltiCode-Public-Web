@@ -60,18 +60,18 @@ const table = useVueTable({
     get columnFilters() {
       return columnFilters.value
     },
-    get columnVisibility() {
-      return columnVisibility.value
-    },
-    get rowSelection() {
-      return rowSelection.value
-    },
+    // get columnVisibility() {
+    //   return columnVisibility.value
+    // },
+    // get rowSelection() {
+    //   return rowSelection.value
+    // },
   },
   enableRowSelection: true,
-  onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
-  onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
-  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
-  onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
+  // onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
+  // onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
+  // onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
+  // onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
   getCoreRowModel: getCoreRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
   getPaginationRowModel: getPaginationRowModel(),

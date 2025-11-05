@@ -58,7 +58,7 @@ function getColumnDisplayName(columnId: string): string {
         :key="column.id"
         class="capitalize"
         :model-value="column.getIsVisible()"
-        @update:model-value="(value) => column.toggleVisibility(!!value)"
+        @update:model-value="(value) => column.toggleVisibility(value)"
       >
         {{ getColumnDisplayName(column.id) }}
       </DropdownMenuCheckboxItem>

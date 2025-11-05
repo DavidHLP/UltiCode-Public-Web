@@ -3,13 +3,13 @@ export const description = '用于登录 UltiCode 管理控制台的表单页面
 </script>
 
 <script setup lang="ts">
-import {computed, reactive, ref} from 'vue'
-import {useRoute, useRouter, RouterLink} from 'vue-router'
-import {GalleryVerticalEnd, Loader2} from 'lucide-vue-next'
-import {Button} from '@/components/ui/button'
-import {Input} from '@/components/ui/input'
-import {Label} from '@/components/ui/label'
-import {useAuthStore} from '@/stores/auth'
+import { computed, reactive, ref } from 'vue'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { GalleryVerticalEnd, Loader2 } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAuthStore } from '@/stores/auth'
 
 interface LoginFormState {
   identifier: string
@@ -80,7 +80,7 @@ async function handleSubmit() {
           <div
             class="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground"
           >
-            <GalleryVerticalEnd class="size-4"/>
+            <GalleryVerticalEnd class="size-4" />
           </div>
           UltiCode
         </RouterLink>
@@ -90,13 +90,13 @@ async function handleSubmit() {
           <form class="flex flex-col gap-6" @submit.prevent="handleSubmit">
             <div class="flex flex-col gap-2 text-center">
               <h1 class="text-2xl font-bold">欢迎回来</h1>
-              <p class="text-muted-foreground text-sm">
-                使用注册时的邮箱或用户名登录 UltiCode
-              </p>
+              <p class="text-muted-foreground text-sm">使用注册时的邮箱或用户名登录 UltiCode</p>
             </div>
 
-            <div v-if="errorMessage"
-                 class="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+            <div
+              v-if="errorMessage"
+              class="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
+            >
               {{ errorMessage }}
             </div>
 
@@ -123,7 +123,7 @@ async function handleSubmit() {
                 />
               </div>
               <Button :disabled="loading" type="submit">
-                <Loader2 v-if="loading" class="mr-2 size-4 animate-spin"/>
+                <Loader2 v-if="loading" class="mr-2 size-4 animate-spin" />
                 登录
               </Button>
             </div>
@@ -131,7 +131,10 @@ async function handleSubmit() {
             <p class="text-center text-sm text-muted-foreground">
               还没有账号？
               <RouterLink
-                :to="{ name: 'register', query: route.query.redirect ? { redirect: route.query.redirect } : undefined }"
+                :to="{
+                  name: 'register',
+                  query: route.query.redirect ? { redirect: route.query.redirect } : undefined,
+                }"
                 class="underline underline-offset-4"
               >
                 立即注册

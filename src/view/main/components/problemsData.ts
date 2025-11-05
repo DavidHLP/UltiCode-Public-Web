@@ -4,19 +4,19 @@ export const difficultyOptions = [
     label: '简单',
     value: 'easy',
     icon: null,
-    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
   },
   {
     label: '中等',
     value: 'medium',
     icon: null,
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
   },
   {
     label: '困难',
     value: 'hard',
     icon: null,
-    color: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
+    color: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
   },
 ]
 
@@ -26,19 +26,19 @@ export const problemStatuses = [
     value: 'unsolved',
     label: '未解决',
     icon: null,
-    color: 'bg-gray-100 text-gray-700 dark:bg-gray-500/10 dark:text-gray-300'
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-500/10 dark:text-gray-300',
   },
   {
     value: 'solved',
     label: '已解决',
     icon: null,
-    color: 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-300'
+    color: 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-300',
   },
   {
     value: 'attempted',
     label: '尝试过',
     icon: null,
-    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300'
+    color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-300',
   },
 ]
 
@@ -90,11 +90,4 @@ export const companyOptions = [
 export const pageSizeOptions = [10, 20, 30, 40, 50, 100]
 
 // 默认显示列配置
-export const defaultVisibleColumns = [
-  'select',
-  'id',
-  'title',
-  'difficulty',
-  'tags',
-  'actions'
-]
+export const defaultVisibleColumns = ['select', 'id', 'title', 'difficulty', 'tags', 'actions']
