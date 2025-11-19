@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ProblemView from '@/view/problems/components/ProblemView.vue'
 import { Button } from '@/components/ui/button'
@@ -14,38 +14,62 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { ProblemListItem } from '@/mocks/schema/problem-list'
-import { fetchProblemListItem, getProblemsByListId, getProblemListStats } from '@/mocks/api/problem-list'
+import type { ProblemListItem, ProblemListStats } from '@/mocks/schema/problem-list'
+import type { Problem } from '@/mocks/schema/problem'
+import { fetchProblemListItem, fetchProblemListStats, fetchProblemsByListId } from '@/api/problem-list'
 
 const route = useRoute()
 const listId = computed(() => route.params.id as string)
 
 // 获取当前列表的详细信息
-const currentList = computed<ProblemListItem | null>(() => {
-  if (!listId.value) return null
-  return fetchProblemListItem(listId.value) ?? null
-})
+const currentList = ref<ProblemListItem | null>(null)
+const problems = ref<Problem[]>([])
+const stats = ref<ProblemListStats | null>(null)
+const emptyStats = computed<ProblemListStats>(() => ({
+  listId: listId.value || '',
+  totalCount: 0,
+  solvedCount: 0,
+  attemptedCount: 0,
+  todoCount: 0,
+  progress: 0,
+}))
+const safeStats = computed<ProblemListStats>(() => stats.value ?? emptyStats.value)
 
-// 获取当前列表的问题
-const problems = computed(() => {
-  if (!listId.value) return []
-  return getProblemsByListId(listId.value)
-})
+async function loadProblemList(id?: string) {
+  if (!id) {
+    currentList.value = null
+    problems.value = []
+    stats.value = null
+    return
+  }
+  try {
+    currentList.value = await fetchProblemListItem(id)
+  } catch (error) {
+    console.error('Failed to load problem list', error)
+    currentList.value = null
+  }
+  try {
+    problems.value = await fetchProblemsByListId(id)
+  } catch (error) {
+    console.error('Failed to load problems for list', error)
+    problems.value = []
+  }
+  try {
+    const allStats = await fetchProblemListStats()
+    stats.value = allStats.find((s) => s.listId === id) ?? emptyStats.value
+  } catch (error) {
+    console.error('Failed to load list stats', error)
+    stats.value = emptyStats.value
+  }
+}
 
-// 获取统计信息
-const stats = computed(() => {
-  const allStats = getProblemListStats()
-  return (
-    allStats.find((s) => s.listId === listId.value) ?? {
-      listId: listId.value,
-      totalCount: 0,
-      solvedCount: 0,
-      attemptedCount: 0,
-      todoCount: 0,
-      progress: 0,
-    }
-  )
-})
+watch(
+  listId,
+  (id) => {
+    void loadProblemList(id)
+  },
+  { immediate: true },
+)
 
 // 格式化日期
 const formatDate = (date?: Date) => {
@@ -74,7 +98,7 @@ const momentumColorScale = computed(() => [
 ])
 
 const statusDistribution = computed(() => {
-  const current = stats.value
+  const current = safeStats.value
   return [
     { label: 'Solved', value: current.solvedCount },
     { label: 'Attempted', value: current.attemptedCount },
@@ -186,23 +210,23 @@ const percentAxisFormatter = (value: number | Date) => {
         <div class="flex items-center gap-6 text-sm">
           <div class="flex items-center gap-2">
             <span class="text-muted-foreground">Total:</span>
-            <span class="font-semibold">{{ stats?.totalCount || 0 }}</span>
+            <span class="font-semibold">{{ safeStats.totalCount }}</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-muted-foreground">Solved:</span>
-            <span class="chart-solved font-semibold">{{ stats?.solvedCount || 0 }}</span>
+            <span class="chart-solved font-semibold">{{ safeStats.solvedCount }}</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-muted-foreground">Attempted:</span>
-            <span class="chart-attempted font-semibold">{{ stats?.attemptedCount || 0 }}</span>
+            <span class="chart-attempted font-semibold">{{ safeStats.attemptedCount }}</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-muted-foreground">Todo:</span>
-            <span class="chart-todo font-semibold">{{ stats?.todoCount || 0 }}</span>
+            <span class="chart-todo font-semibold">{{ safeStats.todoCount }}</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-muted-foreground">Progress:</span>
-            <span class="font-semibold">{{ stats.progress.toFixed(1) }}%</span>
+            <span class="font-semibold">{{ safeStats.progress.toFixed(1) }}%</span>
           </div>
         </div>
 

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { Badge } from '@/components/ui/badge'
 
-import type { SubmissionRecord } from '@/mocks/api/submission'
+import type { SubmissionRecord } from '@/mocks/schema/submission'
 import { Loader2 } from 'lucide-vue-next'
 import {
   Table,

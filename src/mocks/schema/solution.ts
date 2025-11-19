@@ -57,3 +57,11 @@ export interface SolutionFeedMeta extends SolutionFeedMetaRow {
 export interface SolutionFeedItem extends ProblemApproach, SolutionFeedMeta {
   tags: string[]
 }
+
+export interface SolutionFeedResponse {
+  items: SolutionFeedItem[]
+  languageOptions: Array<{ label: string; value: string }>
+  topicOptions: Array<{ label: string; value: string }>
+  quickFilterOptions: Array<{ label: string; value: string }>
+  sortOptions: Array<{ label: string; value: string }>
+}

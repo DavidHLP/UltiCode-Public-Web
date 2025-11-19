@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/menubar'
 import { Bookmark, ChevronLeft, ChevronRight, Shuffle, ThumbsDown, ThumbsUp } from 'lucide-vue-next'
 import logoIcon from '@/ico/favicon.ico'
-import type { ProblemDetail } from '@/mocks/api/problem-detail'
+import type { ProblemDetail } from '@/mocks/schema/problem-detail'
 
 const props = defineProps<{
   problem: ProblemDetail

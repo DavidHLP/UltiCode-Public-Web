@@ -2,8 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import SubmissionsListView from './SubmissionsListView.vue'
 import SubmissionsDetail from './SubmissionsDetail.vue'
-import type { SubmissionRecord } from '@/mocks/api/submission'
-import { fetchProblemSubmissions } from '@/mocks/api/submission'
+import type { SubmissionRecord } from '@/mocks/schema/submission'
+import { fetchProblemSubmissions } from '@/api/submission'
 
 const props = defineProps<{
   problemId: number
@@ -17,17 +17,23 @@ const selectedSubmission = computed(() =>
   submissions.value.find((submission) => submission.id === selectedSubmissionId.value) ?? null,
 )
 
-const loadSubmissions = () => {
+const loadSubmissions = async () => {
   isLoading.value = true
-  submissions.value = fetchProblemSubmissions(props.problemId)
-  isLoading.value = false
+  try {
+    submissions.value = await fetchProblemSubmissions(props.problemId)
+  } catch (error) {
+    console.error('Failed to load submissions', error)
+    submissions.value = []
+  } finally {
+    isLoading.value = false
+  }
 }
 
 watch(
   () => props.problemId,
   () => {
     selectedSubmissionId.value = null
-    loadSubmissions()
+    void loadSubmissions()
   },
   { immediate: true },
 )

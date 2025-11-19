@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { ForumFlairType, ForumPost } from '@/mocks/schema/forum'
+import type {
+  ForumFlairType,
+  ForumPost,
+  ForumCommunity,
+  ForumModerator,
+  ForumTrendingTopic,
+} from '@/mocks/schema/forum'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -14,23 +20,47 @@ import {
 import { ChevronsUpDown } from 'lucide-vue-next'
 import ForumPostCard from '@/view/forum/components/ForumPostCard.vue'
 import ForumSidebar from '@/view/forum/components/ForumSidebar.vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   fetchForumCommunities,
   fetchForumModerators,
   fetchForumPosts,
   fetchForumQuickFilters,
   fetchForumTrendingTopics,
-} from '@/mocks/api/forum'
+} from '@/api/forum'
 
-const posts = fetchForumPosts()
-const trendingTopics = fetchForumTrendingTopics()
-const communities = fetchForumCommunities()
-const moderators = fetchForumModerators()
-const quickFilters = fetchForumQuickFilters()
+const posts = ref<ForumPost[]>([])
+const trendingTopics = ref<ForumTrendingTopic[]>([])
+const communities = ref<ForumCommunity[]>([])
+const moderators = ref<ForumModerator[]>([])
+const quickFilters = ref<Array<{ label: string; value: string }>>([])
+
+onMounted(async () => {
+  try {
+    const [postRows, topicRows, communityRows, moderatorRows, filters] = await Promise.all([
+      fetchForumPosts(),
+      fetchForumTrendingTopics(),
+      fetchForumCommunities(),
+      fetchForumModerators(),
+      fetchForumQuickFilters(),
+    ])
+    posts.value = postRows
+    trendingTopics.value = topicRows
+    communities.value = communityRows
+    moderators.value = moderatorRows
+    quickFilters.value = filters
+  } catch (error) {
+    console.error('Failed to load forum data', error)
+    posts.value = []
+    trendingTopics.value = []
+    communities.value = []
+    moderators.value = []
+    quickFilters.value = []
+  }
+})
 
 const searchQuery = ref('')
-const quickFilter = ref(quickFilters[0]?.value ?? 'hot')
+const quickFilter = ref('hot')
 const selectedCommunity = ref('all')
 const selectedFlair = ref<'all' | ForumFlairType>('all')
 const quickFilterLabel = computed(() => {
@@ -47,7 +77,7 @@ const quickFilterLabel = computed(() => {
 })
 const filteredPosts = computed(() => {
   const normalizedSearch = searchQuery.value.trim().toLowerCase()
-  return posts.filter((post) => {
+  return posts.value.filter((post) => {
     const matchesSearch =
       !normalizedSearch ||
       post.title.toLowerCase().includes(normalizedSearch) ||

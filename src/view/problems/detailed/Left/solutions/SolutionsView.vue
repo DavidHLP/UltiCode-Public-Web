@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { ProblemApproach } from '@/mocks/schema/problem-detail'
+import { computed, ref, watch } from 'vue'
 import type { SolutionFeedItem } from '@/mocks/schema/solution'
 import SolutionsListView from './SolutionsListView.vue'
 import SolutionsDetail from './SolutionsDetail.vue'
+import { fetchSolutionFeed } from '@/api/solution'
 
 const props = defineProps<{
-  approaches: ProblemApproach[]
+  problemId: number
   followUp: string
 }>()
 
@@ -15,6 +15,28 @@ const emit = defineEmits<{
 }>()
 
 const selectedSolution = ref<SolutionFeedItem | null>(null)
+const isLoading = ref(true)
+const feed = ref<Awaited<ReturnType<typeof fetchSolutionFeed>> | null>(null)
+
+watch(
+  () => props.problemId,
+  async (id) => {
+    if (!id) {
+      feed.value = null
+      return
+    }
+    isLoading.value = true
+    try {
+      feed.value = await fetchSolutionFeed(id)
+    } catch (error) {
+      console.error('Failed to load solution feed', error)
+      feed.value = null
+    } finally {
+      isLoading.value = false
+    }
+  },
+  { immediate: true },
+)
 const fallbackSolution = computed<SolutionFeedItem>(() => ({
   id: 'follow-up',
   title: 'Follow-up Insight',
@@ -63,7 +85,7 @@ const resetSelectedSolution = () => {
 </script>
 
 <template>
-  <div v-if="props.approaches.length" class="space-y-4">
+  <div v-if="feed?.items?.length" class="space-y-4">
     <div v-if="selectedSolution" class="space-y-4 px-5 py-4">
       <button
         type="button"
@@ -76,10 +98,17 @@ const resetSelectedSolution = () => {
     </div>
     <SolutionsListView
       v-else
-      :approaches="props.approaches"
+      :items="feed?.items ?? []"
       :follow-up="props.followUp"
+      :language-options="feed?.languageOptions ?? []"
+      :topic-options="feed?.topicOptions ?? []"
+      :quick-filter-options="feed?.quickFilterOptions ?? []"
+      :sort-options="feed?.sortOptions ?? []"
       @select="handleSelect"
     />
   </div>
-  <SolutionsDetail v-else :item="fallbackSolution" />
+  <div v-else>
+    <div v-if="isLoading" class="px-5 py-4 text-sm text-muted-foreground">Loading solutions…</div>
+    <SolutionsDetail v-else :item="fallbackSolution" />
+  </div>
 </template>

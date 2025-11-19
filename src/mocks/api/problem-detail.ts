@@ -1,6 +1,7 @@
 import type { Problem } from '@/mocks/schema/problem'
 import {
   type ProblemApproach,
+  type ProblemDetail,
   type ProblemDetailRecord,
   type ProblemExample,
   type ProblemLanguageOption,
@@ -17,10 +18,6 @@ import { fetchTestCasesByProblemId } from '@/mocks/api/test-case'
 import { fetchProblemSubmissions } from '@/mocks/api/submission'
 
 type DetailRecordFields = Omit<ProblemDetailRecord, 'problemId' | 'id'>
-
-export interface ProblemDetail extends Problem, DetailRecordFields {
-  testCases: ProblemTestCase[]
-}
 
 const detailRecords = new Map<number, ProblemDetailRecord>()
 

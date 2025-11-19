@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { ProblemApproach } from '@/mocks/schema/problem-detail'
 import type { SolutionFeedItem } from '@/mocks/schema/solution'
 import { Input } from '@/components/ui/input'
 import Menubar from '@/components/ui/menubar/Menubar.vue'
@@ -10,18 +9,15 @@ import MenubarMenu from '@/components/ui/menubar/MenubarMenu.vue'
 import MenubarTrigger from '@/components/ui/menubar/MenubarTrigger.vue'
 import SolutionsCard from './SolutionsCard.vue'
 import Separator from '@/components/ui/separator/Separator.vue'
-import {
-  fetchSolutionFeedItems,
-  fetchSolutionLanguageOptions,
-  fetchSolutionQuickFilterOptions,
-  fetchSolutionSortOptions,
-  fetchSolutionTopicOptions,
-} from '@/mocks/api/solution'
 import { ArrowDownUp, Search, SlidersHorizontal } from 'lucide-vue-next'
 
 const props = defineProps<{
-  approaches: ProblemApproach[]
+  items: SolutionFeedItem[]
   followUp: string
+  languageOptions: Array<{ label: string; value: string }>
+  topicOptions: Array<{ label: string; value: string }>
+  quickFilterOptions: Array<{ label: string; value: string }>
+  sortOptions: Array<{ label: string; value: string }>
 }>()
 
 const emit = defineEmits<{
@@ -34,13 +30,41 @@ const topicFilter = ref('all')
 const quickFilter = ref('popular')
 const sortBy = ref('likes')
 
-const quickFilterOptions = fetchSolutionQuickFilterOptions()
-const sortOptions = fetchSolutionSortOptions()
+const quickFilterOptions = computed(() =>
+  props.quickFilterOptions.length
+    ? props.quickFilterOptions
+    : [
+        { label: 'Popular', value: 'popular' },
+        { label: 'Latest', value: 'latest' },
+      ],
+)
+const sortOptions = computed(() =>
+  props.sortOptions.length
+    ? props.sortOptions
+    : [
+        { label: 'Most liked', value: 'likes' },
+        { label: 'Most recent', value: 'newest' },
+      ],
+)
 
-const feedItems = computed<SolutionFeedItem[]>(() => fetchSolutionFeedItems(props.approaches))
+const feedItems = computed<SolutionFeedItem[]>(() => props.items ?? [])
 
-const languageOptions = computed(() => fetchSolutionLanguageOptions(feedItems.value))
-const topicOptions = computed(() => fetchSolutionTopicOptions(feedItems.value))
+const languageOptions = computed(() =>
+  props.languageOptions.length
+    ? props.languageOptions
+    : [
+        { label: 'All languages', value: 'all' },
+        { label: 'Unknown', value: 'unknown' },
+      ],
+)
+const topicOptions = computed(() =>
+  props.topicOptions.length
+    ? props.topicOptions
+    : [
+        { label: 'All topics', value: 'all' },
+        { label: 'General', value: 'general' },
+      ],
+)
 
 const filteredItems = computed(() => {
   const query = search.value.trim().toLowerCase()

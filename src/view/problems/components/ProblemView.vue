@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { Problem } from '@/mocks/schema/problem'
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, onMounted, ref, watch, type Ref } from 'vue'
 import { CheckCircle2, FileEdit, Search, ListFilter, X, ChevronDown } from 'lucide-vue-next'
 import CheckIcon from '~icons/radix-icons/check'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import ProblemTable from './ProblemTable.vue'
-import { fetchProblems } from '@/mocks/api/problem'
+import { fetchProblems } from '@/api/problem'
 
 const props = defineProps<{
   problems?: Problem[]
@@ -29,8 +29,18 @@ const selectedDifficulty = ref<string[]>([])
 const showPremium = ref<boolean | null>(null)
 const problemsPerPage = 50
 const numProblemsToShow = ref(problemsPerPage)
-const fallbackProblems = fetchProblems()
-const sourceProblems = computed(() => props.problems ?? fallbackProblems)
+const fallbackProblems = ref<Problem[]>([])
+
+onMounted(async () => {
+  try {
+    fallbackProblems.value = await fetchProblems()
+  } catch (error) {
+    console.error('Failed to load problems', error)
+    fallbackProblems.value = []
+  }
+})
+
+const sourceProblems = computed(() => props.problems ?? fallbackProblems.value)
 
 // 搜索变化时，重置展示数量
 watch(searchQuery, () => {

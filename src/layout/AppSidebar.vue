@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar'
 import Calendars from '@/layout/Calendars.vue'
-import { fetchProblemLists } from '@/mocks/api/problem-list'
+import { fetchProblemLists } from '@/api/problem-list'
 import DatePicker from '@/layout/DatePicker.vue'
 import NavUser from '@/layout/NavUser.vue'
+import { onMounted, ref } from 'vue'
+import type { ProblemList } from '@/mocks/schema/problem-list'
 import {
   Sidebar,
   SidebarContent,
@@ -23,7 +25,16 @@ const data = {
   },
 }
 
-const problemLists = fetchProblemLists()
+const problemLists = ref<ProblemList[]>([])
+
+onMounted(async () => {
+  try {
+    problemLists.value = await fetchProblemLists()
+  } catch (error) {
+    console.error('Failed to load problem lists', error)
+    problemLists.value = []
+  }
+})
 </script>
 
 <template>

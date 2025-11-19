@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import CodeView from '@/components/code/CodeView.vue'
-import type { SubmissionRecord } from '@/mocks/api/submission'
+import type { SubmissionRecord } from '@/mocks/schema/submission'
 import { ArrowLeft } from 'lucide-vue-next'
 
 const props = defineProps<{

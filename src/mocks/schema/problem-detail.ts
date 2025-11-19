@@ -1,4 +1,4 @@
-import type { ProblemId } from '@/mocks/schema/problem'
+import type { Problem, ProblemId } from '@/mocks/schema/problem'
 
 export type ProblemDetailId = string
 export type ProblemExampleId = string
@@ -118,4 +118,11 @@ export interface ProblemDetailRecord extends ProblemDetailRow {
   languages: ProblemLanguageOption[]
   starterNotes: string[]
   recentResults: ProblemTestResult[]
+}
+
+export interface ProblemDetail
+  extends Problem,
+    Omit<ProblemDetailRecord, 'id' | 'problemId' | 'submissions'> {
+  submissions: ProblemSubmission[]
+  testCases: ProblemTestCase[]
 }

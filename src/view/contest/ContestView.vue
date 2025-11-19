@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type {
   ContestCrewMember,
   ContestEvent,
@@ -9,6 +9,9 @@ import type {
   ContestOpsStatus,
   ContestStatus,
   ContestTrack,
+  ContestResource,
+  ContestFaqItem,
+  ContestInsight,
 } from '@/mocks/schema/contest'
 import {
   fetchContestCrew,
@@ -20,7 +23,7 @@ import {
   fetchContestResources,
   fetchContestSchedule,
   fetchContestTracks,
-} from '@/mocks/api/contest'
+} from '@/api/contest'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -60,15 +63,56 @@ import ContestResourcesPanel from './components/ContestResourcesPanel.vue'
 import ContestCrewDesk from './components/ContestCrewDesk.vue'
 import ContestFaqPanel from './components/ContestFaqPanel.vue'
 
-const heroEvent = fetchContestFeaturedEvent()
-const contestScheduleData = fetchContestSchedule()
-const contestInsightsData = fetchContestInsights()
-const contestLeaderboardData = fetchContestLeaderboard()
-const contestTracksData = fetchContestTracks()
-const contestResourcesData = fetchContestResources()
-const contestFaqData = fetchContestFaq()
-const contestOpsData = fetchContestOpsCheckpoints()
-const contestCrewData = fetchContestCrew()
+const heroEvent = ref<ContestEvent | null>(null)
+const contestScheduleData = ref<ContestEvent[]>([])
+const contestInsightsData = ref<ContestInsight[]>([])
+const contestLeaderboardData = ref<ContestLeaderboardEntry[]>([])
+const contestTracksData = ref<ContestTrack[]>([])
+const contestResourcesData = ref<ContestResource[]>([])
+const contestFaqData = ref<ContestFaqItem[]>([])
+const contestOpsData = ref<ContestOpsCheckpoint[]>([])
+const contestCrewData = ref<ContestCrewMember[]>([])
+const isContestLoading = ref(true)
+
+onMounted(async () => {
+  isContestLoading.value = true
+  try {
+    const [
+      hero,
+      schedule,
+      insights,
+      leaderboard,
+      tracks,
+      resources,
+      faqs,
+      ops,
+      crew,
+    ] = await Promise.all([
+      fetchContestFeaturedEvent(),
+      fetchContestSchedule(),
+      fetchContestInsights(),
+      fetchContestLeaderboard(),
+      fetchContestTracks(),
+      fetchContestResources(),
+      fetchContestFaq(),
+      fetchContestOpsCheckpoints(),
+      fetchContestCrew(),
+    ])
+    heroEvent.value = hero
+    contestScheduleData.value = schedule
+    contestInsightsData.value = insights
+    contestLeaderboardData.value = leaderboard
+    contestTracksData.value = tracks
+    contestResourcesData.value = resources
+    contestFaqData.value = faqs
+    contestOpsData.value = ops
+    contestCrewData.value = crew
+  } catch (error) {
+    console.error('Failed to load contest data', error)
+  } finally {
+    isContestLoading.value = false
+  }
+})
 
 const tabValue = ref('plan')
 const tabItems = [
@@ -104,13 +148,15 @@ const manageMode = ref<'solo' | 'team'>('solo')
 const manageRegistered = ref(false)
 const registrationState = ref<Record<string, { mode: 'solo' | 'team'; registered: boolean }>>({})
 
+const heroEventData = computed(() => heroEvent.value ?? contestScheduleData.value[0] ?? null)
+
 const activeTabDescription = computed(
   () => tabItems.find((tab) => tab.value === tabValue.value)?.description ?? '',
 )
 
 const filteredSchedule = computed(() => {
   const normalizedSearch = searchQuery.value.trim().toLowerCase()
-  return contestScheduleData.filter((event) => {
+  return contestScheduleData.value.filter((event) => {
     const matchesSearch =
       !normalizedSearch ||
       event.title.toLowerCase().includes(normalizedSearch) ||
@@ -158,7 +204,7 @@ const statusesToRender = computed<ContestStatus[]>(() => {
 })
 
 const leaderboardGroups = computed(() => {
-  const map = contestLeaderboardData.reduce<Record<string, ContestLeaderboardEntry[]>>( 
+  const map = contestLeaderboardData.value.reduce<Record<string, ContestLeaderboardEntry[]>>(
     (acc, entry) => {
       if (!acc[entry.divisionTag]) {
         acc[entry.divisionTag] = []
@@ -176,16 +222,19 @@ const leaderboardGroups = computed(() => {
 })
 
 const heroRegistrationPct = computed(() => {
-  if (!heroEvent.registration.slots) return 0
+  const hero = heroEventData.value
+  if (!hero || !hero.registration.slots) return 0
   return Math.min(
     100,
-    Math.round((heroEvent.registration.registered / heroEvent.registration.slots) * 100),
+    Math.round((hero.registration.registered / hero.registration.slots) * 100),
   )
 })
 
 const heroCountdownLabel = computed(() => {
-  if (heroEvent.status === 'live') return 'Live now'
-  const diffMs = new Date(heroEvent.startTime).valueOf() - Date.now()
+  const hero = heroEventData.value
+  if (!hero) return 'Loading...'
+  if (hero.status === 'live') return 'Live now'
+  const diffMs = new Date(hero.startTime).valueOf() - Date.now()
   if (diffMs <= 0) return 'Starting shortly'
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
   const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
@@ -274,7 +323,7 @@ const opsByPhase = computed(() => {
     live: [],
     post: [],
   }
-  contestOpsData.forEach((checkpoint) => {
+  contestOpsData.value.forEach((checkpoint) => {
     grouped[checkpoint.category].push(checkpoint)
   })
   return opsPhaseOrder
@@ -288,7 +337,7 @@ const opsByPhase = computed(() => {
 })
 
 const crewMembers = computed<ContestCrewMember[]>(() => {
-  return [...contestCrewData].sort((a, b) => a.name.localeCompare(b.name))
+  return [...contestCrewData.value].sort((a, b) => a.name.localeCompare(b.name))
 })
 
 const isEventRegistered = (id: string) => registrationState.value[id]?.registered ?? false
@@ -355,13 +404,20 @@ const canConfirmEntry = computed(() => {
     <div class="mx-auto w-full max-w-6xl space-y-8 px-4 py-4 lg:px-10">
       <section class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
         <ContestHero
-          :event="heroEvent"
+          v-if="heroEventData"
+          :event="heroEventData"
           :registration-pct="heroRegistrationPct"
           :countdown-label="heroCountdownLabel"
           :format-date="formatContestDate"
           :format-time="formatContestTime"
           :format-duration="formatDuration"
         />
+        <div
+          v-else
+          class="flex min-h-[260px] items-center justify-center rounded-3xl border border-dashed border-muted-foreground/30 bg-muted/20 text-sm text-muted-foreground"
+        >
+          Loading featured contest...
+        </div>
         <ContestHealthPanel :insights="contestInsightsData" />
       </section>
 

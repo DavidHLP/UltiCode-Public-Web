@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-import type { ProblemDetail } from '@/mocks/api/problem-detail'
-import { fetchProblemDetailById } from '@/mocks/api/problem-detail'
-import { fetchProblemRunResultByProblemId } from '@/mocks/api/test-results'
+import type { ProblemDetail } from '@/mocks/schema/problem-detail'
+import type { ProblemRunResult } from '@/mocks/schema/test-results'
+import { fetchProblemDetailById } from '@/api/problem-detail'
+import { fetchProblemRunResultByProblemId } from '@/api/test-results'
 import DescriptionView from './Left/DescriptionView.vue'
 import SolutionsView from './Left/solutions/SolutionsView.vue'
 import SubmissionsView from './Left/submissions/SubmissionsView.vue'
@@ -19,17 +20,34 @@ import HeaderView from './components/HeaderView.vue'
 const route = useRoute()
 
 const problem = ref<ProblemDetail | null>(null)
+const runResult = ref<ProblemRunResult | null>(null)
 
-const runResult = computed(() => {
-  if (!problem.value) return null
-  return fetchProblemRunResultByProblemId(problem.value.id)
-})
+watch(
+  () => problem.value?.id,
+  async (id) => {
+    if (!id) {
+      runResult.value = null
+      return
+    }
+    try {
+      runResult.value = await fetchProblemRunResultByProblemId(id)
+    } catch (error) {
+      console.error('Failed to load run result', error)
+      runResult.value = null
+    }
+  },
+)
 
-onMounted(() => {
+onMounted(async () => {
   const idParam = route.params.id
   const numericId = typeof idParam === 'string' ? Number.parseInt(idParam, 10) : Number(idParam)
   const safeId = Number.isFinite(numericId) ? numericId : 1
-  problem.value = fetchProblemDetailById(safeId)
+  try {
+    problem.value = await fetchProblemDetailById(safeId)
+  } catch (error) {
+    console.error('Failed to load problem detail', error)
+    problem.value = null
+  }
 })
 </script>
 
@@ -59,7 +77,7 @@ onMounted(() => {
                   <ScrollArea class="h-full pr-3">
                     <div class="px-1 py-2">
                       <SolutionsView
-                        :approaches="problem.approaches"
+                        :problem-id="problem.id"
                         :follow-up="problem.followUp"
                       />
                     </div>

@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Eye, MessageCircle, Triangle } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { renderMarkdown } from '@/lib/markdown'
-import type { ProblemDetail } from '@/mocks/api/problem-detail'
-import { fetchProblemDetailById } from '@/mocks/api/problem-detail'
-import { fetchSolutionFeedItems } from '@/mocks/api/solution'
+import type { ProblemDetail } from '@/mocks/schema/problem-detail'
+import { fetchProblemDetailById } from '@/api/problem-detail'
+import { fetchSolutionFeed } from '@/api/solution'
 import type { SolutionFeedItem } from '@/mocks/schema/solution'
 
 const route = useRoute()
 const router = useRouter()
 
 const problem = ref<ProblemDetail | null>(null)
+const solutionItems = ref<SolutionFeedItem[]>([])
 const isLoading = ref(true)
 
 const problemId = computed(() => {
@@ -25,17 +26,27 @@ const problemId = computed(() => {
 
 const solutionId = computed(() => String(route.params.solutionId ?? ''))
 
-watchEffect(() => {
-  isLoading.value = true
-  const detail = fetchProblemDetailById(problemId.value)
-  problem.value = detail
-  isLoading.value = false
-})
+watch(
+  problemId,
+  async (id) => {
+    isLoading.value = true
+    try {
+      problem.value = await fetchProblemDetailById(id)
+      const feedResponse = await fetchSolutionFeed(id)
+      solutionItems.value = feedResponse.items
+    } catch (error) {
+      console.error('Failed to load solution detail', error)
+      problem.value = null
+      solutionItems.value = []
+    } finally {
+      isLoading.value = false
+    }
+  },
+  { immediate: true },
+)
 
 const solution = computed<SolutionFeedItem | null>(() => {
-  if (!problem.value) return null
-  const feed = fetchSolutionFeedItems(problem.value.approaches)
-  return feed.find((item) => item.id === solutionId.value) ?? null
+  return solutionItems.value.find((item) => item.id === solutionId.value) ?? null
 })
 
 const authorInitial = computed(() => solution.value?.author.name.charAt(0)?.toUpperCase() ?? '?')

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
 import { renderMarkdown } from '@/lib/markdown'
-import type { ProblemDetail } from '@/mocks/api/problem-detail'
+import type { ProblemDetail } from '@/mocks/schema/problem-detail'
 
 const props = defineProps<{
   problem: ProblemDetail

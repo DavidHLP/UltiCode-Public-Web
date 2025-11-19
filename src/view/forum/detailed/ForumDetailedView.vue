@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { ForumFlairType, ForumThread } from '@/mocks/schema/forum'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { fetchForumThread, createForumComment } from '@/mocks/api/forum'
+import { fetchForumThread, createForumComment } from '@/api/forum'
 import { MessageSquare } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import ThreadHeader from '@/view/forum/detailed/components/ThreadHeader.vue'
 import ThreadMedia from '@/view/forum/detailed/components/ThreadMedia.vue'
@@ -12,9 +12,29 @@ import ThreadActions from '@/view/forum/detailed/components/ThreadActions.vue'
 import ThreadComments from '@/view/forum/detailed/components/ThreadComments.vue'
 
 const route = useRoute()
-const postId = route.params.postId as string
-const threadRef = ref<ForumThread>(fetchForumThread(postId))
-const thread = computed(() => threadRef.value)
+const thread = ref<ForumThread | null>(null)
+const isLoading = ref(true)
+
+async function loadThread(postId: string) {
+  if (!postId) return
+  isLoading.value = true
+  try {
+    thread.value = await fetchForumThread(postId)
+  } catch (error) {
+    console.error('Failed to load forum thread', error)
+    thread.value = null
+  } finally {
+    isLoading.value = false
+  }
+}
+
+watch(
+  () => route.params.postId as string,
+  (postId) => {
+    void loadThread(postId)
+  },
+  { immediate: true },
+)
 
 const flairClasses: Record<ForumFlairType, string> = {
   announcement: 'bg-amber-100 text-amber-700',
@@ -24,21 +44,23 @@ const flairClasses: Record<ForumFlairType, string> = {
   hiring: 'bg-orange-100 text-orange-700',
 }
 
-const createdAgo = computed(() => formatRelativeTime(thread.value.post.createdAt))
-const recommendationLabel = computed(() => thread.value.post.recommendation?.label ?? '')
-const media = computed(() => thread.value.post.media)
-const awards = computed(() => thread.value.post.awards ?? [])
+const createdAgo = computed(() =>
+  thread.value ? formatRelativeTime(thread.value.post.createdAt) : '',
+)
+const recommendationLabel = computed(() => thread.value?.post.recommendation?.label ?? '')
+const media = computed(() => thread.value?.post.media)
+const awards = computed(() => thread.value?.post.awards ?? [])
 const upvoteRatioDisplay = computed(() =>
-  typeof thread.value.post.stats.upvoteRatio === 'number'
+  typeof thread.value?.post.stats.upvoteRatio === 'number'
     ? `${Math.round(thread.value.post.stats.upvoteRatio * 100)}%`
     : undefined,
 )
 const viewsDisplay = computed(() =>
-  typeof thread.value.post.stats.views === 'number'
+  typeof thread.value?.post.stats.views === 'number'
     ? formatCount(thread.value.post.stats.views)
     : undefined,
 )
-const voteState = computed(() => thread.value.post.voteState ?? 'neutral')
+const voteState = computed(() => thread.value?.post.voteState ?? 'neutral')
 const voteLabel = computed(() =>
   voteState.value === 'upvoted'
     ? 'Upvoted'
@@ -46,11 +68,21 @@ const voteLabel = computed(() =>
       ? 'Downvoted'
       : 'Upvote',
 )
-const scoreDisplay = computed(() => formatCount(thread.value.post.stats.score))
-const commentsDisplay = computed(() => formatCount(thread.value.post.stats.comments))
-const awardsDisplay = computed(() => formatCount(thread.value.post.stats.awards))
-const savesDisplay = computed(() => formatCount(thread.value.post.stats.saves))
-const sharesDisplay = computed(() => formatCount(thread.value.post.stats.shares))
+const scoreDisplay = computed(() =>
+  thread.value ? formatCount(thread.value.post.stats.score) : '0',
+)
+const commentsDisplay = computed(() =>
+  thread.value ? formatCount(thread.value.post.stats.comments) : '0',
+)
+const awardsDisplay = computed(() =>
+  thread.value ? formatCount(thread.value.post.stats.awards) : '0',
+)
+const savesDisplay = computed(() =>
+  thread.value ? formatCount(thread.value.post.stats.saves) : '0',
+)
+const sharesDisplay = computed(() =>
+  thread.value ? formatCount(thread.value.post.stats.shares) : '0',
+)
 
 function formatCount(value: number) {
   if (value >= 1000) return `${(value / 1000).toFixed(1).replace(/\.0$/, '')}k`
@@ -76,9 +108,10 @@ function formatRelativeTime(value: string) {
   return 'just now'
 }
 
-function onSubmitComment(body: string) {
-  createForumComment(postId, body, null)
-  threadRef.value = fetchForumThread(postId)
+async function onSubmitComment(body: string) {
+  const postId = route.params.postId as string
+  await createForumComment(postId, body, null)
+  await loadThread(postId)
 }
 </script>
 
@@ -93,57 +126,67 @@ function onSubmitComment(body: string) {
       </RouterLink>
     </div>
 
-    <Card class="rounded-xl border border-border/50 bg-background/70 shadow-none">
-      <CardHeader class="pb-2">
-        <CardTitle class="text-xl">{{ thread.post.title }}</CardTitle>
-      </CardHeader>
-      <CardContent class="space-y-4">
-        <ThreadHeader
-          :post="thread.post"
-          :created-ago="createdAgo"
-          :flair-classes="flairClasses"
-          :upvote-ratio-display="upvoteRatioDisplay"
-          :views-display="viewsDisplay"
-        />
-        <p v-if="recommendationLabel" class="text-xs text-muted-foreground">
-          {{ recommendationLabel }}
-        </p>
+    <div v-if="isLoading" class="rounded-xl border border-dashed border-muted p-6 text-sm text-muted-foreground">
+      Loading thread…
+    </div>
 
-        <section v-if="thread.post.excerpt" class="text-sm text-muted-foreground">
-          {{ thread.post.excerpt }}
-        </section>
+    <template v-else-if="thread">
+      <Card class="rounded-xl border border-border/50 bg-background/70 shadow-none">
+        <CardHeader class="pb-2">
+          <CardTitle class="text-xl">{{ thread.post.title }}</CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <ThreadHeader
+            :post="thread.post"
+            :created-ago="createdAgo"
+            :flair-classes="flairClasses"
+            :upvote-ratio-display="upvoteRatioDisplay"
+            :views-display="viewsDisplay"
+          />
+          <p v-if="recommendationLabel" class="text-xs text-muted-foreground">
+            {{ recommendationLabel }}
+          </p>
 
-        <ThreadMedia :media="media" :title="thread.post.title" />
+          <section v-if="thread.post.excerpt" class="text-sm text-muted-foreground">
+            {{ thread.post.excerpt }}
+          </section>
 
-        <ThreadAwards v-if="awards.length" :awards="awards" />
-      </CardContent>
-      <CardFooter class="flex flex-wrap items-center gap-2 border-t border-border/50 px-4 py-3">
-        <ThreadActions
-          :vote-state="voteState"
-          :vote-label="voteLabel"
-          :score-display="scoreDisplay"
-          :comments-display="commentsDisplay"
-          :awards-display="awardsDisplay"
-          :shares-display="sharesDisplay"
-          :saves-display="savesDisplay"
-        />
-      </CardFooter>
-    </Card>
+          <ThreadMedia :media="media" :title="thread.post.title" />
 
-    <Card class="border-border/60 bg-card/60">
-      <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
-        <CardTitle class="flex items-center gap-2 text-sm font-semibold">
-          <MessageSquare class="h-4 w-4 text-blue-500" />
-          Comments
-        </CardTitle>
-      </CardHeader>
-      <CardContent class="p-4">
-        <ThreadComments
-          :comments="thread.comments"
-          :is-locked="thread.post.isLocked"
-          @submit="onSubmitComment"
-        />
-      </CardContent>
-    </Card>
+          <ThreadAwards v-if="awards.length" :awards="awards" />
+        </CardContent>
+        <CardFooter class="flex flex-wrap items-center gap-2 border-t border-border/50 px-4 py-3">
+          <ThreadActions
+            :vote-state="voteState"
+            :vote-label="voteLabel"
+            :score-display="scoreDisplay"
+            :comments-display="commentsDisplay"
+            :awards-display="awardsDisplay"
+            :shares-display="sharesDisplay"
+            :saves-display="savesDisplay"
+          />
+        </CardFooter>
+      </Card>
+
+      <Card class="border-border/60 bg-card/60">
+        <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
+          <CardTitle class="flex items-center gap-2 text-sm font-semibold">
+            <MessageSquare class="h-4 w-4 text-blue-500" />
+            Comments
+          </CardTitle>
+        </CardHeader>
+        <CardContent class="p-4">
+          <ThreadComments
+            :comments="thread.comments"
+            :is-locked="thread.post.isLocked"
+            @submit="onSubmitComment"
+          />
+        </CardContent>
+      </Card>
+    </template>
+
+    <div v-else class="rounded-xl border border-dashed border-destructive/40 bg-destructive/5 p-6 text-sm text-destructive">
+      Failed to load thread.
+    </div>
   </div>
 </template>

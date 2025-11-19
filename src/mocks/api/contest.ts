@@ -37,7 +37,13 @@ export function fetchContestFeaturedEvent(): ContestEvent {
 }
 
 export function fetchContestInsights(): ContestInsight[] {
-  return mapRows(contestData.insights as ContestInsightRow[], ({ contestId, ...row }) => row)
+  return mapRows(
+    contestData.insights as ContestInsightRow[],
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
+  )
 }
 
 export function fetchContestSchedule(): ContestEvent[] {
@@ -47,26 +53,59 @@ export function fetchContestSchedule(): ContestEvent[] {
 export function fetchContestLeaderboard(): ContestLeaderboardEntry[] {
   return mapRows(
     contestData.leaderboard as ContestLeaderboardEntryRow[],
-    ({ contestId, ...row }) => row,
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
   )
 }
 
 export function fetchContestTracks(): ContestTrack[] {
-  return mapRows(contestData.tracks as ContestTrackRow[], ({ contestId, ...row }) => row)
+  return mapRows(
+    contestData.tracks as ContestTrackRow[],
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
+  )
 }
 
 export function fetchContestResources(): ContestResource[] {
-  return mapRows(contestData.resources as ContestResourceRow[], ({ contestId, ...row }) => row)
+  return mapRows(
+    contestData.resources as ContestResourceRow[],
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
+  )
 }
 
 export function fetchContestFaq(): ContestFaqItem[] {
-  return mapRows(contestData.faqs as ContestFaqRow[], ({ contestId, ...row }) => row)
+  return mapRows(
+    contestData.faqs as ContestFaqRow[],
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
+  )
 }
 
 export function fetchContestOpsCheckpoints(): ContestOpsCheckpoint[] {
-  return mapRows(contestData.ops as ContestOpsCheckpointRow[], ({ contestId, ...row }) => row)
+  return mapRows(
+    contestData.ops as ContestOpsCheckpointRow[],
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
+  )
 }
 
 export function fetchContestCrew(): ContestCrewMember[] {
-  return mapRows(contestData.crew as ContestCrewMemberRow[], ({ contestId, ...row }) => row)
+  return mapRows(
+    contestData.crew as ContestCrewMemberRow[],
+    ({ contestId, ...row }) => {
+      void contestId
+      return row
+    },
+  )
 }

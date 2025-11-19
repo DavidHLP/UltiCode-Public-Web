@@ -54,3 +54,12 @@ export interface ProblemListFavoriteRelationRow {
   userId: UserId
   listId: ProblemListId
 }
+
+export interface ProblemListStats {
+  listId: ProblemListId
+  totalCount: number
+  solvedCount: number
+  attemptedCount: number
+  todoCount: number
+  progress: number
+}

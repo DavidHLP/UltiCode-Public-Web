@@ -32,3 +32,5 @@ export interface SubmissionRecordRow extends ProblemSubmission {
   // Optional bin labels (ms) matching runtimeDist length
   runtimeDistBinsMs?: number[]
 }
+
+export type SubmissionRecord = SubmissionRecordRow
