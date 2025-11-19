@@ -1,0 +1,441 @@
+{
+  "groups": [
+    {
+      "id": "group-1",
+      "name": "Created by me",
+      "sortOrder": 1
+    },
+    {
+      "id": "group-2",
+      "name": "Saved by me",
+      "sortOrder": 2
+    },
+    {
+      "id": "group-3",
+      "name": "Favorites",
+      "sortOrder": 3
+    }
+  ],
+  "lists": [
+    {
+      "id": "data-structures",
+      "groupId": "group-1",
+      "name": "Data Structures",
+      "description": "Essential data structure problems",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-20T00:00:00.000Z",
+      "authorId": "u-001",
+      "isPublic": true
+    },
+    {
+      "id": "algorithms",
+      "groupId": "group-1",
+      "name": "Algorithms",
+      "description": "Core algorithm problems",
+      "createdAt": "2024-01-10T00:00:00.000Z",
+      "updatedAt": "2024-01-18T00:00:00.000Z",
+      "authorId": "u-001",
+      "isPublic": true
+    },
+    {
+      "id": "dynamic-programming",
+      "groupId": "group-1",
+      "name": "Dynamic Programming",
+      "description": "DP problems for interview preparation",
+      "createdAt": "2024-01-05T00:00:00.000Z",
+      "updatedAt": "2024-01-22T00:00:00.000Z",
+      "authorId": "u-001",
+      "isPublic": true
+    },
+    {
+      "id": "graph-theory",
+      "groupId": "group-1",
+      "name": "Graph Theory Essentials",
+      "description": "Traversal, connectivity, and scheduling drills",
+      "createdAt": "2024-01-02T00:00:00.000Z",
+      "updatedAt": "2024-01-26T00:00:00.000Z",
+      "authorId": "u-001",
+      "isPublic": true
+    },
+    {
+      "id": "two-pointers",
+      "groupId": "group-2",
+      "name": "Two Pointers",
+      "description": "Two pointers technique problems",
+      "createdAt": "2024-01-12T00:00:00.000Z",
+      "updatedAt": "2024-01-19T00:00:00.000Z",
+      "authorId": "u-002",
+      "isPublic": true
+    },
+    {
+      "id": "sliding-window",
+      "groupId": "group-2",
+      "name": "Sliding Window",
+      "description": "Sliding window pattern problems",
+      "createdAt": "2024-01-14T00:00:00.000Z",
+      "updatedAt": "2024-01-21T00:00:00.000Z",
+      "authorId": "u-002",
+      "isPublic": true
+    },
+    {
+      "id": "binary-search",
+      "groupId": "group-2",
+      "name": "Binary Search",
+      "description": "Binary search variations",
+      "createdAt": "2024-01-16T00:00:00.000Z",
+      "updatedAt": "2024-01-23T00:00:00.000Z",
+      "authorId": "u-002",
+      "isPublic": true
+    },
+    {
+      "id": "design-and-system",
+      "groupId": "group-2",
+      "name": "Design & Systems",
+      "description": "Caching, scaling, and hard design prompts",
+      "createdAt": "2024-01-18T00:00:00.000Z",
+      "updatedAt": "2024-01-27T00:00:00.000Z",
+      "authorId": "u-002",
+      "isPublic": true
+    },
+    {
+      "id": "top-interview-questions",
+      "groupId": "group-3",
+      "name": "Top Interview Questions",
+      "description": "Most frequently asked in interviews",
+      "createdAt": "2024-01-08T00:00:00.000Z",
+      "updatedAt": "2024-01-25T00:00:00.000Z",
+      "authorId": "u-002",
+      "isPublic": true
+    },
+    {
+      "id": "blind-75",
+      "groupId": "group-3",
+      "name": "Blind 75",
+      "description": "The famous Blind 75 LeetCode questions",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-24T00:00:00.000Z",
+      "authorId": "u-002",
+      "isPublic": true
+    }
+  ],
+  "problemListRelations": [
+    {
+      "listId": "data-structures",
+      "problemId": 1
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 2
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 19
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 20
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 21
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 29
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 30
+    },
+    {
+      "listId": "data-structures",
+      "problemId": 32
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 1
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 3
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 5
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 11
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 15
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 17
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 22
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 26
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 28
+    },
+    {
+      "listId": "algorithms",
+      "problemId": 31
+    },
+    {
+      "listId": "dynamic-programming",
+      "problemId": 5
+    },
+    {
+      "listId": "dynamic-programming",
+      "problemId": 10
+    },
+    {
+      "listId": "dynamic-programming",
+      "problemId": 25
+    },
+    {
+      "listId": "dynamic-programming",
+      "problemId": 32
+    },
+    {
+      "listId": "dynamic-programming",
+      "problemId": 33
+    },
+    {
+      "listId": "dynamic-programming",
+      "problemId": 34
+    },
+    {
+      "listId": "two-pointers",
+      "problemId": 11
+    },
+    {
+      "listId": "two-pointers",
+      "problemId": 15
+    },
+    {
+      "listId": "two-pointers",
+      "problemId": 16
+    },
+    {
+      "listId": "two-pointers",
+      "problemId": 19
+    },
+    {
+      "listId": "two-pointers",
+      "problemId": 21
+    },
+    {
+      "listId": "sliding-window",
+      "problemId": 3
+    },
+    {
+      "listId": "sliding-window",
+      "problemId": 18
+    },
+    {
+      "listId": "sliding-window",
+      "problemId": 35
+    },
+    {
+      "listId": "binary-search",
+      "problemId": 4
+    },
+    {
+      "listId": "binary-search",
+      "problemId": 16
+    },
+    {
+      "listId": "binary-search",
+      "problemId": 24
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 1
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 2
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 3
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 5
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 7
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 9
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 11
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 13
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 14
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 17
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 19
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 20
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 21
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 22
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 27
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 28
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 30
+    },
+    {
+      "listId": "top-interview-questions",
+      "problemId": 31
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 1
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 2
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 3
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 5
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 11
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 15
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 19
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 20
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 21
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 22
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 25
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 27
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 28
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 30
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 32
+    },
+    {
+      "listId": "blind-75",
+      "problemId": 33
+    },
+    {
+      "listId": "graph-theory",
+      "problemId": 26
+    },
+    {
+      "listId": "graph-theory",
+      "problemId": 27
+    },
+    {
+      "listId": "graph-theory",
+      "problemId": 28
+    },
+    {
+      "listId": "graph-theory",
+      "problemId": 31
+    },
+    {
+      "listId": "design-and-system",
+      "problemId": 10
+    },
+    {
+      "listId": "design-and-system",
+      "problemId": 24
+    },
+    {
+      "listId": "design-and-system",
+      "problemId": 29
+    },
+    {
+      "listId": "design-and-system",
+      "problemId": 30
+    }
+  ],
+  "savedRelations": [
+    { "userId": "u-001", "listId": "two-pointers" },
+    { "userId": "u-001", "listId": "sliding-window" },
+    { "userId": "u-001", "listId": "binary-search" },
+    { "userId": "u-001", "listId": "design-and-system" }
+  ],
+  "favoriteRelations": [
+    { "userId": "u-001", "listId": "top-interview-questions" },
+    { "userId": "u-001", "listId": "blind-75" }
+  ]
+}

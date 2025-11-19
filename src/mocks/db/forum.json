@@ -1,0 +1,1166 @@
+{
+  "communities": [
+    {
+      "id": "community-cs-careers",
+      "name": "r/cs-careers",
+      "slug": "cs-careers",
+      "icon": "💼",
+      "banner": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+      "description": "Interview prep logs, offer breakdowns, and compensation stories for software engineers.",
+      "members": 2840000,
+      "online": 18200,
+      "tags": ["Career", "Interview", "Comp"],
+      "isOfficial": true,
+      "isNew": false,
+      "accentColor": "#2563eb",
+      "foundedAt": "2014-05-01"
+    },
+    {
+      "id": "community-algorithms",
+      "name": "r/algorithms",
+      "slug": "algorithms",
+      "icon": "🧮",
+      "banner": "https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=1600&q=80",
+      "description": "Daily puzzles, competitive programming tips, and algorithm deep dives.",
+      "members": 980000,
+      "online": 8100,
+      "tags": ["DSA", "Practice", "Theory"],
+      "isOfficial": false,
+      "isNew": false,
+      "accentColor": "#7c3aed",
+      "foundedAt": "2012-09-12"
+    },
+    {
+      "id": "community-frontend",
+      "name": "r/frontend",
+      "slug": "frontend",
+      "icon": "🎨",
+      "banner": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
+      "description": "UI engineering craft, tooling chatter, and design system showcases.",
+      "members": 1540000,
+      "online": 20300,
+      "tags": ["UI", "Tooling", "CSS"],
+      "isOfficial": false,
+      "isNew": false,
+      "accentColor": "#ec4899",
+      "foundedAt": "2011-11-04"
+    },
+    {
+      "id": "community-startups",
+      "name": "r/startups",
+      "slug": "startups",
+      "icon": "🚀",
+      "banner": "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=80",
+      "description": "Founder journeys, product-market fit notes, and hiring first teammates.",
+      "members": 4100000,
+      "online": 29800,
+      "tags": ["Founder", "Growth", "Hiring"],
+      "isOfficial": false,
+      "isNew": false,
+      "accentColor": "#f97316",
+      "foundedAt": "2010-02-18"
+    },
+    {
+      "id": "community-unixporn",
+      "name": "r/unixporn",
+      "slug": "unixporn",
+      "icon": "🖥️",
+      "banner": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1600&q=80",
+      "description": "Rice your desk setups, terminal aesthetics, and dotfile inspiration.",
+      "members": 1600000,
+      "online": 12400,
+      "tags": ["Customization", "CLI", "Showcase"],
+      "isOfficial": false,
+      "isNew": false,
+      "accentColor": "#10b981",
+      "foundedAt": "2013-08-03"
+    },
+    {
+      "id": "community-leetcode",
+      "name": "r/leetcode",
+      "slug": "leetcode",
+      "icon": "🧠",
+      "banner": "https://images.unsplash.com/photo-1551836022-4c4c79ecde51?auto=format&fit=crop&w=1600&q=80",
+      "description": "Daily challenge threads, contest recaps, and study buddies.",
+      "members": 1810000,
+      "online": 19200,
+      "tags": ["Practice", "Contest", "Study"],
+      "isOfficial": false,
+      "isNew": false,
+      "accentColor": "#0ea5e9",
+      "foundedAt": "2014-01-30"
+    },
+    {
+      "id": "community-webdev",
+      "name": "r/webdev",
+      "slug": "webdev",
+      "icon": "🕸️",
+      "banner": "https://images.unsplash.com/photo-1517436073-3b1aa0e70477?auto=format&fit=crop&w=1600&q=80",
+      "description": "Frontend stacks, frameworks, performance tuning, and dev culture.",
+      "members": 2800000,
+      "online": 18700,
+      "tags": ["Frontend", "Tooling", "Career"],
+      "isOfficial": false,
+      "isNew": false,
+      "accentColor": "#6366f1",
+      "foundedAt": "2010-06-21"
+    },
+    {
+      "id": "community-opensource",
+      "name": "r/opensource",
+      "slug": "opensource",
+      "icon": "🧩",
+      "banner": "https://images.unsplash.com/photo-1524646432680-92f144fc4b37?auto=format&fit=crop&w=1600&q=80",
+      "description": "Find maintainers, contributors, and RFC swaps for open projects.",
+      "members": 980000,
+      "online": 6300,
+      "tags": ["Community", "Mentorship"],
+      "isOfficial": false,
+      "isNew": true,
+      "accentColor": "#facc15",
+      "foundedAt": "2016-03-11"
+    }
+  ],
+  "communityRules": [
+    {
+      "id": "cs-rule-01",
+      "communityId": "community-cs-careers",
+      "title": "Share compensation with context",
+      "summary": "Include role, level, location, and total comp when sharing offer details."
+    },
+    {
+      "id": "cs-rule-02",
+      "communityId": "community-cs-careers",
+      "title": "No recruiter spam",
+      "summary": "Recruiters must use the monthly megathread or flair posts with compensation."
+    },
+    {
+      "id": "algo-rule-01",
+      "communityId": "community-algorithms",
+      "title": "Show your attempt",
+      "summary": "Include pseudo-code or an explanation of where you are stuck."
+    },
+    {
+      "id": "algo-rule-02",
+      "communityId": "community-algorithms",
+      "title": "Tag difficulty",
+      "summary": "Use Beginner, Intermediate, or Advanced tags for problem posts."
+    },
+    {
+      "id": "fe-rule-01",
+      "communityId": "community-frontend",
+      "title": "Provide live demos",
+      "summary": "Link to CodePen, StackBlitz, or GitHub when asking for help."
+    },
+    {
+      "id": "fe-rule-02",
+      "communityId": "community-frontend",
+      "title": "No design shaming",
+      "summary": "Give actionable feedback and avoid hostile comments."
+    },
+    {
+      "id": "su-rule-01",
+      "communityId": "community-startups",
+      "title": "Share traction metrics",
+      "summary": "Include revenue, users, or growth numbers when asking for feedback."
+    },
+    {
+      "id": "su-rule-02",
+      "communityId": "community-startups",
+      "title": "Hiring posts need comp",
+      "summary": "List salary, equity range, and location or remote policy."
+    },
+    {
+      "id": "unix-rule-01",
+      "communityId": "community-unixporn",
+      "title": "Include dotfiles",
+      "summary": "Link to your dotfiles repo or gist when posting screenshots."
+    },
+    {
+      "id": "unix-rule-02",
+      "communityId": "community-unixporn",
+      "title": "Tag desktop environment",
+      "summary": "Use KDE, GNOME, i3, etc. tags to help others search."
+    },
+    {
+      "id": "lc-rule-01",
+      "communityId": "community-leetcode",
+      "title": "Spoiler tag contest threads",
+      "summary": "Use spoilers for solutions within 48 hours of contests."
+    },
+    {
+      "id": "lc-rule-02",
+      "communityId": "community-leetcode",
+      "title": "Label difficulty",
+      "summary": "Tag Easy, Medium, or Hard on problem discussions."
+    },
+    {
+      "id": "webdev-rule-01",
+      "communityId": "community-webdev",
+      "title": "Share stack details",
+      "summary": "List frameworks, hosting, and major libraries when showcasing work."
+    },
+    {
+      "id": "webdev-rule-02",
+      "communityId": "community-webdev",
+      "title": "Recruiters must flair",
+      "summary": "Recruiter posts require [HIRING] flair and salary info."
+    },
+    {
+      "id": "oss-rule-01",
+      "communityId": "community-opensource",
+      "title": "Specify license",
+      "summary": "Mention project license in showcase or hiring posts."
+    },
+    {
+      "id": "oss-rule-02",
+      "communityId": "community-opensource",
+      "title": "Link to issues",
+      "summary": "Include starter issues when recruiting contributors."
+    }
+  ],
+  "communityLinks": [
+    {
+      "id": "community-cs-careers-link-1",
+      "communityId": "community-cs-careers",
+      "label": "Salary negotiation wiki",
+      "url": "https://cs-careers.example.com/offer-negotiation",
+      "description": "Guides and scripts for negotiating your next offer."
+    },
+    {
+      "id": "community-cs-careers-link-2",
+      "communityId": "community-cs-careers",
+      "label": "Mock interview roster",
+      "url": "https://cs-careers.example.com/mock-interviews",
+      "description": ""
+    },
+    {
+      "id": "community-algorithms-link-1",
+      "communityId": "community-algorithms",
+      "label": "Daily challenge sheet",
+      "url": "https://algorithms.example.com/daily-sheet",
+      "description": ""
+    },
+    {
+      "id": "community-frontend-link-1",
+      "communityId": "community-frontend",
+      "label": "Design system resources",
+      "url": "https://frontend.example.com/design-systems",
+      "description": ""
+    },
+    {
+      "id": "community-frontend-link-2",
+      "communityId": "community-frontend",
+      "label": "Performance checklist",
+      "url": "https://frontend.example.com/perf",
+      "description": ""
+    },
+    {
+      "id": "community-startups-link-1",
+      "communityId": "community-startups",
+      "label": "Pitch deck template",
+      "url": "https://startups.example.com/pitch-template",
+      "description": ""
+    },
+    {
+      "id": "community-startups-link-2",
+      "communityId": "community-startups",
+      "label": "Founder meetup calendar",
+      "url": "https://startups.example.com/events",
+      "description": ""
+    },
+    {
+      "id": "community-unixporn-link-1",
+      "communityId": "community-unixporn",
+      "label": "Monthly rice showcase",
+      "url": "https://unixporn.example.com/monthly-showcase",
+      "description": ""
+    },
+    {
+      "id": "community-unixporn-link-2",
+      "communityId": "community-unixporn",
+      "label": "Theme archive",
+      "url": "https://unixporn.example.com/themes",
+      "description": ""
+    },
+    {
+      "id": "community-leetcode-link-1",
+      "communityId": "community-leetcode",
+      "label": "Study buddy sheet",
+      "url": "https://leetcode.example.com/study-buddies",
+      "description": ""
+    },
+    {
+      "id": "community-webdev-link-1",
+      "communityId": "community-webdev",
+      "label": "Monthly hiring thread",
+      "url": "https://webdev.example.com/hiring",
+      "description": ""
+    },
+    {
+      "id": "community-webdev-link-2",
+      "communityId": "community-webdev",
+      "label": "Performance tooling guide",
+      "url": "https://webdev.example.com/perf-tools",
+      "description": ""
+    },
+    {
+      "id": "community-opensource-link-1",
+      "communityId": "community-opensource",
+      "label": "Contributor matchmaking",
+      "url": "https://opensource.example.com/matchmaking",
+      "description": ""
+    }
+  ],
+  "users": [
+    {
+      "id": "runtime_builder",
+      "username": "runtime_builder",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80",
+      "karma": 58210,
+      "roleBadge": "Staff SWE"
+    },
+    {
+      "id": "systemcraft",
+      "username": "systemcraft",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "offer_navigator",
+      "username": "offer_navigator",
+      "avatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=128&q=80",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "stack_unwind",
+      "username": "stack_unwind",
+      "avatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=256&q=80",
+      "karma": 18450,
+      "roleBadge": ""
+    },
+    {
+      "id": "bigOtime",
+      "username": "bigOtime",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "lambda_luv",
+      "username": "lambda_luv",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "layout_thread",
+      "username": "layout_thread",
+      "avatar": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=256&q=80",
+      "karma": 4211,
+      "roleBadge": ""
+    },
+    {
+      "id": "css_druid",
+      "username": "css_druid",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "infra_migrated",
+      "username": "infra_migrated",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "op_loop",
+      "username": "op_loop",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+      "karma": 9822,
+      "roleBadge": "Founder"
+    },
+    {
+      "id": "async_ops",
+      "username": "async_ops",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "equity_curator",
+      "username": "equity_curator",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "dotfiles_cache",
+      "username": "dotfiles_cache",
+      "avatar": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=256&q=80",
+      "karma": 24500,
+      "roleBadge": ""
+    },
+    {
+      "id": "dotmatrix",
+      "username": "dotmatrix",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "neon_kernel",
+      "username": "neon_kernel",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "mod_signal",
+      "username": "mod_signal",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "ops_coffee",
+      "username": "ops_coffee",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    },
+    {
+      "id": "ux_patrol",
+      "username": "ux_patrol",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": ""
+    }
+  ],
+  "moderators": [
+    {
+      "id": "mod_signal",
+      "username": "mod_signal",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": "",
+      "timezone": "GMT+1",
+      "availability": "Weekdays 7p-11p",
+      "focus": ["Reports", "Wiki"]
+    },
+    {
+      "id": "ops_coffee",
+      "username": "ops_coffee",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": "",
+      "timezone": "GMT-5",
+      "availability": "Daily 9a-2p",
+      "focus": ["AMAs", "Hiring Posts"]
+    },
+    {
+      "id": "ux_patrol",
+      "username": "ux_patrol",
+      "avatar": "",
+      "karma": 0,
+      "roleBadge": "",
+      "timezone": "GMT+8",
+      "availability": "Weekends only",
+      "focus": ["Design Reviews"]
+    }
+  ],
+  "posts": [
+    {
+      "id": "post-001",
+      "permalink": "/r/cs-careers/comments/post-001/system_design_prep_roadmap/",
+      "communityId": "community-cs-careers",
+      "userId": "runtime_builder",
+      "flairLabel": "Showcase",
+      "flairType": "showcase",
+      "title": "How I structured my system design prep for 90 days",
+      "tags": ["System Design", "Interview", "Career"],
+      "excerpt": "Documenting a practical roadmap that blends Grokking, open-source case studies, and mock interviews.",
+      "media": {
+        "kind": "image",
+        "src": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+        "alt": "Product team reviewing a systems architecture diagram on a whiteboard",
+        "ratio": 1.7777777777777777,
+        "caption": "Whiteboard review during our weekly mock interview retro."
+      },
+      "recommendation": {
+        "source": "visited",
+        "label": "Because you've visited this community before"
+      },
+      "statsId": "post-001-stats",
+      "createdAt": "2025-01-12T08:25:00Z",
+      "voteState": "upvoted",
+      "isSaved": true,
+      "impressions": 48000,
+      "isPinned": true,
+      "isLocked": false
+    },
+    {
+      "id": "post-002",
+      "permalink": "/r/algorithms/comments/post-002/reverse_polish_notation_evaluator/",
+      "communityId": "community-algorithms",
+      "userId": "stack_unwind",
+      "flairLabel": "Discussion",
+      "flairType": "discussion",
+      "title": "Daily interview challenge: Reverse Polish Notation evaluator",
+      "tags": ["Stack", "TypeScript", "Practice"],
+      "excerpt": "Sharing my TypeScript implementation, tricky overflow cases, and a playground link for testing.",
+      "media": {
+        "kind": "link",
+        "url": "https://github.com/stack-unwind/rpn-evaluator",
+        "domain": "github.com",
+        "title": "stack-unwind/rpn-evaluator",
+        "thumbnail": "https://images.unsplash.com/photo-1517436073-3b1aa0e70477?auto=format&fit=crop&w=640&q=80",
+        "description": "A compact Reverse Polish Notation evaluator written in TypeScript."
+      },
+      "recommendation": {
+        "source": "trending",
+        "label": "Trending in r/algorithms this week"
+      },
+      "statsId": "post-002-stats",
+      "createdAt": "2025-01-12T16:45:00Z",
+      "voteState": "neutral",
+      "isSaved": false,
+      "impressions": 26500,
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "post-003",
+      "permalink": "/r/frontend/comments/post-003/staying_frontend_after_8_years/",
+      "communityId": "community-frontend",
+      "userId": "layout_thread",
+      "flairLabel": "Question",
+      "flairType": "question",
+      "title": "Ask HN style: what kept you in frontend after 8+ years?",
+      "tags": ["Career", "Frontend", "Discussion"],
+      "excerpt": "Collecting honest takes on why senior folks stayed IC vs. pivoting to platform or infra roles.",
+      "media": {
+        "kind": "text",
+        "body": "I’m at that crossroad where I either double down on UX-heavy work or jump into infra. Looking for stories about what kept you in the frontend craft.",
+        "markdown": "## What I'm weighing\n\n- Stay IC and mentor the new design systems squad.\n- Jump to a platform team to broaden my scope.\n\nWould love long-form perspectives or resources you leaned on when deciding."
+      },
+      "recommendation": null,
+      "statsId": "post-003-stats",
+      "createdAt": "2025-01-11T12:10:00Z",
+      "voteState": "upvoted",
+      "isSaved": true,
+      "impressions": 31200,
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "post-004",
+      "permalink": "/r/startups/comments/post-004/founding_engineers_async_education_platform/",
+      "communityId": "community-startups",
+      "userId": "op_loop",
+      "flairLabel": "Hiring",
+      "flairType": "hiring",
+      "title": "We’re hiring founding engineers to scale our education platform",
+      "tags": ["Jobs", "Startups", "Remote"],
+      "excerpt": "Remote-first team building async coding meetups. Equity plus a 3-month sabbatical stipend.",
+      "media": {
+        "kind": "image",
+        "src": "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1600&q=80",
+        "alt": "Founding team collaborating over laptops in a bright workspace",
+        "ratio": 1.7777777777777777
+      },
+      "recommendation": {
+        "source": "popular",
+        "label": "Popular with founders similar to the communities you follow"
+      },
+      "statsId": "post-004-stats",
+      "createdAt": "2025-01-10T09:00:00Z",
+      "voteState": "neutral",
+      "isSaved": false,
+      "impressions": 20400,
+      "isPinned": false,
+      "isLocked": true
+    },
+    {
+      "id": "post-005",
+      "permalink": "/r/unixporn/comments/post-005/terminal_only_productivity_stack/",
+      "communityId": "community-unixporn",
+      "userId": "dotfiles_cache",
+      "flairLabel": "Discussion",
+      "flairType": "discussion",
+      "title": "Show us your terminal-only productivity stack",
+      "tags": ["Productivity", "CLI", "Showcase"],
+      "excerpt": "Collecting dotfiles, TUI dashboards, and scripts that reduce context switching.",
+      "media": {
+        "kind": "image",
+        "src": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1600&q=80",
+        "alt": "Custom terminal dashboard with muted neon accents",
+        "ratio": 1.7777777777777777
+      },
+      "recommendation": {
+        "source": "similar",
+        "label": "Similar to unix customizations you bookmarked"
+      },
+      "statsId": "post-005-stats",
+      "createdAt": "2025-01-09T21:15:00Z",
+      "voteState": "upvoted",
+      "isSaved": true,
+      "impressions": 60500,
+      "isPinned": false,
+      "isLocked": false
+    }
+  ],
+  "postStats": [
+    {
+      "id": "post-001-stats",
+      "score": 2412,
+      "comments": 318,
+      "awards": 12,
+      "saves": 1529,
+      "shares": 82,
+      "upvoteRatio": 0.91,
+      "views": 182000
+    },
+    {
+      "id": "post-002-stats",
+      "score": 864,
+      "comments": 74,
+      "awards": 5,
+      "saves": 402,
+      "shares": 21,
+      "upvoteRatio": 0.86,
+      "views": 92000
+    },
+    {
+      "id": "post-003-stats",
+      "score": 653,
+      "comments": 211,
+      "awards": 8,
+      "saves": 287,
+      "shares": 15,
+      "upvoteRatio": 0.78,
+      "views": 74000
+    },
+    {
+      "id": "post-004-stats",
+      "score": 443,
+      "comments": 98,
+      "awards": 3,
+      "saves": 184,
+      "shares": 110,
+      "upvoteRatio": 0.73,
+      "views": 65800
+    },
+    {
+      "id": "post-005-stats",
+      "score": 1290,
+      "comments": 403,
+      "awards": 14,
+      "saves": 578,
+      "shares": 64,
+      "upvoteRatio": 0.95,
+      "views": 198000
+    }
+  ],
+  "awards": [
+    {
+      "id": "award-rocket",
+      "name": "Helpful",
+      "icon": "🚀",
+      "description": "",
+      "count": 6
+    },
+    {
+      "id": "award-gold",
+      "name": "Gold",
+      "icon": "🥇",
+      "description": "Premium appreciation",
+      "count": 1
+    },
+    {
+      "id": "award-heart",
+      "name": "Insightful",
+      "icon": "💡",
+      "description": "",
+      "count": 5
+    },
+    {
+      "id": "award-brain",
+      "name": "Brainiac",
+      "icon": "🧠",
+      "description": "",
+      "count": 5
+    },
+    {
+      "id": "award-chat",
+      "name": "Great Question",
+      "icon": "❓",
+      "description": "",
+      "count": 5
+    },
+    {
+      "id": "award-hiring",
+      "name": "Hiring Boost",
+      "icon": "📣",
+      "description": "",
+      "count": 3
+    },
+    {
+      "id": "award-laser",
+      "name": "Blinding Lights",
+      "icon": "🔆",
+      "description": "",
+      "count": 9
+    },
+    {
+      "id": "award-spark",
+      "name": "Creative",
+      "icon": "✨",
+      "description": "",
+      "count": 3
+    }
+  ],
+  "postAwards": [
+    {
+      "postId": "post-001",
+      "awardId": "award-rocket",
+      "count": 6
+    },
+    {
+      "postId": "post-001",
+      "awardId": "award-gold",
+      "count": 1
+    },
+    {
+      "postId": "post-001",
+      "awardId": "award-heart",
+      "count": 5
+    },
+    {
+      "postId": "post-002",
+      "awardId": "award-brain",
+      "count": 5
+    },
+    {
+      "postId": "post-003",
+      "awardId": "award-heart",
+      "count": 3
+    },
+    {
+      "postId": "post-003",
+      "awardId": "award-chat",
+      "count": 5
+    },
+    {
+      "postId": "post-004",
+      "awardId": "award-hiring",
+      "count": 3
+    },
+    {
+      "postId": "post-005",
+      "awardId": "award-laser",
+      "count": 9
+    },
+    {
+      "postId": "post-005",
+      "awardId": "award-gold",
+      "count": 2
+    },
+    {
+      "postId": "post-005",
+      "awardId": "award-spark",
+      "count": 3
+    }
+  ],
+  "comments": [
+    {
+      "id": "comment-001",
+      "authorId": "systemcraft",
+      "avatar": "",
+      "body": "Love the 3-phase approach. The notion template is gold—thanks for sharing!",
+      "upvotes": 214,
+      "createdAt": "2025-01-12T12:18:00Z"
+    },
+    {
+      "id": "comment-002",
+      "authorId": "offer_navigator",
+      "avatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=128&q=80",
+      "body": "Seconding the mock interview cadence—having 2/week was the unlock for me too.",
+      "upvotes": 167,
+      "createdAt": "2025-01-12T14:02:00Z"
+    },
+    {
+      "id": "comment-101",
+      "authorId": "bigOtime",
+      "avatar": "",
+      "body": "Appreciate the overflow guards—most solutions skip 32-bit constraints.",
+      "upvotes": 58,
+      "createdAt": "2025-01-12T17:30:00Z"
+    },
+    {
+      "id": "comment-102",
+      "authorId": "lambda_luv",
+      "avatar": "",
+      "body": "Would love a follow-up on time complexity with random inputs.",
+      "upvotes": 33,
+      "createdAt": "2025-01-12T18:12:00Z"
+    },
+    {
+      "id": "comment-201",
+      "authorId": "css_druid",
+      "avatar": "",
+      "body": "Stayed for mentorship + design system ownership. The craft is way more than pixels.",
+      "upvotes": 97,
+      "createdAt": "2025-01-11T13:45:00Z"
+    },
+    {
+      "id": "comment-202",
+      "authorId": "infra_migrated",
+      "avatar": "",
+      "body": "Platform move gave me new challenges, but I miss those product cycles—consider a hybrid.",
+      "upvotes": 81,
+      "createdAt": "2025-01-11T14:32:00Z"
+    },
+    {
+      "id": "comment-301",
+      "authorId": "async_ops",
+      "avatar": "",
+      "body": "How async-friendly is your onboarding? Curious about timezone overlap expectations.",
+      "upvotes": 41,
+      "createdAt": "2025-01-10T10:25:00Z"
+    },
+    {
+      "id": "comment-302",
+      "authorId": "equity_curator",
+      "avatar": "",
+      "body": "Thanks for listing comp bands! Are you open to staff+ candidates seeking team lead roles?",
+      "upvotes": 29,
+      "createdAt": "2025-01-10T11:11:00Z"
+    },
+    {
+      "id": "comment-401",
+      "authorId": "dotmatrix",
+      "avatar": "",
+      "body": "Stealing that tmux status bar setup immediately. Any plans to open-source the scripts?",
+      "upvotes": 152,
+      "createdAt": "2025-01-09T22:07:00Z"
+    },
+    {
+      "id": "comment-402",
+      "authorId": "neon_kernel",
+      "avatar": "",
+      "body": "That Alacritty theme is chef’s kiss. Love the thoughtful keybindings breakdown.",
+      "upvotes": 133,
+      "createdAt": "2025-01-09T23:14:00Z"
+    }
+  ],
+  "postComments": [
+    {
+      "postId": "post-001",
+      "commentId": "comment-001"
+    },
+    {
+      "postId": "post-001",
+      "commentId": "comment-002"
+    },
+    {
+      "postId": "post-002",
+      "commentId": "comment-101"
+    },
+    {
+      "postId": "post-002",
+      "commentId": "comment-102"
+    },
+    {
+      "postId": "post-003",
+      "commentId": "comment-201"
+    },
+    {
+      "postId": "post-003",
+      "commentId": "comment-202"
+    },
+    {
+      "postId": "post-004",
+      "commentId": "comment-301"
+    },
+    {
+      "postId": "post-004",
+      "commentId": "comment-302"
+    },
+    {
+      "postId": "post-005",
+      "commentId": "comment-401"
+    },
+    {
+      "postId": "post-005",
+      "commentId": "comment-402"
+    }
+  ],
+  "quickFilters": [
+    {
+      "label": "Hot",
+      "value": "hot"
+    },
+    {
+      "label": "New",
+      "value": "new"
+    },
+    {
+      "label": "Top",
+      "value": "top"
+    },
+    {
+      "label": "Rising",
+      "value": "rising"
+    }
+  ],
+  "trendingTopics": [
+    {
+      "id": "trend-001",
+      "title": "Post-offer salary negotiation AMA with Meta engineers",
+      "communityId": "cs-careers",
+      "delta": 214,
+      "trend": "up"
+    },
+    {
+      "id": "trend-002",
+      "title": "Reverse Polish notation tricks for interview speed",
+      "communityId": "algorithms",
+      "delta": 132,
+      "trend": "up"
+    },
+    {
+      "id": "trend-003",
+      "title": "The great monorepo split debate resurfaces",
+      "communityId": "frontend",
+      "delta": 67,
+      "trend": "up"
+    },
+    {
+      "id": "trend-004",
+      "title": "Hiring founding engineers for async cohorts",
+      "communityId": "startups",
+      "delta": 38,
+      "trend": "down"
+    }
+  ],
+  "threadComments": [
+    {
+      "id": "tc-001-1",
+      "postId": "post-001",
+      "parentId": null,
+      "authorId": "systemcraft",
+      "avatar": "",
+      "body": "This roadmap resonates. How did you balance reading vs. building?",
+      "markdown": "",
+      "upvotes": 142,
+      "createdAt": "2025-01-12T12:25:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-001-1-1",
+      "postId": "post-001",
+      "parentId": "tc-001-1",
+      "authorId": "runtime_builder",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80",
+      "body": "60/40 split in weeks 1-4, then flipped to 30/70 with mock systems.",
+      "markdown": "",
+      "upvotes": 88,
+      "createdAt": "2025-01-12T12:40:00Z",
+      "editedAt": "",
+      "isPinned": true,
+      "isLocked": false
+    },
+    {
+      "id": "tc-001-2",
+      "postId": "post-001",
+      "parentId": null,
+      "authorId": "stack_unwind",
+      "avatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=256&q=80",
+      "body": "Did you practice diagramming under time? Any tools you recommend?",
+      "markdown": "",
+      "upvotes": 67,
+      "createdAt": "2025-01-12T13:10:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-001-2-1",
+      "postId": "post-001",
+      "parentId": "tc-001-2",
+      "authorId": "runtime_builder",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=256&q=80",
+      "body": "Excalidraw + timer. Also recorded 3 sessions to review pacing.",
+      "markdown": "",
+      "upvotes": 49,
+      "createdAt": "2025-01-12T13:25:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+
+    {
+      "id": "tc-002-1",
+      "postId": "post-002",
+      "parentId": null,
+      "authorId": "bigOtime",
+      "avatar": "",
+      "body": "Edge cases around overflow were tricky. Did you clamp or throw?",
+      "markdown": "",
+      "upvotes": 33,
+      "createdAt": "2025-01-12T17:45:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-002-2",
+      "postId": "post-002",
+      "parentId": null,
+      "authorId": "lambda_luv",
+      "avatar": "",
+      "body": "Would love a benchmark comparison vs. recursive parser.",
+      "markdown": "",
+      "upvotes": 21,
+      "createdAt": "2025-01-12T18:15:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-002-2-1",
+      "postId": "post-002",
+      "parentId": "tc-002-2",
+      "authorId": "stack_unwind",
+      "avatar": "https://images.unsplash.com/photo-1517436073-3b1aa0e70477?auto=format&fit=crop&w=640&q=80",
+      "body": "I can add a perf note. Iterative stack wins for large inputs.",
+      "markdown": "",
+      "upvotes": 18,
+      "createdAt": "2025-01-12T18:30:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+
+    {
+      "id": "tc-003-1",
+      "postId": "post-003",
+      "parentId": null,
+      "authorId": "css_druid",
+      "avatar": "",
+      "body": "Stayed IC for autonomy and craft. Platform felt too abstract for me.",
+      "markdown": "",
+      "upvotes": 76,
+      "createdAt": "2025-01-11T14:00:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-003-1-1",
+      "postId": "post-003",
+      "parentId": "tc-003-1",
+      "authorId": "layout_thread",
+      "avatar": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=256&q=80",
+      "body": "+1 on autonomy. I also pair with platform monthly to keep breadth.",
+      "markdown": "",
+      "upvotes": 44,
+      "createdAt": "2025-01-11T14:25:00Z",
+      "editedAt": "",
+      "isPinned": true,
+      "isLocked": false
+    },
+    {
+      "id": "tc-003-2",
+      "postId": "post-003",
+      "parentId": null,
+      "authorId": "infra_migrated",
+      "avatar": "",
+      "body": "Consider a 6-month tour in platform—brings empathy back to product.",
+      "markdown": "",
+      "upvotes": 35,
+      "createdAt": "2025-01-11T15:05:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+
+    {
+      "id": "tc-004-1",
+      "postId": "post-004",
+      "parentId": null,
+      "authorId": "async_ops",
+      "avatar": "",
+      "body": "What’s the onboarding like asynchronously?",
+      "markdown": "",
+      "upvotes": 19,
+      "createdAt": "2025-01-10T10:35:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": true
+    },
+    {
+      "id": "tc-004-1-1",
+      "postId": "post-004",
+      "parentId": "tc-004-1",
+      "authorId": "op_loop",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+      "body": "Buddy system + async runbooks. Live overlap not required first 2 weeks.",
+      "markdown": "",
+      "upvotes": 27,
+      "createdAt": "2025-01-10T11:00:00Z",
+      "editedAt": "",
+      "isPinned": true,
+      "isLocked": true
+    },
+
+    {
+      "id": "tc-005-1",
+      "postId": "post-005",
+      "parentId": null,
+      "authorId": "dotmatrix",
+      "avatar": "",
+      "body": "Posting dotfiles later today. Your status bar is slick!",
+      "markdown": "",
+      "upvotes": 88,
+      "createdAt": "2025-01-09T22:20:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-005-2",
+      "postId": "post-005",
+      "parentId": null,
+      "authorId": "neon_kernel",
+      "avatar": "",
+      "body": "Any plans to OSS the scripts?",
+      "markdown": "",
+      "upvotes": 61,
+      "createdAt": "2025-01-09T23:20:00Z",
+      "editedAt": "",
+      "isPinned": false,
+      "isLocked": false
+    },
+    {
+      "id": "tc-005-2-1",
+      "postId": "post-005",
+      "parentId": "tc-005-2",
+      "authorId": "dotfiles_cache",
+      "avatar": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=256&q=80",
+      "body": "Yes—cleaning up configs and adding docs this weekend.",
+      "markdown": "",
+      "upvotes": 73,
+      "createdAt": "2025-01-09T23:35:00Z",
+      "editedAt": "",
+      "isPinned": true,
+      "isLocked": false
+    }
+  ]
+}

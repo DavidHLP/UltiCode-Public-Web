@@ -1,0 +1,139 @@
+<script setup lang="ts">
+import type { ForumFlairType, ForumPost } from '@/mocks/schema/forum'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from '@/components/ui/dropdown-menu'
+import { ChevronsUpDown } from 'lucide-vue-next'
+import ForumPostCard from '@/view/forum/components/ForumPostCard.vue'
+import ForumSidebar from '@/view/forum/components/ForumSidebar.vue'
+import { computed, ref } from 'vue'
+import {
+  fetchForumCommunities,
+  fetchForumModerators,
+  fetchForumPosts,
+  fetchForumQuickFilters,
+  fetchForumTrendingTopics,
+} from '@/mocks/api/forum'
+
+const posts = fetchForumPosts()
+const trendingTopics = fetchForumTrendingTopics()
+const communities = fetchForumCommunities()
+const moderators = fetchForumModerators()
+const quickFilters = fetchForumQuickFilters()
+
+const searchQuery = ref('')
+const quickFilter = ref(quickFilters[0]?.value ?? 'hot')
+const selectedCommunity = ref('all')
+const selectedFlair = ref<'all' | ForumFlairType>('all')
+const quickFilterLabel = computed(() => {
+  return (
+    (
+      {
+        hot: 'Hot',
+        new: 'New',
+        top: 'Top',
+        rising: 'Rising',
+      } as Record<string, string>
+    )[quickFilter.value] ?? 'Hot'
+  )
+})
+const filteredPosts = computed(() => {
+  const normalizedSearch = searchQuery.value.trim().toLowerCase()
+  return posts.filter((post) => {
+    const matchesSearch =
+      !normalizedSearch ||
+      post.title.toLowerCase().includes(normalizedSearch) ||
+      post.excerpt?.toLowerCase().includes(normalizedSearch) ||
+      post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
+
+    const matchesCommunity =
+      selectedCommunity.value === 'all' || post.community.slug === selectedCommunity.value
+
+    const matchesFlair = selectedFlair.value === 'all' || post.flair?.type === selectedFlair.value
+
+    return matchesSearch && matchesCommunity && matchesFlair
+  })
+})
+
+const sortedPosts = computed(() => {
+  const posts = [...filteredPosts.value]
+  const sorters: Record<string, (a: ForumPost, b: ForumPost) => number> = {
+    hot: (a, b) => b.stats.score - a.stats.score,
+    new: (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
+    top: (a, b) => b.stats.saves - a.stats.saves,
+    rising: (a, b) => b.stats.shares - a.stats.shares,
+  }
+
+  const sorter = sorters[quickFilter.value] ?? sorters.hot
+  posts.sort(sorter)
+
+  const pinned = posts.filter((post) => post.isPinned)
+  const rest = posts.filter((post) => !post.isPinned)
+
+  return [...pinned, ...rest]
+})
+</script>
+
+<template>
+  <ScrollArea class="h-full">
+    <div class="mx-auto w-full max-w-6xl space-y-8 px-4 lg:px-10">
+      <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <Card class="border-none bg-transparent p-0 shadow-none">
+          <CardHeader class="space-y-3 border-none px-0 pb-0">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button variant="outline" class="gap-2">
+                    Sort: {{ quickFilterLabel }}
+                    <ChevronsUpDown class="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent class="w-40">
+                  <DropdownMenuRadioGroup v-model:value="quickFilter">
+                    <DropdownMenuRadioItem value="hot">Hot</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="new">New</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="rising">Rising</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <form class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                <Input v-model="searchQuery" placeholder="Search threads" class="w-full sm:w-64" />
+              </form>
+            </div>
+            <div class="flex items-center justify-between text-sm text-muted-foreground">
+              <p class="flex items-center gap-1">
+                Showing
+                <span class="font-semibold text-foreground">{{ sortedPosts.length }}</span>
+                threads
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                class="h-auto px-2 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-primary"
+              >
+                Subscribe RSS
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent class="space-y-6 px-0">
+            <ForumPostCard v-for="post in sortedPosts" :key="post.id" :post="post" />
+          </CardContent>
+        </Card>
+        <ForumSidebar
+          :trendingTopics="trendingTopics"
+          :communities="communities"
+          :moderators="moderators"
+        />
+      </div>
+    </div>
+  </ScrollArea>
+</template>

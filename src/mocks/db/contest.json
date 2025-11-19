@@ -1,0 +1,486 @@
+{
+  "featuredContestId": "contest-global-sprint-47",
+  "events": [
+    {
+      "id": "contest-global-sprint-47",
+      "title": "Global Sprint #47",
+      "series": "Ultimate Cup Series",
+      "description": "4 problems ranging from interactive geometry to streaming DP with aggressive partial scoring.",
+      "startTime": "2024-08-31T13:00:00Z",
+      "durationMinutes": 150,
+      "timezone": "UTC",
+      "status": "registration",
+      "difficulty": "Advanced",
+      "ratingBand": "1700 – 2600",
+      "tags": ["rated", "partial scoring", "editorial 6h"],
+      "rewards": ["Top 50 hoodie drop", "Rating multiplier x1.15", "Live editorial Q&A"],
+      "registration": {
+        "open": true,
+        "closesAt": "2024-08-30T23:59:00Z",
+        "slots": 12000,
+        "registered": 8400,
+        "mode": "solo"
+      },
+      "division": "global",
+      "host": "Ulticode Arena",
+      "isRated": true,
+      "prizePool": "$8,000 + travel stipends",
+      "coverImage": "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1600&q=80",
+      "broadcast": "twitch.tv/ulticode",
+      "editorialEta": "2024-08-31T20:00:00Z"
+    },
+    {
+      "id": "contest-regional-apac-qualifiers",
+      "title": "APAC Regional Qualifiers",
+      "series": "Regional Ladder",
+      "description": "Team-based relay format with synchronous checkpoints and shared code review minutes.",
+      "startTime": "2024-08-25T04:00:00Z",
+      "durationMinutes": 180,
+      "timezone": "UTC+8",
+      "status": "live",
+      "difficulty": "Intermediate",
+      "ratingBand": "1400 – 2000",
+      "tags": ["team", "relay", "rated"],
+      "rewards": ["Top 10 advance to onsite finals"],
+      "registration": {
+        "open": true,
+        "closesAt": "2024-08-24T12:00:00Z",
+        "slots": 600,
+        "registered": 512,
+        "mode": "team"
+      },
+      "division": "regional",
+      "host": "Ulticode Singapore Hub",
+      "isRated": true,
+      "prizePool": "$3,500 travel + plaques",
+      "coverImage": "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80",
+      "broadcast": "youtube.com/ulticode",
+      "editorialEta": "2024-08-25T12:00:00Z"
+    },
+    {
+      "id": "contest-college-ladder-14",
+      "title": "College Ladder #14",
+      "series": "Campus Sprint",
+      "description": "Entry-friendly ladder with curated walkthroughs and office hours for verified campus clubs.",
+      "startTime": "2024-09-03T18:00:00Z",
+      "durationMinutes": 120,
+      "timezone": "UTC-4",
+      "status": "upcoming",
+      "difficulty": "Starter",
+      "ratingBand": "0 – 1600",
+      "tags": ["mentored", "virtual"],
+      "rewards": ["Digital badges", "Mentor review slots"],
+      "registration": {
+        "open": true,
+        "closesAt": "2024-09-03T10:00:00Z",
+        "slots": 4000,
+        "registered": 2200,
+        "mode": "solo"
+      },
+      "division": "college",
+      "host": "Ulticode Campus Program",
+      "isRated": false,
+      "coverImage": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80"
+    },
+    {
+      "id": "contest-team-marathon-09",
+      "title": "Team Marathon #09",
+      "series": "Async Marathon",
+      "description": "48-hour window with checkpoint scoring and sandboxed datasets for reinforcement learning.",
+      "startTime": "2024-09-07T00:00:00Z",
+      "durationMinutes": 2880,
+      "timezone": "UTC",
+      "status": "registration",
+      "difficulty": "Championship",
+      "ratingBand": "1900 – 3000",
+      "tags": ["marathon", "ml", "sandboxes"],
+      "rewards": ["Cloud credits", "Highlight interview"],
+      "registration": {
+        "open": true,
+        "closesAt": "2024-09-05T23:59:00Z",
+        "slots": 800,
+        "registered": 380,
+        "mode": "team"
+      },
+      "division": "team",
+      "host": "Ulticode Labs",
+      "isRated": true,
+      "prizePool": "$12,000 + research grants",
+      "editorialEta": "2024-09-10T18:00:00Z"
+    },
+    {
+      "id": "contest-global-sprint-46",
+      "title": "Global Sprint #46",
+      "series": "Ultimate Cup Series",
+      "description": "Previous sprint with 4 problems, editorial published, now archived.",
+      "startTime": "2024-08-10T13:00:00Z",
+      "durationMinutes": 150,
+      "timezone": "UTC",
+      "status": "archived",
+      "difficulty": "Advanced",
+      "ratingBand": "1700 – 2600",
+      "tags": ["rated", "editorial live", "archived"],
+      "rewards": ["Rating changes applied"],
+      "registration": {
+        "open": false,
+        "slots": 11000,
+        "registered": 10320,
+        "mode": "solo"
+      },
+      "division": "global",
+      "host": "Ulticode Arena",
+      "isRated": true,
+      "prizePool": "$6,000",
+      "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=80",
+      "broadcast": "twitch.tv/ulticode",
+      "editorialEta": "2024-08-10T20:00:00Z"
+    }
+  ],
+  "insights": [
+    {
+      "id": "insight-registrations",
+      "label": "Active registrations",
+      "value": "12.4k",
+      "helper": "across 3 open contests",
+      "trend": "up",
+      "delta": "+9% WoW",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "insight-solve-rate",
+      "label": "Median solve rate",
+      "value": "42%",
+      "helper": "last rated contest",
+      "trend": "steady",
+      "delta": "±0% vs avg",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "insight-editorial",
+      "label": "Editorial turnaround",
+      "value": "4h 12m",
+      "helper": "avg publish window",
+      "trend": "down",
+      "delta": "-36m",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "insight-newcomers",
+      "label": "New rated users",
+      "value": "1,184",
+      "helper": "last 30 days",
+      "trend": "up",
+      "delta": "+14%",
+      "contestId": "contest-global-sprint-47"
+    }
+  ],
+  "leaderboard": [
+    {
+      "id": "leaderboard-01",
+      "rank": 1,
+      "handle": "yuki.codes",
+      "country": "JP",
+      "rating": 2841,
+      "ratingDelta": 46,
+      "solved": 4,
+      "penalty": 3,
+      "contestId": "contest-global-sprint-46",
+      "divisionTag": "Global Elite",
+      "trend": "up"
+    },
+    {
+      "id": "leaderboard-02",
+      "rank": 2,
+      "handle": "bytewave",
+      "country": "US",
+      "rating": 2720,
+      "ratingDelta": 18,
+      "solved": 4,
+      "penalty": 7,
+      "contestId": "contest-global-sprint-46",
+      "divisionTag": "Global Elite",
+      "trend": "steady"
+    },
+    {
+      "id": "leaderboard-03",
+      "rank": 3,
+      "handle": "algorhythm",
+      "country": "IN",
+      "rating": 2684,
+      "ratingDelta": -4,
+      "solved": 3,
+      "penalty": 11,
+      "contestId": "contest-global-sprint-46",
+      "divisionTag": "Global Elite",
+      "trend": "down"
+    },
+    {
+      "id": "leaderboard-04",
+      "rank": 1,
+      "handle": "falcon-squad",
+      "country": "SG",
+      "rating": 2210,
+      "ratingDelta": 32,
+      "solved": 6,
+      "penalty": 21,
+      "contestId": "contest-regional-apac-qualifiers",
+      "divisionTag": "APAC Teams",
+      "trend": "up"
+    },
+    {
+      "id": "leaderboard-05",
+      "rank": 2,
+      "handle": "hkust-knit",
+      "country": "HK",
+      "rating": 2148,
+      "ratingDelta": 11,
+      "solved": 5,
+      "penalty": 18,
+      "contestId": "contest-regional-apac-qualifiers",
+      "divisionTag": "APAC Teams",
+      "trend": "steady"
+    },
+    {
+      "id": "leaderboard-06",
+      "rank": 1,
+      "handle": "deltafreshman",
+      "country": "CA",
+      "rating": 1538,
+      "ratingDelta": 64,
+      "solved": 3,
+      "penalty": 5,
+      "contestId": "contest-college-ladder-13",
+      "divisionTag": "Campus Ladder",
+      "trend": "up"
+    },
+    {
+      "id": "leaderboard-07",
+      "rank": 1,
+      "handle": "neonfox",
+      "country": "PL",
+      "rating": 2798,
+      "ratingDelta": 34,
+      "solved": 4,
+      "penalty": 5,
+      "contestId": "contest-global-sprint-47",
+      "divisionTag": "Global Elite",
+      "trend": "up"
+    },
+    {
+      "id": "leaderboard-08",
+      "rank": 2,
+      "handle": "bitra",
+      "country": "CN",
+      "rating": 2705,
+      "ratingDelta": 12,
+      "solved": 4,
+      "penalty": 9,
+      "contestId": "contest-global-sprint-47",
+      "divisionTag": "Global Elite",
+      "trend": "steady"
+    },
+    {
+      "id": "leaderboard-09",
+      "rank": 3,
+      "handle": "solarium",
+      "country": "DE",
+      "rating": 2652,
+      "ratingDelta": -6,
+      "solved": 3,
+      "penalty": 10,
+      "contestId": "contest-global-sprint-47",
+      "divisionTag": "Global Elite",
+      "trend": "down"
+    }
+  ],
+  "tracks": [
+    {
+      "id": "track-accelerator",
+      "name": "Accelerator Track",
+      "summary": "4-week ramp with daily drills and weekly rated scrimmages for 1400 → 1800 push.",
+      "cadence": "Daily micro drills + Sat scrimmage",
+      "targetRating": "1400 – 1900",
+      "focus": ["Advanced DP", "Interactive IO", "Graph transforms"],
+      "included": ["Private upsolve board", "Coach feedback loop", "Post-contest briefs"],
+      "badge": "Velocity",
+      "difficulty": "Intermediate",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "track-foundations",
+      "name": "Foundations Track",
+      "summary": "Mentor-led onboarding with solved example gallery and playlists for brand-new users.",
+      "cadence": "2x live labs / week",
+      "targetRating": "< 1400",
+      "focus": ["Speed math", "Greedy patterns", "Contest hygiene"],
+      "included": ["Office hours", "Starter pack problems", "Editorial walkthroughs"],
+      "badge": "On Ramp",
+      "difficulty": "Starter",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "track-marathon-lab",
+      "name": "Marathon Lab",
+      "summary": "Async experiments for RL / ML style contests with sandbox credits and reviews.",
+      "cadence": "Bi-weekly drops",
+      "targetRating": "2000+",
+      "focus": ["Heuristics", "Simulation", "Profiling"],
+      "included": ["Baseline kits", "Model hosting credits", "Mentor pairing"],
+      "badge": "Deep Work",
+      "difficulty": "Advanced",
+      "contestId": "contest-global-sprint-47"
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource-playbook",
+      "title": "Contest playbook 2024",
+      "description": "Prep checklist for warmups, communication, and onsite-ready gear.",
+      "href": "#",
+      "category": "playbook",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "resource-editorial",
+      "title": "Editorial backlog tracker",
+      "description": "Live sheet covering release ETA, authors, and revision state.",
+      "href": "#",
+      "category": "announcement",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "resource-stream",
+      "title": "Strategy stream: relay format",
+      "description": "45-minute VOD on how to split checkpoints under the new relay rules.",
+      "href": "#",
+      "category": "video",
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "resource-guide",
+      "title": "Rating recovery guide",
+      "description": "Framework for bouncing back after volatile contests with targeted drills.",
+      "href": "#",
+      "category": "guide",
+      "contestId": "contest-global-sprint-47"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq-eligibility",
+      "question": "Are global sprint contests rated for every division?",
+      "answer": "Yes. Solo global sprints are rated for any user with at least one historical rated contest. Newcomers will receive a provisional rating after 2 finishes.",
+      "tags": ["rating", "global sprint"],
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "faq-team",
+      "question": "Can I mix countries when registering for team relays?",
+      "answer": "Teams may mix regions. However, at least two members must share a time zone within ±3 hours for scheduling the synchronous checkpoint review.",
+      "tags": ["teams", "relay format"],
+      "contestId": "contest-global-sprint-47"
+    },
+    {
+      "id": "faq-editorial",
+      "question": "Where do I find the editorial livestream link?",
+      "answer": "Each contest page includes a broadcast link once the countdown hits 6 hours. You can also subscribe to the editorial calendar inside the forum.",
+      "tags": ["editorial"],
+      "contestId": "contest-global-sprint-47"
+    }
+  ],
+  "ops": [
+    {
+      "id": "ops-problem-freeze",
+      "contestId": "contest-global-sprint-47",
+      "title": "Lock tasks & statements",
+      "owner": "Problem review pod",
+      "dueAt": "2024-08-29T18:00:00Z",
+      "status": "in_progress",
+      "category": "pre-flight",
+      "effort": "High",
+      "notes": "Final difficulty sweep with translation sync"
+    },
+    {
+      "id": "ops-broadcast-tech",
+      "contestId": "contest-global-sprint-47",
+      "title": "Broadcast tech check",
+      "owner": "Media studio",
+      "dueAt": "2024-08-30T02:00:00Z",
+      "status": "pending",
+      "category": "pre-flight",
+      "effort": "Medium",
+      "notes": "OBS + captions, assign on-call producer"
+    },
+    {
+      "id": "ops-scoreboard-lock",
+      "contestId": "contest-global-sprint-47",
+      "title": "Scoreboard freeze window",
+      "owner": "Arena control",
+      "dueAt": "2024-08-31T14:30:00Z",
+      "status": "pending",
+      "category": "live",
+      "effort": "Low",
+      "notes": "Coordinate with appeals for last 30 minutes"
+    },
+    {
+      "id": "ops-editorial-hand-off",
+      "contestId": "contest-global-sprint-47",
+      "title": "Editorial hand-off",
+      "owner": "Solutions guild",
+      "dueAt": "2024-08-31T19:00:00Z",
+      "status": "pending",
+      "category": "post",
+      "effort": "Medium",
+      "notes": "Package stream timestamps + PDF outline"
+    },
+    {
+      "id": "ops-prize-email",
+      "contestId": "contest-global-sprint-47",
+      "title": "Prize email batch",
+      "owner": "Community ops",
+      "dueAt": "2024-09-01T16:00:00Z",
+      "status": "pending",
+      "category": "post",
+      "effort": "Low",
+      "notes": "Attach hoodie sizes + travel policy"
+    }
+  ],
+  "crew": [
+    {
+      "id": "crew-director",
+      "contestId": "contest-global-sprint-47",
+      "name": "Mira Chen",
+      "role": "Contest director",
+      "channel": "@mira-c",
+      "timezone": "UTC+8",
+      "focus": "Ops & appeals"
+    },
+    {
+      "id": "crew-broadcast",
+      "contestId": "contest-global-sprint-47",
+      "name": "Dev Raj",
+      "role": "Broadcast lead",
+      "channel": "@dev.stream",
+      "timezone": "UTC",
+      "focus": "Livestream & comms"
+    },
+    {
+      "id": "crew-judge",
+      "contestId": "contest-global-sprint-47",
+      "name": "Ivy Ortega",
+      "role": "Head judge",
+      "channel": "@ivy-o",
+      "timezone": "UTC-5",
+      "focus": "Scoring & clarifications"
+    },
+    {
+      "id": "crew-community",
+      "contestId": "contest-global-sprint-47",
+      "name": "Rahul Menon",
+      "role": "Community liaison",
+      "channel": "@rahul",
+      "timezone": "UTC+5:30",
+      "focus": "Clubs + travel"
+    }
+  ]
+}

@@ -1,45 +1,65 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-export const MAIN_ROUTE_NAME = 'main'
-export const LOGIN_ROUTE_NAME = 'login'
-export const REGISTER_ROUTE_NAME = 'register'
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: { name: LOGIN_ROUTE_NAME },
+      redirect: { name: 'forum-home' },
     },
     {
-      path: '/login',
-      name: LOGIN_ROUTE_NAME,
-      component: () => import('@/view/login/index.vue'),
-      meta: { guestOnly: true },
+      path: '/forum',
+      component: () => import('@/layout/AppLayout.vue'),
+      children: [
+        {
+          path: '',
+          name: 'forum-home',
+          component: () => import('@/view/forum/ForumView.vue'),
+        },
+        {
+          path: 'detailed/:postId',
+          name: 'forum-thread',
+          component: () => import('@/view/forum/detailed/ForumDetailedView.vue'),
+        },
+      ],
     },
     {
-      path: '/register',
-      name: REGISTER_ROUTE_NAME,
-      component: () => import('@/view/register/index.vue'),
-      meta: { guestOnly: true },
+      path: '/contest',
+      component: () => import('@/layout/AppLayout.vue'),
+      children: [
+        {
+          path: '',
+          name: 'contest-home',
+          component: () => import('@/view/contest/ContestView.vue'),
+        },
+      ],
     },
     {
-      path: '/main',
-      name: MAIN_ROUTE_NAME,
-      component: () => import('@/view/main/index.vue'),
-      meta: { requiresAuth: true },
+      path: '/problem',
+      component: () => import('@/layout/AppLayout.vue'), // 作为 layout
+      children: [
+        { path: '', redirect: { name: 'problemset' } },
+        {
+          path: 'problemset',
+          name: 'problemset',
+          component: () => import('@/view/problems/problemset/ProblemSet.vue'),
+        },
+        {
+          path: 'problemlist/:id',
+          name: 'problemlist',
+          component: () => import('@/view/problems/problemlist/ProblemList.vue'),
+        },
+      ],
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('@/view/dashboard/index.vue'),
-      meta: { requiresAuth: true },
+      path: '/problem/detail/:id(\\d+)',
+      name: 'problem-detail',
+      component: () => import('@/view/problems/detailed/DetailedView.vue'),
     },
     {
-      path: '/problems/:slug',
-      name: 'problem-editor',
-      component: () => import('@/view/editer/index.vue'),
-      meta: { requiresAuth: true },
+      path: '/problem/detail/:id(\\d+)/solutions/:solutionId',
+      name: 'problem-solution-detail',
+      component: () => import('@/view/problems/detailed/SolutionDetailView.vue'),
     },
   ],
 })

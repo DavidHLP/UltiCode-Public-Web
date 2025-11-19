@@ -1,0 +1,91 @@
+{
+  "runResults": [
+    {
+      "id": "run-1",
+      "problemId": 1,
+      "userId": "u-001",
+      "verdict": "Wrong Answer",
+      "runtime": "0 ms",
+      "memory": "—"
+    }
+  ],
+  "runCases": [
+    {
+      "id": "run-1-case-1",
+      "runId": "run-1",
+      "caseLabel": "Case 1",
+      "status": "Accepted",
+      "runtime": "0 ms",
+      "memory": "—",
+      "detail": "Output matched expected value.",
+      "output": "[0,1]",
+      "expectedOutput": "[0,1]"
+    },
+    {
+      "id": "run-1-case-2",
+      "runId": "run-1",
+      "caseLabel": "Case 2",
+      "status": "Wrong Answer",
+      "runtime": "0 ms",
+      "memory": "—",
+      "detail": "Output did not match expected value.",
+      "output": "[0,1]",
+      "expectedOutput": "[1,2]"
+    },
+    {
+      "id": "run-1-case-3",
+      "runId": "run-1",
+      "caseLabel": "Case 3",
+      "status": "Accepted",
+      "runtime": "0 ms",
+      "memory": "—",
+      "detail": "Output matched expected value.",
+      "output": "[0,1]",
+      "expectedOutput": "[0,1]"
+    }
+  ],
+  "runCaseInputs": [
+    {
+      "id": "run-1-case-1-nums-0",
+      "runCaseId": "run-1-case-1",
+      "field": "nums",
+      "label": "nums",
+      "value": "[2,7,11,15]"
+    },
+    {
+      "id": "run-1-case-1-target-1",
+      "runCaseId": "run-1-case-1",
+      "field": "target",
+      "label": "target",
+      "value": "9"
+    },
+    {
+      "id": "run-1-case-2-nums-0",
+      "runCaseId": "run-1-case-2",
+      "field": "nums",
+      "label": "nums",
+      "value": "[3,2,4]"
+    },
+    {
+      "id": "run-1-case-2-target-1",
+      "runCaseId": "run-1-case-2",
+      "field": "target",
+      "label": "target",
+      "value": "6"
+    },
+    {
+      "id": "run-1-case-3-nums-0",
+      "runCaseId": "run-1-case-3",
+      "field": "nums",
+      "label": "nums",
+      "value": "[3,3]"
+    },
+    {
+      "id": "run-1-case-3-target-1",
+      "runCaseId": "run-1-case-3",
+      "field": "target",
+      "label": "target",
+      "value": "6"
+    }
+  ]
+}

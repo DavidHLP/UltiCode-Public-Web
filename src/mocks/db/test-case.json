@@ -1,0 +1,66 @@
+{
+  "testCases": [
+    {
+      "id": "case-1",
+      "problemId": 1,
+      "label": "Case 1",
+      "explanation": "Indices 0 and 1 sum up to 9."
+    },
+    {
+      "id": "case-2",
+      "problemId": 1,
+      "label": "Case 2",
+      "explanation": "Indices 1 and 2 sum up to 6."
+    },
+    {
+      "id": "case-3",
+      "problemId": 1,
+      "label": "Case 3",
+      "explanation": ""
+    }
+  ],
+  "testCaseInputs": [
+    {
+      "id": "case-1-nums-0",
+      "testCaseId": "case-1",
+      "field": "nums",
+      "label": "nums",
+      "value": "[2,7,11,15]"
+    },
+    {
+      "id": "case-1-target-1",
+      "testCaseId": "case-1",
+      "field": "target",
+      "label": "target",
+      "value": "9"
+    },
+    {
+      "id": "case-2-nums-0",
+      "testCaseId": "case-2",
+      "field": "nums",
+      "label": "nums",
+      "value": "[3,2,4]"
+    },
+    {
+      "id": "case-2-target-1",
+      "testCaseId": "case-2",
+      "field": "target",
+      "label": "target",
+      "value": "6"
+    },
+    {
+      "id": "case-3-nums-0",
+      "testCaseId": "case-3",
+      "field": "nums",
+      "label": "nums",
+      "value": "[3,3]"
+    },
+    {
+      "id": "case-3-target-1",
+      "testCaseId": "case-3",
+      "field": "target",
+      "label": "target",
+      "value": "6"
+    }
+  ]
+}

@@ -1,0 +1,736 @@
+{
+  "problems": [
+    {
+      "id": 1,
+      "title": "Two Sum",
+      "status": "solved",
+      "acceptanceRate": 50.2,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-15"
+    },
+    {
+      "id": 2,
+      "title": "Add Two Numbers",
+      "status": "attempted",
+      "acceptanceRate": 41.5,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true
+    },
+    {
+      "id": 3,
+      "title": "Longest Substring Without Repeating Characters",
+      "status": "todo",
+      "acceptanceRate": 33.8,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true
+    },
+    {
+      "id": 4,
+      "title": "Median of Two Sorted Arrays",
+      "status": "todo",
+      "acceptanceRate": 36.9,
+      "difficulty": "Hard",
+      "isPremium": true,
+      "solution": false
+    },
+    {
+      "id": 5,
+      "title": "Longest Palindromic Substring",
+      "status": "solved",
+      "acceptanceRate": 32.5,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-22"
+    },
+    {
+      "id": 6,
+      "title": "Zigzag Conversion",
+      "status": "todo",
+      "acceptanceRate": 41.8,
+      "difficulty": "Medium",
+      "isPremium": true,
+      "solution": false
+    },
+    {
+      "id": 7,
+      "title": "Reverse Integer",
+      "status": "solved",
+      "acceptanceRate": 27.8,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": false,
+      "completedTime": "2025-11-10"
+    },
+    {
+      "id": 8,
+      "title": "String to Integer (atoi)",
+      "status": "attempted",
+      "acceptanceRate": 16.4,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": false
+    },
+    {
+      "id": 9,
+      "title": "Palindrome Number",
+      "status": "solved",
+      "acceptanceRate": 53.1,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-12"
+    },
+    {
+      "id": 10,
+      "title": "Regular Expression Matching",
+      "status": "todo",
+      "acceptanceRate": 28.2,
+      "difficulty": "Hard",
+      "isPremium": true,
+      "solution": true
+    },
+    {
+      "id": 11,
+      "title": "Container With Most Water",
+      "status": "solved",
+      "acceptanceRate": 54.1,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-18"
+    },
+    {
+      "id": 12,
+      "title": "Integer to Roman",
+      "status": "todo",
+      "acceptanceRate": 60.2,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": false
+    },
+    {
+      "id": 13,
+      "title": "Roman to Integer",
+      "status": "solved",
+      "acceptanceRate": 58.1,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-05"
+    },
+    {
+      "id": 14,
+      "title": "Longest Common Prefix",
+      "status": "solved",
+      "acceptanceRate": 41,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-28"
+    },
+    {
+      "id": 15,
+      "title": "3Sum",
+      "status": "attempted",
+      "acceptanceRate": 32,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true
+    },
+    {
+      "id": 16,
+      "title": "3Sum Closest",
+      "status": "todo",
+      "acceptanceRate": 46,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": false
+    },
+    {
+      "id": 17,
+      "title": "Letter Combinations of a Phone Number",
+      "status": "solved",
+      "acceptanceRate": 55.6,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-05"
+    },
+    {
+      "id": 18,
+      "title": "4Sum",
+      "status": "todo",
+      "acceptanceRate": 36.5,
+      "difficulty": "Medium",
+      "isPremium": true,
+      "solution": false
+    },
+    {
+      "id": 19,
+      "title": "Remove Nth Node From End of List",
+      "status": "solved",
+      "acceptanceRate": 40,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-30"
+    },
+    {
+      "id": 20,
+      "title": "Valid Parentheses",
+      "status": "solved",
+      "acceptanceRate": 42.9,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-20"
+    },
+    {
+      "id": 21,
+      "title": "Merge Two Sorted Lists",
+      "status": "solved",
+      "acceptanceRate": 58.7,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-15"
+    },
+    {
+      "id": 22,
+      "title": "Generate Parentheses",
+      "status": "attempted",
+      "acceptanceRate": 63,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true
+    },
+    {
+      "id": 23,
+      "title": "Valid Sudoku",
+      "status": "todo",
+      "acceptanceRate": 62.4,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": false
+    },
+    {
+      "id": 24,
+      "title": "Sudoku Solver",
+      "status": "todo",
+      "acceptanceRate": 42.3,
+      "difficulty": "Hard",
+      "isPremium": true,
+      "solution": false
+    },
+    {
+      "id": 25,
+      "title": "Minimum Path Sum",
+      "status": "solved",
+      "acceptanceRate": 57.4,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-25"
+    },
+    {
+      "id": 26,
+      "title": "Word Ladder",
+      "status": "attempted",
+      "acceptanceRate": 32.5,
+      "difficulty": "Hard",
+      "isPremium": false,
+      "solution": false
+    },
+    {
+      "id": 27,
+      "title": "Course Schedule",
+      "status": "solved",
+      "acceptanceRate": 45.9,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-10"
+    },
+    {
+      "id": 28,
+      "title": "Number of Islands",
+      "status": "solved",
+      "acceptanceRate": 55.1,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-22"
+    },
+    {
+      "id": 29,
+      "title": "Merge k Sorted Lists",
+      "status": "todo",
+      "acceptanceRate": 44.2,
+      "difficulty": "Hard",
+      "isPremium": true,
+      "solution": false
+    },
+    {
+      "id": 30,
+      "title": "LRU Cache",
+      "status": "attempted",
+      "acceptanceRate": 36.7,
+      "difficulty": "Medium",
+      "isPremium": true,
+      "solution": true
+    },
+    {
+      "id": 31,
+      "title": "Binary Tree Level Order Traversal",
+      "status": "solved",
+      "acceptanceRate": 63.5,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-05"
+    },
+    {
+      "id": 32,
+      "title": "Maximum Subarray",
+      "status": "solved",
+      "acceptanceRate": 48.9,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-30"
+    },
+    {
+      "id": 33,
+      "title": "Climbing Stairs",
+      "status": "solved",
+      "acceptanceRate": 55.8,
+      "difficulty": "Easy",
+      "isPremium": false,
+      "solution": true,
+      "completedTime": "2025-11-18"
+    },
+    {
+      "id": 34,
+      "title": "Word Break",
+      "status": "todo",
+      "acceptanceRate": 39.1,
+      "difficulty": "Medium",
+      "isPremium": false,
+      "solution": false
+    },
+    {
+      "id": 35,
+      "title": "Sliding Window Maximum",
+      "status": "attempted",
+      "acceptanceRate": 44,
+      "difficulty": "Hard",
+      "isPremium": false,
+      "solution": false
+    }
+  ],
+  "problemTags": [
+    {
+      "id": "array",
+      "label": "Array"
+    },
+    {
+      "id": "hash-table",
+      "label": "Hash Table"
+    },
+    {
+      "id": "linked-list",
+      "label": "Linked List"
+    },
+    {
+      "id": "math",
+      "label": "Math"
+    },
+    {
+      "id": "recursion",
+      "label": "Recursion"
+    },
+    {
+      "id": "string",
+      "label": "String"
+    },
+    {
+      "id": "sliding-window",
+      "label": "Sliding Window"
+    },
+    {
+      "id": "binary-search",
+      "label": "Binary Search"
+    },
+    {
+      "id": "divide-and-conquer",
+      "label": "Divide and Conquer"
+    },
+    {
+      "id": "dynamic-programming",
+      "label": "Dynamic Programming"
+    },
+    {
+      "id": "two-pointers",
+      "label": "Two Pointers"
+    },
+    {
+      "id": "greedy",
+      "label": "Greedy"
+    },
+    {
+      "id": "sorting",
+      "label": "Sorting"
+    },
+    {
+      "id": "backtracking",
+      "label": "Backtracking"
+    },
+    {
+      "id": "stack",
+      "label": "Stack"
+    },
+    {
+      "id": "breadth-first-search",
+      "label": "Breadth-First Search"
+    },
+    {
+      "id": "graph",
+      "label": "Graph"
+    },
+    {
+      "id": "topological-sort",
+      "label": "Topological Sort"
+    },
+    {
+      "id": "matrix",
+      "label": "Matrix"
+    },
+    {
+      "id": "depth-first-search",
+      "label": "Depth-First Search"
+    },
+    {
+      "id": "heap",
+      "label": "Heap"
+    },
+    {
+      "id": "design",
+      "label": "Design"
+    },
+    {
+      "id": "tree",
+      "label": "Tree"
+    },
+    {
+      "id": "deque",
+      "label": "Deque"
+    }
+  ],
+  "problemTagRelations": [
+    {
+      "problemId": 1,
+      "tagId": "array"
+    },
+    {
+      "problemId": 1,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 2,
+      "tagId": "linked-list"
+    },
+    {
+      "problemId": 2,
+      "tagId": "math"
+    },
+    {
+      "problemId": 2,
+      "tagId": "recursion"
+    },
+    {
+      "problemId": 3,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 3,
+      "tagId": "string"
+    },
+    {
+      "problemId": 3,
+      "tagId": "sliding-window"
+    },
+    {
+      "problemId": 4,
+      "tagId": "array"
+    },
+    {
+      "problemId": 4,
+      "tagId": "binary-search"
+    },
+    {
+      "problemId": 4,
+      "tagId": "divide-and-conquer"
+    },
+    {
+      "problemId": 5,
+      "tagId": "string"
+    },
+    {
+      "problemId": 5,
+      "tagId": "dynamic-programming"
+    },
+    {
+      "problemId": 6,
+      "tagId": "string"
+    },
+    {
+      "problemId": 7,
+      "tagId": "math"
+    },
+    {
+      "problemId": 8,
+      "tagId": "string"
+    },
+    {
+      "problemId": 9,
+      "tagId": "math"
+    },
+    {
+      "problemId": 10,
+      "tagId": "string"
+    },
+    {
+      "problemId": 10,
+      "tagId": "dynamic-programming"
+    },
+    {
+      "problemId": 10,
+      "tagId": "recursion"
+    },
+    {
+      "problemId": 11,
+      "tagId": "array"
+    },
+    {
+      "problemId": 11,
+      "tagId": "two-pointers"
+    },
+    {
+      "problemId": 11,
+      "tagId": "greedy"
+    },
+    {
+      "problemId": 12,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 12,
+      "tagId": "math"
+    },
+    {
+      "problemId": 12,
+      "tagId": "string"
+    },
+    {
+      "problemId": 13,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 13,
+      "tagId": "math"
+    },
+    {
+      "problemId": 13,
+      "tagId": "string"
+    },
+    {
+      "problemId": 14,
+      "tagId": "string"
+    },
+    {
+      "problemId": 15,
+      "tagId": "array"
+    },
+    {
+      "problemId": 15,
+      "tagId": "two-pointers"
+    },
+    {
+      "problemId": 15,
+      "tagId": "sorting"
+    },
+    {
+      "problemId": 16,
+      "tagId": "array"
+    },
+    {
+      "problemId": 16,
+      "tagId": "two-pointers"
+    },
+    {
+      "problemId": 16,
+      "tagId": "sorting"
+    },
+    {
+      "problemId": 17,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 17,
+      "tagId": "string"
+    },
+    {
+      "problemId": 17,
+      "tagId": "backtracking"
+    },
+    {
+      "problemId": 18,
+      "tagId": "array"
+    },
+    {
+      "problemId": 18,
+      "tagId": "two-pointers"
+    },
+    {
+      "problemId": 18,
+      "tagId": "sorting"
+    },
+    {
+      "problemId": 19,
+      "tagId": "linked-list"
+    },
+    {
+      "problemId": 19,
+      "tagId": "two-pointers"
+    },
+    {
+      "problemId": 20,
+      "tagId": "string"
+    },
+    {
+      "problemId": 20,
+      "tagId": "stack"
+    },
+    {
+      "problemId": 21,
+      "tagId": "linked-list"
+    },
+    {
+      "problemId": 21,
+      "tagId": "recursion"
+    },
+    {
+      "problemId": 22,
+      "tagId": "string"
+    },
+    {
+      "problemId": 22,
+      "tagId": "backtracking"
+    },
+    {
+      "problemId": 23,
+      "tagId": "array"
+    },
+    {
+      "problemId": 23,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 24,
+      "tagId": "array"
+    },
+    {
+      "problemId": 24,
+      "tagId": "backtracking"
+    },
+    {
+      "problemId": 25,
+      "tagId": "array"
+    },
+    {
+      "problemId": 25,
+      "tagId": "dynamic-programming"
+    },
+    {
+      "problemId": 26,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 26,
+      "tagId": "breadth-first-search"
+    },
+    {
+      "problemId": 27,
+      "tagId": "graph"
+    },
+    {
+      "problemId": 27,
+      "tagId": "topological-sort"
+    },
+    {
+      "problemId": 28,
+      "tagId": "matrix"
+    },
+    {
+      "problemId": 28,
+      "tagId": "depth-first-search"
+    },
+    {
+      "problemId": 29,
+      "tagId": "linked-list"
+    },
+    {
+      "problemId": 29,
+      "tagId": "heap"
+    },
+    {
+      "problemId": 30,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 30,
+      "tagId": "design"
+    },
+    {
+      "problemId": 31,
+      "tagId": "tree"
+    },
+    {
+      "problemId": 31,
+      "tagId": "breadth-first-search"
+    },
+    {
+      "problemId": 32,
+      "tagId": "array"
+    },
+    {
+      "problemId": 32,
+      "tagId": "dynamic-programming"
+    },
+    {
+      "problemId": 33,
+      "tagId": "dynamic-programming"
+    },
+    {
+      "problemId": 34,
+      "tagId": "dynamic-programming"
+    },
+    {
+      "problemId": 34,
+      "tagId": "hash-table"
+    },
+    {
+      "problemId": 35,
+      "tagId": "deque"
+    },
+    {
+      "problemId": 35,
+      "tagId": "sliding-window"
+    }
+  ]
+}
