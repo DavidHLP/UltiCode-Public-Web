@@ -27,10 +27,14 @@ const problemTagsMap = problemsData.problem_tag_relations.reduce<
   return acc;
 }, new Map());
 
-const problems: Problem[] = problemsData.problems.map((problem) => ({
-  ...problem,
-  tags: problemTagsMap.get(problem.id) ?? [],
-}));
+const problems: Problem[] = problemsData.problems.map((problem) => {
+  const { acceptance_rate, ...rest } = problem
+  return {
+    ...rest,
+    acceptanceRate: acceptance_rate,
+    tags: problemTagsMap.get(problem.id) ?? [],
+  }
+});
 
 export function fetchProblems(): Problem[] {
   return problems;
