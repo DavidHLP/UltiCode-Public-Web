@@ -289,6 +289,93 @@ const SCHEMA_METADATA: Record<string, SchemaMetadata> = {
     },
     requiredFields: ["id", "submission_id", "label", "status", "runtime"],
   },
+  run_results: {
+    primaryKey: { field: "id", type: "string" },
+    foreignKeys: [
+      {
+        field: "submission_id",
+        references: { entity: "submissions", field: "id" },
+      },
+      { field: "problem_id", references: { entity: "problems", field: "id" } },
+    ],
+    enums: {
+      verdict: [
+        "Accepted",
+        "Wrong Answer",
+        "Runtime Error",
+        "Time Limit Exceeded",
+        "Pending",
+      ],
+    },
+    requiredFields: [
+      "id",
+      "submission_id",
+      "problem_id",
+      "user_id",
+      "verdict",
+      "runtime",
+      "memory",
+    ],
+  },
+  run_cases: {
+    primaryKey: { field: "id", type: "string" },
+    foreignKeys: [
+      {
+        field: "run_result_id",
+        references: { entity: "run_results", field: "id" },
+      },
+      {
+        field: "submission_test_id",
+        references: { entity: "submission_tests", field: "id" },
+      },
+      {
+        field: "test_case_id",
+        references: { entity: "test_cases", field: "id" },
+      },
+    ],
+    enums: {
+      status: [
+        "Accepted",
+        "Wrong Answer",
+        "Runtime Error",
+        "Time Limit Exceeded",
+        "Pending",
+      ],
+    },
+    requiredFields: [
+      "id",
+      "run_result_id",
+      "submission_test_id",
+      "test_case_id",
+      "status",
+      "runtime",
+      "memory",
+      "detail",
+      "output_text",
+      "expected_output_text",
+    ],
+  },
+  run_case_inputs: {
+    primaryKey: { field: "id", type: "string" },
+    foreignKeys: [
+      {
+        field: "run_case_id",
+        references: { entity: "run_cases", field: "id" },
+      },
+      {
+        field: "test_case_input_id",
+        references: { entity: "test_case_inputs", field: "id" },
+      },
+    ],
+    requiredFields: [
+      "id",
+      "run_case_id",
+      "test_case_input_id",
+      "field_name",
+      "label",
+      "value",
+    ],
+  },
   problem_list_groups: {
     primaryKey: { field: "id", type: "string" },
     requiredFields: ["id", "name", "sort_order"],

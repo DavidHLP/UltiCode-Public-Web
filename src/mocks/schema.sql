@@ -222,6 +222,51 @@ CREATE TABLE submission_tests (
 );
 
 -- ----------------------------
+-- Problem run results (execution feedback)
+-- ----------------------------
+DROP TABLE IF EXISTS run_results;
+CREATE TABLE run_results (
+    id             VARCHAR(40) PRIMARY KEY,
+    submission_id  VARCHAR(40) NOT NULL,
+    problem_id     BIGINT NOT NULL,
+    user_id        VARCHAR(40) NOT NULL,
+    verdict        ENUM ('Accepted','Wrong Answer','Runtime Error','Time Limit Exceeded','Pending') NOT NULL,
+    runtime        VARCHAR(32) NOT NULL,
+    memory         VARCHAR(32) NOT NULL,
+    CONSTRAINT fk_rr_submission FOREIGN KEY (submission_id) REFERENCES submissions(id),
+    CONSTRAINT fk_rr_problem FOREIGN KEY (problem_id) REFERENCES problems(id)
+);
+
+DROP TABLE IF EXISTS run_cases;
+CREATE TABLE run_cases (
+    id                    VARCHAR(40) PRIMARY KEY,
+    run_result_id         VARCHAR(40) NOT NULL,
+    submission_test_id    VARCHAR(40) NOT NULL,
+    test_case_id          VARCHAR(40) NOT NULL,
+    status                ENUM ('Accepted','Wrong Answer','Runtime Error','Time Limit Exceeded','Pending') NOT NULL,
+    runtime               VARCHAR(32) NOT NULL,
+    memory                VARCHAR(32) NOT NULL,
+    detail                TEXT NOT NULL,
+    output_text           TEXT NOT NULL,
+    expected_output_text  TEXT NOT NULL,
+    CONSTRAINT fk_rc_run_result FOREIGN KEY (run_result_id) REFERENCES run_results(id),
+    CONSTRAINT fk_rc_submission_test FOREIGN KEY (submission_test_id) REFERENCES submission_tests(id),
+    CONSTRAINT fk_rc_test_case FOREIGN KEY (test_case_id) REFERENCES test_cases(id)
+);
+
+DROP TABLE IF EXISTS run_case_inputs;
+CREATE TABLE run_case_inputs (
+    id                 VARCHAR(40) PRIMARY KEY,
+    run_case_id        VARCHAR(40) NOT NULL,
+    test_case_input_id VARCHAR(40) NOT NULL,
+    field_name         VARCHAR(60) NOT NULL,
+    label              VARCHAR(60) NOT NULL,
+    value              TEXT NOT NULL,
+    CONSTRAINT fk_rci_run_case FOREIGN KEY (run_case_id) REFERENCES run_cases(id),
+    CONSTRAINT fk_rci_test_case_input FOREIGN KEY (test_case_input_id) REFERENCES test_case_inputs(id)
+);
+
+-- ----------------------------
 -- Problem lists
 -- ----------------------------
 DROP TABLE IF EXISTS problem_list_groups;
