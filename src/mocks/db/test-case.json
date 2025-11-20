@@ -23,44 +23,44 @@
     {
       "id": "case-1-nums-0",
       "testCaseId": "case-1",
-      "field": "nums",
       "label": "nums",
-      "value": "[2,7,11,15]"
+      "value": "[2,7,11,15]",
+      "fieldName": "nums"
     },
     {
       "id": "case-1-target-1",
       "testCaseId": "case-1",
-      "field": "target",
       "label": "target",
-      "value": "9"
+      "value": "9",
+      "fieldName": "target"
     },
     {
       "id": "case-2-nums-0",
       "testCaseId": "case-2",
-      "field": "nums",
       "label": "nums",
-      "value": "[3,2,4]"
+      "value": "[3,2,4]",
+      "fieldName": "nums"
     },
     {
       "id": "case-2-target-1",
       "testCaseId": "case-2",
-      "field": "target",
       "label": "target",
-      "value": "6"
+      "value": "6",
+      "fieldName": "target"
     },
     {
       "id": "case-3-nums-0",
       "testCaseId": "case-3",
-      "field": "nums",
       "label": "nums",
-      "value": "[3,3]"
+      "value": "[3,3]",
+      "fieldName": "nums"
     },
     {
       "id": "case-3-target-1",
       "testCaseId": "case-3",
-      "field": "target",
       "label": "target",
-      "value": "6"
+      "value": "6",
+      "fieldName": "target"
     }
   ]
 }

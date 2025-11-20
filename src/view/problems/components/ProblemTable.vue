@@ -106,7 +106,7 @@ onUnmounted(() => {
               <span class="truncate">{{ problem.id }}. {{ problem.title }}</span>
               <!-- 关键：去掉下划线 -->
               <a
-                v-if="problem.solution"
+                v-if="problem.hasSolution"
                 href="#"
                 class="no-underline hover:no-underline text-muted-foreground hover:text-foreground"
                 @click.stop

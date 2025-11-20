@@ -23,22 +23,25 @@
     {
       "id": "example-1",
       "problemId": 1,
-      "input": "**Input:** `nums = [2,7,11,15]`, `target = 9`",
-      "output": "**Output:** `[0,1]`",
+      "exampleOrder": 1,
+      "inputText": "**Input:** `nums = [2,7,11,15]`, `target = 9`",
+      "outputText": "**Output:** `[0,1]`",
       "explanation": "Indices satisfy $nums_0 + nums_1 = 7 + 2 = 9$. Return `[0, 1]` in ascending order."
     },
     {
       "id": "example-2",
       "problemId": 1,
-      "input": "**Input:** `nums = [3,2,4]`, `target = 6`",
-      "output": "**Output:** `[1,2]`",
+      "exampleOrder": 2,
+      "inputText": "**Input:** `nums = [3,2,4]`, `target = 6`",
+      "outputText": "**Output:** `[1,2]`",
       "explanation": "Complement lookup: $target - nums_2 = 6 - 4 = 2$, which already exists at index 1."
     },
     {
       "id": "example-3",
       "problemId": 1,
-      "input": "**Input:** `nums = [3,3]`, `target = 6`",
-      "output": "**Output:** `[0,1]`",
+      "exampleOrder": 3,
+      "inputText": "**Input:** `nums = [3,3]`, `target = 6`",
+      "outputText": "**Output:** `[0,1]`",
       "explanation": "Both entries are equal so the first complement is found immediately: $3 + 3 = 6$."
     }
   ],

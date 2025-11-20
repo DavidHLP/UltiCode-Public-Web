@@ -55,12 +55,7 @@ const router = createRouter({
       path: '/problem/detail/:id(\\d+)',
       name: 'problem-detail',
       component: () => import('@/view/problems/detailed/DetailedView.vue'),
-    },
-    {
-      path: '/problem/detail/:id(\\d+)/solutions/:solutionId',
-      name: 'problem-solution-detail',
-      component: () => import('@/view/problems/detailed/SolutionDetailView.vue'),
-    },
+    }
   ],
 })
 

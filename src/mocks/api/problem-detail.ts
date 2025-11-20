@@ -75,12 +75,15 @@ problemDetailData.problemDetails.forEach((detail) => {
     updatedAt: detail.updatedAt,
     followUp: detail.followUp,
     constraints: detail.constraints,
-    examples: (examplesByProblemId.get(detail.problemId) ?? []).map((example) => ({
-      id: example.id,
-      input: example.input,
-      output: example.output,
-      explanation: example.explanation,
-    })),
+    examples: (examplesByProblemId.get(detail.problemId) ?? [])
+      .sort((a, b) => a.exampleOrder - b.exampleOrder)
+      .map((example) => ({
+        id: example.id,
+        order: example.exampleOrder,
+        input: example.inputText,
+        output: example.outputText,
+        explanation: example.explanation,
+      })),
     approaches: (approachesByProblemId.get(detail.problemId) ?? []).map(normalizeApproach),
     submissions: [],
     languages: (languagesByProblemId.get(detail.problemId) ?? []).map(

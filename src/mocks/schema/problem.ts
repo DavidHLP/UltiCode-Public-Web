@@ -5,12 +5,13 @@ export type ProblemDifficulty = 'Easy' | 'Medium' | 'Hard'
 
 export interface ProblemRow {
   id: ProblemId
+  slug: string
   title: string
   status: ProblemStatus
   acceptanceRate: number
   difficulty: ProblemDifficulty
   isPremium: boolean
-  solution: boolean
+  hasSolution: boolean
   completedTime?: string
 }
 

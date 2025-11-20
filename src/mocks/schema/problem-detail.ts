@@ -27,8 +27,9 @@ export interface ProblemDetailRow {
 export interface ProblemExampleRow {
   id: ProblemExampleId
   problemId: ProblemId
-  input: string
-  output: string
+  exampleOrder: number
+  inputText: string
+  outputText: string
   explanation?: string
 }
 
@@ -74,7 +75,13 @@ export interface ProblemStarterNoteRow {
   content: string
 }
 
-export type ProblemExample = Omit<ProblemExampleRow, 'problemId'>
+export interface ProblemExample {
+  id: ProblemExampleId
+  order: number
+  input: string
+  output: string
+  explanation?: string
+}
 
 export interface ProblemApproach
   extends Omit<ProblemApproachRow, 'problemId' | 'timeComplexity' | 'spaceComplexity'> {
@@ -91,6 +98,7 @@ export type ProblemLanguageOption = Omit<ProblemLanguageRow, 'problemId'>
 
 export interface ProblemTestCaseInput {
   id: string
+  fieldName: string
   label: string
   value: string
 }

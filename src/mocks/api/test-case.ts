@@ -7,7 +7,8 @@ const inputsByTestCaseId = testCaseData.testCaseInputs.reduce<Map<string, Proble
       acc.set(input.testCaseId, [])
     }
     acc.get(input.testCaseId)!.push({
-      id: input.field,
+      id: input.id,
+      fieldName: input.fieldName,
       label: input.label,
       value: input.value,
     })
