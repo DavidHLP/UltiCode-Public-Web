@@ -1,5 +1,5 @@
 {
-  "filterOptions": [
+  "solution_filter_options": [
     {
       "id": "quick-1",
       "kind": "quick",
@@ -43,39 +43,39 @@
       "value": "oldest"
     }
   ],
-  "authors": [
+  "solution_authors": [
     {
       "id": "author-1",
       "name": "System",
       "role": "Editorial · Demo data",
-      "avatarColor": "#94a3b8"
+      "avatar_color": "#94a3b8"
     },
     {
       "id": "author-2",
       "name": "Bricklayers Club",
       "role": "JavaScript · Summit cohort",
-      "avatarColor": "#f97316"
+      "avatar_color": "#f97316"
     },
     {
       "id": "author-3",
       "name": "Boundary Tales",
       "role": "Python · Manual reasoning lab",
-      "avatarColor": "#0ea5e9"
+      "avatar_color": "#0ea5e9"
     },
     {
       "id": "author-4",
       "name": "Chen Lele",
       "role": "C++ · Template curator",
-      "avatarColor": "#6366f1"
+      "avatar_color": "#6366f1"
     },
     {
       "id": "author-5",
       "name": "Soul Hill",
       "role": "Polyglot · Experience share",
-      "avatarColor": "#10b981"
+      "avatar_color": "#10b981"
     }
   ],
-  "badges": [
+  "solution_badges": [
     {
       "id": "sample",
       "label": "Sample"
@@ -113,113 +113,113 @@
       "label": "Retrospective"
     }
   ],
-  "badgeRelations": [
+  "solution_badge_relations": [
     {
-      "badgeId": "sample",
-      "metaId": "fallback-1"
+      "badge_id": "sample",
+      "meta_id": "fallback-1"
     },
     {
-      "badgeId": "single-pass",
-      "metaId": "meta-1"
+      "badge_id": "single-pass",
+      "meta_id": "meta-1"
     },
     {
-      "badgeId": "clear-reasoning",
-      "metaId": "meta-1"
+      "badge_id": "clear-reasoning",
+      "meta_id": "meta-1"
     },
     {
-      "badgeId": "decomposed",
-      "metaId": "meta-2"
+      "badge_id": "decomposed",
+      "meta_id": "meta-2"
     },
     {
-      "badgeId": "complexity-callout",
-      "metaId": "meta-2"
+      "badge_id": "complexity-callout",
+      "meta_id": "meta-2"
     },
     {
-      "badgeId": "c",
-      "metaId": "meta-3"
+      "badge_id": "c",
+      "meta_id": "meta-3"
     },
     {
-      "badgeId": "implementation-notes",
-      "metaId": "meta-3"
+      "badge_id": "implementation-notes",
+      "meta_id": "meta-3"
     },
     {
-      "badgeId": "polyglot",
-      "metaId": "meta-4"
+      "badge_id": "polyglot",
+      "meta_id": "meta-4"
     },
     {
-      "badgeId": "retrospective",
-      "metaId": "meta-4"
+      "badge_id": "retrospective",
+      "meta_id": "meta-4"
     }
   ],
-  "metas": [
+  "solution_metas": [
     {
       "id": "fallback-1",
       "highlight": "Sample walkthrough insight",
       "flair": "Featured",
-      "authorId": "author-1",
-      "views": "0",
+      "author_id": "author-1",
+      "views_text": "0",
       "likes": 0,
       "comments": 0,
-      "createdAt": "just now",
-      "publishedAt": "2025-04-01T08:00:00.000Z",
+      "created_at": "2025-04-01T07:59:00.000Z",
+      "published_at": "2025-04-01T08:00:00.000Z",
       "topic": "dp",
-      "languageFilter": "all",
+      "language_filter": "all",
       "score": 0
     },
     {
       "id": "meta-1",
       "highlight": "LeetCode #1: breaking down the one-pass HashMap trick",
       "flair": "Featured",
-      "authorId": "author-2",
-      "views": "169.8K",
+      "author_id": "author-2",
+      "views_text": "169.8K",
       "likes": 337,
       "comments": 86,
-      "createdAt": "1 hour ago",
-      "publishedAt": "2025-04-01T07:00:00.000Z",
+      "created_at": "2025-04-01T06:00:00.000Z",
+      "published_at": "2025-04-01T07:00:00.000Z",
       "topic": "dp",
-      "languageFilter": "javascript",
+      "language_filter": "javascript",
       "score": 95
     },
     {
       "id": "meta-2",
       "highlight": "An intuitive Python path derivation with inline notes",
       "flair": "Deep dive",
-      "authorId": "author-3",
-      "views": "250.3K",
+      "author_id": "author-3",
+      "views_text": "250.3K",
       "likes": 476,
       "comments": 182,
-      "createdAt": "3 hours ago",
-      "publishedAt": "2025-04-01T05:00:00.000Z",
+      "created_at": "2025-04-01T04:00:00.000Z",
+      "published_at": "2025-04-01T05:00:00.000Z",
       "topic": "dfs",
-      "languageFilter": "python",
+      "language_filter": "python",
       "score": 98
     },
     {
       "id": "meta-3",
       "highlight": "Two Sum in C++: making brute force elegant",
       "flair": "Community buzz",
-      "authorId": "author-4",
-      "views": "792.1K",
+      "author_id": "author-4",
+      "views_text": "792.1K",
       "likes": 1170,
       "comments": 92,
-      "createdAt": "yesterday",
-      "publishedAt": "2025-03-31T12:00:00.000Z",
+      "created_at": "2025-03-31T11:00:00.000Z",
+      "published_at": "2025-03-31T12:00:00.000Z",
       "topic": "memo",
-      "languageFilter": "cpp",
+      "language_filter": "cpp",
       "score": 90
     },
     {
       "id": "meta-4",
       "highlight": "What can we learn from Two Sum?",
       "flair": "Discussion",
-      "authorId": "author-5",
-      "views": "210.7K",
+      "author_id": "author-5",
+      "views_text": "210.7K",
       "likes": 768,
       "comments": 184,
-      "createdAt": "2 days ago",
-      "publishedAt": "2025-03-30T08:00:00.000Z",
+      "created_at": "2025-03-30T07:00:00.000Z",
+      "published_at": "2025-03-30T08:00:00.000Z",
       "topic": "dp",
-      "languageFilter": "all",
+      "language_filter": "all",
       "score": 88
     }
   ],

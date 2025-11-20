@@ -6,7 +6,7 @@ import type {
   ContestInsight,
   ContestInsightRow,
   ContestLeaderboardEntry,
-  ContestLeaderboardEntryRow,
+  ContestLeaderboardRow,
   ContestOpsCheckpoint,
   ContestOpsCheckpointRow,
   ContestResource,
@@ -14,98 +14,109 @@ import type {
   ContestTrack,
   ContestTrackRow,
   ContestCrewMember,
-  ContestCrewMemberRow,
-} from '@/mocks/schema/contest'
-import contestData from '@/mocks/db/contest.json'
+  ContestCrewRow,
+  ContestRow,
+} from "@/mocks/schema/contest";
+import contestData from "@/mocks/db/contest.json";
 
-const schedule = contestData.events as ContestEventRow[]
+const contests = contestData.contests as ContestRow[];
+const schedule = contestData.contest_events as ContestEventRow[];
+
+// Get the main contest and its featured event
+const mainContest = contests[0];
+if (!mainContest) {
+  throw new Error("Contest dataset is empty");
+}
+
 const derivedFeaturedContest =
-  schedule.find((event) => event.id === contestData.featuredContestId) ?? schedule[0]
+  schedule.find((event) => event.id === mainContest.featured_event_id) ??
+  schedule[0];
 
 if (!derivedFeaturedContest) {
-  throw new Error('Contest dataset is empty')
+  throw new Error("Contest events dataset is empty");
 }
-const featuredContest = derivedFeaturedContest
+const featuredContest = derivedFeaturedContest;
 
-const mapRows = <T extends { contestId: string }, O>(
+const mapRows = <T extends { contest_id: string }, O>(
   rows: T[],
-  mapper: (row: T) => O,
-): O[] => rows.filter((row) => row.contestId === featuredContest.id).map(mapper)
+  mapper: (row: T) => O
+): O[] =>
+  rows.filter((row) => row.contest_id === featuredContest.id).map(mapper);
 
-export function fetchContestFeaturedEvent(): ContestEvent {
-  return featuredContest
+export function fetchContestFeaturedEvent(): ContestEventRow {
+  return featuredContest;
 }
 
 export function fetchContestInsights(): ContestInsight[] {
   return mapRows(
-    contestData.insights as ContestInsightRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_insights as ContestInsightRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }
 
-export function fetchContestSchedule(): ContestEvent[] {
-  return schedule
+export function fetchContestSchedule(): ContestEventRow[] {
+  return schedule;
 }
 
 export function fetchContestLeaderboard(): ContestLeaderboardEntry[] {
   return mapRows(
-    contestData.leaderboard as ContestLeaderboardEntryRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_leaderboard as ContestLeaderboardRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }
 
 export function fetchContestTracks(): ContestTrack[] {
   return mapRows(
-    contestData.tracks as ContestTrackRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_tracks as ContestTrackRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }
 
 export function fetchContestResources(): ContestResource[] {
   return mapRows(
-    contestData.resources as ContestResourceRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_resources as ContestResourceRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }
 
 export function fetchContestFaq(): ContestFaqItem[] {
   return mapRows(
-    contestData.faqs as ContestFaqRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_faq as ContestFaqRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }
 
 export function fetchContestOpsCheckpoints(): ContestOpsCheckpoint[] {
   return mapRows(
-    contestData.ops as ContestOpsCheckpointRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_ops_checkpoints as ContestOpsCheckpointRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }
 
 export function fetchContestCrew(): ContestCrewMember[] {
   return mapRows(
-    contestData.crew as ContestCrewMemberRow[],
-    ({ contestId, ...row }) => {
-      void contestId
-      return row
-    },
-  )
+    contestData.contest_crew as ContestCrewRow[],
+    ({ contest_id, ...row }) => {
+      void contest_id;
+      return row;
+    }
+  );
 }

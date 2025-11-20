@@ -2,373 +2,373 @@
   "problems": [
     {
       "id": 1,
-      "title": "Two Sum",
-      "status": "solved",
-      "acceptanceRate": 50.2,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-15",
       "slug": "two-sum",
-      "hasSolution": true
+      "title": "Two Sum",
+      "difficulty": "Easy",
+      "acceptance_rate": 50.2,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-15"
     },
     {
       "id": 2,
-      "title": "Add Two Numbers",
-      "status": "attempted",
-      "acceptanceRate": 41.5,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "add-two-numbers",
-      "hasSolution": true
+      "title": "Add Two Numbers",
+      "difficulty": "Medium",
+      "acceptance_rate": 41.5,
+      "status": "attempted",
+      "is_premium": false,
+      "has_solution": true
     },
     {
       "id": 3,
-      "title": "Longest Substring Without Repeating Characters",
-      "status": "todo",
-      "acceptanceRate": 33.8,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "longest-substring-without-repeating-characters",
-      "hasSolution": true
+      "title": "Longest Substring Without Repeating Characters",
+      "difficulty": "Medium",
+      "acceptance_rate": 33.8,
+      "status": "todo",
+      "is_premium": false,
+      "has_solution": true
     },
     {
       "id": 4,
-      "title": "Median of Two Sorted Arrays",
-      "status": "todo",
-      "acceptanceRate": 36.9,
-      "difficulty": "Hard",
-      "isPremium": true,
       "slug": "median-of-two-sorted-arrays",
-      "hasSolution": false
+      "title": "Median of Two Sorted Arrays",
+      "difficulty": "Hard",
+      "acceptance_rate": 36.9,
+      "status": "todo",
+      "is_premium": true,
+      "has_solution": false
     },
     {
       "id": 5,
-      "title": "Longest Palindromic Substring",
-      "status": "solved",
-      "acceptanceRate": 32.5,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-22",
       "slug": "longest-palindromic-substring",
-      "hasSolution": true
+      "title": "Longest Palindromic Substring",
+      "difficulty": "Medium",
+      "acceptance_rate": 32.5,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-22"
     },
     {
       "id": 6,
-      "title": "Zigzag Conversion",
-      "status": "todo",
-      "acceptanceRate": 41.8,
-      "difficulty": "Medium",
-      "isPremium": true,
       "slug": "zigzag-conversion",
-      "hasSolution": false
+      "title": "Zigzag Conversion",
+      "difficulty": "Medium",
+      "acceptance_rate": 41.8,
+      "status": "todo",
+      "is_premium": true,
+      "has_solution": false
     },
     {
       "id": 7,
-      "title": "Reverse Integer",
-      "status": "solved",
-      "acceptanceRate": 27.8,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-10",
       "slug": "reverse-integer",
-      "hasSolution": false
+      "title": "Reverse Integer",
+      "difficulty": "Easy",
+      "acceptance_rate": 27.8,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": false,
+      "completed_time": "2025-11-10"
     },
     {
       "id": 8,
-      "title": "String to Integer (atoi)",
-      "status": "attempted",
-      "acceptanceRate": 16.4,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "string-to-integer-atoi",
-      "hasSolution": false
+      "title": "String to Integer (atoi)",
+      "difficulty": "Medium",
+      "acceptance_rate": 16.4,
+      "status": "attempted",
+      "is_premium": false,
+      "has_solution": false
     },
     {
       "id": 9,
-      "title": "Palindrome Number",
-      "status": "solved",
-      "acceptanceRate": 53.1,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-12",
       "slug": "palindrome-number",
-      "hasSolution": true
+      "title": "Palindrome Number",
+      "difficulty": "Easy",
+      "acceptance_rate": 53.1,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-12"
     },
     {
       "id": 10,
-      "title": "Regular Expression Matching",
-      "status": "todo",
-      "acceptanceRate": 28.2,
-      "difficulty": "Hard",
-      "isPremium": true,
       "slug": "regular-expression-matching",
-      "hasSolution": true
+      "title": "Regular Expression Matching",
+      "difficulty": "Hard",
+      "acceptance_rate": 28.2,
+      "status": "todo",
+      "is_premium": true,
+      "has_solution": true
     },
     {
       "id": 11,
-      "title": "Container With Most Water",
-      "status": "solved",
-      "acceptanceRate": 54.1,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-18",
       "slug": "container-with-most-water",
-      "hasSolution": true
+      "title": "Container With Most Water",
+      "difficulty": "Medium",
+      "acceptance_rate": 54.1,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-18"
     },
     {
       "id": 12,
-      "title": "Integer to Roman",
-      "status": "todo",
-      "acceptanceRate": 60.2,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "integer-to-roman",
-      "hasSolution": false
+      "title": "Integer to Roman",
+      "difficulty": "Medium",
+      "acceptance_rate": 60.2,
+      "status": "todo",
+      "is_premium": false,
+      "has_solution": false
     },
     {
       "id": 13,
-      "title": "Roman to Integer",
-      "status": "solved",
-      "acceptanceRate": 58.1,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-05",
       "slug": "roman-to-integer",
-      "hasSolution": true
+      "title": "Roman to Integer",
+      "difficulty": "Easy",
+      "acceptance_rate": 58.1,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-05"
     },
     {
       "id": 14,
-      "title": "Longest Common Prefix",
-      "status": "solved",
-      "acceptanceRate": 41,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-28",
       "slug": "longest-common-prefix",
-      "hasSolution": true
+      "title": "Longest Common Prefix",
+      "difficulty": "Easy",
+      "acceptance_rate": 41.0,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-28"
     },
     {
       "id": 15,
-      "title": "3Sum",
-      "status": "attempted",
-      "acceptanceRate": 32,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "3sum",
-      "hasSolution": true
+      "title": "3Sum",
+      "difficulty": "Medium",
+      "acceptance_rate": 32.0,
+      "status": "attempted",
+      "is_premium": false,
+      "has_solution": true
     },
     {
       "id": 16,
-      "title": "3Sum Closest",
-      "status": "todo",
-      "acceptanceRate": 46,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "3sum-closest",
-      "hasSolution": false
+      "title": "3Sum Closest",
+      "difficulty": "Medium",
+      "acceptance_rate": 46.0,
+      "status": "todo",
+      "is_premium": false,
+      "has_solution": false
     },
     {
       "id": 17,
-      "title": "Letter Combinations of a Phone Number",
-      "status": "solved",
-      "acceptanceRate": 55.6,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-05",
       "slug": "letter-combinations-of-a-phone-number",
-      "hasSolution": true
+      "title": "Letter Combinations of a Phone Number",
+      "difficulty": "Medium",
+      "acceptance_rate": 55.6,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-05"
     },
     {
       "id": 18,
-      "title": "4Sum",
-      "status": "todo",
-      "acceptanceRate": 36.5,
-      "difficulty": "Medium",
-      "isPremium": true,
       "slug": "4sum",
-      "hasSolution": false
+      "title": "4Sum",
+      "difficulty": "Medium",
+      "acceptance_rate": 36.5,
+      "status": "todo",
+      "is_premium": true,
+      "has_solution": false
     },
     {
       "id": 19,
-      "title": "Remove Nth Node From End of List",
-      "status": "solved",
-      "acceptanceRate": 40,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-30",
       "slug": "remove-nth-node-from-end-of-list",
-      "hasSolution": true
+      "title": "Remove Nth Node From End of List",
+      "difficulty": "Medium",
+      "acceptance_rate": 40.0,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-30"
     },
     {
       "id": 20,
-      "title": "Valid Parentheses",
-      "status": "solved",
-      "acceptanceRate": 42.9,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-20",
       "slug": "valid-parentheses",
-      "hasSolution": true
+      "title": "Valid Parentheses",
+      "difficulty": "Easy",
+      "acceptance_rate": 42.9,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-20"
     },
     {
       "id": 21,
-      "title": "Merge Two Sorted Lists",
-      "status": "solved",
-      "acceptanceRate": 58.7,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-15",
       "slug": "merge-two-sorted-lists",
-      "hasSolution": true
+      "title": "Merge Two Sorted Lists",
+      "difficulty": "Easy",
+      "acceptance_rate": 58.7,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-15"
     },
     {
       "id": 22,
-      "title": "Generate Parentheses",
-      "status": "attempted",
-      "acceptanceRate": 63,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "generate-parentheses",
-      "hasSolution": true
+      "title": "Generate Parentheses",
+      "difficulty": "Medium",
+      "acceptance_rate": 63.0,
+      "status": "attempted",
+      "is_premium": false,
+      "has_solution": true
     },
     {
       "id": 23,
-      "title": "Valid Sudoku",
-      "status": "todo",
-      "acceptanceRate": 62.4,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "valid-sudoku",
-      "hasSolution": false
+      "title": "Valid Sudoku",
+      "difficulty": "Medium",
+      "acceptance_rate": 62.4,
+      "status": "todo",
+      "is_premium": false,
+      "has_solution": false
     },
     {
       "id": 24,
-      "title": "Sudoku Solver",
-      "status": "todo",
-      "acceptanceRate": 42.3,
-      "difficulty": "Hard",
-      "isPremium": true,
       "slug": "sudoku-solver",
-      "hasSolution": false
+      "title": "Sudoku Solver",
+      "difficulty": "Hard",
+      "acceptance_rate": 42.3,
+      "status": "todo",
+      "is_premium": true,
+      "has_solution": false
     },
     {
       "id": 25,
-      "title": "Minimum Path Sum",
-      "status": "solved",
-      "acceptanceRate": 57.4,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-25",
       "slug": "minimum-path-sum",
-      "hasSolution": true
+      "title": "Minimum Path Sum",
+      "difficulty": "Medium",
+      "acceptance_rate": 57.4,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-25"
     },
     {
       "id": 26,
-      "title": "Word Ladder",
-      "status": "attempted",
-      "acceptanceRate": 32.5,
-      "difficulty": "Hard",
-      "isPremium": false,
       "slug": "word-ladder",
-      "hasSolution": false
+      "title": "Word Ladder",
+      "difficulty": "Hard",
+      "acceptance_rate": 32.5,
+      "status": "attempted",
+      "is_premium": false,
+      "has_solution": false
     },
     {
       "id": 27,
-      "title": "Course Schedule",
-      "status": "solved",
-      "acceptanceRate": 45.9,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-10",
       "slug": "course-schedule",
-      "hasSolution": true
+      "title": "Course Schedule",
+      "difficulty": "Medium",
+      "acceptance_rate": 45.9,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-10"
     },
     {
       "id": 28,
-      "title": "Number of Islands",
-      "status": "solved",
-      "acceptanceRate": 55.1,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-22",
       "slug": "number-of-islands",
-      "hasSolution": true
+      "title": "Number of Islands",
+      "difficulty": "Medium",
+      "acceptance_rate": 55.1,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-22"
     },
     {
       "id": 29,
-      "title": "Merge k Sorted Lists",
-      "status": "todo",
-      "acceptanceRate": 44.2,
-      "difficulty": "Hard",
-      "isPremium": true,
       "slug": "merge-k-sorted-lists",
-      "hasSolution": false
+      "title": "Merge k Sorted Lists",
+      "difficulty": "Hard",
+      "acceptance_rate": 44.2,
+      "status": "todo",
+      "is_premium": true,
+      "has_solution": false
     },
     {
       "id": 30,
-      "title": "LRU Cache",
-      "status": "attempted",
-      "acceptanceRate": 36.7,
-      "difficulty": "Medium",
-      "isPremium": true,
       "slug": "lru-cache",
-      "hasSolution": true
+      "title": "LRU Cache",
+      "difficulty": "Medium",
+      "acceptance_rate": 36.7,
+      "status": "attempted",
+      "is_premium": true,
+      "has_solution": true
     },
     {
       "id": 31,
-      "title": "Binary Tree Level Order Traversal",
-      "status": "solved",
-      "acceptanceRate": 63.5,
-      "difficulty": "Medium",
-      "isPremium": false,
-      "completedTime": "2025-11-05",
       "slug": "binary-tree-level-order-traversal",
-      "hasSolution": true
+      "title": "Binary Tree Level Order Traversal",
+      "difficulty": "Medium",
+      "acceptance_rate": 63.5,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-05"
     },
     {
       "id": 32,
-      "title": "Maximum Subarray",
-      "status": "solved",
-      "acceptanceRate": 48.9,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-30",
       "slug": "maximum-subarray",
-      "hasSolution": true
+      "title": "Maximum Subarray",
+      "difficulty": "Easy",
+      "acceptance_rate": 48.9,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-30"
     },
     {
       "id": 33,
-      "title": "Climbing Stairs",
-      "status": "solved",
-      "acceptanceRate": 55.8,
-      "difficulty": "Easy",
-      "isPremium": false,
-      "completedTime": "2025-11-18",
       "slug": "climbing-stairs",
-      "hasSolution": true
+      "title": "Climbing Stairs",
+      "difficulty": "Easy",
+      "acceptance_rate": 55.8,
+      "status": "solved",
+      "is_premium": false,
+      "has_solution": true,
+      "completed_time": "2025-11-18"
     },
     {
       "id": 34,
-      "title": "Word Break",
-      "status": "todo",
-      "acceptanceRate": 39.1,
-      "difficulty": "Medium",
-      "isPremium": false,
       "slug": "word-break",
-      "hasSolution": false
+      "title": "Word Break",
+      "difficulty": "Medium",
+      "acceptance_rate": 39.1,
+      "status": "todo",
+      "is_premium": false,
+      "has_solution": false
     },
     {
       "id": 35,
-      "title": "Sliding Window Maximum",
-      "status": "attempted",
-      "acceptanceRate": 44,
-      "difficulty": "Hard",
-      "isPremium": false,
       "slug": "sliding-window-maximum",
-      "hasSolution": false
+      "title": "Sliding Window Maximum",
+      "difficulty": "Hard",
+      "acceptance_rate": 44.0,
+      "status": "attempted",
+      "is_premium": false,
+      "has_solution": false
     }
   ],
-  "problemTags": [
+  "problem_tags": [
     {
       "id": "array",
       "label": "Array"
@@ -466,306 +466,306 @@
       "label": "Deque"
     }
   ],
-  "problemTagRelations": [
+  "problem_tag_relations": [
     {
-      "problemId": 1,
-      "tagId": "array"
+      "problem_id": 1,
+      "tag_id": "array"
     },
     {
-      "problemId": 1,
-      "tagId": "hash-table"
+      "problem_id": 1,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 2,
-      "tagId": "linked-list"
+      "problem_id": 2,
+      "tag_id": "linked-list"
     },
     {
-      "problemId": 2,
-      "tagId": "math"
+      "problem_id": 2,
+      "tag_id": "math"
     },
     {
-      "problemId": 2,
-      "tagId": "recursion"
+      "problem_id": 2,
+      "tag_id": "recursion"
     },
     {
-      "problemId": 3,
-      "tagId": "hash-table"
+      "problem_id": 3,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 3,
-      "tagId": "string"
+      "problem_id": 3,
+      "tag_id": "string"
     },
     {
-      "problemId": 3,
-      "tagId": "sliding-window"
+      "problem_id": 3,
+      "tag_id": "sliding-window"
     },
     {
-      "problemId": 4,
-      "tagId": "array"
+      "problem_id": 4,
+      "tag_id": "array"
     },
     {
-      "problemId": 4,
-      "tagId": "binary-search"
+      "problem_id": 4,
+      "tag_id": "binary-search"
     },
     {
-      "problemId": 4,
-      "tagId": "divide-and-conquer"
+      "problem_id": 4,
+      "tag_id": "divide-and-conquer"
     },
     {
-      "problemId": 5,
-      "tagId": "string"
+      "problem_id": 5,
+      "tag_id": "string"
     },
     {
-      "problemId": 5,
-      "tagId": "dynamic-programming"
+      "problem_id": 5,
+      "tag_id": "dynamic-programming"
     },
     {
-      "problemId": 6,
-      "tagId": "string"
+      "problem_id": 6,
+      "tag_id": "string"
     },
     {
-      "problemId": 7,
-      "tagId": "math"
+      "problem_id": 7,
+      "tag_id": "math"
     },
     {
-      "problemId": 8,
-      "tagId": "string"
+      "problem_id": 8,
+      "tag_id": "string"
     },
     {
-      "problemId": 9,
-      "tagId": "math"
+      "problem_id": 9,
+      "tag_id": "math"
     },
     {
-      "problemId": 10,
-      "tagId": "string"
+      "problem_id": 10,
+      "tag_id": "string"
     },
     {
-      "problemId": 10,
-      "tagId": "dynamic-programming"
+      "problem_id": 10,
+      "tag_id": "dynamic-programming"
     },
     {
-      "problemId": 10,
-      "tagId": "recursion"
+      "problem_id": 10,
+      "tag_id": "recursion"
     },
     {
-      "problemId": 11,
-      "tagId": "array"
+      "problem_id": 11,
+      "tag_id": "array"
     },
     {
-      "problemId": 11,
-      "tagId": "two-pointers"
+      "problem_id": 11,
+      "tag_id": "two-pointers"
     },
     {
-      "problemId": 11,
-      "tagId": "greedy"
+      "problem_id": 11,
+      "tag_id": "greedy"
     },
     {
-      "problemId": 12,
-      "tagId": "hash-table"
+      "problem_id": 12,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 12,
-      "tagId": "math"
+      "problem_id": 12,
+      "tag_id": "math"
     },
     {
-      "problemId": 12,
-      "tagId": "string"
+      "problem_id": 12,
+      "tag_id": "string"
     },
     {
-      "problemId": 13,
-      "tagId": "hash-table"
+      "problem_id": 13,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 13,
-      "tagId": "math"
+      "problem_id": 13,
+      "tag_id": "math"
     },
     {
-      "problemId": 13,
-      "tagId": "string"
+      "problem_id": 13,
+      "tag_id": "string"
     },
     {
-      "problemId": 14,
-      "tagId": "string"
+      "problem_id": 14,
+      "tag_id": "string"
     },
     {
-      "problemId": 15,
-      "tagId": "array"
+      "problem_id": 15,
+      "tag_id": "array"
     },
     {
-      "problemId": 15,
-      "tagId": "two-pointers"
+      "problem_id": 15,
+      "tag_id": "two-pointers"
     },
     {
-      "problemId": 15,
-      "tagId": "sorting"
+      "problem_id": 15,
+      "tag_id": "sorting"
     },
     {
-      "problemId": 16,
-      "tagId": "array"
+      "problem_id": 16,
+      "tag_id": "array"
     },
     {
-      "problemId": 16,
-      "tagId": "two-pointers"
+      "problem_id": 16,
+      "tag_id": "two-pointers"
     },
     {
-      "problemId": 16,
-      "tagId": "sorting"
+      "problem_id": 16,
+      "tag_id": "sorting"
     },
     {
-      "problemId": 17,
-      "tagId": "hash-table"
+      "problem_id": 17,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 17,
-      "tagId": "string"
+      "problem_id": 17,
+      "tag_id": "string"
     },
     {
-      "problemId": 17,
-      "tagId": "backtracking"
+      "problem_id": 17,
+      "tag_id": "backtracking"
     },
     {
-      "problemId": 18,
-      "tagId": "array"
+      "problem_id": 18,
+      "tag_id": "array"
     },
     {
-      "problemId": 18,
-      "tagId": "two-pointers"
+      "problem_id": 18,
+      "tag_id": "two-pointers"
     },
     {
-      "problemId": 18,
-      "tagId": "sorting"
+      "problem_id": 18,
+      "tag_id": "sorting"
     },
     {
-      "problemId": 19,
-      "tagId": "linked-list"
+      "problem_id": 19,
+      "tag_id": "linked-list"
     },
     {
-      "problemId": 19,
-      "tagId": "two-pointers"
+      "problem_id": 19,
+      "tag_id": "two-pointers"
     },
     {
-      "problemId": 20,
-      "tagId": "string"
+      "problem_id": 20,
+      "tag_id": "string"
     },
     {
-      "problemId": 20,
-      "tagId": "stack"
+      "problem_id": 20,
+      "tag_id": "stack"
     },
     {
-      "problemId": 21,
-      "tagId": "linked-list"
+      "problem_id": 21,
+      "tag_id": "linked-list"
     },
     {
-      "problemId": 21,
-      "tagId": "recursion"
+      "problem_id": 21,
+      "tag_id": "recursion"
     },
     {
-      "problemId": 22,
-      "tagId": "string"
+      "problem_id": 22,
+      "tag_id": "string"
     },
     {
-      "problemId": 22,
-      "tagId": "backtracking"
+      "problem_id": 22,
+      "tag_id": "backtracking"
     },
     {
-      "problemId": 23,
-      "tagId": "array"
+      "problem_id": 23,
+      "tag_id": "array"
     },
     {
-      "problemId": 23,
-      "tagId": "hash-table"
+      "problem_id": 23,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 24,
-      "tagId": "array"
+      "problem_id": 24,
+      "tag_id": "array"
     },
     {
-      "problemId": 24,
-      "tagId": "backtracking"
+      "problem_id": 24,
+      "tag_id": "backtracking"
     },
     {
-      "problemId": 25,
-      "tagId": "array"
+      "problem_id": 25,
+      "tag_id": "array"
     },
     {
-      "problemId": 25,
-      "tagId": "dynamic-programming"
+      "problem_id": 25,
+      "tag_id": "dynamic-programming"
     },
     {
-      "problemId": 26,
-      "tagId": "hash-table"
+      "problem_id": 26,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 26,
-      "tagId": "breadth-first-search"
+      "problem_id": 26,
+      "tag_id": "breadth-first-search"
     },
     {
-      "problemId": 27,
-      "tagId": "graph"
+      "problem_id": 27,
+      "tag_id": "graph"
     },
     {
-      "problemId": 27,
-      "tagId": "topological-sort"
+      "problem_id": 27,
+      "tag_id": "topological-sort"
     },
     {
-      "problemId": 28,
-      "tagId": "matrix"
+      "problem_id": 28,
+      "tag_id": "matrix"
     },
     {
-      "problemId": 28,
-      "tagId": "depth-first-search"
+      "problem_id": 28,
+      "tag_id": "depth-first-search"
     },
     {
-      "problemId": 29,
-      "tagId": "linked-list"
+      "problem_id": 29,
+      "tag_id": "linked-list"
     },
     {
-      "problemId": 29,
-      "tagId": "heap"
+      "problem_id": 29,
+      "tag_id": "heap"
     },
     {
-      "problemId": 30,
-      "tagId": "hash-table"
+      "problem_id": 30,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 30,
-      "tagId": "design"
+      "problem_id": 30,
+      "tag_id": "design"
     },
     {
-      "problemId": 31,
-      "tagId": "tree"
+      "problem_id": 31,
+      "tag_id": "tree"
     },
     {
-      "problemId": 31,
-      "tagId": "breadth-first-search"
+      "problem_id": 31,
+      "tag_id": "breadth-first-search"
     },
     {
-      "problemId": 32,
-      "tagId": "array"
+      "problem_id": 32,
+      "tag_id": "array"
     },
     {
-      "problemId": 32,
-      "tagId": "dynamic-programming"
+      "problem_id": 32,
+      "tag_id": "dynamic-programming"
     },
     {
-      "problemId": 33,
-      "tagId": "dynamic-programming"
+      "problem_id": 33,
+      "tag_id": "dynamic-programming"
     },
     {
-      "problemId": 34,
-      "tagId": "dynamic-programming"
+      "problem_id": 34,
+      "tag_id": "dynamic-programming"
     },
     {
-      "problemId": 34,
-      "tagId": "hash-table"
+      "problem_id": 34,
+      "tag_id": "hash-table"
     },
     {
-      "problemId": 35,
-      "tagId": "deque"
+      "problem_id": 35,
+      "tag_id": "deque"
     },
     {
-      "problemId": 35,
-      "tagId": "sliding-window"
+      "problem_id": 35,
+      "tag_id": "sliding-window"
     }
   ]
 }

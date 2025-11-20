@@ -16,7 +16,10 @@
     "format": "prettier --write src/",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "validate:mocks": "node scripts/validate-mock-data.mjs",
+    "validate:mocks:verbose": "node scripts/validate-mock-data.mjs --verbose",
+    "validate:mocks:strict": "node scripts/validate-mock-data.mjs --strict"
   },
   "dependencies": {
     "@monaco-editor/loader": "^1.6.1",
