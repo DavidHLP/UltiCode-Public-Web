@@ -1,4 +1,4 @@
-import submissionsData from "@/mocks/db/submission.json";
+import submissionsData from "@/mocks/db/submission";
 import type {
   SubmissionRow,
   SubmissionTestRow,

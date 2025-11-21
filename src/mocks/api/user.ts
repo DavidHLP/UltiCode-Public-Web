@@ -1,4 +1,4 @@
-import userData from '@/mocks/db/user.json'
+import userData from '@/mocks/db/user'
 import type { User, UserDataset, UserId } from '@/mocks/schema/user'
 
 const dataset = userData as unknown as UserDataset

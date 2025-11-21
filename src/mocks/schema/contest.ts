@@ -137,10 +137,63 @@ export interface ContestEvent {
   editorialEta?: string;
 }
 
-export type ContestInsight = Omit<ContestInsightRow, "contest_id">;
-export type ContestLeaderboardEntry = Omit<ContestLeaderboardRow, "contest_id">;
-export type ContestTrack = Omit<ContestTrackRow, "contest_id">;
-export type ContestResource = Omit<ContestResourceRow, "contest_id">;
-export type ContestFaqItem = Omit<ContestFaqRow, "contest_id">;
-export type ContestOpsCheckpoint = Omit<ContestOpsCheckpointRow, "contest_id">;
-export type ContestCrewMember = Omit<ContestCrewRow, "contest_id">;
+export type ContestTrend = "up" | "down" | "steady";
+
+export interface ContestInsight extends Omit<ContestInsightRow, "contest_id" | "status"> {
+  trend: ContestTrend;
+  delta: string;
+  helper: string;
+}
+
+export interface ContestLeaderboardEntry {
+  id: ContestLeaderboardEntryId;
+  divisionTag: string;
+  rank: number;
+  handle: string;
+  rating: number;
+  ratingDelta: number;
+  solved: number;
+  penalty: number;
+  country: string;
+}
+
+export interface ContestTrack {
+  id: ContestTrackId;
+  name: string;
+  summary: string;
+  difficulty: "Starter" | "Intermediate" | "Advanced";
+  badge: string;
+  cadence: string;
+  targetRating: string;
+  focus: string[];
+  included: string[];
+}
+
+export interface ContestResource {
+  id: ContestResourceId;
+  title: string;
+  description: string;
+  url: string;
+  category: "guide" | "video" | "playbook" | "announcement";
+}
+
+export interface ContestFaqItem extends Omit<ContestFaqRow, "contest_id"> {
+  tags?: string[];
+}
+
+export interface ContestOpsCheckpoint {
+  id: ContestOpsCheckpointId;
+  title: string;
+  category: ContestOpsPhase;
+  status: ContestOpsStatus;
+  notes: string;
+  dueAt: string;
+  owner: string;
+  effort: "S" | "M" | "L";
+}
+
+export interface ContestCrewMember extends Omit<ContestCrewRow, "contest_id"> {
+  timezone: string;
+  focus: string;
+  channel: string;
+}

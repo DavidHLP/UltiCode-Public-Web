@@ -1,6 +1,6 @@
 import type { Problem } from "@/mocks/schema/problem";
 import type { ProblemList, ProblemListItem } from "@/mocks/schema/problem-list";
-import problemListData from "@/mocks/db/problem-lists.json";
+import problemListData from "@/mocks/db/problem-lists";
 import { fetchProblems } from "@/mocks/api/problem";
 import { fetchCurrentUserId } from "@/mocks/api/user";
 

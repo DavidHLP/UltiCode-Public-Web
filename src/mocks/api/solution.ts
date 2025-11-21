@@ -3,7 +3,7 @@ import type {
   SolutionFeedItem,
   SolutionFeedMeta,
 } from "@/mocks/schema/solution";
-import solutionDataRaw from "@/mocks/db/solution.json";
+import solutionDataRaw from "@/mocks/db/solution";
 
 const solutionData = solutionDataRaw as {
   solution_filter_options: {

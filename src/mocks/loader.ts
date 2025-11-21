@@ -9,16 +9,16 @@ import { MockDataValidator } from "./validation/validator";
 import type { MockDatabase, ValidationResult } from "./validation/validator";
 
 // Import all mock data files
-import problemsData from "./db/problems.json";
-import problemDetailData from "./db/problem-detail.json";
-import solutionData from "./db/solution.json";
-import submissionData from "./db/submission.json";
-import testCaseData from "./db/test-case.json";
-import testResultsData from "./db/test-results.json";
-import problemListsData from "./db/problem-lists.json";
-import contestData from "./db/contest.json";
-import forumData from "./db/forum.json";
-import userData from "./db/user.json";
+import problemsData from "./db/problems";
+import problemDetailData from "./db/problem-detail";
+import solutionData from "./db/solution";
+import submissionData from "./db/submission";
+import testCaseData from "./db/test-case";
+import testResultsData from "./db/test-results";
+import problemListsData from "./db/problem-lists";
+import contestData from "./db/contest";
+import forumData from "./db/forum";
+import userData from "./db/user";
 
 /**
  * Configuration for data loading behavior

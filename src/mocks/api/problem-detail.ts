@@ -11,7 +11,7 @@ import {
   type ProblemApproachRow,
   type ResultStatus,
 } from "@/mocks/schema/problem-detail";
-import problemDetailData from "@/mocks/db/problem-detail.json";
+import problemDetailData from "@/mocks/db/problem-detail";
 import { fetchProblemById } from "@/mocks/api/problem";
 import { fetchTestCasesByProblemId } from "@/mocks/api/test-case";
 import { fetchProblemSubmissions } from "@/mocks/api/submission";

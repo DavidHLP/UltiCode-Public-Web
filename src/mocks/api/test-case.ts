@@ -3,7 +3,7 @@ import type {
   TestCaseRow,
   TestCaseInputRow,
 } from "@/mocks/schema/problem-detail";
-import testCaseData from "@/mocks/db/test-case.json";
+import testCaseData from "@/mocks/db/test-case";
 
 const testCases = testCaseData.test_cases as TestCaseRow[];
 const testCaseInputs = testCaseData.test_case_inputs as TestCaseInputRow[];

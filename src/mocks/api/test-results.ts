@@ -4,9 +4,9 @@ import type {
   RunCaseRow,
   RunResultRow,
 } from '@/mocks/schema/test-results'
-import testResultData from '@/mocks/db/test-results.json'
-import testCaseData from '@/mocks/db/test-case.json'
-import submissionData from '@/mocks/db/submission.json'
+import testResultData from '@/mocks/db/test-results'
+import testCaseData from '@/mocks/db/test-case'
+import submissionData from '@/mocks/db/submission'
 import type { TestCaseInputRow, TestCaseRow } from '@/mocks/schema/problem-detail'
 import type { SubmissionRow } from '@/mocks/schema/submission'
 import type { UserId } from '@/mocks/schema/user'

@@ -4,7 +4,7 @@ import type {
   ProblemTagRelationRow,
   ProblemTagRow,
 } from "@/mocks/schema/problem";
-import rawProblemsData from "@/mocks/db/problems.json";
+import rawProblemsData from "@/mocks/db/problems";
 
 const problemsData = rawProblemsData as {
   problems: ProblemRow[];

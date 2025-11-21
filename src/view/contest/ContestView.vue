@@ -166,7 +166,7 @@ const filteredSchedule = computed(() => {
       divisionFilter.value === 'all' || event.division === divisionFilter.value
     const matchesDifficulty =
       difficultyFilter.value === 'all' || event.difficulty === difficultyFilter.value
-    const matchesMode = modeFilter.value === 'all' || event.registration.mode === modeFilter.value
+    const matchesMode = modeFilter.value === 'all' || event.registration?.mode === modeFilter.value
     const matchesRated = !ratedOnly.value || event.isRated
     const matchesArchived = showArchived.value || event.status !== 'archived'
     return (
@@ -223,7 +223,7 @@ const leaderboardGroups = computed(() => {
 
 const heroRegistrationPct = computed(() => {
   const hero = heroEventData.value
-  if (!hero || !hero.registration.slots) return 0
+  if (!hero || !hero.registration || !hero.registration.slots) return 0
   return Math.min(
     100,
     Math.round((hero.registration.registered / hero.registration.slots) * 100),
@@ -257,7 +257,9 @@ const statusAccentClasses: Record<ContestStatus, string> = {
 }
 
 const formatContestDate = (iso: string) => {
+  if (!iso) return ''
   const date = new Date(iso)
+  if (Number.isNaN(date.valueOf())) return ''
   return new Intl.DateTimeFormat('en', {
     month: 'short',
     day: 'numeric',
@@ -265,7 +267,9 @@ const formatContestDate = (iso: string) => {
 }
 
 const formatContestTime = (iso: string) => {
+  if (!iso) return ''
   const date = new Date(iso)
+  if (Number.isNaN(date.valueOf())) return ''
   return new Intl.DateTimeFormat('en', {
     hour: '2-digit',
     minute: '2-digit',
@@ -369,7 +373,7 @@ const openEventBrief = (event: ContestEvent) => {
 const openManageDialog = (event: ContestEvent) => {
   manageEvent.value = event
   const existing = registrationState.value[event.id]
-  manageMode.value = existing?.mode ?? event.registration.mode
+  manageMode.value = existing?.mode ?? event.registration?.mode ?? 'solo'
   manageRegistered.value = existing?.registered ?? false
   manageDialogOpen.value = true
 }
@@ -390,7 +394,7 @@ const handleRegister = () => persistRegistration(true)
 const handleCancelRegistration = () => persistRegistration(false)
 
 const canConfirmEntry = computed(() => {
-  if (!manageEvent.value) return false
+  if (!manageEvent.value || !manageEvent.value.registration) return false
   if (manageRegistered.value) return true
   return (
     manageEvent.value.registration.registered < manageEvent.value.registration.slots &&
@@ -520,7 +524,7 @@ const canConfirmEntry = computed(() => {
               <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">Duration</p>
               <p class="font-semibold">{{ formatDuration(selectedEvent.durationMinutes) }}</p>
               <p class="text-xs text-muted-foreground">
-                Mode · {{ selectedEvent.registration.mode.toUpperCase() }}
+                Mode · {{ selectedEvent.registration?.mode.toUpperCase() }}
               </p>
             </div>
           </div>
@@ -530,7 +534,7 @@ const canConfirmEntry = computed(() => {
               {{ tag }}
             </Badge>
           </div>
-          <div class="rounded-xl border border-border/60 p-4">
+          <div v-if="selectedEvent.registration" class="rounded-xl border border-border/60 p-4">
             <p class="text-sm font-semibold">Registration</p>
             <p class="text-xs text-muted-foreground">
               {{ selectedEvent.registration.registered.toLocaleString() }} /
@@ -563,7 +567,7 @@ const canConfirmEntry = computed(() => {
         </DialogHeader>
         <div v-if="manageEvent" class="space-y-4">
           <div class="grid gap-3 md:grid-cols-3">
-            <div>
+            <div v-if="manageEvent.registration">
               <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">Slots</p>
               <p class="text-sm">
                 {{ manageEvent.registration.registered.toLocaleString() }} /

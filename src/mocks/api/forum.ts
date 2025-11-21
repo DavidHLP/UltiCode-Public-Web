@@ -19,7 +19,7 @@ import type {
   ForumComment,
   ForumThread,
 } from "@/mocks/schema/forum";
-import forumDataRaw from "@/mocks/db/forum.json";
+import forumDataRaw from "@/mocks/db/forum";
 
 const forumData = forumDataRaw as any as {
   forum_communities: ForumCommunityRow[];
