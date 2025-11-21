@@ -42,19 +42,25 @@ const router = createRouter({
     },
     {
       path: "/problem",
-      component: () => import("@/layout/AppLayout.vue"), // 作为 layout
+      component: () => import("@/layout/AppLayout.vue"),
       children: [
-        { path: "", redirect: { name: "problemset" } },
         {
-          path: "problemset",
-          name: "problemset",
-          component: () => import("@/view/problem/problemset/ProblemSet.vue"),
-        },
-        {
-          path: "problemlist/:id",
-          name: "problemlist",
-          component: () =>
-            import("@/view/problem/problemlist/ProblemList.vue"),
+          path: "",
+          component: () => import("@/view/problem/ProblemView.vue"),
+          children: [
+            { path: "", redirect: { name: "problemset" } },
+            {
+              path: "problemset",
+              name: "problemset",
+              component: () => import("@/view/problem/problemset/ProblemSet.vue"),
+            },
+            {
+              path: "problemlist/:id",
+              name: "problemlist",
+              component: () =>
+                import("@/view/problem/problemlist/ProblemList.vue"),
+            },
+          ],
         },
       ],
     },

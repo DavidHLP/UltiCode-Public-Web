@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import ProblemView from "@/view/problems/components/ProblemView.vue";
+import ProblemView from "@/view/problem/components/ProblemView.vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart } from "@/components/ui/chart-line";
@@ -188,17 +188,18 @@ const percentAxisFormatter = (value: number | Date) => {
 </script>
 
 <template>
-  <ProblemView :problems="problems">
+  <div class="mx-auto w-full max-w-[60%] space-y-8 py-6">
+    <ProblemView :problems="problems">
     <template #header>
-      <div class="space-y-4">
+      <div class="space-y-6">
         <!-- 标题和操作按钮 -->
-        <div class="flex items-end justify-between">
-          <div class="flex items-end gap-2">
-            <h1 class="text-2xl font-bold">
+        <div class="flex items-end justify-between gap-4">
+          <div class="flex items-end gap-3">
+            <h1 class="text-3xl font-bold tracking-tight">
               {{ currentList?.name || "Problem List" }}
             </h1>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-3">
             <Button variant="outline" size="sm">
               <Share2 class="mr-2 h-4 w-4" />
               Share
@@ -227,36 +228,36 @@ const percentAxisFormatter = (value: number | Date) => {
         <!-- 描述 -->
         <p
           v-if="currentList?.description"
-          class="text-sm text-muted-foreground"
+          class="text-base text-muted-foreground leading-relaxed"
         >
           {{ currentList.description }}
         </p>
 
         <!-- 统计信息 - 使用图表颜色系统 -->
-        <div class="flex items-center gap-6 text-sm">
-          <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-8 text-sm">
+          <div class="flex items-center gap-2.5">
             <span class="text-muted-foreground">Total:</span>
             <span class="font-semibold">{{ safeStats.totalCount }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2.5">
             <span class="text-muted-foreground">Solved:</span>
             <span class="chart-solved font-semibold">{{
               safeStats.solvedCount
             }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2.5">
             <span class="text-muted-foreground">Attempted:</span>
             <span class="chart-attempted font-semibold">{{
               safeStats.attemptedCount
             }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2.5">
             <span class="text-muted-foreground">Todo:</span>
             <span class="chart-todo font-semibold">{{
               safeStats.todoCount
             }}</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2.5">
             <span class="text-muted-foreground">Progress:</span>
             <span class="font-semibold"
               >{{ safeStats.progress.toFixed(1) }}%</span
@@ -265,7 +266,7 @@ const percentAxisFormatter = (value: number | Date) => {
         </div>
 
         <!-- 元数据 -->
-        <div class="flex items-center gap-4 text-xs text-muted-foreground">
+        <div class="flex items-center gap-6 text-xs text-muted-foreground">
           <span v-if="currentList?.createdAt">
             Created: {{ formatDate(currentList.createdAt) }}
           </span>
@@ -277,19 +278,19 @@ const percentAxisFormatter = (value: number | Date) => {
         <!-- 图表区域 -->
         <div
           v-if="problems.length"
-          class="grid grid-cols-1 gap-6 xl:grid-cols-3"
+          class="grid grid-cols-1 gap-8 xl:grid-cols-3"
         >
           <!-- Status Overview Card -->
-          <Card class="chart-fade-in bg-card/60 backdrop-blur">
-            <CardHeader class="pb-2 space-y-1">
-              <CardTitle>Status Overview</CardTitle>
-              <p class="text-sm text-muted-foreground">
+          <Card class="chart-fade-in bg-card/60 backdrop-blur transition-shadow hover:shadow-lg">
+            <CardHeader class="pb-3 space-y-2">
+              <CardTitle class="text-lg">Status Overview</CardTitle>
+              <p class="text-sm text-muted-foreground leading-relaxed">
                 Status mix rendered with the shared donut design
               </p>
             </CardHeader>
             <CardContent class="space-y-6">
               <DonutChart
-                class="h-60"
+                class="h-64"
                 index="name"
                 :category="'total'"
                 :data="statusDonutData"
@@ -300,16 +301,16 @@ const percentAxisFormatter = (value: number | Date) => {
           </Card>
 
           <!-- Difficulty Insights Card -->
-          <Card class="chart-fade-in xl:col-span-2">
-            <CardHeader class="pb-2 space-y-1">
-              <CardTitle>Difficulty Insights</CardTitle>
-              <p class="text-sm text-muted-foreground">
+          <Card class="chart-fade-in xl:col-span-2 transition-shadow hover:shadow-lg">
+            <CardHeader class="pb-3 space-y-2">
+              <CardTitle class="text-lg">Difficulty Insights</CardTitle>
+              <p class="text-sm text-muted-foreground leading-relaxed">
                 Status mix, premium load, and acceptance per difficulty
               </p>
             </CardHeader>
             <CardContent>
               <BarChart
-                class="h-80"
+                class="h-96"
                 :data="difficultyInsights"
                 index="difficulty"
                 :categories="statusCategories"
@@ -322,16 +323,16 @@ const percentAxisFormatter = (value: number | Date) => {
           </Card>
 
           <!-- Progress Momentum Card -->
-          <Card class="chart-fade-in xl:col-span-3">
-            <CardHeader class="pb-2 space-y-1">
-              <CardTitle>Progress Momentum</CardTitle>
-              <p class="text-sm text-muted-foreground">
+          <Card class="chart-fade-in xl:col-span-3 transition-shadow hover:shadow-lg">
+            <CardHeader class="pb-3 space-y-2">
+              <CardTitle class="text-lg">Progress Momentum</CardTitle>
+              <p class="text-sm text-muted-foreground leading-relaxed">
                 Rolling share of solved / attempted / todo alongside acceptance
               </p>
             </CardHeader>
             <CardContent>
               <LineChart
-                class="h-[360px]"
+                class="h-[400px]"
                 :data="progressMomentum"
                 index="label"
                 :categories="momentumCategories"
@@ -346,17 +347,18 @@ const percentAxisFormatter = (value: number | Date) => {
 
     <!-- 问题列表将由 ProblemView 组件处理 -->
     <template v-if="problems.length === 0">
-      <div class="flex h-64 items-center justify-center">
-        <div class="text-center">
-          <p class="text-lg font-medium text-muted-foreground">
+      <div class="flex h-80 items-center justify-center">
+        <div class="text-center space-y-4">
+          <p class="text-xl font-medium text-muted-foreground">
             No problems in this list
           </p>
-          <p class="mt-2 text-sm text-muted-foreground">
+          <p class="text-base text-muted-foreground">
             Add problems to get started
           </p>
-          <Button class="mt-4" variant="outline">Add Problems</Button>
+          <Button class="mt-6" variant="outline" size="lg">Add Problems</Button>
         </div>
       </div>
     </template>
-  </ProblemView>
+    </ProblemView>
+  </div>
 </template>

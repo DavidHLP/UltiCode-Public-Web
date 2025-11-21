@@ -9,7 +9,7 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { Button } from "@/components/ui/button";
-import CodeEditor from "@/view/problems/detailed/components/CodeEditor.vue";
+import CodeEditor from "@/view/problem/detailed/components/CodeEditor.vue";
 import type { ProblemLanguageOption } from "@/mocks/schema/problem-detail";
 import CheckIcon from "~icons/radix-icons/check";
 import {

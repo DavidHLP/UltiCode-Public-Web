@@ -59,8 +59,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex h-screen w-screen flex-col gap-4 overflow-hidden">
-    <div v-if="problem" class="flex flex-1 min-h-0 flex-col gap-4 pb-4">
+  <div class="flex h-screen w-screen flex-col gap-4 overflow-hidden p-4">
+    <div v-if="problem" class="flex flex-1 min-h-0 flex-col gap-4">
       <HeaderView :problem="problem" />
 
       <ResizablePanelGroup direction="horizontal" class="flex-1 min-h-0 gap-4">
@@ -88,7 +88,7 @@ onMounted(async () => {
                     <div class="px-1 py-2">
                       <SolutionsView
                         :problem-id="problem.id"
-                        :follow-up="problem.followUp"
+                        :follow-up="problem.followUp ?? ''"
                       />
                     </div>
                   </ScrollArea>
