@@ -8,6 +8,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   ArrowBigUp,
   Bookmark,
+  BookmarkCheck,
   Eye,
   Gift,
   Lock,
@@ -469,24 +470,37 @@ function formatRelativeTime(value: string) {
         <Share2 class="h-4 w-4" />
         {{ sharesDisplay }} shares
       </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
-        <Bookmark class="h-4 w-4" />
-        {{ savesDisplay }} saves
-      </Button>
-      <div class="ml-auto flex items-center gap-2">
-        <Button
+              <Button
           variant="ghost"
           size="sm"
           :class="[
-            'gap-2 text-xs font-medium',
+            'group gap-1.5 text-xs font-medium transition-all duration-200',
             isSaved
-              ? 'text-primary'
+              ? 'text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400'
               : 'text-muted-foreground hover:text-foreground',
           ]"
         >
-          <Bookmark class="h-4 w-4" />
-          {{ saveLabel }}
+          <BookmarkCheck
+            v-if="isSaved"
+            :class="[
+              'h-4 w-4 transition-transform duration-200 group-hover:scale-110',
+              'fill-amber-600 dark:fill-amber-500',
+            ]"
+          />
+          <Bookmark
+            v-else
+            class="h-4 w-4 transition-transform duration-200 group-hover:scale-110"
+          />
+          <span class="transition-colors duration-200">{{ saveLabel }}</span>
+          <span
+            :class="[
+              'transition-colors duration-200',
+              isSaved ? 'text-amber-500/70' : 'text-muted-foreground',
+            ]"
+            >· {{ savesDisplay }}</span
+          >
         </Button>
+      <div class="ml-auto flex items-center gap-3">
         <span
           v-if="impressionsDisplay"
           class="text-[11px] text-muted-foreground"
