@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import { ArrowBigUp, Gift, MessageSquare, Share2 } from 'lucide-vue-next'
+import { Button } from "@/components/ui/button";
+import { ArrowBigUp, Gift, MessageSquare, Share2 } from "lucide-vue-next";
 
 defineProps<{
-  voteState: 'upvoted' | 'downvoted' | 'neutral'
-  voteLabel: string
-  scoreDisplay: string
-  commentsDisplay: string
-  awardsDisplay: string
-  sharesDisplay: string
-  savesDisplay: string
-}>()
+  voteState: "upvoted" | "downvoted" | "neutral";
+  voteLabel: string;
+  scoreDisplay: string;
+  commentsDisplay: string;
+  awardsDisplay: string;
+  sharesDisplay: string;
+  savesDisplay: string;
+}>();
 </script>
 
 <template>
@@ -23,7 +23,10 @@ defineProps<{
         voteState === 'upvoted' ? 'text-primary' : 'text-foreground',
       ]"
     >
-      <ArrowBigUp class="h-4 w-4" :class="voteState === 'upvoted' ? 'text-primary' : ''" />
+      <ArrowBigUp
+        class="h-4 w-4"
+        :class="voteState === 'upvoted' ? 'text-primary' : ''"
+      />
       <span>{{ voteLabel }}</span>
       <span class="text-muted-foreground">· {{ scoreDisplay }}</span>
     </Button>

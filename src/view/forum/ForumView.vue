@@ -5,111 +5,115 @@ import type {
   ForumCommunity,
   ForumModerator,
   ForumTrendingTopic,
-} from '@/mocks/schema/forum'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
+} from "@/mocks/schema/forum";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-} from '@/components/ui/dropdown-menu'
-import { ChevronsUpDown } from 'lucide-vue-next'
-import ForumPostCard from '@/view/forum/components/ForumPostCard.vue'
-import ForumSidebar from '@/view/forum/components/ForumSidebar.vue'
-import { computed, onMounted, ref } from 'vue'
+} from "@/components/ui/dropdown-menu";
+import { ChevronsUpDown } from "lucide-vue-next";
+import ForumPostCard from "@/view/forum/components/ForumPostCard.vue";
+import ForumSidebar from "@/view/forum/components/ForumSidebar.vue";
+import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,
   fetchForumModerators,
   fetchForumPosts,
   fetchForumQuickFilters,
   fetchForumTrendingTopics,
-} from '@/api/forum'
+} from "@/api/forum";
 
-const posts = ref<ForumPost[]>([])
-const trendingTopics = ref<ForumTrendingTopic[]>([])
-const communities = ref<ForumCommunity[]>([])
-const moderators = ref<ForumModerator[]>([])
-const quickFilters = ref<Array<{ label: string; value: string }>>([])
+const posts = ref<ForumPost[]>([]);
+const trendingTopics = ref<ForumTrendingTopic[]>([]);
+const communities = ref<ForumCommunity[]>([]);
+const moderators = ref<ForumModerator[]>([]);
+const quickFilters = ref<Array<{ label: string; value: string }>>([]);
 
 onMounted(async () => {
   try {
-    const [postRows, topicRows, communityRows, moderatorRows, filters] = await Promise.all([
-      fetchForumPosts(),
-      fetchForumTrendingTopics(),
-      fetchForumCommunities(),
-      fetchForumModerators(),
-      fetchForumQuickFilters(),
-    ])
-    posts.value = postRows
-    trendingTopics.value = topicRows
-    communities.value = communityRows
-    moderators.value = moderatorRows
-    quickFilters.value = filters
+    const [postRows, topicRows, communityRows, moderatorRows, filters] =
+      await Promise.all([
+        fetchForumPosts(),
+        fetchForumTrendingTopics(),
+        fetchForumCommunities(),
+        fetchForumModerators(),
+        fetchForumQuickFilters(),
+      ]);
+    posts.value = postRows;
+    trendingTopics.value = topicRows;
+    communities.value = communityRows;
+    moderators.value = moderatorRows;
+    quickFilters.value = filters;
   } catch (error) {
-    console.error('Failed to load forum data', error)
-    posts.value = []
-    trendingTopics.value = []
-    communities.value = []
-    moderators.value = []
-    quickFilters.value = []
+    console.error("Failed to load forum data", error);
+    posts.value = [];
+    trendingTopics.value = [];
+    communities.value = [];
+    moderators.value = [];
+    quickFilters.value = [];
   }
-})
+});
 
-const searchQuery = ref('')
-const quickFilter = ref('hot')
-const selectedCommunity = ref('all')
-const selectedFlair = ref<'all' | ForumFlairType>('all')
+const searchQuery = ref("");
+const quickFilter = ref("hot");
+const selectedCommunity = ref("all");
+const selectedFlair = ref<"all" | ForumFlairType>("all");
 const quickFilterLabel = computed(() => {
   return (
     (
       {
-        hot: 'Hot',
-        new: 'New',
-        top: 'Top',
-        rising: 'Rising',
+        hot: "Hot",
+        new: "New",
+        top: "Top",
+        rising: "Rising",
       } as Record<string, string>
-    )[quickFilter.value] ?? 'Hot'
-  )
-})
+    )[quickFilter.value] ?? "Hot"
+  );
+});
 const filteredPosts = computed(() => {
-  const normalizedSearch = searchQuery.value.trim().toLowerCase()
+  const normalizedSearch = searchQuery.value.trim().toLowerCase();
   return posts.value.filter((post) => {
     const matchesSearch =
       !normalizedSearch ||
       post.title.toLowerCase().includes(normalizedSearch) ||
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
-      post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch))
+      post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch));
 
     const matchesCommunity =
-      selectedCommunity.value === 'all' || post.community.slug === selectedCommunity.value
+      selectedCommunity.value === "all" ||
+      post.community.slug === selectedCommunity.value;
 
-    const matchesFlair = selectedFlair.value === 'all' || post.flair?.type === selectedFlair.value
+    const matchesFlair =
+      selectedFlair.value === "all" || post.flair?.type === selectedFlair.value;
 
-    return matchesSearch && matchesCommunity && matchesFlair
-  })
-})
+    return matchesSearch && matchesCommunity && matchesFlair;
+  });
+});
 
 const sortedPosts = computed(() => {
-  const posts = [...filteredPosts.value]
+  const posts = [...filteredPosts.value];
   const sorters: Record<string, (a: ForumPost, b: ForumPost) => number> = {
     hot: (a, b) => b.stats.score - a.stats.score,
-    new: (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
+    new: (a, b) =>
+      new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
     top: (a, b) => b.stats.saves - a.stats.saves,
     rising: (a, b) => b.stats.shares - a.stats.shares,
-  }
+  };
 
-  const sorter = sorters[quickFilter.value] ?? sorters.hot
-  posts.sort(sorter)
+  const sorter = sorters[quickFilter.value] ?? sorters.hot;
+  posts.sort(sorter);
 
-  const pinned = posts.filter((post) => post.isPinned)
-  const rest = posts.filter((post) => !post.isPinned)
+  const pinned = posts.filter((post) => post.isPinned);
+  const rest = posts.filter((post) => !post.isPinned);
 
-  return [...pinned, ...rest]
-})
+  return [...pinned, ...rest];
+});
 </script>
 
 <template>
@@ -118,7 +122,9 @@ const sortedPosts = computed(() => {
       <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
         <Card class="border-none bg-transparent p-0 shadow-none">
           <CardHeader class="space-y-3 border-none px-0 pb-0">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="outline" class="gap-2">
@@ -128,21 +134,39 @@ const sortedPosts = computed(() => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="w-40">
                   <DropdownMenuRadioGroup v-model:value="quickFilter">
-                    <DropdownMenuRadioItem value="hot">Hot</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="new">New</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="rising">Rising</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="hot"
+                      >Hot</DropdownMenuRadioItem
+                    >
+                    <DropdownMenuRadioItem value="new"
+                      >New</DropdownMenuRadioItem
+                    >
+                    <DropdownMenuRadioItem value="top"
+                      >Top</DropdownMenuRadioItem
+                    >
+                    <DropdownMenuRadioItem value="rising"
+                      >Rising</DropdownMenuRadioItem
+                    >
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <form class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-                <Input v-model="searchQuery" placeholder="Search threads" class="w-full sm:w-64" />
+              <form
+                class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
+              >
+                <Input
+                  v-model="searchQuery"
+                  placeholder="Search threads"
+                  class="w-full sm:w-64"
+                />
               </form>
             </div>
-            <div class="flex items-center justify-between text-sm text-muted-foreground">
+            <div
+              class="flex items-center justify-between text-sm text-muted-foreground"
+            >
               <p class="flex items-center gap-1">
                 Showing
-                <span class="font-semibold text-foreground">{{ sortedPosts.length }}</span>
+                <span class="font-semibold text-foreground">{{
+                  sortedPosts.length
+                }}</span>
                 threads
               </p>
               <Button
@@ -155,7 +179,11 @@ const sortedPosts = computed(() => {
             </div>
           </CardHeader>
           <CardContent class="space-y-6 px-0">
-            <ForumPostCard v-for="post in sortedPosts" :key="post.id" :post="post" />
+            <ForumPostCard
+              v-for="post in sortedPosts"
+              :key="post.id"
+              :post="post"
+            />
           </CardContent>
         </Card>
         <ForumSidebar

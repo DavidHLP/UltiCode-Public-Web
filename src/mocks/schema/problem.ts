@@ -29,7 +29,7 @@ export interface ProblemTagRelationRow {
 }
 
 // Composite interface for API responses
-export interface Problem extends Omit<ProblemRow, 'acceptance_rate'> {
+export interface Problem extends Omit<ProblemRow, "acceptance_rate"> {
   acceptanceRate: number;
   tags: string[];
 }

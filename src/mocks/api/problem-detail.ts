@@ -58,7 +58,7 @@ const normalizeApproach = (approach: ProblemApproachRow): ProblemApproach => ({
 });
 
 const groupByProblemId = <T extends { problem_id: number }>(
-  source: T[]
+  source: T[],
 ): Map<number, T[]> => {
   return source.reduce<Map<number, T[]>>((acc, item) => {
     if (!acc.has(item.problem_id)) {
@@ -70,19 +70,19 @@ const groupByProblemId = <T extends { problem_id: number }>(
 };
 
 const examplesByProblemId = groupByProblemId(
-  problemDetailData.problem_examples
+  problemDetailData.problem_examples,
 );
 const approachesByProblemId = groupByProblemId(
-  problemDetailData.problem_approaches
+  problemDetailData.problem_approaches,
 );
 const languagesByProblemId = groupByProblemId(
-  problemDetailData.problem_languages
+  problemDetailData.problem_languages,
 );
 const starterNotesByProblemId = groupByProblemId(
-  problemDetailData.problem_starter_notes
+  problemDetailData.problem_starter_notes,
 );
 const recentResultsByProblemId = groupByProblemId(
-  problemDetailData.problem_recent_results
+  problemDetailData.problem_recent_results,
 );
 
 problemDetailData.problem_details.forEach((detail) => {
@@ -108,7 +108,7 @@ problemDetailData.problem_details.forEach((detail) => {
         explanation: example.explanation,
       })),
     approaches: (approachesByProblemId.get(detail.problem_id) ?? []).map(
-      normalizeApproach
+      normalizeApproach,
     ),
     languages: (languagesByProblemId.get(detail.problem_id) ?? []).map(
       ({ id, label, value, starter_code }) => ({
@@ -116,10 +116,10 @@ problemDetailData.problem_details.forEach((detail) => {
         label,
         value,
         starterCode: starter_code,
-      })
+      }),
     ),
     starterNotes: (starterNotesByProblemId.get(detail.problem_id) ?? []).map(
-      (note) => note.content
+      (note) => note.content,
     ),
     recentResults: (recentResultsByProblemId.get(detail.problem_id) ?? []).map(
       ({ id, case_label, status, runtime, memory, detail }) => ({
@@ -129,7 +129,7 @@ problemDetailData.problem_details.forEach((detail) => {
         runtime,
         memory,
         detail,
-      })
+      }),
     ),
   });
 });
@@ -176,7 +176,7 @@ function getFallbackDetail(): ProblemDetail {
 }
 
 export function fetchProblemDetailById(
-  id: number
+  id: number,
 ): ProblemDetail & { submissions: ProblemSubmission[] } {
   const base = detailRecords.has(id) ? getDetail(id) : getFallbackDetail();
   const submissions: ProblemSubmission[] = fetchProblemSubmissions(base.id).map(
@@ -187,7 +187,7 @@ export function fetchProblemDetailById(
       memory,
       language,
       submittedAt,
-    })
+    }),
   );
   return { ...base, submissions };
 }
@@ -206,13 +206,13 @@ export function fetchProblemDetailSummary() {
     })
     .filter(
       (
-        summary
+        summary,
       ): summary is {
         id: number;
         title: string;
         difficulty: Problem["difficulty"];
         acceptance_rate: number;
-      } => Boolean(summary)
+      } => Boolean(summary),
     );
 }
 

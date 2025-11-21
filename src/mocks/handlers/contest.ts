@@ -1,26 +1,53 @@
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse } from "msw";
 import {
-  fetchContestCrew,
-  fetchContestFaq,
-  fetchContestFeaturedEvent,
-  fetchContestInsights,
-  fetchContestLeaderboard,
-  fetchContestOpsCheckpoints,
-  fetchContestResources,
-  fetchContestSchedule,
-  fetchContestTracks,
-} from '@/mocks/api/contest'
+  fetchContestList,
+  fetchUpcomingContests,
+  fetchRunningContests,
+  fetchPastContests,
+  fetchContestDetail,
+  fetchContestRanking,
+  fetchGlobalRankings,
+  fetchContestStats,
+} from "@/mocks/api/contest";
 
 export const contestHandlers = [
-  http.get('/api/contest/featured', () => HttpResponse.json(fetchContestFeaturedEvent())),
-  http.get('/api/contest/insights', () => HttpResponse.json(fetchContestInsights())),
-  http.get('/api/contest/schedule', () => HttpResponse.json(fetchContestSchedule())),
-  http.get('/api/contest/leaderboard', () => HttpResponse.json(fetchContestLeaderboard())),
-  http.get('/api/contest/tracks', () => HttpResponse.json(fetchContestTracks())),
-  http.get('/api/contest/resources', () => HttpResponse.json(fetchContestResources())),
-  http.get('/api/contest/faq', () => HttpResponse.json(fetchContestFaq())),
-  http.get('/api/contest/ops-checkpoints', () =>
-    HttpResponse.json(fetchContestOpsCheckpoints()),
+  // 获取所有竞赛列表
+  http.get("/api/contest/list", () => HttpResponse.json(fetchContestList())),
+
+  // 获取即将开始的竞赛
+  http.get("/api/contest/upcoming", () =>
+    HttpResponse.json(fetchUpcomingContests()),
   ),
-  http.get('/api/contest/crew', () => HttpResponse.json(fetchContestCrew())),
-]
+
+  // 获取正在进行的竞赛
+  http.get("/api/contest/running", () =>
+    HttpResponse.json(fetchRunningContests()),
+  ),
+
+  // 获取已结束的竞赛(往届竞赛)
+  http.get("/api/contest/past", () => HttpResponse.json(fetchPastContests())),
+
+  // 获取全球排名榜 - 必须在 :contestId 之前
+  http.get("/api/contest/global-ranking", () =>
+    HttpResponse.json(fetchGlobalRankings()),
+  ),
+
+  // 获取竞赛统计信息 - 必须在 :contestId 之前
+  http.get("/api/contest/stats", () => HttpResponse.json(fetchContestStats())),
+
+  // 获取竞赛排行榜 - 必须在 :contestId 之前
+  http.get("/api/contest/:contestId/ranking", ({ params }) => {
+    const { contestId } = params;
+    return HttpResponse.json(fetchContestRanking(contestId as string));
+  }),
+
+  // 根据 ID 获取竞赛详情 - 放在最后，因为是最通用的模式
+  http.get("/api/contest/:contestId", ({ params }) => {
+    const { contestId } = params;
+    const detail = fetchContestDetail(contestId as string);
+    if (!detail) {
+      return HttpResponse.json({ error: "Contest not found" }, { status: 404 });
+    }
+    return HttpResponse.json(detail);
+  }),
+];

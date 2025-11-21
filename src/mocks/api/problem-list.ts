@@ -15,7 +15,7 @@ const relationsByListId = problemListData.problem_list_relations.reduce<
 }, new Map());
 
 const listsById = new Map(
-  problemListData.problem_lists.map((list) => [list.id, list])
+  problemListData.problem_lists.map((list) => [list.id, list]),
 );
 
 function toItem(listId: string): ProblemListItem | undefined {
@@ -41,7 +41,7 @@ function buildGroupedLists(): ProblemList[] {
   const savedSet = new Set(
     (problemListData.problem_list_saved_relations || [])
       .filter((r) => r.user_id === uid)
-      .map((r) => r.list_id)
+      .map((r) => r.list_id),
   );
   const savedIds = problemListData.problem_lists
     .filter((l) => savedSet.has(l.id))
@@ -50,7 +50,7 @@ function buildGroupedLists(): ProblemList[] {
   const favoriteSet = new Set(
     (problemListData.problem_list_favorite_relations || [])
       .filter((r) => r.user_id === uid)
-      .map((r) => r.list_id)
+      .map((r) => r.list_id),
   );
   const favoriteIds = problemListData.problem_lists
     .filter((l) => favoriteSet.has(l.id))
@@ -76,7 +76,7 @@ export function fetchProblemLists(): ProblemList[] {
 }
 
 export function fetchProblemListItem(
-  listId: string
+  listId: string,
 ): ProblemListItem | undefined {
   const list = listsById.get(listId);
   if (!list) return undefined;
@@ -109,13 +109,13 @@ export function getProblemListStats() {
   return Array.from(relationsByListId.entries()).map(([listId, problemIds]) => {
     const problemSet = new Set(problemIds);
     const listProblems = fetchProblems().filter((problem) =>
-      problemSet.has(problem.id)
+      problemSet.has(problem.id),
     );
     const solvedCount = listProblems.filter(
-      (p) => p.status === "solved"
+      (p) => p.status === "solved",
     ).length;
     const attemptedCount = listProblems.filter(
-      (p) => p.status === "attempted"
+      (p) => p.status === "attempted",
     ).length;
     const todoCount = listProblems.filter((p) => p.status === "todo").length;
 
@@ -133,27 +133,27 @@ export function getProblemListStats() {
 
 export function getProblemsByListIdAndTag(
   listId: string,
-  tag: string
+  tag: string,
 ): Problem[] {
   return getProblemsByListId(listId).filter((problem) =>
-    problem.tags.includes(tag)
+    problem.tags.includes(tag),
   );
 }
 
 export function getProblemsByListIdAndDifficulty(
   listId: string,
-  difficulty: "Easy" | "Medium" | "Hard"
+  difficulty: "Easy" | "Medium" | "Hard",
 ): Problem[] {
   return getProblemsByListId(listId).filter(
-    (problem) => problem.difficulty === difficulty
+    (problem) => problem.difficulty === difficulty,
   );
 }
 
 export function getProblemsByListIdAndStatus(
   listId: string,
-  status: "solved" | "attempted" | "todo"
+  status: "solved" | "attempted" | "todo",
 ): Problem[] {
   return getProblemsByListId(listId).filter(
-    (problem) => problem.status === status
+    (problem) => problem.status === status,
   );
 }

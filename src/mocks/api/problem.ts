@@ -13,7 +13,7 @@ const problemsData = rawProblemsData as {
 };
 
 const tagLookup = new Map(
-  problemsData.problem_tags.map((tag) => [tag.id, tag.label])
+  problemsData.problem_tags.map((tag) => [tag.id, tag.label]),
 );
 
 const problemTagsMap = problemsData.problem_tag_relations.reduce<
@@ -28,12 +28,12 @@ const problemTagsMap = problemsData.problem_tag_relations.reduce<
 }, new Map());
 
 const problems: Problem[] = problemsData.problems.map((problem) => {
-  const { acceptance_rate, ...rest } = problem
+  const { acceptance_rate, ...rest } = problem;
   return {
     ...rest,
     acceptanceRate: acceptance_rate,
     tags: problemTagsMap.get(problem.id) ?? [],
-  }
+  };
 });
 
 export function fetchProblems(): Problem[] {

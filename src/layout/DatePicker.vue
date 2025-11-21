@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { Calendar } from '@/components/ui/calendar'
-import { SidebarGroup, SidebarGroupContent } from '@/components/ui/sidebar'
-import { fetchProblems } from '@/api/problem'
-import type { Problem } from '@/mocks/schema/problem'
-import { computed, onMounted, ref } from 'vue'
-import { getLocalTimeZone, today } from '@internationalized/date'
+import { Calendar } from "@/components/ui/calendar";
+import { SidebarGroup, SidebarGroupContent } from "@/components/ui/sidebar";
+import { fetchProblems } from "@/api/problem";
+import type { Problem } from "@/mocks/schema/problem";
+import { computed, onMounted, ref } from "vue";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
-const problems = ref<Problem[]>([])
+const problems = ref<Problem[]>([]);
 
 onMounted(async () => {
   try {
-    problems.value = await fetchProblems()
+    problems.value = await fetchProblems();
   } catch (error) {
-    console.error('Failed to load problems', error)
-    problems.value = []
+    console.error("Failed to load problems", error);
+    problems.value = [];
   }
-})
+});
 
 const completedDates = computed(() => {
   return problems.value
-    .filter((p) => p.status === 'solved' && p.completedTime)
+    .filter((p) => p.status === "solved" && p.completedTime)
     .map((p) => {
-      const [year, month, day] = p.completedTime!.split('-').map(Number)
-      return today(getLocalTimeZone()).set({ year, month, day })
-    })
-})
+      const [year, month, day] = p.completedTime!.split("-").map(Number);
+      return today(getLocalTimeZone()).set({ year, month, day });
+    });
+});
 </script>
 
 <template>

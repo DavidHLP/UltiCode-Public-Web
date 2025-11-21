@@ -89,19 +89,19 @@ const communities: ForumCommunity[] = forumData.forum_communities.map(
     ...community,
     rules: rulesByCommunity.get(community.id) ?? [],
     links: linksByCommunity.get(community.id) ?? [],
-  })
+  }),
 );
 
 const communityMap = new Map(
-  communities.map((community) => [community.id, community])
+  communities.map((community) => [community.id, community]),
 );
 
 const usersById = new Map<ForumUser["username"], ForumUser>(
-  forumData.forum_users.map((user) => [user.username, user])
+  forumData.forum_users.map((user) => [user.username, user]),
 );
 
 const awardsById = new Map<ForumAward["id"], ForumAward>(
-  forumData.forum_awards.map((award) => [award.id, award])
+  forumData.forum_awards.map((award) => [award.id, award]),
 );
 
 const extraThreadComments: ForumCommentRow[] = [];
@@ -198,7 +198,7 @@ export function fetchForumQuickFilters() {
 
 function buildCommentTree(
   rows: ForumCommentRow[],
-  postId: string
+  postId: string,
 ): ForumComment[] {
   const byId = new Map<string, ForumComment>();
   const roots: ForumComment[] = [];
@@ -261,7 +261,7 @@ export function createForumComment(
   postId: string,
   body: string,
   parentId: string | null = null,
-  authorId?: string
+  authorId?: string,
 ): ForumComment {
   const trimmed = body.trim();
   if (!trimmed) {

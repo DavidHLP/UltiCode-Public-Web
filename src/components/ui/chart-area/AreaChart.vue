@@ -1,15 +1,19 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import type { BulletLegendItemInterface } from '@unovis/ts'
-import type { Component } from 'vue'
-import type { BaseChartProps } from '.'
-import { Area, Axis, CurveType, Line } from '@unovis/ts'
+import type { BulletLegendItemInterface } from "@unovis/ts";
+import type { Component } from "vue";
+import type { BaseChartProps } from ".";
+import { Area, Axis, CurveType, Line } from "@unovis/ts";
 
-import { VisArea, VisAxis, VisLine, VisXYContainer } from '@unovis/vue'
-import { useMounted } from '@vueuse/core'
-import { useId } from 'reka-ui'
-import { computed, ref } from 'vue'
-import { cn } from '@/lib/utils'
-import { ChartCrosshair, ChartLegend, defaultColors } from '@/components/ui/chart'
+import { VisArea, VisAxis, VisLine, VisXYContainer } from "@unovis/vue";
+import { useMounted } from "@vueuse/core";
+import { useId } from "reka-ui";
+import { computed, ref } from "vue";
+import { cn } from "@/lib/utils";
+import {
+  ChartCrosshair,
+  ChartLegend,
+  defaultColors,
+} from "@/components/ui/chart";
 
 const props = withDefaults(
   defineProps<
@@ -17,16 +21,16 @@ const props = withDefaults(
       /**
        * Render custom tooltip component.
        */
-      customTooltip?: Component
+      customTooltip?: Component;
       /**
        * Type of curve
        */
-      curveType?: CurveType
+      curveType?: CurveType;
       /**
        * Controls the visibility of gradient.
        * @default true
        */
-      showGradient?: boolean
+      showGradient?: boolean;
     }
   >(),
   {
@@ -40,21 +44,21 @@ const props = withDefaults(
     showGridLine: true,
     showGradient: true,
   },
-)
+);
 
 const emits = defineEmits<{
-  legendItemClick: [d: BulletLegendItemInterface, i: number]
-}>()
+  legendItemClick: [d: BulletLegendItemInterface, i: number];
+}>();
 
-type KeyOfT = Extract<keyof T, string>
-type Data = (typeof props.data)[number]
+type KeyOfT = Extract<keyof T, string>;
+type Data = (typeof props.data)[number];
 
-const chartRef = useId()
+const chartRef = useId();
 
-const index = computed(() => props.index as KeyOfT)
+const index = computed(() => props.index as KeyOfT);
 const colors = computed(() =>
   props.colors?.length ? props.colors : defaultColors(props.categories.length),
-)
+);
 
 const legendItems = ref<BulletLegendItemInterface[]>(
   props.categories.map((category, i) => ({
@@ -62,17 +66,19 @@ const legendItems = ref<BulletLegendItemInterface[]>(
     color: colors.value[i],
     inactive: false,
   })),
-)
+);
 
-const isMounted = useMounted()
+const isMounted = useMounted();
 
 function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
-  emits('legendItemClick', d, i)
+  emits("legendItemClick", d, i);
 }
 </script>
 
 <template>
-  <div :class="cn('w-full h-[400px] flex flex-col items-end', $attrs.class ?? '')">
+  <div
+    :class="cn('w-full h-[400px] flex flex-col items-end', $attrs.class ?? '')"
+  >
     <ChartLegend
       v-if="showLegend"
       v-model:items="legendItems"
@@ -126,7 +132,9 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
             },
           }"
           :opacity="
-            legendItems.find((item) => item.name === category)?.inactive ? filterOpacity : 1
+            legendItems.find((item) => item.name === category)?.inactive
+              ? filterOpacity
+              : 1
           "
         />
       </template>
@@ -139,7 +147,8 @@ function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
           :curve-type="curveType"
           :attributes="{
             [Line.selectors.line]: {
-              opacity: legendItems.find((item) => item.name === category)?.inactive
+              opacity: legendItems.find((item) => item.name === category)
+                ?.inactive
                 ? filterOpacity
                 : 1,
             },

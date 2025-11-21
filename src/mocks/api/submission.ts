@@ -63,13 +63,13 @@ function transformSubmission(row: SubmissionRow): SubmissionRecordRow {
 
 export function fetchProblemSubmissions(
   problemId: ProblemId,
-  userId?: UserId
+  userId?: UserId,
 ): SubmissionRecord[] {
   const uid = userId ?? fetchCurrentUserId();
   return submissionRows
     .filter(
       (submission) =>
-        submission.problem_id === problemId && submission.user_id === uid
+        submission.problem_id === problemId && submission.user_id === uid,
     )
     .map(transformSubmission);
 }

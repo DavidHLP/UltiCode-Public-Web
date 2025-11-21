@@ -1,47 +1,68 @@
-import { apiGet } from '@/api/client'
+import { apiGet } from "@/api/client";
 import type {
-  ContestCrewMember,
-  ContestEvent,
-  ContestFaqItem,
-  ContestInsight,
-  ContestLeaderboardEntry,
-  ContestOpsCheckpoint,
-  ContestResource,
-  ContestTrack,
-} from '@/mocks/schema/contest'
+  ContestListItem,
+  ContestDetail,
+  ContestRankingEntry,
+  GlobalRankingEntry,
+  ContestStats,
+} from "@/mocks/schema/contest";
 
-export async function fetchContestFeaturedEvent(): Promise<ContestEvent> {
-  return apiGet<ContestEvent>('/contest/featured')
+/**
+ * 获取所有竞赛列表
+ */
+export async function fetchContestList(): Promise<ContestListItem[]> {
+  return apiGet<ContestListItem[]>("/contest/list");
 }
 
-export async function fetchContestInsights(): Promise<ContestInsight[]> {
-  return apiGet<ContestInsight[]>('/contest/insights')
+/**
+ * 获取即将开始的竞赛
+ */
+export async function fetchUpcomingContests(): Promise<ContestListItem[]> {
+  return apiGet<ContestListItem[]>("/contest/upcoming");
 }
 
-export async function fetchContestSchedule(): Promise<ContestEvent[]> {
-  return apiGet<ContestEvent[]>('/contest/schedule')
+/**
+ * 获取正在进行的竞赛
+ */
+export async function fetchRunningContests(): Promise<ContestListItem[]> {
+  return apiGet<ContestListItem[]>("/contest/running");
 }
 
-export async function fetchContestLeaderboard(): Promise<ContestLeaderboardEntry[]> {
-  return apiGet<ContestLeaderboardEntry[]>('/contest/leaderboard')
+/**
+ * 获取已结束的竞赛(往届竞赛)
+ */
+export async function fetchPastContests(): Promise<ContestListItem[]> {
+  return apiGet<ContestListItem[]>("/contest/past");
 }
 
-export async function fetchContestTracks(): Promise<ContestTrack[]> {
-  return apiGet<ContestTrack[]>('/contest/tracks')
+/**
+ * 根据 ID 获取竞赛详情
+ */
+export async function fetchContestDetail(
+  contestId: string,
+): Promise<ContestDetail> {
+  return apiGet<ContestDetail>(`/contest/${contestId}`);
 }
 
-export async function fetchContestResources(): Promise<ContestResource[]> {
-  return apiGet<ContestResource[]>('/contest/resources')
+/**
+ * 获取竞赛排行榜
+ */
+export async function fetchContestRanking(
+  contestId: string,
+): Promise<ContestRankingEntry[]> {
+  return apiGet<ContestRankingEntry[]>(`/contest/${contestId}/ranking`);
 }
 
-export async function fetchContestFaq(): Promise<ContestFaqItem[]> {
-  return apiGet<ContestFaqItem[]>('/contest/faq')
+/**
+ * 获取全球排名榜
+ */
+export async function fetchGlobalRankings(): Promise<GlobalRankingEntry[]> {
+  return apiGet<GlobalRankingEntry[]>("/contest/global-ranking");
 }
 
-export async function fetchContestOpsCheckpoints(): Promise<ContestOpsCheckpoint[]> {
-  return apiGet<ContestOpsCheckpoint[]>('/contest/ops-checkpoints')
-}
-
-export async function fetchContestCrew(): Promise<ContestCrewMember[]> {
-  return apiGet<ContestCrewMember[]>('/contest/crew')
+/**
+ * 获取竞赛统计信息
+ */
+export async function fetchContestStats(): Promise<ContestStats> {
+  return apiGet<ContestStats>("/contest/stats");
 }

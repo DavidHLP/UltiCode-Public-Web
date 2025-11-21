@@ -163,45 +163,45 @@
 /* Chart Component Styling */
 @layer components {
   /* Donut Chart Segments */
-  [data-chart-segment='Solved'] {
+  [data-chart-segment="Solved"] {
     fill: hsl(var(--chart-status-solved));
   }
 
-  [data-chart-segment='Attempted'] {
+  [data-chart-segment="Attempted"] {
     fill: hsl(var(--chart-status-attempted));
   }
 
-  [data-chart-segment='Todo'] {
+  [data-chart-segment="Todo"] {
     fill: hsl(var(--chart-status-todo));
   }
 
   /* Bar Chart Segments */
-  [data-chart-bar='Solved'] {
+  [data-chart-bar="Solved"] {
     fill: hsl(var(--chart-status-solved));
   }
 
-  [data-chart-bar='Attempted'] {
+  [data-chart-bar="Attempted"] {
     fill: hsl(var(--chart-status-attempted));
   }
 
-  [data-chart-bar='Todo'] {
+  [data-chart-bar="Todo"] {
     fill: hsl(var(--chart-status-todo));
   }
 
   /* Line Chart Series */
-  [data-chart-line='Solved Share'] {
+  [data-chart-line="Solved Share"] {
     stroke: hsl(var(--chart-status-solved) / 0.8);
   }
 
-  [data-chart-line='Attempted Share'] {
+  [data-chart-line="Attempted Share"] {
     stroke: hsl(var(--chart-status-attempted) / 0.8);
   }
 
-  [data-chart-line='Todo Share'] {
+  [data-chart-line="Todo Share"] {
     stroke: hsl(var(--chart-status-todo) / 0.8);
   }
 
-  [data-chart-line='Acceptance Rate'] {
+  [data-chart-line="Acceptance Rate"] {
     stroke: hsl(var(--chart-accent-info) / 0.9);
   }
 

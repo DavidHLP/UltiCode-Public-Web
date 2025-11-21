@@ -1,29 +1,40 @@
 <script setup lang="ts">
-import type { ForumPostMedia } from '@/mocks/schema/forum.ts'
-import { AspectRatio } from '@/components/ui/aspect-ratio'
+import type { ForumPostMedia } from "@/mocks/schema/forum.ts";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 defineProps<{
-  media?: ForumPostMedia
-  title: string
-}>()
+  media?: ForumPostMedia;
+  title: string;
+}>();
 
 function formatPollPercentage(votes: number, totalVotes: number) {
-  if (totalVotes <= 0) return '0%'
-  return `${Math.round((votes / totalVotes) * 100)}%`
+  if (totalVotes <= 0) return "0%";
+  return `${Math.round((votes / totalVotes) * 100)}%`;
 }
 
 function formatPollWidth(votes: number, totalVotes: number) {
-  if (totalVotes <= 0) return '0%'
-  const percentage = (votes / totalVotes) * 100
-  const minimum = votes > 0 && percentage < 4 ? 4 : percentage
-  return `${Math.min(100, Math.max(minimum, 0)).toFixed(0)}%`
+  if (totalVotes <= 0) return "0%";
+  const percentage = (votes / totalVotes) * 100;
+  const minimum = votes > 0 && percentage < 4 ? 4 : percentage;
+  return `${Math.min(100, Math.max(minimum, 0)).toFixed(0)}%`;
 }
 </script>
 
 <template>
-  <section v-if="media" class="overflow-hidden rounded-lg border border-border/60">
-    <AspectRatio v-if="media.kind === 'image'" :ratio="media.ratio ?? 16 / 9" class="bg-muted">
-      <img :src="media.src" :alt="media.alt ?? title" class="h-full w-full object-cover" />
+  <section
+    v-if="media"
+    class="overflow-hidden rounded-lg border border-border/60"
+  >
+    <AspectRatio
+      v-if="media.kind === 'image'"
+      :ratio="media.ratio ?? 16 / 9"
+      class="bg-muted"
+    >
+      <img
+        :src="media.src"
+        :alt="media.alt ?? title"
+        class="h-full w-full object-cover"
+      />
     </AspectRatio>
     <p
       v-if="media.kind === 'image' && media.caption"
@@ -47,9 +58,16 @@ function formatPollWidth(votes: number, totalVotes: number) {
         />
       </div>
       <div class="min-w-0 space-y-1 text-sm">
-        <p class="text-xs uppercase tracking-wide text-muted-foreground">{{ media.domain }}</p>
-        <p class="truncate font-medium text-foreground">{{ media.title ?? media.url }}</p>
-        <p v-if="media.description" class="line-clamp-2 text-xs text-muted-foreground">
+        <p class="text-xs uppercase tracking-wide text-muted-foreground">
+          {{ media.domain }}
+        </p>
+        <p class="truncate font-medium text-foreground">
+          {{ media.title ?? media.url }}
+        </p>
+        <p
+          v-if="media.description"
+          class="line-clamp-2 text-xs text-muted-foreground"
+        >
           {{ media.description }}
         </p>
       </div>
@@ -60,9 +78,11 @@ function formatPollWidth(votes: number, totalVotes: number) {
       class="space-y-2 bg-muted/20 p-4 text-sm leading-relaxed text-muted-foreground"
     >
       {{ media.body }}
-      <pre v-if="media.markdown" class="whitespace-pre-wrap text-xs text-muted-foreground">{{
-        media.markdown
-      }}</pre>
+      <pre
+        v-if="media.markdown"
+        class="whitespace-pre-wrap text-xs text-muted-foreground"
+        >{{ media.markdown }}</pre
+      >
     </div>
 
     <div v-else-if="media.kind === 'video'" class="bg-muted">
@@ -89,21 +109,29 @@ function formatPollWidth(votes: number, totalVotes: number) {
       class="space-y-3 bg-background/80 p-4 text-sm text-foreground"
     >
       <header class="space-y-1">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+        >
           Community poll
         </p>
         <p class="font-medium text-foreground">{{ media.question }}</p>
       </header>
       <ul class="space-y-2">
         <li v-for="option in media.options" :key="option.id" class="space-y-1">
-          <div class="flex items-center justify-between text-[11px] text-muted-foreground">
+          <div
+            class="flex items-center justify-between text-[11px] text-muted-foreground"
+          >
             <span class="text-foreground">{{ option.label }}</span>
-            <span>{{ formatPollPercentage(option.votes, media.totalVotes) }}</span>
+            <span>{{
+              formatPollPercentage(option.votes, media.totalVotes)
+            }}</span>
           </div>
           <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
               class="h-full rounded-full bg-primary"
-              :style="{ width: formatPollWidth(option.votes, media.totalVotes) }"
+              :style="{
+                width: formatPollWidth(option.votes, media.totalVotes),
+              }"
             />
           </div>
         </li>

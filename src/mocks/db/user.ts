@@ -1,11 +1,23 @@
-import type { MockDatabase } from '../validation/validator'
+import type { MockDatabase } from "../validation/validator";
 
 const data = {
-  currentUserId: 'u-001',
+  currentUserId: "u-001",
   users: [
-    { id: 'u-001', username: 'shadcn', name: 'Shad', email: 'm@example.com', avatar: '/avatars/shadcn.jpg' },
-    { id: 'u-002', username: 'stack_unwind', name: 'Stack Unwind', email: 'su@example.com', avatar: '' },
+    {
+      id: "u-001",
+      username: "shadcn",
+      name: "Shad",
+      email: "m@example.com",
+      avatar: "/avatars/shadcn.jpg",
+    },
+    {
+      id: "u-002",
+      username: "stack_unwind",
+      name: "Stack Unwind",
+      email: "su@example.com",
+      avatar: "",
+    },
   ],
-} as const satisfies MockDatabase
+} as const satisfies MockDatabase;
 
-export default data
+export default data;

@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import type { ForumAward } from '@/mocks/schema/forum.ts'
+import type { ForumAward } from "@/mocks/schema/forum.ts";
 
 defineProps<{
-  awards: ForumAward[]
-}>()
+  awards: ForumAward[];
+}>();
 </script>
 
 <template>
-  <section class="space-y-2 rounded-lg border border-border/60 bg-background/60 p-3">
-    <header class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+  <section
+    class="space-y-2 rounded-lg border border-border/60 bg-background/60 p-3"
+  >
+    <header
+      class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+    >
       Awards
     </header>
     <ul class="flex flex-wrap gap-2">

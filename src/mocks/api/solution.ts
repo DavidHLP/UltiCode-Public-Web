@@ -52,10 +52,10 @@ const sortOptions = solutionData.solution_filter_options
   }));
 
 const authorsById = new Map(
-  solutionData.solution_authors.map((author) => [author.id, author])
+  solutionData.solution_authors.map((author) => [author.id, author]),
 );
 const badgesById = new Map(
-  solutionData.solution_badges.map((badge) => [badge.id, badge.label])
+  solutionData.solution_badges.map((badge) => [badge.id, badge.label]),
 );
 
 const badgesByMetaId = solutionData.solution_badge_relations.reduce<
@@ -71,7 +71,7 @@ const badgesByMetaId = solutionData.solution_badge_relations.reduce<
 }, new Map());
 
 const buildMeta = (
-  metaRow: (typeof solutionData.solution_metas)[number]
+  metaRow: (typeof solutionData.solution_metas)[number],
 ): SolutionFeedMeta => {
   const author = authorsById.get(metaRow.author_id);
   if (!author) {
@@ -109,18 +109,18 @@ const buildMeta = (
 const metaRecords: SolutionFeedMeta[] =
   solutionData.solution_metas.map(buildMeta);
 const fallbackMetaCandidate = metaRecords.find(
-  (meta) => meta.id === solutionData.fallbackMetaId
+  (meta) => meta.id === solutionData.fallbackMetaId,
 );
 if (!fallbackMetaCandidate) {
   throw new Error("Fallback solution meta missing");
 }
 const fallbackMeta = fallbackMetaCandidate;
 const rotatingMetaSeed = metaRecords.filter(
-  (meta) => meta.id !== fallbackMeta.id
+  (meta) => meta.id !== fallbackMeta.id,
 ) ?? [fallbackMeta];
 
 export function fetchSolutionFeedItems(
-  approaches: ProblemApproach[]
+  approaches: ProblemApproach[],
 ): SolutionFeedItem[] {
   if (!approaches.length) return [];
 
@@ -136,8 +136,8 @@ export function fetchSolutionFeedItems(
           ...meta.badges,
         ]
           .map((tag) => tag.trim())
-          .filter(Boolean)
-      )
+          .filter(Boolean),
+      ),
     );
     return {
       ...approach,
@@ -150,8 +150,8 @@ export function fetchSolutionFeedItems(
 export function fetchSolutionLanguageOptions(items: SolutionFeedItem[]) {
   const uniqueLanguages = Array.from(
     new Set(
-      items.map((item) => item.languageFilter || item.language).filter(Boolean)
-    )
+      items.map((item) => item.languageFilter || item.language).filter(Boolean),
+    ),
   );
   return [
     { label: "All languages", value: "all" },
@@ -164,7 +164,7 @@ export function fetchSolutionLanguageOptions(items: SolutionFeedItem[]) {
 
 export function fetchSolutionTopicOptions(items: SolutionFeedItem[]) {
   const uniqueTopics = Array.from(
-    new Set(items.map((item) => item.topic).filter(Boolean))
+    new Set(items.map((item) => item.topic).filter(Boolean)),
   );
   return [
     { label: "All topics", value: "all" },

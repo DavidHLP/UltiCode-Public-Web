@@ -1,16 +1,15 @@
-import { setupWorker, type SetupWorkerApi } from "msw/browser";
+import { setupWorker } from "msw/browser";
 import { handlers } from "@/mocks/handlers";
 import { defaultLoader } from "@/mocks/loader";
 
 type WorkerState = {
-  worker: SetupWorkerApi;
+  worker: ReturnType<typeof setupWorker>;
   startPromise?: Promise<void>;
 };
 
 const existingState = (globalThis as { __mswWorker?: WorkerState }).__mswWorker;
 
-export const worker =
-  existingState?.worker ?? setupWorker(...handlers);
+export const worker = existingState?.worker ?? setupWorker(...handlers);
 
 if (!existingState) {
   (globalThis as { __mswWorker?: WorkerState }).__mswWorker = {
@@ -28,33 +27,28 @@ export async function startMockWorker() {
   state.startPromise = (async () => {
     // Validate mock data in development mode
     if (import.meta.env.DEV) {
-      console.log("🔍 Validating mock data...");
       const result = defaultLoader.validate();
 
-      if (!result.valid) {
-        console.error("❌ Mock data validation failed:");
-        result.errors.forEach((error) => {
-          console.error(
-            `  [ERROR] ${error.entity}.${error.field}: ${error.message}`
-          );
-        });
-      } else if (result.warnings.length > 0) {
-        console.warn("⚠️  Mock data validation warnings:");
-        result.warnings.forEach((warning) => {
-          console.warn(
-            `  [WARNING] ${warning.entity}.${warning.field}: ${warning.message}`
-          );
-        });
-      } else {
-        console.log("✅ Mock data validation passed");
+      if (!result.valid || result.warnings.length > 0) {
+        throw new Error(
+          "Mock data validation failed or had warnings. See console for details (if any were logged by MSW itself).",
+        );
       }
     }
 
-    worker.events?.setMaxListeners?.(0);
+    // Increase max listeners to prevent warning in development
+    // MSW creates many event listeners for mocked responses
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const emitter = (worker as any).emitter;
+      if (emitter && typeof emitter.setMaxListeners === "function") {
+        emitter.setMaxListeners(0);
+      }
+    }
+
     await worker.start({
       onUnhandledRequest: "bypass",
     });
-    worker.events?.setMaxListeners?.(0);
   })();
 
   return state.startPromise;

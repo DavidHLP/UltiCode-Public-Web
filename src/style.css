@@ -1,7 +1,7 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'katex/dist/katex.min.css';
-@import './assets/charts.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "katex/dist/katex.min.css";
+@import "./assets/charts.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -75,8 +75,8 @@
 
   .markdown-block code {
     font-family:
-      'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-      'Liberation Mono', 'Courier New', monospace;
+      "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo,
+      Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 0.85em;
     padding: 0.1rem 0.35rem;
     border-radius: 0.35rem;
@@ -96,9 +96,14 @@
   }
 
   .markdown-block blockquote {
-    border-inline-start: 2px solid color-mix(in srgb, var(--foreground) 30%, transparent);
+    border-inline-start: 2px solid
+      color-mix(in srgb, var(--foreground) 30%, transparent);
     padding-inline-start: 1rem;
-    color: color-mix(in srgb, var(--muted-foreground) 90%, var(--foreground) 10%);
+    color: color-mix(
+      in srgb,
+      var(--muted-foreground) 90%,
+      var(--foreground) 10%
+    );
   }
 
   .markdown-block ul {

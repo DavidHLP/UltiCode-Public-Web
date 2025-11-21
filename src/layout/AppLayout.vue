@@ -1,50 +1,54 @@
 <script setup lang="ts">
-import AppSidebar from '@/layout/AppSidebar.vue'
+import AppSidebar from "@/layout/AppSidebar.vue";
 import {
   NavigationMenu,
   NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from '@/components/ui/navigation-menu'
-import { Separator } from '@/components/ui/separator'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import type { RouteLocationRaw } from 'vue-router'
-import { useRoute } from 'vue-router'
+} from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import type { RouteLocationRaw } from "vue-router";
+import { useRoute } from "vue-router";
 
-const route = useRoute()
+const route = useRoute();
 
 type NavItem = {
-  label: string
-  to?: RouteLocationRaw
-  href?: string
-  comingSoon?: boolean
-}
+  label: string;
+  to?: RouteLocationRaw;
+  href?: string;
+  comingSoon?: boolean;
+};
 
 const navItems: NavItem[] = [
   {
-    label: 'ProblemSet',
-    to: { name: 'problemset' },
+    label: "ProblemSet",
+    to: { name: "problemset" },
   },
   {
-    label: 'Forum',
-    to: { name: 'forum-home' },
+    label: "Forum",
+    to: { name: "forum-home" },
   },
   {
-    label: 'Contest',
-    to: { name: 'contest-home' },
+    label: "Contest",
+    to: { name: "contest-home" },
   },
-]
+];
 
 const isActiveNav = (item: NavItem) => {
-  if (!item.to) return false
-  if (typeof item.to === 'string') return route.path === item.to
-  if (typeof item.to === 'object') {
-    if ('name' in item.to && item.to.name) return route.name === item.to.name
-    if ('path' in item.to && item.to.path) return route.path === item.to.path
+  if (!item.to) return false;
+  if (typeof item.to === "string") return route.path === item.to;
+  if (typeof item.to === "object") {
+    if ("name" in item.to && item.to.name) return route.name === item.to.name;
+    if ("path" in item.to && item.to.path) return route.path === item.to.path;
   }
-  return false
-}
+  return false;
+};
 </script>
 
 <template>

@@ -1,13 +1,17 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronRight } from 'lucide-vue-next'
-import type { ProblemList } from '@/mocks/schema/problem-list'
-import { RouterLink } from 'vue-router'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronRight } from "lucide-vue-next";
+import type { ProblemList } from "@/mocks/schema/problem-list";
+import { RouterLink } from "vue-router";
 
 defineProps<{
-  problemLists: ProblemList[]
-}>()
+  problemLists: ProblemList[];
+}>();
 </script>
 
 <template>
@@ -27,7 +31,9 @@ defineProps<{
               class="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               <span class="flex-1 truncate">{{ item.name }}</span>
-              <span class="text-xs text-muted-foreground">{{ item.problemCount }}</span>
+              <span class="text-xs text-muted-foreground">{{
+                item.problemCount
+              }}</span>
             </RouterLink>
           </li>
         </ul>

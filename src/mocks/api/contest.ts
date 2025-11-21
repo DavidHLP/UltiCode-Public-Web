@@ -1,399 +1,259 @@
 import type {
-  ContestCrewMember,
-  ContestCrewRow,
-  ContestEvent,
-  ContestEventRow,
-  ContestFaqItem,
-  ContestFaqRow,
-  ContestInsight,
-  ContestInsightRow,
-  ContestLeaderboardEntry,
-  ContestLeaderboardRow,
-  ContestOpsCheckpoint,
-  ContestOpsCheckpointRow,
-  ContestOpsPhase,
-  ContestOpsStatus,
-  ContestResource,
-  ContestResourceRow,
   ContestRow,
-  ContestTrack,
-  ContestTrackRow,
+  ContestProblemRow,
+  ContestRankingRow,
+  GlobalRankingRow,
+  ContestListItem,
+  ContestDetail,
+  ContestProblemInfo,
+  ContestRankingEntry,
+  GlobalRankingEntry,
+  ContestStats,
 } from "@/mocks/schema/contest";
 import contestData from "@/mocks/db/contest";
 
 const contests = contestData.contests as ContestRow[];
-const schedule = contestData.contest_events as ContestEventRow[];
+const contestProblems = contestData.contest_problems as ContestProblemRow[];
+const contestRankings = contestData.contest_rankings as ContestRankingRow[];
+const globalRankings = contestData.global_rankings as GlobalRankingRow[];
 
-const eventMeta: Record<
-  string,
-  Partial<
-    Pick<
-      ContestEvent,
-      | "series"
-      | "ratingBand"
-      | "timezone"
-      | "host"
-      | "rewards"
-      | "prizePool"
-      | "coverImage"
-      | "broadcast"
-      | "editorialEta"
-    >
-  >
-> = {
-  "contest-global-sprint-47": {
-    series: "Sprint League",
-    ratingBand: "1700 - 2400",
-    timezone: "UTC",
-    host: "Contest Ops",
-    rewards: ["$2k travel credits", "Coach review slot"],
-    prizePool: "$2,000 + perks",
-    coverImage:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
-    editorialEta: "2024-08-31T21:30:00Z",
-  },
-  "contest-regional-apac-qualifiers": {
-    series: "Regional Relay",
-    ratingBand: "1500 - 2100",
-    timezone: "UTC+8",
-    host: "APAC Ops",
-    rewards: ["Asia finals invite", "Team badge"],
-    prizePool: "$1,000",
-  },
-  "contest-college-ladder-14": {
-    series: "Campus Ladder",
-    ratingBand: "800 - 1400",
-    timezone: "UTC",
-    host: "Campus Program",
-    rewards: ["Mentor hour", "Profile badge"],
-  },
-  "contest-team-marathon-09": {
-    series: "Marathon Lab",
-    ratingBand: "2000+",
-    timezone: "UTC",
-    host: "RL Lab",
-    rewards: ["Cloud credits", "Feature interview"],
-    prizePool: "$5,000",
-  },
-  "contest-global-sprint-46": {
-    series: "Sprint League",
-    ratingBand: "1700 - 2400",
-    timezone: "UTC",
-    host: "Contest Ops",
-    rewards: ["Archived trophy", "Editorial pack"],
-    prizePool: "$1,500",
-  },
-  "contest-college-ladder-13": {
-    series: "Campus Ladder",
-    ratingBand: "800 - 1400",
-    timezone: "UTC",
-    host: "Campus Program",
-    rewards: ["Mentor AMA", "Campus badge"],
-  },
-};
-
-const difficultyBands: Record<string, string> = {
-  Starter: "800 - 1400",
-  Intermediate: "1400 - 1900",
-  Advanced: "1700 - 2400",
-  Championship: "2000+",
-};
-
-// Get the main contest and its featured event
-const mainContest = contests[0];
-if (!mainContest) {
-  throw new Error("Contest dataset is empty");
-}
-
-const derivedFeaturedContest =
-  schedule.find((event) => event.id === mainContest.featured_event_id) ?? schedule[0];
-
-if (!derivedFeaturedContest) {
-  throw new Error("Contest events dataset is empty");
-}
-const featuredContest = derivedFeaturedContest;
-
-const minutesBetween = (start: string, end: string, fallback = 90) => {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  if (Number.isNaN(startDate.valueOf()) || Number.isNaN(endDate.valueOf())) return fallback;
-  return Math.max(30, Math.round((endDate.valueOf() - startDate.valueOf()) / (1000 * 60)));
-};
-
-const mapRows = <T extends { contest_id: string }, O>(
-  rows: T[],
-  mapper: (row: T) => O,
-): O[] => rows.filter((row) => row.contest_id === featuredContest.id).map(mapper);
-
-const mapEventRow = (row: ContestEventRow): ContestEvent => {
-  const meta = eventMeta[row.id] ?? {};
-  return {
-    id: row.id,
-    title: row.title,
-    series: meta.series ?? "UltiCode Contest",
-    description: row.description,
-    startTime: row.start_time,
-    durationMinutes: minutesBetween(row.start_time, row.end_time),
-    timezone: meta.timezone ?? "UTC",
-    status: row.status,
-    difficulty: row.difficulty as ContestEvent["difficulty"],
-    ratingBand: meta.ratingBand ?? difficultyBands[row.difficulty] ?? "All ratings",
-    tags: Array.isArray(row.tags) ? row.tags : [],
-    rewards: meta.rewards?.length ? meta.rewards : ["Digital badge"],
-    registration: {
-      open: row.status !== "archived",
-      closesAt: meta.editorialEta ?? row.end_time,
-      slots: row.slots ?? row.registered,
-      registered: row.registered,
-      mode: row.mode,
-    },
-    division: row.division as ContestEvent["division"],
-    host: meta.host ?? "Ops Team",
-    isRated: row.is_rated,
-    prizePool: meta.prizePool,
-    coverImage: meta.coverImage,
-    broadcast: meta.broadcast,
-    editorialEta: meta.editorialEta,
-  };
-};
-
-const insightMeta: Record<
-  string,
-  {
-    helper: string;
-    unit?: string;
+/**
+ * 格式化时间(秒)为 HH:MM:SS 格式
+ */
+function formatTime(seconds: number | null | undefined): string {
+  if (seconds == null) return "-";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   }
-> = {
-  "insight-registrations": { helper: "vs last 7 days", unit: "%" },
-  "insight-solve-rate": { helper: "median across last sprint", unit: "%" },
-  "insight-editorial": { helper: "faster than last cycle", unit: "m" },
-  "insight-newcomers": { helper: "new rated users this month" },
-};
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
-const mapInsightRow = ({ contest_id, ...row }: ContestInsightRow): ContestInsight => {
-  void contest_id;
-  const meta = insightMeta[row.id] ?? { helper: "vs last window" };
-  const trend: ContestInsight["trend"] =
-    row.status === "down" || (row.delta && row.delta < 0)
-      ? "down"
-      : row.status === "up" || (row.delta && row.delta > 0)
-        ? "up"
-        : "steady";
-  const deltaText =
-    typeof row.delta === "number"
-      ? `${row.delta > 0 ? "+" : ""}${row.delta}${meta.unit ?? ""}`
-      : row.delta ?? "0";
-
-  return {
-    id: row.id,
-    label: row.label,
-    value: row.value,
-    trend,
-    delta: deltaText,
-    helper: meta.helper,
-  };
-};
-
-const leaderboardMeta: Record<
-  string,
-  Partial<Pick<ContestLeaderboardEntry, "handle" | "rating" | "ratingDelta" | "country">>
-> = {
-  "leaderboard-01": { handle: "yuki.codes", rating: 2841, ratingDelta: 28, country: "JP" },
-  "leaderboard-02": { handle: "bytewave", rating: 2720, ratingDelta: 12, country: "US" },
-  "leaderboard-03": { handle: "algorhythm", rating: 2684, ratingDelta: -6, country: "DE" },
-  "leaderboard-04": { handle: "falcon-squad", rating: 2210, ratingDelta: 18, country: "SG" },
-  "leaderboard-05": { handle: "hkust-knit", rating: 2148, ratingDelta: 20, country: "HK" },
-  "leaderboard-06": { handle: "deltafreshman", rating: 1538, ratingDelta: 9, country: "IN" },
-  "leaderboard-07": { handle: "neonfox", rating: 2798, ratingDelta: 19, country: "CA" },
-  "leaderboard-08": { handle: "bitra", rating: 2705, ratingDelta: 10, country: "ES" },
-  "leaderboard-09": { handle: "solarium", rating: 2652, ratingDelta: -4, country: "PL" },
-};
-
-const mapLeaderboardRow = ({ contest_id, ...row }: ContestLeaderboardRow): ContestLeaderboardEntry => {
-  void contest_id;
-  const meta = leaderboardMeta[row.id] ?? {};
-  return {
-    id: row.id,
-    divisionTag: row.division_tag,
-    rank: row.rank,
-    handle: meta.handle ?? row.team_name,
-    rating: meta.rating ?? row.score,
-    ratingDelta: meta.ratingDelta ?? 0,
-    solved: row.solved,
-    penalty: row.penalty,
-    country: meta.country ?? "Global",
-  };
-};
-
-const trackMeta: Record<string, Omit<ContestTrack, "id" | "summary">> = {
-  "track-accelerator": {
-    name: "Accelerator Track",
-    badge: "High focus",
-    difficulty: "Intermediate",
-    cadence: "Daily drills",
-    targetRating: "1400 → 1800",
-    focus: ["Speed", "Templates", "Greedy"],
-    included: ["Scrimmages", "Mentor review", "Code clinic"],
-  },
-  "track-foundations": {
-    name: "Foundations Track",
-    badge: "Onboarding",
-    difficulty: "Starter",
-    cadence: "3x week",
-    targetRating: "800 → 1200",
-    focus: ["Basics", "Simulation", "Two pointers"],
-    included: ["Walkthroughs", "Playlists", "Office hours"],
-  },
-  "track-marathon-lab": {
-    name: "Marathon Lab",
-    badge: "Async",
-    difficulty: "Advanced",
-    cadence: "Weekly",
-    targetRating: "1900 → 2300",
-    focus: ["DP", "Graphs", "RL datasets"],
-    included: ["Sandbox credits", "Review minutes", "Checkpoints"],
-  },
-};
-
-const mapTrackRow = ({ contest_id, ...row }: ContestTrackRow): ContestTrack => {
-  void contest_id;
-  const meta = trackMeta[row.id] ?? {
-    name: row.title,
-    badge: "Prep",
-    difficulty: "Intermediate",
-    cadence: "Weekly",
-    targetRating: "All levels",
-    focus: ["Core skills"],
-    included: ["Docs"],
-  };
-
-  return {
-    id: row.id,
-    name: meta.name,
-    summary: row.summary,
-    difficulty: meta.difficulty,
-    badge: meta.badge,
-    cadence: meta.cadence,
-    targetRating: meta.targetRating,
-    focus: meta.focus,
-    included: meta.included,
-  };
-};
-
-const resourceMeta: Record<string, Pick<ContestResource, "description" | "category">> = {
-  "resource-playbook": { description: "Ops-ready prep checklist", category: "playbook" },
-  "resource-editorial": { description: "Track editorial delivery", category: "announcement" },
-  "resource-stream": { description: "Live strategy stream link", category: "video" },
-  "resource-guide": { description: "Rating recovery guide", category: "guide" },
-};
-
-const mapResourceRow = ({ contest_id, ...row }: ContestResourceRow): ContestResource => {
-  void contest_id;
-  const meta = resourceMeta[row.id] ?? {
-    description: row.title,
-    category: row.kind as ContestResource["category"],
-  };
+/**
+ * 将数据库竞赛记录转换为 API 响应
+ */
+function mapContestToListItem(row: ContestRow): ContestListItem {
   return {
     id: row.id,
     title: row.title,
-    description: meta.description,
-    url: row.url,
-    category: meta.category,
+    slug: row.slug,
+    type: row.contest_type,
+    startTime: row.start_time,
+    durationMinutes: row.duration_minutes,
+    status: row.status,
+    registeredCount: row.registered_count,
+    participantCount: row.participant_count,
+    isRated: row.is_rated,
+    coverImage: row.cover_image ?? undefined,
   };
-};
+}
 
-const faqMeta: Record<string, string[]> = {
-  "faq-eligibility": ["rating", "policy"],
-  "faq-team": ["team", "region"],
-  "faq-editorial": ["editorial", "broadcast"],
-};
+/**
+ * 将竞赛题目记录转换为 API 响应
+ */
+function mapContestProblem(row: ContestProblemRow): ContestProblemInfo {
+  const acceptanceRate =
+    row.submission_count > 0
+      ? ((row.solved_count / row.submission_count) * 100).toFixed(1) + "%"
+      : "0.0%";
 
-const mapFaqRow = ({ contest_id, ...row }: ContestFaqRow): ContestFaqItem => {
-  void contest_id;
+  // 根据 problem_id 查找题目信息 (这里模拟, 实际应从 problems 表中查询)
+  const problemTitles: Record<number, { title: string; difficulty: string }> = {
+    3001: { title: "找出数组中的重复元素", difficulty: "Easy" },
+    3002: { title: "最长递增子序列", difficulty: "Medium" },
+    3003: { title: "二叉树的最大路径和", difficulty: "Hard" },
+    3004: { title: "极大极小值的最小差", difficulty: "Hard" },
+  };
+
+  const problemInfo = problemTitles[row.problem_id] ?? {
+    title: `题目 ${row.problem_id}`,
+    difficulty: "Medium",
+  };
+
   return {
     id: row.id,
-    question: row.question,
-    answer: row.answer,
-    tags: faqMeta[row.id] ?? [],
+    problemId: row.problem_id,
+    problemIndex: row.problem_index,
+    title: problemInfo.title,
+    difficulty: problemInfo.difficulty,
+    score: row.score,
+    solvedCount: row.solved_count,
+    submissionCount: row.submission_count,
+    acceptanceRate,
   };
-};
+}
 
-const opsOwners: Record<string, string> = {
-  "ops-problem-freeze": "Problem lead",
-  "ops-broadcast-tech": "Broadcast",
-  "ops-scoreboard-lock": "Control room",
-  "ops-editorial-hand-off": "Editorial",
-  "ops-prize-email": "Community",
-};
-
-const mapOpsRow = ({ contest_id, ...row }: ContestOpsCheckpointRow): ContestOpsCheckpoint => {
-  void contest_id;
-  const [title, ...rest] = row.description.split(" - ");
+/**
+ * 将排名记录转换为 API 响应
+ */
+function mapContestRanking(row: ContestRankingRow): ContestRankingEntry {
   return {
     id: row.id,
-    title: title || row.description,
-    category: row.phase as ContestOpsPhase,
-    status: row.status as ContestOpsStatus,
-    notes: rest.join(" - ") || row.description,
-    dueAt: row.timestamp,
-    owner: opsOwners[row.id] ?? "Ops",
-    effort: "M",
+    rank: row.rank,
+    username: row.username,
+    score: row.score,
+    finishTime: formatTime(row.finish_time_seconds),
+    problemResults: [
+      {
+        index: "Q1",
+        solved: row.q1_time_seconds != null,
+        time: formatTime(row.q1_time_seconds),
+      },
+      {
+        index: "Q2",
+        solved: row.q2_time_seconds != null,
+        time: formatTime(row.q2_time_seconds),
+      },
+      {
+        index: "Q3",
+        solved: row.q3_time_seconds != null,
+        time: formatTime(row.q3_time_seconds),
+      },
+      {
+        index: "Q4",
+        solved: row.q4_time_seconds != null,
+        time: formatTime(row.q4_time_seconds),
+      },
+    ],
+    ratingBefore: row.rating_before,
+    ratingAfter: row.rating_after,
+    ratingChange: row.rating_change,
+    country: row.country,
   };
-};
+}
 
-const crewMeta: Record<string, Pick<ContestCrewMember, "timezone" | "focus" | "channel">> = {
-  "crew-director": { timezone: "UTC", focus: "End-to-end", channel: "@mira-c" },
-  "crew-broadcast": { timezone: "UTC+5:30", focus: "Streaming & captions", channel: "@dev.stream" },
-  "crew-judge": { timezone: "UTC-5", focus: "Appeals & QA", channel: "@ivy-o" },
-  "crew-community": { timezone: "UTC+1", focus: "Community & prizes", channel: "@rahul" },
-};
-
-const mapCrewRow = (row: ContestCrewRow): ContestCrewMember => {
-  const meta = crewMeta[row.id] ?? {
-    timezone: "UTC",
-    focus: "Contest ops",
-    channel: row.contact,
-  };
+/**
+ * 将全球排名记录转换为 API 响应
+ */
+function mapGlobalRanking(row: GlobalRankingRow): GlobalRankingEntry {
   return {
-    ...row,
-    timezone: meta.timezone,
-    focus: meta.focus,
-    channel: meta.channel,
+    id: row.id,
+    globalRank: row.global_rank,
+    username: row.username,
+    rating: row.rating,
+    maxRating: row.max_rating,
+    contestsAttended: row.contests_attended,
+    avatar: row.avatar ?? undefined,
+    country: row.country,
+    badge: row.badge ?? undefined,
   };
-};
-
-export function fetchContestFeaturedEvent(): ContestEvent {
-  return mapEventRow(featuredContest);
 }
 
-export function fetchContestInsights(): ContestInsight[] {
-  return mapRows(contestData.contest_insights as ContestInsightRow[], mapInsightRow);
+// ============================================
+// API 函数
+// ============================================
+
+/**
+ * 获取所有竞赛列表
+ */
+export function fetchContestList(): ContestListItem[] {
+  return contests.map(mapContestToListItem);
 }
 
-export function fetchContestSchedule(): ContestEvent[] {
-  return schedule.map(mapEventRow);
+/**
+ * 获取即将开始的竞赛
+ */
+export function fetchUpcomingContests(): ContestListItem[] {
+  return contests
+    .filter((c) => c.status === "upcoming")
+    .map(mapContestToListItem)
+    .sort(
+      (a, b) =>
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    );
 }
 
-export function fetchContestLeaderboard(): ContestLeaderboardEntry[] {
-  return mapRows(contestData.contest_leaderboard as ContestLeaderboardRow[], mapLeaderboardRow);
+/**
+ * 获取正在进行的竞赛
+ */
+export function fetchRunningContests(): ContestListItem[] {
+  return contests
+    .filter((c) => c.status === "running")
+    .map(mapContestToListItem);
 }
 
-export function fetchContestTracks(): ContestTrack[] {
-  return mapRows(contestData.contest_tracks as ContestTrackRow[], mapTrackRow);
+/**
+ * 获取已结束的竞赛(往届竞赛)
+ */
+export function fetchPastContests(): ContestListItem[] {
+  return contests
+    .filter((c) => c.status === "finished")
+    .map(mapContestToListItem)
+    .sort(
+      (a, b) =>
+        new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+    );
 }
 
-export function fetchContestResources(): ContestResource[] {
-  return mapRows(contestData.contest_resources as ContestResourceRow[], mapResourceRow);
+/**
+ * 根据 ID 获取竞赛详情
+ */
+export function fetchContestDetail(contestId: string): ContestDetail | null {
+  const contest = contests.find((c) => c.id === contestId);
+  if (!contest) return null;
+
+  const problems = contestProblems
+    .filter((p) => p.contest_id === contestId)
+    .map(mapContestProblem)
+    .sort((a, b) => a.problemIndex.localeCompare(b.problemIndex));
+
+  const now = new Date();
+  const startTime = new Date(contest.start_time);
+  const endTime = new Date(
+    startTime.getTime() + contest.duration_minutes * 60 * 1000
+  );
+
+  return {
+    ...mapContestToListItem(contest),
+    description: contest.description ?? undefined,
+    problems,
+    canRegister: contest.status === "upcoming" && now < startTime,
+    canStart:
+      contest.status === "running" ||
+      (contest.status === "finished" && now > endTime),
+    userStatus: {
+      isRegistered: false,
+      isParticipated: false,
+    },
+  };
 }
 
-export function fetchContestFaq(): ContestFaqItem[] {
-  return mapRows(contestData.contest_faq as ContestFaqRow[], mapFaqRow);
+/**
+ * 获取竞赛排行榜
+ */
+export function fetchContestRanking(contestId: string): ContestRankingEntry[] {
+  return contestRankings
+    .filter((r) => r.contest_id === contestId)
+    .map(mapContestRanking)
+    .sort((a, b) => a.rank - b.rank);
 }
 
-export function fetchContestOpsCheckpoints(): ContestOpsCheckpoint[] {
-  return mapRows(contestData.contest_ops_checkpoints as ContestOpsCheckpointRow[], mapOpsRow);
+/**
+ * 获取全球排名榜
+ */
+export function fetchGlobalRankings(): GlobalRankingEntry[] {
+  return globalRankings
+    .map(mapGlobalRanking)
+    .sort((a, b) => a.globalRank - b.globalRank);
 }
 
-export function fetchContestCrew(): ContestCrewMember[] {
-  return mapRows(contestData.contest_crew as ContestCrewRow[], mapCrewRow);
+/**
+ * 获取竞赛统计信息
+ */
+export function fetchContestStats(): ContestStats {
+  const totalParticipants = contests.reduce(
+    (sum, c) => sum + c.participant_count,
+    0
+  );
+  const totalRating = globalRankings.reduce((sum, r) => sum + r.rating, 0);
+
+  return {
+    totalContests: contests.length,
+    upcomingContests: contests.filter((c) => c.status === "upcoming").length,
+    runningContests: contests.filter((c) => c.status === "running").length,
+    totalParticipants,
+    averageRating: Math.round(totalRating / globalRankings.length),
+  };
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SidebarProps } from '@/components/ui/sidebar'
-import Calendars from '@/layout/Calendars.vue'
-import { fetchProblemLists } from '@/api/problem-list'
-import DatePicker from '@/layout/DatePicker.vue'
-import NavUser from '@/layout/NavUser.vue'
-import { onMounted, ref } from 'vue'
-import type { ProblemList } from '@/mocks/schema/problem-list'
+import type { SidebarProps } from "@/components/ui/sidebar";
+import Calendars from "@/layout/Calendars.vue";
+import { fetchProblemLists } from "@/api/problem-list";
+import DatePicker from "@/layout/DatePicker.vue";
+import NavUser from "@/layout/NavUser.vue";
+import { onMounted, ref } from "vue";
+import type { ProblemList } from "@/mocks/schema/problem-list";
 import {
   Sidebar,
   SidebarContent,
@@ -13,28 +13,28 @@ import {
   SidebarHeader,
   SidebarRail,
   SidebarSeparator,
-} from '@/components/ui/sidebar'
+} from "@/components/ui/sidebar";
 
-const props = defineProps<SidebarProps>()
+const props = defineProps<SidebarProps>();
 // This is sample data.
 const data = {
   user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
   },
-}
+};
 
-const problemLists = ref<ProblemList[]>([])
+const problemLists = ref<ProblemList[]>([]);
 
 onMounted(async () => {
   try {
-    problemLists.value = await fetchProblemLists()
+    problemLists.value = await fetchProblemLists();
   } catch (error) {
-    console.error('Failed to load problem lists', error)
-    problemLists.value = []
+    console.error("Failed to load problem lists", error);
+    problemLists.value = [];
   }
-})
+});
 </script>
 
 <template>

@@ -1,102 +1,142 @@
-import type { MockDatabase } from '../validation/validator'
+import type { MockDatabase } from "../validation/validator";
 
-const communityId = 'community-ulticode'
+const communityId = "community-ulticode";
 
 const data = {
   forum_communities: [
     {
       id: communityId,
-      name: 'UltiCode Forum',
-      slug: 'ulticode',
-      description: 'Lightweight community aligned with the mock problems and contest.',
+      name: "UltiCode Forum",
+      slug: "ulticode",
+      description:
+        "Lightweight community aligned with the mock problems and contest.",
       members: 1200,
       online: 64,
     },
   ],
   forum_community_rules: [
-    { id: 'rule-show-attempt', community_id: communityId, title: 'Show your attempt', body: 'Include snippets or reasoning with every question.' },
-    { id: 'rule-be-kind', community_id: communityId, title: 'Be constructive', body: 'Keep feedback actionable and respectful.' },
+    {
+      id: "rule-show-attempt",
+      community_id: communityId,
+      title: "Show your attempt",
+      body: "Include snippets or reasoning with every question.",
+    },
+    {
+      id: "rule-be-kind",
+      community_id: communityId,
+      title: "Be constructive",
+      body: "Keep feedback actionable and respectful.",
+    },
   ],
   forum_community_links: [
-    { id: 'link-editorial', community_id: communityId, label: 'Weekly editorial', url: 'https://example.com/editorial' },
+    {
+      id: "link-editorial",
+      community_id: communityId,
+      label: "Weekly editorial",
+      url: "https://example.com/editorial",
+    },
   ],
   forum_users: [
-    { username: 'shadcn', karma: 1200 },
-    { username: 'stack_unwind', karma: 860 },
+    { username: "shadcn", karma: 1200 },
+    { username: "stack_unwind", karma: 860 },
   ],
   forum_moderators: [
-    { id: 'mod-shad', community_id: communityId, username: 'shadcn', title: 'Moderator' },
+    {
+      id: "mod-shad",
+      community_id: communityId,
+      username: "shadcn",
+      title: "Moderator",
+    },
   ],
   forum_posts: [
     {
-      id: 'post-two-sum',
+      id: "post-two-sum",
       community_id: communityId,
-      user_id: 'shadcn',
-      title: 'Does the Two Sum hashmap need two passes?',
-      body: 'Trying to justify why one pass always works—am I missing an edge case?',
-      tags: ['two-sum', 'hashmap'],
-      flair_type: 'discussion',
-      vote_state: 'neutral',
+      user_id: "shadcn",
+      title: "Does the Two Sum hashmap need two passes?",
+      body: "Trying to justify why one pass always works—am I missing an edge case?",
+      tags: ["two-sum", "hashmap"],
+      flair_type: "discussion",
+      vote_state: "neutral",
       is_saved: false,
       impressions: 210,
       is_pinned: true,
       is_locked: false,
-      created_at: '2024-08-01T12:00:00.000Z',
+      created_at: "2024-08-01T12:00:00.000Z",
     },
     {
-      id: 'post-two-pointers',
+      id: "post-two-pointers",
       community_id: communityId,
-      user_id: 'stack_unwind',
-      title: 'Why move the shorter line in Container With Most Water?',
-      body: 'Looking for a proof sketch that the greedy move is safe.',
-      tags: ['two-pointers'],
-      flair_type: 'question',
-      vote_state: 'neutral',
+      user_id: "stack_unwind",
+      title: "Why move the shorter line in Container With Most Water?",
+      body: "Looking for a proof sketch that the greedy move is safe.",
+      tags: ["two-pointers"],
+      flair_type: "question",
+      vote_state: "neutral",
       is_saved: true,
       impressions: 180,
       is_pinned: false,
       is_locked: false,
-      created_at: '2024-08-02T10:00:00.000Z',
+      created_at: "2024-08-02T10:00:00.000Z",
     },
   ],
   forum_post_stats: [
-    { id: 'stats-post-two-sum', post_id: 'post-two-sum', score: 24, comments: 3, awards: 1, saves: 2, shares: 0 },
-    { id: 'stats-post-two-pointers', post_id: 'post-two-pointers', score: 12, comments: 2, awards: 0, saves: 1, shares: 0 },
+    {
+      id: "stats-post-two-sum",
+      post_id: "post-two-sum",
+      score: 24,
+      comments: 3,
+      awards: 1,
+      saves: 2,
+      shares: 0,
+    },
+    {
+      id: "stats-post-two-pointers",
+      post_id: "post-two-pointers",
+      score: 12,
+      comments: 2,
+      awards: 0,
+      saves: 1,
+      shares: 0,
+    },
   ],
-  forum_awards: [
-    { id: 'award-boost', label: 'Insightful' },
-  ],
+  forum_awards: [{ id: "award-boost", label: "Insightful" }],
   forum_post_awards: [
-    { post_id: 'post-two-sum', award_id: 'award-boost', count: 1 },
+    { post_id: "post-two-sum", award_id: "award-boost", count: 1 },
   ],
   forum_comments: [
     {
-      id: 'comment-1',
-      post_id: 'post-two-sum',
+      id: "comment-1",
+      post_id: "post-two-sum",
       parent_id: null,
-      author_id: 'stack_unwind',
-      body: 'One pass is safe because you check before inserting the current number.',
+      author_id: "stack_unwind",
+      body: "One pass is safe because you check before inserting the current number.",
       upvotes: 6,
-      created_at: '2024-08-01T12:10:00.000Z',
+      created_at: "2024-08-01T12:10:00.000Z",
     },
     {
-      id: 'comment-2',
-      post_id: 'post-two-pointers',
+      id: "comment-2",
+      post_id: "post-two-pointers",
       parent_id: null,
-      author_id: 'shadcn',
-      body: 'Moving the shorter line is the only way to possibly increase the area.',
+      author_id: "shadcn",
+      body: "Moving the shorter line is the only way to possibly increase the area.",
       upvotes: 4,
-      created_at: '2024-08-02T10:15:00.000Z',
+      created_at: "2024-08-02T10:15:00.000Z",
     },
   ],
   forum_quick_filters: [
-    { id: 'filter-new', label: 'New', value: 'new' },
-    { id: 'filter-top', label: 'Top', value: 'top' },
+    { id: "filter-new", label: "New", value: "new" },
+    { id: "filter-top", label: "Top", value: "top" },
   ],
   forum_trending_topics: [
-    { id: 'topic-two-sum', title: 'Two Sum proofs', posts: 3, trend: 'up' },
-    { id: 'topic-two-pointers', title: 'Greedy two-pointers', posts: 2, trend: 'up' },
+    { id: "topic-two-sum", title: "Two Sum proofs", posts: 3, trend: "up" },
+    {
+      id: "topic-two-pointers",
+      title: "Greedy two-pointers",
+      posts: 2,
+      trend: "up",
+    },
   ],
-} as const satisfies MockDatabase
+} as const satisfies MockDatabase;
 
-export default data
+export default data;

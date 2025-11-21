@@ -1,8 +1,8 @@
-import MarkdownIt from 'markdown-it'
-import markdownItFootnote from 'markdown-it-footnote'
-import markdownItKatex from 'markdown-it-katex'
-import markdownItLinkAttributes from 'markdown-it-link-attributes'
-import markdownItTaskLists from 'markdown-it-task-lists'
+import MarkdownIt from "markdown-it";
+import markdownItFootnote from "markdown-it-footnote";
+import markdownItKatex from "markdown-it-katex";
+import markdownItLinkAttributes from "markdown-it-link-attributes";
+import markdownItTaskLists from "markdown-it-task-lists";
 
 const md = new MarkdownIt({
   html: false,
@@ -15,17 +15,17 @@ const md = new MarkdownIt({
   .use(markdownItTaskLists)
   .use(markdownItLinkAttributes, {
     attrs: {
-      target: '_blank',
-      rel: 'noopener noreferrer',
+      target: "_blank",
+      rel: "noopener noreferrer",
     },
-  })
+  });
 
 export function renderMarkdown(content: string): string {
-  if (!content) return ''
-  return md.render(content)
+  if (!content) return "";
+  return md.render(content);
 }
 
 export function renderMarkdownInline(content: string): string {
-  if (!content) return ''
-  return md.renderInline(content)
+  if (!content) return "";
+  return md.renderInline(content);
 }

@@ -36,11 +36,11 @@ const casesByProblemId = testCases.reduce<Map<number, ProblemTestCase[]>>(
     });
     return acc;
   },
-  new Map()
+  new Map(),
 );
 
 export function fetchTestCasesByProblemId(
-  problemId: number
+  problemId: number,
 ): ProblemTestCase[] {
   return casesByProblemId.get(problemId) ?? [];
 }
