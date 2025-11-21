@@ -52,7 +52,7 @@ const hasAwards = computed(() => awards.value.length > 0);
 const commentPreview = computed(() => props.post.commentPreview ?? []);
 const hasCommentPreview = computed(() => commentPreview.value.length > 0);
 const upvoteRatioDisplay = computed(() => {
-  const ratio = props.post.stats.upvoteRatio;
+  const ratio = props.post.stats.upvote_ratio;
   if (typeof ratio !== "number") return undefined;
   return `${Math.round(ratio * 100)}%`;
 });
@@ -257,7 +257,7 @@ function formatRelativeTime(value: string) {
             class="inline-flex items-center gap-2 rounded-full bg-muted/50 px-3 py-1 text-xs font-medium"
           >
             <span class="text-sm">{{ award.icon }}</span>
-            <span class="text-foreground">{{ award.name }}</span>
+            <span class="text-foreground">{{ award.label }}</span>
             <span class="text-muted-foreground">×{{ award.count }}</span>
           </li>
         </ul>

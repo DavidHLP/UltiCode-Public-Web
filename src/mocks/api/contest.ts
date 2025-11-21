@@ -9,13 +9,43 @@ import type {
   ContestRankingEntry,
   GlobalRankingEntry,
   ContestStats,
+  ContestParticipantRow,
 } from "@/mocks/schema/contest";
+import { fetchProblemsByIds } from "@/mocks/api/problem";
+import { fetchCurrentUserId, getUserById } from "@/mocks/api/user";
 import contestData from "@/mocks/db/contest";
 
 const contests = contestData.contests as ContestRow[];
 const contestProblems = contestData.contest_problems as ContestProblemRow[];
 const contestRankings = contestData.contest_rankings as ContestRankingRow[];
 const globalRankings = contestData.global_rankings as GlobalRankingRow[];
+const contestParticipants =
+  (contestData.contest_participants ?? []) as ContestParticipantRow[];
+
+const contestProblemIds = Array.from(
+  new Set(contestProblems.map((row) => row.problem_id)),
+);
+const problemsById = new Map(
+  fetchProblemsByIds(contestProblemIds).map((problem) => [problem.id, problem]),
+);
+const participantsByContest = contestParticipants.reduce<
+  Map<string, ContestParticipantRow[]>
+>((acc, participant) => {
+  if (!acc.has(participant.contest_id)) {
+    acc.set(participant.contest_id, []);
+  }
+  acc.get(participant.contest_id)!.push(participant);
+  return acc;
+}, new Map());
+
+function getCurrentUserParticipation(
+  contestId: string,
+): ContestParticipantRow | undefined {
+  const currentUserId = fetchCurrentUserId();
+  return (participantsByContest.get(contestId) ?? []).find(
+    (participant) => participant.user_id === currentUserId,
+  );
+}
 
 /**
  * 格式化时间(秒)为 HH:MM:SS 格式
@@ -54,30 +84,19 @@ function mapContestToListItem(row: ContestRow): ContestListItem {
  * 将竞赛题目记录转换为 API 响应
  */
 function mapContestProblem(row: ContestProblemRow): ContestProblemInfo {
-  const acceptanceRate =
-    row.submission_count > 0
-      ? ((row.solved_count / row.submission_count) * 100).toFixed(1) + "%"
+  const problem = problemsById.get(row.problem_id);
+  const acceptanceRate = problem
+    ? `${problem.acceptanceRate.toFixed(1)}%`
+    : row.submission_count > 0
+      ? `${((row.solved_count / row.submission_count) * 100).toFixed(1)}%`
       : "0.0%";
-
-  // 根据 problem_id 查找题目信息 (这里模拟, 实际应从 problems 表中查询)
-  const problemTitles: Record<number, { title: string; difficulty: string }> = {
-    3001: { title: "找出数组中的重复元素", difficulty: "Easy" },
-    3002: { title: "最长递增子序列", difficulty: "Medium" },
-    3003: { title: "二叉树的最大路径和", difficulty: "Hard" },
-    3004: { title: "极大极小值的最小差", difficulty: "Hard" },
-  };
-
-  const problemInfo = problemTitles[row.problem_id] ?? {
-    title: `题目 ${row.problem_id}`,
-    difficulty: "Medium",
-  };
 
   return {
     id: row.id,
     problemId: row.problem_id,
     problemIndex: row.problem_index,
-    title: problemInfo.title,
-    difficulty: problemInfo.difficulty,
+    title: problem?.title ?? `题目 ${row.problem_id}`,
+    difficulty: problem?.difficulty ?? "Medium",
     score: row.score,
     solvedCount: row.solved_count,
     submissionCount: row.submission_count,
@@ -89,10 +108,13 @@ function mapContestProblem(row: ContestProblemRow): ContestProblemInfo {
  * 将排名记录转换为 API 响应
  */
 function mapContestRanking(row: ContestRankingRow): ContestRankingEntry {
+  const user = getUserById(row.user_id);
+  const username = user?.username ?? row.username;
+
   return {
     id: row.id,
     rank: row.rank,
-    username: row.username,
+    username,
     score: row.score,
     finishTime: formatTime(row.finish_time_seconds),
     problemResults: [
@@ -128,14 +150,16 @@ function mapContestRanking(row: ContestRankingRow): ContestRankingEntry {
  * 将全球排名记录转换为 API 响应
  */
 function mapGlobalRanking(row: GlobalRankingRow): GlobalRankingEntry {
+  const user = getUserById(row.user_id);
+  const username = user?.username ?? row.username;
   return {
     id: row.id,
     globalRank: row.global_rank,
-    username: row.username,
+    username,
     rating: row.rating,
     maxRating: row.max_rating,
     contestsAttended: row.contests_attended,
-    avatar: row.avatar ?? undefined,
+    avatar: row.avatar ?? user?.avatar ?? undefined,
     country: row.country,
     badge: row.badge ?? undefined,
   };
@@ -204,18 +228,22 @@ export function fetchContestDetail(contestId: string): ContestDetail | null {
   const endTime = new Date(
     startTime.getTime() + contest.duration_minutes * 60 * 1000
   );
+  const participant = getCurrentUserParticipation(contestId);
 
   return {
     ...mapContestToListItem(contest),
     description: contest.description ?? undefined,
     problems,
-    canRegister: contest.status === "upcoming" && now < startTime,
+    canRegister:
+      contest.status === "upcoming" && now < startTime && !participant,
     canStart:
       contest.status === "running" ||
       (contest.status === "finished" && now > endTime),
     userStatus: {
-      isRegistered: false,
-      isParticipated: false,
+      isRegistered: Boolean(participant),
+      isParticipated: participant?.status === "participated",
+      rank: participant?.rank ?? undefined,
+      score: participant?.score ?? undefined,
     },
   };
 }
@@ -248,12 +276,16 @@ export function fetchContestStats(): ContestStats {
     0
   );
   const totalRating = globalRankings.reduce((sum, r) => sum + r.rating, 0);
+  const averageRating =
+    globalRankings.length > 0
+      ? Math.round(totalRating / globalRankings.length)
+      : 0;
 
   return {
     totalContests: contests.length,
     upcomingContests: contests.filter((c) => c.status === "upcoming").length,
     runningContests: contests.filter((c) => c.status === "running").length,
     totalParticipants,
-    averageRating: Math.round(totalRating / globalRankings.length),
+    averageRating,
   };
 }

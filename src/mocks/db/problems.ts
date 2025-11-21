@@ -33,18 +33,32 @@ const data = {
       is_premium: false,
       has_solution: true,
     },
+    {
+      id: 4,
+      slug: "min-cost-to-connect-all-points",
+      title: "Min Cost to Connect All Points",
+      difficulty: "Hard",
+      acceptance_rate: 46.3,
+      status: "todo",
+      is_premium: false,
+      has_solution: true,
+    },
   ],
   problem_tags: [
     { id: "tag-arrays", label: "Arrays" },
     { id: "tag-hashmap", label: "Hash Map" },
     { id: "tag-linked-list", label: "Linked List" },
     { id: "tag-two-pointers", label: "Two Pointers" },
+    { id: "tag-graph", label: "Graph" },
+    { id: "tag-union-find", label: "Union Find" },
   ],
   problem_tag_relations: [
     { problem_id: 1, tag_id: "tag-arrays" },
     { problem_id: 1, tag_id: "tag-hashmap" },
     { problem_id: 2, tag_id: "tag-linked-list" },
     { problem_id: 3, tag_id: "tag-two-pointers" },
+    { problem_id: 4, tag_id: "tag-graph" },
+    { problem_id: 4, tag_id: "tag-union-find" },
   ],
 } as const satisfies MockDatabase;
 

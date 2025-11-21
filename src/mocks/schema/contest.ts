@@ -19,7 +19,7 @@ export type ParticipationStatus = "registered" | "participated" | "virtual";
 export interface ContestRow {
   id: string; // VARCHAR(40) PRIMARY KEY
   title: string; // VARCHAR(120) NOT NULL - 例如: "第 470 场周赛"
-  slug: string; // VARCHAR(120) NOT NULL UNIQUE - 例如: "weekly-contest-470"
+  slug: string; // VARCHAR(120) NOT NULL - 例如: "weekly-contest-470"
   contest_type: ContestType; // ENUM ('weekly','biweekly','special') NOT NULL
   start_time: string; // DATETIME NOT NULL - ISO 8601 格式
   duration_minutes: number; // INT NOT NULL - 竞赛时长(分钟)
@@ -38,7 +38,7 @@ export interface ContestRow {
 export interface ContestProblemRow {
   id: string; // VARCHAR(40) PRIMARY KEY
   contest_id: string; // VARCHAR(40) NOT NULL (FK to contests.id)
-  problem_id: number; // INT NOT NULL (FK to problems.problem_id)
+  problem_id: number; // BIGINT NOT NULL (FK to problems.id)
   problem_index: string; // VARCHAR(10) NOT NULL - 题目编号 (Q1, Q2, Q3, Q4)
   score: number; // INT NOT NULL DEFAULT 100 - 题目分值
   solved_count: number; // INT NOT NULL DEFAULT 0 - 通过人数
@@ -73,7 +73,7 @@ export interface ContestRankingRow {
   contest_id: string; // VARCHAR(40) NOT NULL (FK to contests.id)
   user_id: string; // VARCHAR(40) NOT NULL (FK to users.id)
   username: string; // VARCHAR(120) NOT NULL
-  rank: number; // INT NOT NULL - 全球排名
+  rank: number; // INT NOT NULL - 场内排名
   score: number; // INT NOT NULL - 总分
   finish_time_seconds: number; // INT NOT NULL - 完赛用时(秒)
   q1_time_seconds?: number | null; // INT - Q1 用时

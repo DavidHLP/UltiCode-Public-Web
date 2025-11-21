@@ -34,6 +34,7 @@ const createEmptyInputs = (
   return [
     {
       id: generateId("input"),
+      fieldName: "input",
       label: "input",
       value: "",
     },

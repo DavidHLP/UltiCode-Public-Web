@@ -46,9 +46,9 @@ export default defineComponent({
             { class: "h-7 w-7 border border-border/50" },
             {
               default: () => [
-                props.comment.avatar
+                props.comment.author.avatar
                   ? h(AvatarImage, {
-                      src: props.comment.avatar,
+                      src: props.comment.author.avatar,
                       alt: props.comment.author.username,
                     })
                   : h(

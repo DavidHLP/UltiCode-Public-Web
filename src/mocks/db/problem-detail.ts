@@ -49,6 +49,25 @@ const data = {
       follow_up: "Discuss why a greedy inward two-pointer scan is optimal.",
       constraints_json: ["2 <= n <= 1e5", "0 <= height[i] <= 1e4"],
     },
+    {
+      id: "pd-min-cost",
+      problem_id: 4,
+      slug: "min-cost-to-connect-all-points",
+      summary:
+        "Connect every point with edges weighted by Manhattan distance while minimizing the total cost.",
+      companies: ["Amazon", "Uber"],
+      likes: 760,
+      dislikes: 28,
+      difficulty_rating: 1820,
+      updated_at: now,
+      follow_up:
+        "Can you avoid materializing all O(n^2) edges by using Prim with a priority queue?",
+      constraints_json: [
+        "1 <= n <= 1000",
+        "points[i].length == 2",
+        "-1e6 <= points[i][j] <= 1e6",
+      ],
+    },
   ],
   problem_examples: [
     {
@@ -74,6 +93,24 @@ const data = {
       input_text: "height = [1,8,6,2,5,4,8,3,7]",
       output_text: "49",
       explanation: "Lines at index 1 and 8 form the optimal container.",
+    },
+    {
+      id: "ex-min-cost-1",
+      problem_id: 4,
+      example_order: 0,
+      input_text: "points = [[0,0],[2,2],[3,10],[5,2],[7,0]]",
+      output_text: "20",
+      explanation:
+        "The MST uses edges (0-1),(1-3),(3-4),(1-2) with weights 4 + 3 + 4 + 9 = 20.",
+    },
+    {
+      id: "ex-min-cost-2",
+      problem_id: 4,
+      example_order: 1,
+      input_text: "points = [[3,12],[-2,5],[-4,1]]",
+      output_text: "18",
+      explanation:
+        "Connecting [-4,1] → [-2,5] → [3,12] yields total cost 18.",
     },
   ],
   problem_approaches: [
@@ -111,6 +148,18 @@ const data = {
       space_complexity: "O(1)",
       code_snippet:
         "function maxArea(h: number[]) {\n  let l = 0, r = h.length - 1, best = 0\n  while (l < r) {\n    best = Math.max(best, Math.min(h[l], h[r]) * (r - l))\n    if (h[l] < h[r]) l++\n    else r--\n  }\n  return best\n}",
+      language: "TypeScript",
+    },
+    {
+      id: "ap-min-cost-kruskal",
+      problem_id: 4,
+      title: "Kruskal with union-find",
+      summary:
+        "Enumerate all O(n^2) edges with Manhattan weight, sort them, and connect components greedily.",
+      time_complexity: "O(n^2 log n)",
+      space_complexity: "O(n^2)",
+      code_snippet:
+        "function minCostConnectPoints(points: number[][]): number {\n  const n = points.length\n  const parent = Array.from({ length: n }, (_, i) => i)\n  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))\n  const union = (a: number, b: number): boolean => {\n    const pa = find(a), pb = find(b)\n    if (pa === pb) return false\n    parent[pb] = pa\n    return true\n  }\n  const edges: Array<[number, number, number]> = []\n  for (let i = 0; i < n; i++) {\n    for (let j = i + 1; j < n; j++) {\n      const w = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1])\n      edges.push([w, i, j])\n    }\n  }\n  edges.sort((a, b) => a[0] - b[0])\n  let cost = 0, used = 0\n  for (const [w, u, v] of edges) {\n    if (union(u, v)) {\n      cost += w\n      if (++used === n - 1) break\n    }\n  }\n  return cost\n}",
       language: "TypeScript",
     },
   ],
@@ -172,6 +221,25 @@ const data = {
       step_order: 2,
       content: "Track the maximum area until pointers cross.",
     },
+    {
+      id: "step-min-cost-1",
+      approach_id: "ap-min-cost-kruskal",
+      step_order: 0,
+      content: "Generate all pairwise Manhattan edge weights from the points list.",
+    },
+    {
+      id: "step-min-cost-2",
+      approach_id: "ap-min-cost-kruskal",
+      step_order: 1,
+      content: "Sort edges ascending so the smallest bridge is always considered first.",
+    },
+    {
+      id: "step-min-cost-3",
+      approach_id: "ap-min-cost-kruskal",
+      step_order: 2,
+      content:
+        "Use union-find to connect components and add an edge only if it links two different sets.",
+    },
   ],
   problem_languages: [
     {
@@ -198,6 +266,14 @@ const data = {
       starter_code:
         "function maxArea(height: number[]): number {\n  let l = 0, r = height.length - 1, best = 0\n  while (l < r) {\n    best = Math.max(best, Math.min(height[l], height[r]) * (r - l))\n    if (height[l] < height[r]) l++\n    else r--\n  }\n  return best\n}",
     },
+    {
+      id: "lang-ts-4",
+      problem_id: 4,
+      label: "TypeScript",
+      value: "typescript",
+      starter_code:
+        "function minCostConnectPoints(points: number[][]): number {\n  const n = points.length\n  const parent = Array.from({ length: n }, (_, i) => i)\n  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))\n  const union = (a: number, b: number): boolean => {\n    const pa = find(a), pb = find(b)\n    if (pa === pb) return false\n    parent[pb] = pa\n    return true\n  }\n  const edges: Array<[number, number, number]> = []\n  for (let i = 0; i < n; i++) {\n    for (let j = i + 1; j < n; j++) {\n      const w = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1])\n      edges.push([w, i, j])\n    }\n  }\n  edges.sort((a, b) => a[0] - b[0])\n  let cost = 0, used = 0\n  for (const [w, u, v] of edges) {\n    if (union(u, v)) {\n      cost += w\n      if (++used === n - 1) break\n    }\n  }\n  return cost\n}",
+    },
   ],
   problem_starter_notes: [
     {
@@ -216,6 +292,12 @@ const data = {
       id: "note-container",
       problem_id: 3,
       content: "Only the smaller edge can improve area when moved inward.",
+    },
+    {
+      id: "note-min-cost",
+      problem_id: 4,
+      content:
+        "Union-find keeps Kruskal simple here; Prim with a priority queue reduces memory if n grows.",
     },
   ],
   problem_recent_results: [
@@ -245,6 +327,15 @@ const data = {
       runtime: "5 ms",
       memory: "5.1 MB",
       detail: "Two-pointer sweep finds max span.",
+    },
+    {
+      id: "recent-min-cost",
+      problem_id: 4,
+      case_label: "Dense edges",
+      status: "Accepted",
+      runtime: "112 ms",
+      memory: "55.3 MB",
+      detail: "Sorting O(n^2) edges still passes for n up to 1e3.",
     },
   ],
 } as const satisfies MockDatabase;

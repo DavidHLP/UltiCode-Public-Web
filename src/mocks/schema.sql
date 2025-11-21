@@ -5,6 +5,19 @@
  * Only the entities that are consumed by the web client are modeled here.
  */
 
+
+-- ----------------------------
+-- Users
+-- ----------------------------
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+    id       VARCHAR(40) PRIMARY KEY,
+    username VARCHAR(120) NOT NULL UNIQUE,
+    name     VARCHAR(120),
+    email    VARCHAR(255),
+    avatar   VARCHAR(255)
+);
+
 -- ----------------------------
 -- Problem catalog
 -- ----------------------------
@@ -208,7 +221,8 @@ CREATE TABLE submissions (
     tags_json           JSON,
     runtime_dist        JSON,
     runtime_dist_bins   JSON,
-    CONSTRAINT fk_sub_problem FOREIGN KEY (problem_id) REFERENCES problems(id)
+    CONSTRAINT fk_sub_problem FOREIGN KEY (problem_id) REFERENCES problems(id),
+    CONSTRAINT fk_sub_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 DROP TABLE IF EXISTS submission_tests;
@@ -234,7 +248,8 @@ CREATE TABLE run_results (
     runtime        VARCHAR(32) NOT NULL,
     memory         VARCHAR(32) NOT NULL,
     CONSTRAINT fk_rr_submission FOREIGN KEY (submission_id) REFERENCES submissions(id),
-    CONSTRAINT fk_rr_problem FOREIGN KEY (problem_id) REFERENCES problems(id)
+    CONSTRAINT fk_rr_problem FOREIGN KEY (problem_id) REFERENCES problems(id),
+    CONSTRAINT fk_rr_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 DROP TABLE IF EXISTS run_cases;
@@ -286,7 +301,8 @@ CREATE TABLE problem_lists (
     is_public   TINYINT(1) NOT NULL DEFAULT 1,
     created_at  DATETIME NOT NULL,
     updated_at  DATETIME NOT NULL,
-    CONSTRAINT fk_pl_group FOREIGN KEY (group_id) REFERENCES problem_list_groups(id)
+    CONSTRAINT fk_pl_group FOREIGN KEY (group_id) REFERENCES problem_list_groups(id),
+    CONSTRAINT fk_pl_author FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
 DROP TABLE IF EXISTS problem_list_relations;
@@ -303,7 +319,8 @@ CREATE TABLE problem_list_saved_relations (
     user_id VARCHAR(40) NOT NULL,
     list_id VARCHAR(40) NOT NULL,
     PRIMARY KEY (user_id, list_id),
-    CONSTRAINT fk_plsr_list FOREIGN KEY (list_id) REFERENCES problem_lists(id)
+    CONSTRAINT fk_plsr_list FOREIGN KEY (list_id) REFERENCES problem_lists(id),
+    CONSTRAINT fk_plsr_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 DROP TABLE IF EXISTS problem_list_favorite_relations;
@@ -311,110 +328,95 @@ CREATE TABLE problem_list_favorite_relations (
     user_id VARCHAR(40) NOT NULL,
     list_id VARCHAR(40) NOT NULL,
     PRIMARY KEY (user_id, list_id),
-    CONSTRAINT fk_plfr_list FOREIGN KEY (list_id) REFERENCES problem_lists(id)
+    CONSTRAINT fk_plfr_list FOREIGN KEY (list_id) REFERENCES problem_lists(id),
+    CONSTRAINT fk_plfr_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- ----------------------------
 -- Contest operations
 -- ----------------------------
+DROP TABLE IF EXISTS contest_rankings;
+DROP TABLE IF EXISTS contest_participants;
+DROP TABLE IF EXISTS contest_problems;
 DROP TABLE IF EXISTS contests;
+DROP TABLE IF EXISTS global_rankings;
+
 CREATE TABLE contests (
-    id          VARCHAR(40) PRIMARY KEY,
-    name        VARCHAR(120) NOT NULL,
-    featured_event_id VARCHAR(40) NOT NULL
+    id               VARCHAR(40) PRIMARY KEY,
+    title            VARCHAR(120) NOT NULL,
+    slug             VARCHAR(120) NOT NULL,
+    contest_type     ENUM ('weekly','biweekly','special') NOT NULL,
+    start_time       DATETIME NOT NULL,
+    duration_minutes INT NOT NULL,
+    status           ENUM ('upcoming','running','finished') NOT NULL,
+    registered_count INT NOT NULL DEFAULT 0,
+    participant_count INT NOT NULL DEFAULT 0,
+    is_rated         TINYINT(1) NOT NULL DEFAULT 1,
+    description      TEXT,
+    cover_image      VARCHAR(255)
 );
 
-DROP TABLE IF EXISTS contest_events;
-CREATE TABLE contest_events (
-    id           VARCHAR(40) PRIMARY KEY,
-    contest_id   VARCHAR(40) NOT NULL,
-    title        VARCHAR(120) NOT NULL,
-    description  TEXT NOT NULL,
-    status       ENUM ('live','registration','upcoming','archived') NOT NULL,
-    division     VARCHAR(40) NOT NULL,
-    difficulty   VARCHAR(40) NOT NULL,
-    tags         JSON NOT NULL,
-    start_time   DATETIME NOT NULL,
-    end_time     DATETIME NOT NULL,
-    is_rated     TINYINT(1) NOT NULL DEFAULT 1,
-    mode         ENUM ('solo','team') NOT NULL,
-    registered   INT NOT NULL,
-    slots        INT NULL,
-    CONSTRAINT fk_ce_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
+CREATE TABLE contest_problems (
+    id               VARCHAR(40) PRIMARY KEY,
+    contest_id       VARCHAR(40) NOT NULL,
+    problem_id       BIGINT NOT NULL,
+    problem_index    VARCHAR(10) NOT NULL,
+    score            INT NOT NULL DEFAULT 0,
+    solved_count     INT NOT NULL DEFAULT 0,
+    submission_count INT NOT NULL DEFAULT 0,
+    CONSTRAINT fk_cp_contest FOREIGN KEY (contest_id) REFERENCES contests(id),
+    CONSTRAINT fk_cp_problem FOREIGN KEY (problem_id) REFERENCES problems(id)
 );
 
-DROP TABLE IF EXISTS contest_insights;
-CREATE TABLE contest_insights (
-    id          VARCHAR(40) PRIMARY KEY,
-    contest_id  VARCHAR(40) NOT NULL,
-    label       VARCHAR(120) NOT NULL,
-    value       VARCHAR(40) NOT NULL,
-    delta       DECIMAL(6,2) NULL,
-    status      VARCHAR(40) NOT NULL,
-    CONSTRAINT fk_ci_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
+CREATE TABLE contest_participants (
+    id                  VARCHAR(40) PRIMARY KEY,
+    contest_id          VARCHAR(40) NOT NULL,
+    user_id             VARCHAR(40) NOT NULL,
+    username            VARCHAR(120) NOT NULL,
+    status              ENUM ('registered','participated','virtual') NOT NULL,
+    registered_at       DATETIME NOT NULL,
+    started_at          DATETIME,
+    finished_at         DATETIME,
+    rank                INT,
+    score               INT NOT NULL DEFAULT 0,
+    finish_time_seconds INT,
+    is_virtual          TINYINT(1) NOT NULL DEFAULT 0,
+    CONSTRAINT fk_cpart_contest FOREIGN KEY (contest_id) REFERENCES contests(id),
+    CONSTRAINT fk_cpart_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-DROP TABLE IF EXISTS contest_leaderboard;
-CREATE TABLE contest_leaderboard (
-    id           VARCHAR(40) PRIMARY KEY,
-    contest_id   VARCHAR(40) NOT NULL,
-    division_tag VARCHAR(40) NOT NULL,
-    rank         INT NOT NULL,
-    team_name    VARCHAR(120) NOT NULL,
-    score        INT NOT NULL,
-    solved       INT NOT NULL,
-    penalty      INT NOT NULL,
-    CONSTRAINT fk_cl_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
+CREATE TABLE contest_rankings (
+    id                  VARCHAR(40) PRIMARY KEY,
+    contest_id          VARCHAR(40) NOT NULL,
+    user_id             VARCHAR(40) NOT NULL,
+    username            VARCHAR(120) NOT NULL,
+    rank                INT NOT NULL,
+    score               INT NOT NULL,
+    finish_time_seconds INT NOT NULL,
+    q1_time_seconds     INT,
+    q2_time_seconds     INT,
+    q3_time_seconds     INT,
+    q4_time_seconds     INT,
+    rating_before       INT NOT NULL,
+    rating_after        INT NOT NULL,
+    rating_change       INT NOT NULL,
+    country             VARCHAR(10) NOT NULL DEFAULT 'CN',
+    CONSTRAINT fk_cr_contest FOREIGN KEY (contest_id) REFERENCES contests(id),
+    CONSTRAINT fk_cr_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-DROP TABLE IF EXISTS contest_tracks;
-CREATE TABLE contest_tracks (
-    id         VARCHAR(40) PRIMARY KEY,
-    contest_id VARCHAR(40) NOT NULL,
-    title      VARCHAR(120) NOT NULL,
-    summary    TEXT NOT NULL,
-    CONSTRAINT fk_ct_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
-);
-
-DROP TABLE IF EXISTS contest_resources;
-CREATE TABLE contest_resources (
-    id         VARCHAR(40) PRIMARY KEY,
-    contest_id VARCHAR(40) NOT NULL,
-    title      VARCHAR(120) NOT NULL,
-    url        VARCHAR(255) NOT NULL,
-    kind       VARCHAR(40) NOT NULL,
-    CONSTRAINT fk_cr_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
-);
-
-DROP TABLE IF EXISTS contest_faq;
-CREATE TABLE contest_faq (
-    id         VARCHAR(40) PRIMARY KEY,
-    contest_id VARCHAR(40) NOT NULL,
-    question   VARCHAR(255) NOT NULL,
-    answer     TEXT NOT NULL,
-    CONSTRAINT fk_cfaq_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
-);
-
-DROP TABLE IF EXISTS contest_ops_checkpoints;
-CREATE TABLE contest_ops_checkpoints (
-    id         VARCHAR(40) PRIMARY KEY,
-    contest_id VARCHAR(40) NOT NULL,
-    phase      VARCHAR(40) NOT NULL,
-    status     VARCHAR(40) NOT NULL,
-    description TEXT NOT NULL,
-    timestamp  DATETIME NOT NULL,
-    CONSTRAINT fk_coc_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
-);
-
-DROP TABLE IF EXISTS contest_crew;
-CREATE TABLE contest_crew (
-    id         VARCHAR(40) PRIMARY KEY,
-    contest_id VARCHAR(40) NOT NULL,
-    name       VARCHAR(120) NOT NULL,
-    role       VARCHAR(120) NOT NULL,
-    contact    VARCHAR(120) NOT NULL,
-    avatar     VARCHAR(255),
-    CONSTRAINT fk_cc_contest FOREIGN KEY (contest_id) REFERENCES contests(id)
+CREATE TABLE global_rankings (
+    id                 VARCHAR(40) PRIMARY KEY,
+    user_id            VARCHAR(40) NOT NULL UNIQUE,
+    username           VARCHAR(120) NOT NULL,
+    global_rank        INT NOT NULL,
+    rating             INT NOT NULL DEFAULT 1500,
+    max_rating         INT NOT NULL DEFAULT 1500,
+    contests_attended  INT NOT NULL DEFAULT 0,
+    avatar             VARCHAR(255),
+    country            VARCHAR(10) NOT NULL DEFAULT 'CN',
+    badge              VARCHAR(50),
+    CONSTRAINT fk_gr_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- ----------------------------

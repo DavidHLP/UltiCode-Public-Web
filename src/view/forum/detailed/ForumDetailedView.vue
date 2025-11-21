@@ -59,8 +59,8 @@ const recommendationLabel = computed(
 const media = computed(() => thread.value?.post.media);
 const awards = computed(() => thread.value?.post.awards ?? []);
 const upvoteRatioDisplay = computed(() =>
-  typeof thread.value?.post.stats.upvoteRatio === "number"
-    ? `${Math.round(thread.value.post.stats.upvoteRatio * 100)}%`
+  typeof thread.value?.post.stats.upvote_ratio === "number"
+    ? `${Math.round(thread.value.post.stats.upvote_ratio * 100)}%`
     : undefined,
 );
 const viewsDisplay = computed(() =>

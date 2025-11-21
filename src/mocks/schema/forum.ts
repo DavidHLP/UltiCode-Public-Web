@@ -235,7 +235,9 @@ export interface ForumPostRecommendation {
 
 export type ForumPostStats = ForumPostStatsRow;
 
-export type ForumAward = ForumAwardRow;
+export interface ForumAward extends ForumAwardRow {
+  count: number;
+}
 
 export interface ForumPostCommentPreview
   extends Omit<ForumPostCommentPreviewRow, "authorId"> {

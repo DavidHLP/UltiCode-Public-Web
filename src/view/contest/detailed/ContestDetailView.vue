@@ -235,7 +235,7 @@ function getCountryFlag(countryCode: string): string {
                       <TableCell>
                         <div class="space-y-1">
                           <router-link
-                            :to="{ name: 'problem-detail', params: { id: problem.id } }"
+                            :to="{ name: 'problem-detail', params: { id: problem.problemId } }"
                             class="font-semibold hover:text-primary"
                           >
                             {{ problem.title }}
@@ -274,7 +274,7 @@ function getCountryFlag(countryCode: string): string {
                           size="sm"
                           variant="ghost"
                           class="opacity-0 group-hover:opacity-100"
-                          @click="$router.push({ name: 'problem-detail', params: { id: problem.id } })"
+                          @click="$router.push({ name: 'problem-detail', params: { id: problem.problemId } })"
                         >
                           <ChevronRight class="h-4 w-4" />
                         </Button>

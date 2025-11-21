@@ -87,7 +87,7 @@ const buildMeta = (
       id: author.id,
       name: author.name,
       role: author.role,
-      avatar_color: author.avatar_color,
+      avatarColor: author.avatar_color,
     },
     badges: badgesByMetaId.get(metaRow.id) ?? [],
     stats: {

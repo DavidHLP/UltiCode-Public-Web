@@ -20,6 +20,12 @@ const data = {
       label: "Wide span",
       explanation: "Max area near the edges.",
     },
+    {
+      id: "tc-min-cost",
+      problem_id: 4,
+      label: "Star bridge",
+      explanation: "Forces MST to pick balanced Manhattan edges.",
+    },
   ],
   test_case_inputs: [
     {
@@ -56,6 +62,13 @@ const data = {
       field_name: "height",
       label: "height",
       value: "[1,8,6,2,5,4,8,3,7]",
+    },
+    {
+      id: "tci-min-cost-points",
+      test_case_id: "tc-min-cost",
+      field_name: "points",
+      label: "points",
+      value: "[[0,0],[2,2],[3,10],[5,2],[7,0]]",
     },
   ],
 } as const satisfies MockDatabase;

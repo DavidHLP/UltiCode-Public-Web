@@ -83,7 +83,7 @@ const filteredPosts = computed(() => {
       !normalizedSearch ||
       post.title.toLowerCase().includes(normalizedSearch) ||
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
-      post.tags.some((tag) => tag.toLowerCase().includes(normalizedSearch));
+      post.tags.some((tag: string) => tag.toLowerCase().includes(normalizedSearch));
 
     const matchesCommunity =
       selectedCommunity.value === "all" ||

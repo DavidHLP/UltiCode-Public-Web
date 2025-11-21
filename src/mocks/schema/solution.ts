@@ -50,9 +50,17 @@ export interface SolutionBadgeRelationRow {
   meta_id: string; // VARCHAR(40) NOT NULL (FK to solution_metas.id)
 }
 
+// API response interface for solution author (camelCase)
+export interface SolutionAuthor {
+  id: string;
+  name: string;
+  role: string;
+  avatarColor: string;
+}
+
 export interface SolutionFeedMeta extends SolutionFeedMetaRow {
   badges: string[];
-  author: SolutionAuthorRow;
+  author: SolutionAuthor;
   stats: {
     views: string;
     likes: number;

@@ -28,10 +28,13 @@ const problemTagsMap = problemsData.problem_tag_relations.reduce<
 }, new Map());
 
 const problems: Problem[] = problemsData.problems.map((problem) => {
-  const { acceptance_rate, ...rest } = problem;
+  const { acceptance_rate, is_premium, has_solution, completed_time, ...rest } = problem;
   return {
     ...rest,
     acceptanceRate: acceptance_rate,
+    isPremium: is_premium,
+    hasSolution: has_solution,
+    completedTime: completed_time,
     tags: problemTagsMap.get(problem.id) ?? [],
   };
 });

@@ -22,7 +22,7 @@ defineProps<{
         class="inline-flex items-center gap-2 rounded-full bg-muted/50 px-3 py-1 text-xs font-medium"
       >
         <span class="text-sm">{{ award.icon }}</span>
-        <span class="text-foreground">{{ award.name }}</span>
+        <span class="text-foreground">{{ award.label }}</span>
         <span class="text-muted-foreground">×{{ award.count }}</span>
       </li>
     </ul>
