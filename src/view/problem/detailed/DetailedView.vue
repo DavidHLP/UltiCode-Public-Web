@@ -13,7 +13,7 @@ import type { ProblemDetail } from "@/mocks/schema/problem-detail";
 import type { ProblemRunResult } from "@/mocks/schema/test-results";
 import { fetchProblemDetailById } from "@/api/problem-detail";
 import { fetchProblemRunResultByProblemId } from "@/api/test-results";
-import DescriptionView from "./Left/DescriptionView.vue";
+import DescriptionView from "./Left/description/DescriptionView.vue";
 import SolutionsView from "./Left/solutions/SolutionsView.vue";
 import SubmissionsView from "./Left/submissions/SubmissionsView.vue";
 import CodeView from "./right/top/CodeView.vue";

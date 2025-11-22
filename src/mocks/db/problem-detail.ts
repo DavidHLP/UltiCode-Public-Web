@@ -1,4 +1,4 @@
-import type { MockDatabase } from "../validation/validator";
+
 
 const now = "2024-11-01T00:00:00.000Z";
 
@@ -9,63 +9,60 @@ const data = {
       problem_id: 1,
       slug: "two-sum",
       summary:
-        "Return the indices of two numbers that sum to a target. Exactly one pair exists in each test.",
+        "Given an integer array and a target, return the indices of the two numbers that add up to the target so that $nums[i] + nums[j] = target$. Exactly one valid pair exists per test case, and an element cannot be reused.",
       companies: ["Amazon", "Google"],
       likes: 1240,
       dislikes: 42,
       difficulty_rating: 1197,
       updated_at: now,
       follow_up: "How would you handle a sorted array without extra space?",
-      constraints_json: ["2 <= n <= 1e4", "-1e9 <= nums[i], target <= 1e9"],
+      constraints_json: ["$2 \\leq n \\leq 10^4$", "$-10^9 \\leq nums[i], target \\leq 10^9$"],
     },
     {
       id: "pd-add-two-numbers",
       problem_id: 2,
       slug: "add-two-numbers",
       summary:
-        "Add two numbers represented by linked lists, returning a new list in reversed digit order.",
+        "Two non-empty linked lists represent non-negative integers in reverse order. Add them digit by digit with carry where $carry = \\lfloor (x + y + carry) / 10 \\rfloor$, and return the sum as a linked list in the same reversed order.",
       companies: ["Microsoft", "ByteDance"],
       likes: 980,
       dislikes: 31,
       difficulty_rating: 1420,
       updated_at: now,
       follow_up: "Try writing a recursive variant and discuss its stack cost.",
-      constraints_json: [
-        "1 <= len(l1), len(l2) <= 100",
-        "Nodes store a single digit",
-      ],
+      constraints_json: ["$1 \\leq len(l1), len(l2) \\leq 100$", "Nodes store a single digit"],
     },
     {
       id: "pd-container",
       problem_id: 3,
       slug: "container-with-most-water",
       summary:
-        "Given line heights, find two lines that form the container with the maximum water.",
+        "Given n vertical lines represented by an array of heights, pick two lines that maximize container area $A(i,j) = \\min(h_i, h_j) \\times (j - i)$. Return the maximal area.",
       companies: ["Meta"],
       likes: 840,
       dislikes: 22,
       difficulty_rating: 1360,
       updated_at: now,
       follow_up: "Discuss why a greedy inward two-pointer scan is optimal.",
-      constraints_json: ["2 <= n <= 1e5", "0 <= height[i] <= 1e4"],
+      constraints_json: ["$2 \\leq n \\leq 10^5$", "$0 \\leq height[i] \\leq 10^4$"],
     },
     {
       id: "pd-min-cost",
       problem_id: 4,
       slug: "min-cost-to-connect-all-points",
       summary:
-        "Connect every point with edges weighted by Manhattan distance while minimizing the total cost.",
+        "You are given n points on a 2D plane. Connect all points so the total cost of edges defined by $|x_i - x_j| + |y_i - y_j|$ is minimized; return the minimum spanning tree cost.",
       companies: ["Amazon", "Uber"],
       likes: 760,
       dislikes: 28,
       difficulty_rating: 1820,
       updated_at: now,
       follow_up:
-        "Can you avoid materializing all O(n^2) edges by using Prim with a priority queue?",
+        "Can you avoid materializing all $O(n^2)$ edges by using Prim with a priority queue?",
       constraints_json: [
-        "1 <= n <= 1000",
-        "points[i].length == 2",
-        "-1e6 <= points[i][j] <= 1e6",
+        "$1 \\leq n \\leq 1000$",
+        "$points[i].length = 2$",
+        "$-10^6 \\leq points[i][j] \\leq 10^6$",
       ],
     },
     {
@@ -73,7 +70,7 @@ const data = {
       problem_id: 5,
       slug: "binary-tree-level-order-traversal",
       summary:
-        "Return the values of a binary tree level by level from top to bottom.",
+        "Given the root of a binary tree, return its node values level by level from top to bottom using breadth-first search with $O(n)$ time and $O(n)$ space.",
       companies: ["Google", "Bloomberg"],
       likes: 1340,
       dislikes: 58,
@@ -81,8 +78,8 @@ const data = {
       updated_at: now,
       follow_up: "How would you produce a zigzag level order in one pass?",
       constraints_json: [
-        "0 <= nodes <= 1e4",
-        "-1000 <= Node.val <= 1000",
+        "$0 \\leq nodes \\leq 10^4$",
+        "$-1000 \\leq Node.val \\leq 1000$",
         "Tree may be unbalanced",
       ],
     },
@@ -91,7 +88,7 @@ const data = {
       problem_id: 6,
       slug: "lru-cache",
       summary:
-        "Design an LRU cache with O(1) get and put, evicting the least recently used key when capacity is exceeded.",
+        "Design a Least Recently Used (LRU) cache that supports $O(1)$ `get` and `put` by combining a hash map with a doubly linked list, evicting the least recently used key when capacity is exceeded.",
       companies: ["Amazon", "Apple"],
       likes: 1780,
       dislikes: 210,
@@ -99,9 +96,9 @@ const data = {
       updated_at: now,
       follow_up: "Discuss how you would make the cache thread-safe or add TTL eviction.",
       constraints_json: [
-        "1 <= capacity <= 3000",
-        "0 <= key, value <= 1e4",
-        "At most 1e5 operations",
+        "$1 \\leq capacity \\leq 3000$",
+        "$0 \\leq key, value \\leq 10^4$",
+        "At most $10^5$ operations",
       ],
     },
   ],
@@ -512,6 +509,6 @@ const data = {
       detail: "Tail eviction fired twice after promoting hot keys to the head.",
     },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;
