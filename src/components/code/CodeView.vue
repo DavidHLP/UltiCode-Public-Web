@@ -12,8 +12,8 @@ import rust from "highlight.js/lib/languages/rust";
 import csharp from "highlight.js/lib/languages/csharp";
 import kotlin from "highlight.js/lib/languages/kotlin";
 import swift from "highlight.js/lib/languages/swift";
-import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-vue-next";
+import { Copy, Check, RefreshCw } from "lucide-vue-next";
+import { Separator } from "@/components/ui/separator";
 
 const languages: Array<[string, LanguageFn]> = [
   ["javascript", javascript],
@@ -72,7 +72,7 @@ const languageAliases: Record<string, string> = {
 };
 
 const highlightLanguage = computed(
-  () => languageAliases[normalizeLanguageKey(props.language)] ?? null,
+  () => languageAliases[normalizeLanguageKey(props.language)] ?? null
 );
 
 const highlightedCode = computed(() => {
@@ -91,7 +91,7 @@ const highlightedCode = computed(() => {
 });
 
 const languageLabel = computed(
-  () => props.language ?? highlightLanguage.value ?? "Code snippet",
+  () => props.language ?? highlightLanguage.value ?? "Code snippet"
 );
 
 const handleCopy = async () => {
@@ -121,7 +121,7 @@ watch(
       clearTimeout(copyTimeout);
       copyTimeout = null;
     }
-  },
+  }
 );
 
 onBeforeUnmount(() => {
@@ -133,30 +133,112 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="border border-border bg-card text-sm">
-    <header
-      class="flex items-center justify-between border-b border-border/60 bg-muted/40 px-3 py-2"
-    >
-      <span
-        class="font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground"
-      >
-        {{ languageLabel }}
-      </span>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        class="h-7 w-7 rounded-none text-muted-foreground hover:text-foreground"
-        @click="handleCopy"
-      >
-        <Check v-if="copied" class="h-4 w-4 text-emerald-500" />
-        <Copy v-else class="h-4 w-4" />
-      </Button>
-    </header>
+  <div class="flex flex-col w-full">
+    <div class="flex items-center gap-2 pb-2 text-sm font-medium text-muted-foreground  h-5">
+      <span>代码</span>
+      <Separator orientation="vertical" class="h-3 w-px bg-border" />
+      <span>{{ languageLabel }}</span>
+    </div>
 
-    <pre
-      class="m-0 block h-full w-full overflow-auto bg-card px-4 py-3 font-mono text-[13px] leading-6"
-    >
-      <code class="hljs block h-full w-full" v-html="highlightedCode" />
-    </pre>
+    <!-- 代码显示区域 -->
+    <div class="relative">
+      <div class="relative w-full rounded-lg overflow-hidden bg-[#1e1e1e] dark:bg-[#1e1e1e]">
+        <!-- 代码内容 -->
+        <div class="relative group">
+          <pre
+            class="m-0 p-4 overflow-x-auto text-[13px] leading-relaxed font-mono"
+            style="
+              max-height: 205px;
+              scrollbar-width: thin;
+              scrollbar-color: #4a4a4a #1e1e1e;
+            "
+          ><code class="hljs" v-html="highlightedCode" /></pre>
+
+          <!-- 右上角操作按钮 -->
+          <div
+            class="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <button
+              class="flex h-7 w-7 items-center justify-center rounded bg-[#2d2d2d] hover:bg-[#3d3d3d] text-white transition-colors"
+              @click="handleCopy"
+              title="复制代码"
+            >
+              <Check v-if="copied" class="h-4 w-4 text-green-400" />
+              <Copy v-else class="h-4 w-4" />
+            </button>
+            <button
+              class="flex h-7 w-7 items-center justify-center rounded bg-[#2d2d2d] hover:bg-[#3d3d3d] text-white transition-colors"
+              title="重置"
+            >
+              <RefreshCw class="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* 自定义滚动条样式 */
+pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+/* hljs 样式覆盖 - 深色主题 */
+:deep(.hljs) {
+  background: transparent;
+  color: #d4d4d4;
+}
+
+:deep(.hljs-keyword) {
+  color: #569cd6;
+}
+
+:deep(.hljs-string) {
+  color: #ce9178;
+}
+
+:deep(.hljs-number) {
+  color: #b5cea8;
+}
+
+:deep(.hljs-comment) {
+  color: #6a9955;
+  font-style: italic;
+}
+
+:deep(.hljs-function) {
+  color: #dcdcaa;
+}
+
+:deep(.hljs-class),
+:deep(.hljs-title) {
+  color: #4ec9b0;
+}
+
+:deep(.hljs-variable) {
+  color: #9cdcfe;
+}
+
+:deep(.hljs-built_in) {
+  color: #4ec9b0;
+}
+
+:deep(.hljs-params) {
+  color: #9cdcfe;
+}
+</style>

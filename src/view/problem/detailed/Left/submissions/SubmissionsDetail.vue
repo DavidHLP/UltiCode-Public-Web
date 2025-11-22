@@ -2,8 +2,6 @@
 import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import CodeView from "@/components/code/CodeView.vue";
 import type { SubmissionRecord } from "@/mocks/schema/submission";
 import { Clock, Microchip, Sparkles } from "lucide-vue-next";
@@ -65,8 +63,7 @@ const highlightIndex = computed(() => {
   return closest;
 });
 
-const activeChart = ref<'runtime' | 'memory' | null>(null);
-const commentText = ref("");
+const activeChart = ref<'runtime' | 'memory'>('runtime');
 
 const showRuntimeDetail = computed(() => activeChart.value === 'runtime');
 const showMemoryDetail = computed(() => activeChart.value === 'memory');
@@ -313,11 +310,11 @@ watch(activeChart, (newVal) => {
 });
 
 const toggleRuntimeChart = () => {
-  activeChart.value = activeChart.value === 'runtime' ? null : 'runtime';
+  activeChart.value = 'runtime';
 };
 
 const toggleMemoryChart = () => {
-  activeChart.value = activeChart.value === 'memory' ? null : 'memory';
+  activeChart.value = 'memory';
 };
 </script>
 
@@ -441,55 +438,8 @@ const toggleMemoryChart = () => {
     </div>
 
     <!-- 代码展示 -->
-    <div class="rounded-lg border border-border overflow-hidden">
-      <Tabs default-value="code" class="w-full">
-        <div class="border-b border-border px-4">
-          <TabsList class="h-auto bg-transparent p-0">
-            <TabsTrigger 
-              value="code" 
-              class="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-            >
-              代码
-            </TabsTrigger>
-            <TabsTrigger 
-              value="language" 
-              class="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
-            >
-              {{ submission.language }}
-            </TabsTrigger>
-          </TabsList>
-        </div>
-        
-        <TabsContent value="code" class="m-0">
-          <CodeView :code="submission.code" :language="submission.language" />
-        </TabsContent>
-        
-        <TabsContent value="language" class="m-0 p-4">
-          <div class="text-sm text-muted-foreground">
-            <p class="mb-2 font-medium">语言信息：</p>
-            <ul class="list-disc list-inside space-y-1">
-              <li>语言：{{ submission.language }}</li>
-              <li>提交时间：{{ new Date(submission.submittedAt).toLocaleString() }}</li>
-              <li v-for="tag in submission.tags" :key="tag">标签：{{ tag }}</li>
-            </ul>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-
-    <!-- 提交评论 -->
-    <div class="rounded-lg border border-border p-4">
-      <h3 class="text-sm font-medium text-foreground mb-3">添加提交评论，例如"欧拉筛"、"方法二"等</h3>
-      <div class="space-y-3">
-        <Textarea
-          v-model="commentText"
-          placeholder="请输入相关标签..."
-          class="min-h-20 resize-none"
-        />
-        <div class="flex justify-end">
-          <span class="text-xs text-muted-foreground">0/5</span>
-        </div>
-      </div>
+    <div>
+      <CodeView :code="submission.code" :language="submission.language" />
     </div>
   </div>
 </template>
