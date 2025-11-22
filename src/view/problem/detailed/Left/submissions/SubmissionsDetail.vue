@@ -1,56 +1,24 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import CodeView from "@/components/code/CodeView.vue";
 import type { SubmissionRecord } from "@/mocks/schema/submission";
-import { ArrowLeft } from "lucide-vue-next";
+import { Clock, Microchip, Sparkles } from "lucide-vue-next";
+import * as echarts from "echarts";
+import type { ECharts } from "echarts";
+
+interface TooltipCallbackDataParams {
+  dataIndex: number;
+  value: number;
+  [key: string]: unknown;
+}
 
 const props = defineProps<{
   submission: SubmissionRecord;
 }>();
-
-const emit = defineEmits<{
-  back: [];
-}>();
-
-const statusVariant = (status: SubmissionRecord["status"]) => {
-  switch (status) {
-    case "Accepted":
-      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300";
-    case "Wrong Answer":
-      return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
-    case "Runtime Error":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300";
-    case "Time Limit Exceeded":
-      return "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300";
-    default:
-      return "";
-  }
-};
-
-const overviewMetrics = computed(() => [
-  {
-    label: "Runtime",
-    value: props.submission.runtime,
-    helper: `Top ${props.submission.runtimePercentile}%`,
-  },
-  {
-    label: "Memory",
-    value: props.submission.memory,
-    helper: `Top ${props.submission.memoryPercentile}%`,
-  },
-  {
-    label: "Language",
-    value: props.submission.language,
-    helper: props.submission.tags.slice(0, 2).join(", ") || "General",
-  },
-  {
-    label: "Submitted",
-    value: new Date(props.submission.submittedAt).toLocaleString(),
-    helper: props.submission.id,
-  },
-]);
 
 const parseMs = (value: string) => {
   const m = /([0-9]+)\s*ms/.exec(value);
@@ -71,11 +39,6 @@ const pairedDist = computed(() =>
     count: distCounts.value[i]!,
     bin: distBins.value[i]!,
   })),
-);
-const maxCount = computed(() =>
-  pairedDist.value.length
-    ? Math.max(...pairedDist.value.map((d) => d.count))
-    : 0,
 );
 const totalCount = computed(() =>
   pairedDist.value.reduce(
@@ -102,176 +65,431 @@ const highlightIndex = computed(() => {
   return closest;
 });
 
-const highlightShare = computed(() => {
-  const idx = highlightIndex.value;
-  const total = totalCount.value;
-  if (idx < 0 || !total || idx >= distCounts.value.length) return null;
-  const c = distCounts.value[idx] ?? 0;
-  return (c / total) * 100;
+const activeChart = ref<'runtime' | 'memory' | null>(null);
+const commentText = ref("");
+
+const showRuntimeDetail = computed(() => activeChart.value === 'runtime');
+const showMemoryDetail = computed(() => activeChart.value === 'memory');
+
+const runtimeChartRef = ref<HTMLDivElement>();
+const memoryChartRef = ref<HTMLDivElement>();
+let runtimeChart: ECharts | null = null;
+let memoryChart: ECharts | null = null;
+
+const initRuntimeChart = () => {
+  if (!runtimeChartRef.value) return;
+  
+  if (runtimeChart) {
+    runtimeChart.dispose();
+  }
+  
+  runtimeChart = echarts.init(runtimeChartRef.value);
+  
+  const userIndex = highlightIndex.value;
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      formatter: (params: unknown) => {
+        const dataArray = params as TooltipCallbackDataParams[];
+        const data = dataArray[0];
+        if (!data) return '';
+        const bin = distBins.value[data.dataIndex];
+        const count = distCounts.value[data.dataIndex] ?? 0;
+        const total = totalCount.value;
+        const percentage = total ? ((count / total) * 100).toFixed(2) : '0';
+        const isUserPosition = data.dataIndex === userIndex;
+        return `${bin}ms<br/>数量: ${count}<br/>占比: ${percentage}%${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">您的位置</span>' : ''}`;
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      top: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: distBins.value.map(bin => `${bin}ms`),
+      axisLabel: {
+        interval: Math.ceil(distBins.value.length / 8),
+        rotate: 0,
+        fontSize: 10
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'hsl(var(--border))'
+        }
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: {
+        show: false
+      },
+      axisTick: {
+        show: false
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'hsl(var(--border))'
+        }
+      },
+      axisLabel: {
+        fontSize: 10,
+        color: 'hsl(var(--muted-foreground))'
+      }
+    },
+    series: [
+      {
+        type: 'bar',
+        data: pairedDist.value.map((d, i) => ({
+          value: d.count,
+          itemStyle: {
+            color: i === userIndex
+              ? 'hsl(var(--chart-series-1))' 
+              : 'hsl(var(--muted-foreground) / 0.3)',
+            borderRadius: [4, 4, 0, 0]
+          }
+        })),
+        barMaxWidth: 40,
+        markPoint: userIndex >= 0 ? {
+          data: [
+            {
+              coord: [userIndex, pairedDist.value[userIndex]?.count ?? 0],
+              symbol: 'pin',
+              symbolSize: 50,
+              itemStyle: {
+                color: 'hsl(var(--chart-series-1))'
+              },
+              label: {
+                show: true,
+                position: 'top',
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: 'hsl(var(--chart-series-1))'
+              }
+            }
+          ]
+        } : undefined,
+      }
+    ]
+  };
+  
+  runtimeChart.setOption(option);
+};
+
+const initMemoryChart = () => {
+  if (!memoryChartRef.value) return;
+  
+  if (memoryChart) {
+    memoryChart.dispose();
+  }
+  
+  memoryChart = echarts.init(memoryChartRef.value);
+  
+  // 模拟内存分布数据
+  const memoryBins = Array.from({ length: 80 }, (_, i) => {
+    const baseMemory = 43.42;
+    const step = 0.048;
+    return (baseMemory + i * step).toFixed(3);
+  });
+  
+  const memoryCounts = Array.from({ length: 80 }, () => Math.floor(Math.random() * 100));
+  const userMemoryIndex = 40; // 用户位置索引
+  
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      formatter: (params: unknown) => {
+        const dataArray = params as TooltipCallbackDataParams[];
+        const data = dataArray[0];
+        if (!data) return '';
+        const isUserPosition = data.dataIndex === userMemoryIndex;
+        return `${memoryBins[data.dataIndex]}MB<br/>数量: ${data.value}${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">您的位置</span>' : ''}`;
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      top: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: memoryBins,
+      axisLabel: {
+        interval: Math.ceil(memoryBins.length / 8),
+        rotate: 0,
+        fontSize: 10,
+        formatter: (value: string) => `${value}mb`
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'hsl(var(--border))'
+        }
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: {
+        show: false
+      },
+      axisTick: {
+        show: false
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'hsl(var(--border))'
+        }
+      },
+      axisLabel: {
+        fontSize: 10,
+        color: 'hsl(var(--muted-foreground))'
+      }
+    },
+    series: [
+      {
+        type: 'bar',
+        data: memoryCounts.map((count, i) => ({
+          value: count,
+          itemStyle: {
+            color: i === userMemoryIndex
+              ? 'hsl(var(--chart-series-1))' 
+              : 'hsl(var(--muted-foreground) / 0.3)',
+            borderRadius: [4, 4, 0, 0]
+          }
+        })),
+        barMaxWidth: 40,
+        markPoint: {
+          data: [
+            {
+              coord: [userMemoryIndex, memoryCounts[userMemoryIndex] ?? 0],
+              symbol: 'pin',
+              symbolSize: 50,
+              itemStyle: {
+                color: 'hsl(var(--chart-series-1))'
+              },
+              label: {
+                show: true,
+                position: 'top',
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: 'hsl(var(--chart-series-1))'
+              }
+            }
+          ]
+        },
+      }
+    ]
+  };
+  
+  memoryChart.setOption(option);
+};
+
+onMounted(() => {
+  if (showRuntimeDetail.value) {
+    nextTick(() => initRuntimeChart());
+  }
+  if (showMemoryDetail.value) {
+    nextTick(() => initMemoryChart());
+  }
 });
+
+watch(activeChart, (newVal) => {
+  if (newVal === 'runtime') {
+    nextTick(() => initRuntimeChart());
+  } else if (newVal === 'memory') {
+    nextTick(() => initMemoryChart());
+  }
+});
+
+const toggleRuntimeChart = () => {
+  activeChart.value = activeChart.value === 'runtime' ? null : 'runtime';
+};
+
+const toggleMemoryChart = () => {
+  activeChart.value = activeChart.value === 'memory' ? null : 'memory';
+};
 </script>
 
 <template>
-  <div
-    class="space-y-4 rounded-xl border border-border/60 bg-background/70 p-4 shadow-sm"
-  >
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <Button variant="ghost" size="sm" class="text-xs" @click="emit('back')">
-          <ArrowLeft class="mr-2 h-3.5 w-3.5" /> Back
-        </Button>
-        <Badge
-          class="rounded-full px-3 py-0.5 text-xs font-semibold"
-          :class="statusVariant(submission.status)"
-        >
-          {{ submission.status }}
-        </Badge>
+  <div class="mx-auto flex w-full max-w-[700px] flex-col gap-4 px-4 py-3">
+    <!-- 顶部状态栏 -->
+    <div class="flex w-full items-center justify-between gap-4">
+      <div class="flex flex-1 flex-col items-start gap-1 overflow-hidden">
+        <div class="flex flex-1 items-center gap-2 text-[16px] font-medium leading-6"
+          :class="[
+            submission.status === 'Accepted' 
+              ? 'text-green-600 dark:text-green-400'
+              : 'text-red-600 dark:text-red-400'
+          ]">
+          <span data-e2e-locator="submission-result">{{ submission.status }}</span>
+          <div class="text-xs font-normal text-muted-foreground">
+            <span>{{ submission.tests?.filter(t => t.status === 'Accepted').length ?? 0 }} / {{ submission.tests?.length ?? 0 }} </span>个通过的测试用例
+          </div>
+        </div>
+        <div class="flex max-w-full flex-1 items-center gap-1 overflow-hidden text-xs">
+          <Avatar class="h-4 w-4 flex-none cursor-pointer">
+            <AvatarImage src="https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png" alt="User" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+          <div class="truncate max-w-full font-medium text-foreground">用户</div>
+          <span class="text-muted-foreground flex-none whitespace-nowrap">
+            提交于&nbsp;<span class="max-w-full truncate">{{ new Date(submission.submittedAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) }}</span>
+          </span>
+        </div>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <Badge
-          v-for="tag in submission.tags"
-          :key="tag"
-          variant="secondary"
-          class="text-xs"
+      <div class="flex flex-none gap-2">
+        <Button variant="secondary" size="sm" class="h-8 gap-2">
+          官方题解
+        </Button>
+        <Button 
+          variant="default" 
+          size="sm" 
+          class="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white"
         >
-          {{ tag }}
-        </Badge>
+          写题解
+        </Button>
       </div>
     </div>
 
-    <section class="grid gap-3 md:grid-cols-2">
-      <div class="space-y-3 rounded-lg border border-border/60 bg-card/50 p-3">
-        <header class="flex items-center justify-between">
-          <h3 class="text-sm font-semibold text-foreground">
-            Runtime distribution
-          </h3>
-          <span class="text-xs text-muted-foreground">
-            {{ submission.runtime }} · Top {{ submission.runtimePercentile }}%
-          </span>
-        </header>
-        <div v-if="pairedDist.length" class="h-40 flex items-end gap-1">
-          <div v-for="d in pairedDist" :key="d.i" class="relative flex-1">
-            <div
-              :class="[
-                'w-full rounded-sm',
-                d.i === highlightIndex
-                  ? 'bg-primary'
-                  : 'bg-muted-foreground/30',
-              ]"
-              :style="{
-                height: maxCount
-                  ? Math.max(2, Math.round((d.count / maxCount) * 100)) + '%'
-                  : '2%',
-              }"
-            />
-            <div
-              v-if="d.i === highlightIndex && highlightShare != null"
-              class="absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] text-muted-foreground"
-            >
-              {{ highlightShare.toFixed(2) }}% of submissions near this runtime
-              · Runtime: {{ d.bin }} ms
+    <!-- 分布统计卡片 -->
+    <div class="flex w-full flex-col gap-2 rounded-lg border border-border p-3">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex w-full flex-wrap gap-3">
+          <!-- 执行用时分布 -->
+          <div 
+            class="rounded-md group flex min-w-[275px] flex-1 cursor-pointer flex-col px-4 py-3 text-xs transition hover:opacity-100"
+            :class="showRuntimeDetail ? 'bg-accent' : 'opacity-40'"
+            @click="toggleRuntimeChart"
+          >
+            <div class="flex justify-between gap-2">
+              <div class="flex items-center gap-1 text-foreground">
+                <Clock class="h-3 w-3" />
+                <div class="flex-1 text-sm">执行用时分布</div>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center gap-1">
+              <span class="text-foreground text-lg font-semibold">{{ submission.runtime.replace(' ms', '') }}</span>
+              <span class="text-muted-foreground text-sm">ms</span>
+              <div class="w-px h-3 bg-border mx-1"></div>
+              <span class="text-muted-foreground capitalize">击败</span>
+              <span class="text-foreground text-lg font-semibold">{{ submission.runtimePercentile }}%</span>
+            </div>
+            <div class="mt-1 flex w-fit cursor-pointer gap-1 text-xs opacity-0 group-hover:opacity-100">
+              <Sparkles class="h-4 w-4 text-blue-500" />
+              <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">复杂度分析</span>
+            </div>
+          </div>
+          
+          <!-- 消耗内存分布 -->
+          <div 
+            class="rounded-md group flex min-w-[275px] flex-1 cursor-pointer flex-col px-4 py-3 text-xs transition hover:opacity-100"
+            :class="showMemoryDetail ? 'bg-accent' : 'opacity-40'"
+            @click="toggleMemoryChart"
+          >
+            <div class="flex justify-between gap-2">
+              <div class="flex items-center gap-1 text-foreground">
+                <Microchip class="h-3 w-3" />
+                <div class="flex-1 text-sm">消耗内存分布</div>
+              </div>
+            </div>
+            <div class="mt-2 flex items-center gap-1">
+              <span class="text-foreground text-lg font-semibold">{{ submission.memory.replace(' MB', '') }}</span>
+              <span class="text-muted-foreground text-sm">MB</span>
+              <div class="w-px h-3 bg-border mx-1"></div>
+              <span class="text-muted-foreground capitalize">击败</span>
+              <span class="text-foreground text-lg font-semibold">{{ submission.memoryPercentile }}%</span>
+            </div>
+            <div class="mt-1 flex w-fit cursor-pointer gap-1 text-xs opacity-0 group-hover:opacity-100">
+              <Sparkles class="h-4 w-4 text-blue-500" />
+              <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">复杂度分析</span>
             </div>
           </div>
         </div>
-        <div
-          v-else
-          class="h-40 flex items-center justify-center text-xs text-muted-foreground"
-        >
-          No distribution data
-        </div>
       </div>
-      <div class="space-y-1 rounded-lg border border-border/60 bg-card/50 p-3">
-        <header class="text-sm font-semibold text-foreground">
-          Memory distribution
-        </header>
-        <div class="text-2xl font-semibold text-foreground">
-          {{ submission.memory }}
-        </div>
-        <div class="text-xs text-muted-foreground">
-          Top {{ submission.memoryPercentile }}%
-        </div>
-      </div>
-    </section>
-
-    <div class="grid gap-3 md:grid-cols-2">
-      <article
-        v-for="metric in overviewMetrics"
-        :key="metric.label"
-        class="rounded-lg border border-border/70 bg-card/60 p-3"
-      >
-        <p class="text-xs uppercase tracking-wide text-muted-foreground">
-          {{ metric.label }}
-        </p>
-        <p class="text-lg font-semibold text-foreground">{{ metric.value }}</p>
-        <p v-if="metric.helper" class="text-xs text-muted-foreground">
-          {{ metric.helper }}
-        </p>
-      </article>
     </div>
 
-    <section
-      class="space-y-3 rounded-lg border border-border/60 bg-card/50 p-3"
-    >
-      <header class="text-sm font-semibold text-foreground">
-        Test summary
-      </header>
-      <ul class="space-y-2">
-        <li
-          v-for="test in submission.tests"
-          :key="test.id"
-          class="flex items-center justify-between rounded-lg border border-border/50 px-3 py-2 text-sm"
-        >
-          <span class="font-medium text-foreground">{{ test.label }}</span>
-          <div class="flex items-center gap-3 text-xs text-muted-foreground">
-            <span>{{ test.runtime }}</span>
-            <Badge
-              class="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-              :class="statusVariant(test.status)"
-            >
-              {{ test.status }}
-            </Badge>
-          </div>
-        </li>
-      </ul>
-    </section>
-
-    <section class="space-y-3">
-      <header class="flex items-center justify-between">
-        <h3 class="text-sm font-semibold text-foreground">Submission code</h3>
-        <span class="text-xs text-muted-foreground"
-          >Snapshot of submitted source</span
-        >
-      </header>
-      <CodeView :code="submission.code" :language="submission.language" />
-    </section>
-
-    <section
-      v-if="submission.notes || submission.metrics.length"
-      class="space-y-3"
-    >
-      <header class="text-sm font-semibold text-foreground">
-        Notes & Metrics
-      </header>
-      <p v-if="submission.notes" class="text-sm text-muted-foreground">
-        {{ submission.notes }}
-      </p>
-      <div class="grid gap-3 sm:grid-cols-2">
-        <article
-          v-for="metric in submission.metrics"
-          :key="metric.label"
-          class="rounded-lg border border-border/70 bg-card/60 p-3"
-        >
-          <p class="text-xs uppercase tracking-wide text-muted-foreground">
-            {{ metric.label }}
-          </p>
-          <p class="text-base font-semibold text-foreground">
-            {{ metric.value }}
-          </p>
-          <p v-if="metric.helper" class="text-xs text-muted-foreground">
-            {{ metric.helper }}
-          </p>
-        </article>
+    <!-- 执行用时详细图表 -->
+    <div v-if="showRuntimeDetail" class="rounded-lg border border-border p-4">
+      <div class="space-y-3">
+        <h3 class="text-sm font-medium text-foreground">执行用时分布详情</h3>
+        <template v-if="pairedDist.length">
+          <div ref="runtimeChartRef" class="w-full h-60"></div>
+        </template>
+        <div v-else class="h-40 flex items-center justify-center text-xs text-muted-foreground">
+          暂无分布数据
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- 消耗内存详细图表 -->
+    <div v-if="showMemoryDetail" class="rounded-lg border border-border p-4">
+      <div class="space-y-3">
+        <h3 class="text-sm font-medium text-foreground">消耗内存分布详情</h3>
+        <div ref="memoryChartRef" class="w-full h-60"></div>
+      </div>
+    </div>
+
+    <!-- 代码展示 -->
+    <div class="rounded-lg border border-border overflow-hidden">
+      <Tabs default-value="code" class="w-full">
+        <div class="border-b border-border px-4">
+          <TabsList class="h-auto bg-transparent p-0">
+            <TabsTrigger 
+              value="code" 
+              class="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+            >
+              代码
+            </TabsTrigger>
+            <TabsTrigger 
+              value="language" 
+              class="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2"
+            >
+              {{ submission.language }}
+            </TabsTrigger>
+          </TabsList>
+        </div>
+        
+        <TabsContent value="code" class="m-0">
+          <CodeView :code="submission.code" :language="submission.language" />
+        </TabsContent>
+        
+        <TabsContent value="language" class="m-0 p-4">
+          <div class="text-sm text-muted-foreground">
+            <p class="mb-2 font-medium">语言信息：</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>语言：{{ submission.language }}</li>
+              <li>提交时间：{{ new Date(submission.submittedAt).toLocaleString() }}</li>
+              <li v-for="tag in submission.tags" :key="tag">标签：{{ tag }}</li>
+            </ul>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+
+    <!-- 提交评论 -->
+    <div class="rounded-lg border border-border p-4">
+      <h3 class="text-sm font-medium text-foreground mb-3">添加提交评论，例如"欧拉筛"、"方法二"等</h3>
+      <div class="space-y-3">
+        <Textarea
+          v-model="commentText"
+          placeholder="请输入相关标签..."
+          class="min-h-20 resize-none"
+        />
+        <div class="flex justify-end">
+          <span class="text-xs text-muted-foreground">0/5</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

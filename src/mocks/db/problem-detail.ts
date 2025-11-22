@@ -68,6 +68,42 @@ const data = {
         "-1e6 <= points[i][j] <= 1e6",
       ],
     },
+    {
+      id: "pd-level-order",
+      problem_id: 5,
+      slug: "binary-tree-level-order-traversal",
+      summary:
+        "Return the values of a binary tree level by level from top to bottom.",
+      companies: ["Google", "Bloomberg"],
+      likes: 1340,
+      dislikes: 58,
+      difficulty_rating: 1510,
+      updated_at: now,
+      follow_up: "How would you produce a zigzag level order in one pass?",
+      constraints_json: [
+        "0 <= nodes <= 1e4",
+        "-1000 <= Node.val <= 1000",
+        "Tree may be unbalanced",
+      ],
+    },
+    {
+      id: "pd-lru-cache",
+      problem_id: 6,
+      slug: "lru-cache",
+      summary:
+        "Design an LRU cache with O(1) get and put, evicting the least recently used key when capacity is exceeded.",
+      companies: ["Amazon", "Apple"],
+      likes: 1780,
+      dislikes: 210,
+      difficulty_rating: 1910,
+      updated_at: now,
+      follow_up: "Discuss how you would make the cache thread-safe or add TTL eviction.",
+      constraints_json: [
+        "1 <= capacity <= 3000",
+        "0 <= key, value <= 1e4",
+        "At most 1e5 operations",
+      ],
+    },
   ],
   problem_examples: [
     {
@@ -111,6 +147,32 @@ const data = {
       output_text: "18",
       explanation:
         "Connecting [-4,1] → [-2,5] → [3,12] yields total cost 18.",
+    },
+    {
+      id: "ex-level-order-1",
+      problem_id: 5,
+      example_order: 0,
+      input_text: "root = [3,9,20,null,null,15,7]",
+      output_text: "[[3],[9,20],[15,7]]",
+      explanation: "Queue breadth-first traversal groups nodes by depth.",
+    },
+    {
+      id: "ex-level-order-2",
+      problem_id: 5,
+      example_order: 1,
+      input_text: "root = [1]",
+      output_text: "[[1]]",
+      explanation: "Single node forms one level.",
+    },
+    {
+      id: "ex-lru-cache-1",
+      problem_id: 6,
+      example_order: 0,
+      input_text:
+        'operations = ["LRUCache","put","put","get","put","get","put","get","get","get"], values = [[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]',
+      output_text: "[null,null,null,1,null,-1,null,-1,3,4]",
+      explanation:
+        "Key 2 becomes least used after accessing 1, so it is evicted when 4 is inserted.",
     },
   ],
   problem_approaches: [
@@ -160,6 +222,30 @@ const data = {
       space_complexity: "O(n^2)",
       code_snippet:
         "function minCostConnectPoints(points: number[][]): number {\n  const n = points.length\n  const parent = Array.from({ length: n }, (_, i) => i)\n  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))\n  const union = (a: number, b: number): boolean => {\n    const pa = find(a), pb = find(b)\n    if (pa === pb) return false\n    parent[pb] = pa\n    return true\n  }\n  const edges: Array<[number, number, number]> = []\n  for (let i = 0; i < n; i++) {\n    for (let j = i + 1; j < n; j++) {\n      const w = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1])\n      edges.push([w, i, j])\n    }\n  }\n  edges.sort((a, b) => a[0] - b[0])\n  let cost = 0, used = 0\n  for (const [w, u, v] of edges) {\n    if (union(u, v)) {\n      cost += w\n      if (++used === n - 1) break\n    }\n  }\n  return cost\n}",
+      language: "TypeScript",
+    },
+    {
+      id: "ap-level-order-bfs",
+      problem_id: 5,
+      title: "Queue breadth-first scan",
+      summary:
+        "Walk the tree with a queue, processing a fixed level length each iteration to group nodes by depth.",
+      time_complexity: "O(n)",
+      space_complexity: "O(n)",
+      code_snippet:
+        "interface TreeNode { val: number; left: TreeNode | null; right: TreeNode | null }\nfunction levelOrder(root: TreeNode | null): number[][] {\n  if (!root) return []\n  const res: number[][] = []\n  const queue: TreeNode[] = [root]\n  while (queue.length) {\n    const size = queue.length\n    const level: number[] = []\n    for (let i = 0; i < size; i++) {\n      const node = queue.shift()!\n      level.push(node.val)\n      if (node.left) queue.push(node.left)\n      if (node.right) queue.push(node.right)\n    }\n    res.push(level)\n  }\n  return res\n}",
+      language: "TypeScript",
+    },
+    {
+      id: "ap-lru-dll",
+      problem_id: 6,
+      title: "Hash map + doubly linked list",
+      summary:
+        "Track nodes in a hash map and move them to the head of a doubly linked list on access; evict from the tail when capacity is full.",
+      time_complexity: "O(1) per op",
+      space_complexity: "O(capacity)",
+      code_snippet:
+        "class LRUCache {\n  private capacity: number\n  private map = new Map<number, { key: number; value: number; prev: any; next: any }>()\n  private head = { key: -1, value: -1, prev: null as any, next: null as any }\n  private tail = { key: -1, value: -1, prev: null as any, next: null as any }\n  constructor(capacity: number) {\n    this.capacity = capacity\n    this.head.next = this.tail\n    this.tail.prev = this.head\n  }\n  private remove(node: any) {\n    node.prev.next = node.next\n    node.next.prev = node.prev\n  }\n  private addFront(node: any) {\n    node.next = this.head.next\n    node.prev = this.head\n    this.head.next.prev = node\n    this.head.next = node\n  }\n  get(key: number): number {\n    const node = this.map.get(key)\n    if (!node) return -1\n    this.remove(node)\n    this.addFront(node)\n    return node.value\n  }\n  put(key: number, value: number): void {\n    if (this.map.has(key)) {\n      const node = this.map.get(key)!\n      node.value = value\n      this.remove(node)\n      this.addFront(node)\n      return\n    }\n    if (this.map.size === this.capacity) {\n      const lru = this.tail.prev!\n      this.remove(lru)\n      this.map.delete(lru.key)\n    }\n    const node = { key, value, prev: null as any, next: null as any }\n    this.addFront(node)\n    this.map.set(key, node)\n  }\n}",
       language: "TypeScript",
     },
   ],
@@ -240,6 +326,50 @@ const data = {
       content:
         "Use union-find to connect components and add an edge only if it links two different sets.",
     },
+    {
+      id: "step-level-order-1",
+      approach_id: "ap-level-order-bfs",
+      step_order: 0,
+      content: "Return early if the root is null to avoid empty queue access.",
+    },
+    {
+      id: "step-level-order-2",
+      approach_id: "ap-level-order-bfs",
+      step_order: 1,
+      content: "Push the root into a queue and iterate while the queue has nodes.",
+    },
+    {
+      id: "step-level-order-3",
+      approach_id: "ap-level-order-bfs",
+      step_order: 2,
+      content:
+        "For each level, read the current queue length, process that many nodes, and enqueue children.",
+    },
+    {
+      id: "step-level-order-4",
+      approach_id: "ap-level-order-bfs",
+      step_order: 3,
+      content: "Append the collected values per level to the result array.",
+    },
+    {
+      id: "step-lru-1",
+      approach_id: "ap-lru-dll",
+      step_order: 0,
+      content: "Use dummy head/tail nodes so inserts and removals never need null checks.",
+    },
+    {
+      id: "step-lru-2",
+      approach_id: "ap-lru-dll",
+      step_order: 1,
+      content: "On get, move the node to the front and return its value.",
+    },
+    {
+      id: "step-lru-3",
+      approach_id: "ap-lru-dll",
+      step_order: 2,
+      content:
+        "On put, update and promote existing nodes; otherwise evict the tail's previous node when full, then insert the new node at the front.",
+    },
   ],
   problem_languages: [
     {
@@ -274,6 +404,22 @@ const data = {
       starter_code:
         "function minCostConnectPoints(points: number[][]): number {\n  const n = points.length\n  const parent = Array.from({ length: n }, (_, i) => i)\n  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))\n  const union = (a: number, b: number): boolean => {\n    const pa = find(a), pb = find(b)\n    if (pa === pb) return false\n    parent[pb] = pa\n    return true\n  }\n  const edges: Array<[number, number, number]> = []\n  for (let i = 0; i < n; i++) {\n    for (let j = i + 1; j < n; j++) {\n      const w = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1])\n      edges.push([w, i, j])\n    }\n  }\n  edges.sort((a, b) => a[0] - b[0])\n  let cost = 0, used = 0\n  for (const [w, u, v] of edges) {\n    if (union(u, v)) {\n      cost += w\n      if (++used === n - 1) break\n    }\n  }\n  return cost\n}",
     },
+    {
+      id: "lang-ts-5",
+      problem_id: 5,
+      label: "TypeScript",
+      value: "typescript",
+      starter_code:
+        "interface TreeNode { val: number; left: TreeNode | null; right: TreeNode | null }\nfunction levelOrder(root: TreeNode | null): number[][] {\n  const result: number[][] = []\n  // TODO: implement BFS\n  return result\n}",
+    },
+    {
+      id: "lang-ts-6",
+      problem_id: 6,
+      label: "TypeScript",
+      value: "typescript",
+      starter_code:
+        "class LRUCache {\n  constructor(capacity: number) {\n    // TODO: store capacity and init linked list sentinels\n  }\n  get(key: number): number {\n    return -1\n  }\n  put(key: number, value: number): void {\n    // TODO: update or insert and evict LRU when full\n  }\n}",
+    },
   ],
   problem_starter_notes: [
     {
@@ -298,6 +444,16 @@ const data = {
       problem_id: 4,
       content:
         "Union-find keeps Kruskal simple here; Prim with a priority queue reduces memory if n grows.",
+    },
+    {
+      id: "note-level-order",
+      problem_id: 5,
+      content: "Read the queue length up front for each layer so new children do not leak into the current level.",
+    },
+    {
+      id: "note-lru-cache",
+      problem_id: 6,
+      content: "The node right before the tail sentinel is always the eviction target; move nodes to the head when touched.",
     },
   ],
   problem_recent_results: [
@@ -336,6 +492,24 @@ const data = {
       runtime: "112 ms",
       memory: "55.3 MB",
       detail: "Sorting O(n^2) edges still passes for n up to 1e3.",
+    },
+    {
+      id: "recent-level-order",
+      problem_id: 5,
+      case_label: "Layered BFS",
+      status: "Accepted",
+      runtime: "54 ms",
+      memory: "44.1 MB",
+      detail: "Queue length guards prevent cross-level mixing on skewed trees.",
+    },
+    {
+      id: "recent-lru-cache",
+      problem_id: 6,
+      case_label: "Eviction",
+      status: "Accepted",
+      runtime: "112 ms",
+      memory: "14.2 MB",
+      detail: "Tail eviction fired twice after promoting hot keys to the head.",
     },
   ],
 } as const satisfies MockDatabase;

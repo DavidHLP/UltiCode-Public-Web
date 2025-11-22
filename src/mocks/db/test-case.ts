@@ -26,6 +26,18 @@ const data = {
       label: "Star bridge",
       explanation: "Forces MST to pick balanced Manhattan edges.",
     },
+    {
+      id: "tc-level-order",
+      problem_id: 5,
+      label: "Balanced tree BFS",
+      explanation: "Three-level traversal with missing grandchildren.",
+    },
+    {
+      id: "tc-lru-cache",
+      problem_id: 6,
+      label: "Eviction flow",
+      explanation: "Exercises eviction after reordering recency.",
+    },
   ],
   test_case_inputs: [
     {
@@ -69,6 +81,28 @@ const data = {
       field_name: "points",
       label: "points",
       value: "[[0,0],[2,2],[3,10],[5,2],[7,0]]",
+    },
+    {
+      id: "tci-level-root",
+      test_case_id: "tc-level-order",
+      field_name: "root",
+      label: "root",
+      value: "[3,9,20,null,null,15,7]",
+    },
+    {
+      id: "tci-lru-ops",
+      test_case_id: "tc-lru-cache",
+      field_name: "operations",
+      label: "operations",
+      value:
+        '["LRUCache","put","put","get","put","get","put","get","get","get"]',
+    },
+    {
+      id: "tci-lru-values",
+      test_case_id: "tc-lru-cache",
+      field_name: "values",
+      label: "values",
+      value: "[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]",
     },
   ],
 } as const satisfies MockDatabase;
