@@ -5,7 +5,20 @@ const normalizedBaseUrl = (() => {
   return base.endsWith("/") ? base.slice(0, -1) : base;
 })();
 
+const normalizedBasePath = (() => {
+  try {
+    const url = new URL(normalizedBaseUrl, "http://localhost");
+    const path = url.pathname.endsWith("/")
+      ? url.pathname.slice(0, -1)
+      : url.pathname;
+    return path || "/";
+  } catch {
+    return normalizedBaseUrl || "/";
+  }
+})();
+
 export const API_BASE_URL = normalizedBaseUrl;
+export const API_BASE_PATH = normalizedBasePath;
 export const USE_MOCK_API =
   (import.meta.env.VITE_API_USE_MOCK ?? "true") === "true";
 
@@ -34,7 +47,21 @@ function resolveUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
 }
 
+async function requestWithMock<T>(
+  method: "GET" | "POST",
+  path: string,
+  body?: unknown,
+): Promise<T> {
+  const target = resolveUrl(path);
+  const { handleMockRequest } = await import("@/mocks/server");
+  return handleMockRequest<T>(method, target, body, API_BASE_PATH);
+}
+
 export async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
+  if (USE_MOCK_API) {
+    return requestWithMock<T>("GET", path);
+  }
+
   const response = await fetch(resolveUrl(path), {
     method: "GET",
     credentials: "include",
@@ -48,6 +75,10 @@ export async function apiPost<T>(
   body?: unknown,
   init?: RequestInit,
 ): Promise<T> {
+  if (USE_MOCK_API) {
+    return requestWithMock<T>("POST", path, body);
+  }
+
   const response = await fetch(resolveUrl(path), {
     method: "POST",
     credentials: "include",
