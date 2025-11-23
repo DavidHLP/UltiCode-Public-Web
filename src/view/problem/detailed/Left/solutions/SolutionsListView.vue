@@ -3,15 +3,17 @@ import { computed, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import type { SolutionFeedItem } from "@/mocks/schema/solution";
 import { Input } from "@/components/ui/input";
-import Menubar from "@/components/ui/menubar/Menubar.vue";
-import MenubarContent from "@/components/ui/menubar/MenubarContent.vue";
-import MenubarItem from "@/components/ui/menubar/MenubarItem.vue";
-import MenubarMenu from "@/components/ui/menubar/MenubarMenu.vue";
-import MenubarTrigger from "@/components/ui/menubar/MenubarTrigger.vue";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import SolutionsCard from "./components/SolutionsCard.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import Badge from "@/components/ui/badge/Badge.vue";
-import { Search, Plus, PenLine, ArrowDownAZ } from "lucide-vue-next";
+import { Search, Plus, PenLine, ArrowDownAZ, Check } from "lucide-vue-next";
 
 const props = defineProps<{
   items: SolutionFeedItem[];
@@ -115,33 +117,33 @@ const handleCreateSolution = () => {
       <div class="flex items-center gap-2 px-3 py-2">
         <!-- 搜索框 -->
         <div class="relative flex-1">
-          <Search class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             v-model="search"
-            placeholder="搜索题解"
-            class="pl-8 h-8 text-sm"
+            placeholder="Search solutions"
+            class="h-8 pl-8 text-xs"
           />
         </div>
 
         <!-- 排序按钮 -->
-        <Menubar class="border-none">
-          <MenubarMenu>
-            <MenubarTrigger class="flex items-center gap-1 px-2 py-1 text-sm">
-              <ArrowDownAZ class="w-4 h-4" />
-              排序
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem
-                v-for="option in sortOptions"
-                :key="option.value"
-                @click="sortBy = option.value"
-              >
-                {{ option.label }}
-                <span v-if="sortBy === option.value" class="ml-auto">✓</span>
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-        </Menubar>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="outline" size="sm" class="gap-1.5 text-xs">
+              <ArrowDownAZ class="h-4 w-4" />
+              Sort
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              v-for="option in sortOptions"
+              :key="option.value"
+              @click="sortBy = option.value"
+            >
+              {{ option.label }}
+              <Check v-if="sortBy === option.value" class="ml-auto h-4 w-4" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <!-- 语言标签过滤栏 -->
@@ -153,7 +155,7 @@ const handleCreateSolution = () => {
             :class="languageFilter === 'all' ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
             @click="languageFilter = 'all'"
           >
-            不限
+            All
           </Badge>
           <Badge
             v-for="option in languageOptions.filter(opt => opt.value !== 'all')"
@@ -177,17 +179,17 @@ const handleCreateSolution = () => {
               <Plus class="h-2.5 w-2.5 text-text-primary dark:text-text-primary" />
             </div>
             <span class="text-[11px] leading-tight">
-              你最近一次提交运行时间超过了 
+              Your last submission beats 
               <span class="font-semibold text-green-600 dark:text-green-400">17%</span> 
-              的用户
+              of users
             </span>
           </div>
           <button 
-            class="relative justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-600/90 active:bg-green-700 rounded flex h-5 flex-shrink-0 items-center gap-0.5 px-2 py-0.5 text-[11px] shadow-sm hover:shadow"
+            class="flex h-5 flex-shrink-0 items-center gap-0.5 rounded bg-green-600 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm transition-all hover:bg-green-600/90 hover:shadow active:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50"
             @click="handleCreateSolution"
           >
             <PenLine class="h-2.5 w-2.5" />
-            发布题解
+            Write Solution
           </button>
         </div>
       </div>

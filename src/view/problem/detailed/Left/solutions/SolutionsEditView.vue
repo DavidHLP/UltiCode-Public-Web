@@ -1,15 +1,10 @@
 <template>
   <div class="flex h-screen w-full flex-col overflow-hidden bg-background">
     <!-- 顶部导航栏 -->
-    <header class="flex h-14 flex-shrink-0 items-center border-b px-6">
-      <Button
-        variant="ghost"
-        size="sm"
-        class="gap-2"
-        @click="handleGoBack"
-      >
+    <header class="flex h-14 flex-shrink-0 items-center border-b px-4">
+      <Button variant="ghost" size="sm" class="gap-2" @click="handleGoBack">
         <ArrowLeft class="h-4 w-4" />
-        返回
+        Back
       </Button>
       <div class="flex-1" />
       <span class="text-xs text-muted-foreground">
@@ -17,7 +12,7 @@
       </span>
       <Button size="sm" class="ml-4 gap-2" @click="handlePublish">
         <SendHorizonal class="h-4 w-4" />
-        发布题解
+        Publish Solution
       </Button>
     </header>
 
@@ -25,78 +20,77 @@
     <main class="flex flex-1 overflow-hidden">
       <div class="flex w-full flex-col overflow-hidden">
         <!-- 标题和话题区域 -->
-        <div class="flex flex-shrink-0 flex-col gap-4 border-b px-6 py-4">
-          <Input
-            v-model="title"
-            placeholder="请输入标题"
-            class="h-10 border-0 bg-transparent px-0 text-base font-medium shadow-none focus-visible:ring-0"
-          />
+        <div class="flex flex-shrink-0 flex-col gap-3 px-4 py-3">
+          <div class="rounded-lg border bg-card p-3">
+            <Input
+              v-model="title"
+              placeholder="Enter title"
+              class="rounded-none border-0 border-b bg-transparent px-0 text-base font-medium shadow-none focus-visible:ring-0"
+            />
 
-          <div class="flex flex-wrap items-center gap-2">
-            <Popover v-model:open="showTopicPicker">
-              <PopoverTrigger as-child>
-                <Button variant="outline" size="sm" class="h-8 gap-2">
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <div class="relative">
+                <button
+                  type="button"
+                  class="flex h-8 items-center gap-2 rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
+                  @click="showTopicPicker = !showTopicPicker"
+                >
                   <Tag class="h-4 w-4" />
-                  话题
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" class="w-80 p-0">
-                <div class="flex flex-col">
-                  <div class="border-b px-4 py-3">
-                    <h4 class="text-sm font-medium">选择话题</h4>
+                  Topics
+                </button>
+                <div
+                  v-if="showTopicPicker"
+                  class="absolute left-0 top-10 z-50 w-80 rounded-md border border-border bg-card shadow-lg"
+                >
+                  <div class="border-b border-border px-4 py-3">
+                    <h4 class="text-sm font-medium">Select Topics</h4>
                   </div>
-                  
+
                   <div v-if="isLoadingTopics" class="flex items-center justify-center py-8">
-                    <Spinner class="h-5 w-5" />
-                    <span class="ml-2 text-sm text-muted-foreground">加载中...</span>
+                    <span class="text-sm text-muted-foreground">Loading...</span>
                   </div>
                   <div v-else-if="topicLoadError" class="py-8 text-center">
                     <p class="text-sm text-destructive">{{ topicLoadError }}</p>
                   </div>
                   <div v-else-if="!topicOptions.length" class="py-8 text-center">
-                    <p class="text-sm text-muted-foreground">暂无话题</p>
+                    <p class="text-sm text-muted-foreground">No topics available</p>
                   </div>
-                  <ScrollArea v-else class="max-h-64">
+                  <div v-else class="max-h-64 overflow-y-auto">
                     <div class="p-2">
-                      <Button
+                      <button
                         v-for="topic in topicOptions"
                         :key="topic.id"
-                        variant="ghost"
-                        size="sm"
-                        class="w-full justify-between"
+                        type="button"
+                        class="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-muted"
                         @click="toggleTopic(topic.id)"
                       >
                         <span>{{ topic.name }}</span>
                         <Check v-if="selectedTopicIds.includes(topic.id)" class="h-4 w-4" />
-                      </Button>
+                      </button>
                     </div>
-                  </ScrollArea>
+                  </div>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </div>
 
-            <Badge
-              v-for="topic in selectedTopics"
-              :key="topic.id"
-              variant="secondary"
-              class="gap-1.5 pl-2 pr-1.5"
-            >
-              {{ topic.name }}
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-4 w-4 p-0 hover:bg-transparent"
-                @click="removeTopic(topic.id)"
+              <span
+                v-for="topic in selectedTopics"
+                :key="topic.id"
+                class="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-sm"
               >
-                <X class="h-3 w-3" />
-              </Button>
-            </Badge>
+                {{ topic.name }}
+                <button
+                  type="button"
+                  class="inline-flex h-4 w-4 items-center justify-center hover:opacity-70"
+                  @click="removeTopic(topic.id)"
+                >
+                  <X class="h-3 w-3" />
+                </button>
+              </span>
+            </div>
           </div>
         </div>
 
-       <div
-          class="h-[calc(100vh-14rem)] w-full overflow-hidden px-4 py-4"
-        >
+        <div class="flex-1 overflow-hidden px-4">
           <div class="h-full overflow-x-hidden overflow-y-auto">
             <MdEditor
               v-model="editorContent"
@@ -129,10 +123,6 @@ import "katex/dist/katex.css";
 import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Badge from "@/components/ui/badge/Badge.vue";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Spinner } from "@/components/ui/spinner";
 import { fetchSolutionTopics } from "@/api/topic";
 import type { SolutionTopic } from "@/mocks/schema/topic";
 
@@ -148,18 +138,18 @@ const router = useRouter();
 const route = useRoute();
 
 const title = ref("");
-const editorContent = ref<string>(`# 思路
+const editorContent = ref<string>(`# Approach
 
-> 你选用何种方法解题？
+> What method do you use to solve this problem?
 
-# 解题过程
+# Solution
 
-> 这些方法具体怎么运用？
+> How do you apply these methods?
 
-# 复杂度
+# Complexity
 
-- 时间复杂度: $O(*)$
-- 空间复杂度: $O(*)$
+- Time complexity: $O(*)$
+- Space complexity: $O(*)$
 
 # Code
 
@@ -213,7 +203,9 @@ const footerItems: Footers[] = ["markdownTotal", "="];
 const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
-  topicOptions.value.filter((topic) => selectedTopicIds.value.includes(topic.id)),
+  topicOptions.value.filter((topic) =>
+    selectedTopicIds.value.includes(topic.id)
+  )
 );
 const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
@@ -241,7 +233,7 @@ onMounted(loadTopics);
 const isPreviewMode = ref(false);
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "草稿已保存" : "正在编辑草稿…",
+  isDraftSaved.value ? "Draft saved" : "Editing draft..."
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -256,7 +248,7 @@ watch([title, editorContent, selectedTopicIds], () => {
 const toggleTopic = (topicId: string) => {
   if (selectedTopicIds.value.includes(topicId)) {
     selectedTopicIds.value = selectedTopicIds.value.filter(
-      (item) => item !== topicId,
+      (item) => item !== topicId
     );
   } else {
     selectedTopicIds.value = [...selectedTopicIds.value, topicId];
@@ -265,7 +257,7 @@ const toggleTopic = (topicId: string) => {
 
 const removeTopic = (topicId: string) => {
   selectedTopicIds.value = selectedTopicIds.value.filter(
-    (item) => item !== topicId,
+    (item) => item !== topicId
   );
 };
 
@@ -292,14 +284,14 @@ const handleGoBack = () => {
 
 const handleUpload = async (
   files: File[],
-  callback: (urls: string[]) => void,
+  callback: (urls: string[]) => void
 ) => {
   const urls = files.map((file) => URL.createObjectURL(file));
   callback(urls);
 };
 </script>
 
-<style scoped>
+<style>
 :deep(.md-editor) {
   border: none;
   background: transparent;
