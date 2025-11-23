@@ -1,7 +1,7 @@
 import type { HttpHandler } from "msw";
 import { HttpResponse, http } from "msw";
-import { API_BASE_PATH } from "@/api/client";
-import { mockRoutes } from "@/mocks/server";
+import { API_BASE_PATH } from "@/api/client.ts";
+import { mockRoutes } from "@/mocks/server.ts";
 
 function joinPath(base: string, routePath: string): string {
   const normalizedBase =

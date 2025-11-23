@@ -1,5 +1,5 @@
 import { setupWorker } from "msw/browser";
-import { handlers } from "@/mocks/handlers";
+import { handlers } from "@/mocks/handlers.ts";
 import { defaultLoader } from "@/mocks/loader";
 
 type WorkerState = {

@@ -16,15 +16,6 @@
         <span class="text-xs text-muted-foreground">
           {{ draftStatus }}
         </span>
-        <Button
-          variant="secondary"
-          size="sm"
-          class="h-9 px-3"
-          @click="togglePreview"
-        >
-          <component :is="isPreviewMode ? EyeOff : Eye" class="h-4 w-4" />
-          <span>{{ isPreviewMode ? "退出预览" : "预览" }}</span>
-        </Button>
         <Button size="sm" class="h-9 px-3" @click="handlePublish">
           <SendHorizonal class="h-4 w-4" />
           <span>发布题解</span>
@@ -133,7 +124,7 @@ import type { ToolbarNames, Footers } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import katex from "katex";
 import "katex/dist/katex.css";
-import { Eye, EyeOff, SendHorizonal, Tag, X, ArrowLeft } from "lucide-vue-next";
+import {  SendHorizonal, Tag, X, ArrowLeft } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Badge from "@/components/ui/badge/Badge.vue";
@@ -241,10 +232,6 @@ const toggleTopic = (topic: string) => {
 
 const removeTopic = (topic: string) => {
   selectedTopics.value = selectedTopics.value.filter((item) => item !== topic);
-};
-
-const togglePreview = () => {
-  isPreviewMode.value = !isPreviewMode.value;
 };
 
 const handleManualSave = () => {
