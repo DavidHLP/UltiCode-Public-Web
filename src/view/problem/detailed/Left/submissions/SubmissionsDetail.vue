@@ -99,7 +99,7 @@ const initRuntimeChart = () => {
         const total = totalCount.value;
         const percentage = total ? ((count / total) * 100).toFixed(2) : '0';
         const isUserPosition = data.dataIndex === userIndex;
-        return `${bin}ms<br/>数量: ${count}<br/>占比: ${percentage}%${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">您的位置</span>' : ''}`;
+        return `${bin}ms<br/>Count: ${count}<br/>Percentage: ${percentage}%${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">Your Position</span>' : ''}`;
       }
     },
     grid: {
@@ -210,7 +210,7 @@ const initMemoryChart = () => {
         const data = dataArray[0];
         if (!data) return '';
         const isUserPosition = data.dataIndex === userMemoryIndex;
-        return `${memoryBins[data.dataIndex]}MB<br/>数量: ${data.value}${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">您的位置</span>' : ''}`;
+        return `${memoryBins[data.dataIndex]}MB<br/>Count: ${data.value}${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">Your Position</span>' : ''}`;
       }
     },
     grid: {
@@ -325,97 +325,97 @@ const codeMarkdown = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[700px] flex-col gap-4 px-4 py-3">
+  <div class="mx-auto flex w-full max-w-[700px] flex-col gap-3 px-3 py-2">
     <!-- 顶部状态栏 -->
-    <div class="flex w-full items-center justify-between gap-4">
-      <div class="flex flex-1 flex-col items-start gap-1 overflow-hidden">
-        <div class="flex flex-1 items-center gap-2 text-[16px] font-medium leading-6"
+    <div class="flex w-full items-center justify-between gap-3">
+      <div class="flex flex-1 flex-col items-start gap-0.5 overflow-hidden">
+        <div class="flex flex-1 items-center gap-1.5 text-sm font-medium leading-5"
           :class="[
             submission.status === 'Accepted' 
               ? 'text-green-600 dark:text-green-400'
               : 'text-red-600 dark:text-red-400'
           ]">
           <span data-e2e-locator="submission-result">{{ submission.status }}</span>
-          <div class="text-xs font-normal text-muted-foreground">
-            <span>{{ submission.tests?.filter(t => t.status === 'Accepted').length ?? 0 }} / {{ submission.tests?.length ?? 0 }} </span>个通过的测试用例
+          <div class="text-[11px] font-normal text-muted-foreground">
+            <span>{{ submission.tests?.filter(t => t.status === 'Accepted').length ?? 0 }} / {{ submission.tests?.length ?? 0 }} </span>test cases passed
           </div>
         </div>
-        <div class="flex max-w-full flex-1 items-center gap-1 overflow-hidden text-xs">
-          <Avatar class="h-4 w-4 flex-none cursor-pointer">
+        <div class="flex max-w-full flex-1 items-center gap-1 overflow-hidden text-[11px]">
+          <Avatar class="h-3.5 w-3.5 flex-none cursor-pointer">
             <AvatarImage src="https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png" alt="User" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
-          <div class="truncate max-w-full font-medium text-foreground">用户</div>
+          <div class="truncate max-w-full font-medium text-foreground">User</div>
           <span class="text-muted-foreground flex-none whitespace-nowrap">
-            提交于&nbsp;<span class="max-w-full truncate">{{ new Date(submission.submittedAt).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) }}</span>
+            Submitted&nbsp;<span class="max-w-full truncate">{{ new Date(submission.submittedAt).toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) }}</span>
           </span>
         </div>
       </div>
-      <div class="flex flex-none gap-2">
-        <Button variant="secondary" size="sm" class="h-8 gap-2">
-          官方题解
+      <div class="flex flex-none gap-1.5">
+        <Button variant="secondary" size="sm" class="h-7 gap-1.5 text-xs">
+          Official Solution
         </Button>
         <Button 
           variant="default" 
           size="sm" 
-          class="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white"
+          class="h-7 gap-1.5 bg-green-600 hover:bg-green-700 text-xs text-white"
         >
-          写题解
+          Write Solution
         </Button>
       </div>
     </div>
 
     <!-- 分布统计卡片 -->
-    <div class="flex w-full flex-col gap-2 rounded-lg border border-border p-3">
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex w-full flex-wrap gap-3">
+    <div class="flex w-full flex-col gap-1.5 rounded-lg border border-border p-2">
+      <div class="flex items-center justify-between gap-1.5">
+        <div class="flex w-full flex-wrap gap-2">
           <!-- 执行用时分布 -->
           <div 
-            class="rounded-md group flex min-w-[275px] flex-1 cursor-pointer flex-col px-4 py-3 text-xs transition hover:opacity-100"
+            class="rounded-md group flex min-w-[240px] flex-1 cursor-pointer flex-col px-3 py-2 text-xs transition hover:opacity-100"
             :class="showRuntimeDetail ? 'bg-accent' : 'opacity-40'"
             @click="toggleRuntimeChart"
           >
-            <div class="flex justify-between gap-2">
+            <div class="flex justify-between gap-1.5">
               <div class="flex items-center gap-1 text-foreground">
                 <Clock class="h-3 w-3" />
-                <div class="flex-1 text-sm">执行用时分布</div>
+                <div class="flex-1 text-xs">Runtime Distribution</div>
               </div>
             </div>
-            <div class="mt-2 flex items-center gap-1">
-              <span class="text-foreground text-lg font-semibold">{{ submission.runtime.replace(' ms', '') }}</span>
-              <span class="text-muted-foreground text-sm">ms</span>
-              <div class="w-px h-3 bg-border mx-1"></div>
-              <span class="text-muted-foreground capitalize">击败</span>
-              <span class="text-foreground text-lg font-semibold">{{ submission.runtimePercentile }}%</span>
+            <div class="mt-1.5 flex items-center gap-1">
+              <span class="text-foreground text-base font-semibold">{{ submission.runtime.replace(' ms', '') }}</span>
+              <span class="text-muted-foreground text-xs">ms</span>
+              <div class="w-px h-2.5 bg-border mx-0.5"></div>
+              <span class="text-muted-foreground text-[11px] capitalize">Beats</span>
+              <span class="text-foreground text-base font-semibold">{{ submission.runtimePercentile }}%</span>
             </div>
-            <div class="mt-1 flex w-fit cursor-pointer gap-1 text-xs opacity-0 group-hover:opacity-100">
-              <Sparkles class="h-4 w-4 text-blue-500" />
-              <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">复杂度分析</span>
+            <div class="mt-0.5 flex w-fit cursor-pointer gap-0.5 text-[11px] opacity-0 group-hover:opacity-100">
+              <Sparkles class="h-3.5 w-3.5 text-blue-500" />
+              <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">Complexity Analysis</span>
             </div>
           </div>
           
           <!-- 消耗内存分布 -->
           <div 
-            class="rounded-md group flex min-w-[275px] flex-1 cursor-pointer flex-col px-4 py-3 text-xs transition hover:opacity-100"
+            class="rounded-md group flex min-w-[240px] flex-1 cursor-pointer flex-col px-3 py-2 text-xs transition hover:opacity-100"
             :class="showMemoryDetail ? 'bg-accent' : 'opacity-40'"
             @click="toggleMemoryChart"
           >
-            <div class="flex justify-between gap-2">
+            <div class="flex justify-between gap-1.5">
               <div class="flex items-center gap-1 text-foreground">
                 <Microchip class="h-3 w-3" />
-                <div class="flex-1 text-sm">消耗内存分布</div>
+                <div class="flex-1 text-xs">Memory Distribution</div>
               </div>
             </div>
-            <div class="mt-2 flex items-center gap-1">
-              <span class="text-foreground text-lg font-semibold">{{ submission.memory.replace(' MB', '') }}</span>
-              <span class="text-muted-foreground text-sm">MB</span>
-              <div class="w-px h-3 bg-border mx-1"></div>
-              <span class="text-muted-foreground capitalize">击败</span>
-              <span class="text-foreground text-lg font-semibold">{{ submission.memoryPercentile }}%</span>
+            <div class="mt-1.5 flex items-center gap-1">
+              <span class="text-foreground text-base font-semibold">{{ submission.memory.replace(' MB', '') }}</span>
+              <span class="text-muted-foreground text-xs">MB</span>
+              <div class="w-px h-2.5 bg-border mx-0.5"></div>
+              <span class="text-muted-foreground text-[11px] capitalize">Beats</span>
+              <span class="text-foreground text-base font-semibold">{{ submission.memoryPercentile }}%</span>
             </div>
-            <div class="mt-1 flex w-fit cursor-pointer gap-1 text-xs opacity-0 group-hover:opacity-100">
-              <Sparkles class="h-4 w-4 text-blue-500" />
-              <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">复杂度分析</span>
+            <div class="mt-0.5 flex w-fit cursor-pointer gap-0.5 text-[11px] opacity-0 group-hover:opacity-100">
+              <Sparkles class="h-3.5 w-3.5 text-blue-500" />
+              <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">Complexity Analysis</span>
             </div>
           </div>
         </div>
@@ -423,23 +423,23 @@ const codeMarkdown = computed(() => {
     </div>
 
     <!-- 执行用时详细图表 -->
-    <div v-if="showRuntimeDetail" class="rounded-lg border border-border p-4">
-      <div class="space-y-3">
-        <h3 class="text-sm font-medium text-foreground">执行用时分布详情</h3>
+    <div v-if="showRuntimeDetail" class="rounded-lg border border-border p-3">
+      <div class="space-y-2">
+        <h3 class="text-xs font-medium text-foreground">Runtime Distribution Details</h3>
         <template v-if="pairedDist.length">
-          <div ref="runtimeChartRef" class="w-full h-60"></div>
+          <div ref="runtimeChartRef" class="w-full h-48"></div>
         </template>
-        <div v-else class="h-40 flex items-center justify-center text-xs text-muted-foreground">
-          暂无分布数据
+        <div v-else class="h-32 flex items-center justify-center text-[11px] text-muted-foreground">
+          No distribution data available
         </div>
       </div>
     </div>
 
     <!-- 消耗内存详细图表 -->
-    <div v-if="showMemoryDetail" class="rounded-lg border border-border p-4">
-      <div class="space-y-3">
-        <h3 class="text-sm font-medium text-foreground">消耗内存分布详情</h3>
-        <div ref="memoryChartRef" class="w-full h-60"></div>
+    <div v-if="showMemoryDetail" class="rounded-lg border border-border p-3">
+      <div class="space-y-2">
+        <h3 class="text-xs font-medium text-foreground">Memory Distribution Details</h3>
+        <div ref="memoryChartRef" class="w-full h-48"></div>
       </div>
     </div>
 

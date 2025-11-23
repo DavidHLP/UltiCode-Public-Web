@@ -26,7 +26,7 @@ const topicLabel = computed(
 
 <template>
   <article
-    class="group flex flex-col gap-3 border-b border-border px-4 py-5 last:border-b-0"
+    class="group flex flex-col gap-3 border-b border-border px-0 py-5 last:border-b-0"
   >
     <header class="flex items-start gap-3">
       <Avatar class="h-10 w-10 border border-border/50">
