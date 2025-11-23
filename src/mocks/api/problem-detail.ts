@@ -58,7 +58,7 @@ const normalizeApproach = (approach: ProblemApproachRow): ProblemApproach => ({
 });
 
 const groupByProblemId = <T extends { problem_id: number }>(
-  source: T[],
+  source: readonly T[],
 ): Map<number, T[]> => {
   return source.reduce<Map<number, T[]>>((acc, item) => {
     if (!acc.has(item.problem_id)) {
@@ -97,7 +97,7 @@ problemDetailData.problem_details.forEach((detail) => {
     difficultyRating: detail.difficulty_rating,
     updatedAt: detail.updated_at,
     followUp: detail.follow_up,
-    constraints: detail.constraints_json,
+    constraints: [...detail.constraints_json],
     examples: (examplesByProblemId.get(detail.problem_id) ?? [])
       .sort((a, b) => a.example_order - b.example_order)
       .map((example) => ({
@@ -201,7 +201,7 @@ export function fetchProblemDetailSummary() {
         id: problem.id,
         title: problem.title,
         difficulty: problem.difficulty,
-        acceptance_rate: problem.acceptance_rate,
+        acceptance_rate: problem.acceptanceRate,
       };
     })
     .filter(

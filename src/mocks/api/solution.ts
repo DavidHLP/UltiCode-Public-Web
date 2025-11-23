@@ -130,6 +130,8 @@ export function fetchSolutionFeedItems(
 
   return approaches.map((approach, index) => {
     const meta = seed[index % seed.length]!;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _, ...metaWithoutId } = meta;
     const derivedTags = Array.from(
       new Set(
         [
@@ -142,8 +144,11 @@ export function fetchSolutionFeedItems(
       ),
     );
     return {
+      id: approach.id,
+      title: approach.title,
+      summary: approach.summary,
       language: approach.language,
-      ...meta,
+      ...metaWithoutId,
       tags: derivedTags,
     };
   });

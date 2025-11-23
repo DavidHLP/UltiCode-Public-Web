@@ -10,7 +10,6 @@ import type {
   ForumPost,
   ForumPostCommentPreview,
   ForumPostMedia,
-  ForumPostRow,
   ForumPostStatsRow,
   ForumTrendingTopic,
   ForumUser,
@@ -18,10 +17,11 @@ import type {
   ForumCommentRow,
   ForumComment,
   ForumThread,
+  ForumPostRow,
 } from "@/mocks/schema/forum";
 import forumDataRaw from "@/mocks/db/forum";
 
-const forumData = forumDataRaw as any as {
+const forumData = forumDataRaw as Record<string, unknown> as {
   forum_communities: ForumCommunityRow[];
   forum_community_rules: {
     id: string;
@@ -42,11 +42,11 @@ const forumData = forumDataRaw as any as {
     username: string;
     title: string;
   }[];
-  forum_posts: any[];
+  forum_posts: ForumPostRow[];
   forum_post_stats: ForumPostStatsRow[];
   forum_awards: ForumAwardRow[];
   forum_post_awards: { post_id: string; award_id: string; count: number }[];
-  forum_comments: any[];
+  forum_comments: ForumCommentRow[];
   forum_quick_filters: { id: string; label: string; value: string }[];
   forum_trending_topics: {
     id: string;
@@ -100,7 +100,7 @@ const usersById = new Map<ForumUser["username"], ForumUser>(
   forumData.forum_users.map((user) => [user.username, user]),
 );
 
-const awardsById = new Map<ForumAward["id"], ForumAward>(
+const awardsById = new Map<ForumAwardRow["id"], ForumAwardRow>(
   forumData.forum_awards.map((award) => [award.id, award]),
 );
 
@@ -116,7 +116,7 @@ const posts: ForumPost[] = forumData.forum_posts.map((post) => {
     throw new Error(`Forum dataset is missing references for post ${post.id}`);
   }
 
-  const awards =
+  const awards: ForumAward[] =
     postAwardsByPost.get(post.id)?.map((relation) => ({
       ...awardsById.get(relation.award_id)!,
       count: relation.count,

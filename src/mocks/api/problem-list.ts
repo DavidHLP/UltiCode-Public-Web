@@ -1,12 +1,12 @@
 import type { Problem } from "@/mocks/schema/problem";
-import type { ProblemList, ProblemListItem } from "@/mocks/schema/problem-list";
+import type { ProblemList, ProblemListItem, ProblemListRelationRow, ProblemListRow, ProblemListSavedRelationRow, ProblemListFavoriteRelationRow, ProblemListGroupRow } from "@/mocks/schema/problem-list";
 import problemListData from "@/mocks/db/problem-lists";
 import { fetchProblems } from "@/mocks/api/problem";
 import { fetchCurrentUserId } from "@/mocks/api/user";
 
 const relationsByListId = problemListData.problem_list_relations.reduce<
   Map<string, number[]>
->((acc, relation) => {
+>((acc: Map<string, number[]>, relation: ProblemListRelationRow) => {
   if (!acc.has(relation.list_id)) {
     acc.set(relation.list_id, []);
   }
@@ -14,8 +14,8 @@ const relationsByListId = problemListData.problem_list_relations.reduce<
   return acc;
 }, new Map());
 
-const listsById = new Map(
-  problemListData.problem_lists.map((list) => [list.id, list]),
+const listsById = new Map<string, ProblemListRow>(
+  problemListData.problem_lists.map((list: ProblemListRow) => [list.id, list]),
 );
 
 function toItem(listId: string): ProblemListItem | undefined {
@@ -25,6 +25,7 @@ function toItem(listId: string): ProblemListItem | undefined {
     id: list.id,
     name: list.name,
     description: list.description,
+    is_public: list.is_public,
     problemCount: relationsByListId.get(list.id)?.length ?? 0,
     createdAt: list.created_at ? new Date(list.created_at) : undefined,
     updatedAt: list.updated_at ? new Date(list.updated_at) : undefined,
@@ -35,29 +36,29 @@ function buildGroupedLists(): ProblemList[] {
   const uid = fetchCurrentUserId();
 
   const createdIds = problemListData.problem_lists
-    .filter((l) => l.author_id === uid)
-    .map((l) => l.id);
+    .filter((l: ProblemListRow) => l.author_id === uid)
+    .map((l: ProblemListRow) => l.id);
 
   const savedSet = new Set(
     (problemListData.problem_list_saved_relations || [])
-      .filter((r) => r.user_id === uid)
-      .map((r) => r.list_id),
+      .filter((r: ProblemListSavedRelationRow) => r.user_id === uid)
+      .map((r: ProblemListSavedRelationRow) => r.list_id),
   );
   const savedIds = problemListData.problem_lists
-    .filter((l) => savedSet.has(l.id))
-    .map((l) => l.id);
+    .filter((l: ProblemListRow) => savedSet.has(l.id))
+    .map((l: ProblemListRow) => l.id);
 
   const favoriteSet = new Set(
     (problemListData.problem_list_favorite_relations || [])
-      .filter((r) => r.user_id === uid)
-      .map((r) => r.list_id),
+      .filter((r: ProblemListFavoriteRelationRow) => r.user_id === uid)
+      .map((r: ProblemListFavoriteRelationRow) => r.list_id),
   );
   const favoriteIds = problemListData.problem_lists
-    .filter((l) => favoriteSet.has(l.id))
-    .map((l) => l.id);
+    .filter((l: ProblemListRow) => favoriteSet.has(l.id))
+    .map((l: ProblemListRow) => l.id);
 
   const groups = problemListData.problem_list_groups;
-  return groups.map((group) => {
+  return groups.map((group: ProblemListGroupRow) => {
     let listIds: string[] = [];
     if (group.name.toLowerCase().includes("created")) listIds = createdIds;
     else if (group.name.toLowerCase().includes("saved")) listIds = savedIds;
@@ -84,6 +85,7 @@ export function fetchProblemListItem(
     id: list.id,
     name: list.name,
     description: list.description,
+    is_public: list.is_public,
     problemCount: relationsByListId.get(list.id)?.length ?? 0,
     createdAt: list.created_at ? new Date(list.created_at) : undefined,
     updatedAt: list.updated_at ? new Date(list.updated_at) : undefined,
@@ -106,7 +108,8 @@ export function isProblemInList(problemId: number, listId: string): boolean {
 }
 
 export function getProblemListStats() {
-  return Array.from(relationsByListId.entries()).map(([listId, problemIds]) => {
+  return Array.from<[string, number[]]>(relationsByListId.entries()).map((entry) => {
+    const [listId, problemIds] = entry;
     const problemSet = new Set(problemIds);
     const listProblems = fetchProblems().filter((problem) =>
       problemSet.has(problem.id),

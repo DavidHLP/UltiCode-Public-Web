@@ -2,7 +2,7 @@
 import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import CodeView from "@/components/code/CodeView.vue";
+import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import type { SubmissionRecord } from "@/mocks/schema/submission";
 import { Clock, Microchip, Sparkles } from "lucide-vue-next";
 import * as echarts from "echarts";
@@ -316,6 +316,12 @@ const toggleRuntimeChart = () => {
 const toggleMemoryChart = () => {
   activeChart.value = 'memory';
 };
+
+const codeMarkdown = computed(() => {
+  const lang = props.submission.language.toLowerCase();
+  const code = props.submission.code;
+  return `\`\`\`${lang}\n${code}\n\`\`\``;
+});
 </script>
 
 <template>
@@ -438,8 +444,6 @@ const toggleMemoryChart = () => {
     </div>
 
     <!-- 代码展示 -->
-    <div>
-      <CodeView :code="submission.code" :language="submission.language" />
-    </div>
+    <MarkdownView :content="codeMarkdown" editor-id="submission-code-preview" />
   </div>
 </template>

@@ -18,18 +18,29 @@ let monacoInstance: typeof import("monaco-editor") | null = null;
 let monacoPromise: Promise<typeof import("monaco-editor")> | null = null;
 const globalMonacoKey = "__ULTICODE_MONACO__";
 
+interface GlobalScope {
+  [key: string]: unknown;
+  monaco?: typeof import("monaco-editor");
+  require?: RequireFunction;
+}
+
+interface RequireFunction {
+  (modules: string[], callback: (monaco: typeof import("monaco-editor")) => void): void;
+  defined?: (module: string) => boolean;
+}
+
 const getMonaco = async () => {
   const globalScope =
-    typeof window !== "undefined" ? (window as unknown as Record<string, any>) : null;
+    typeof window !== "undefined" ? (window as unknown as GlobalScope) : null;
   if (monacoInstance) return monacoInstance;
   const cached =
-    globalScope?.[globalMonacoKey] ??
+    globalScope?.[globalMonacoKey] as typeof import("monaco-editor") | undefined ??
     (globalScope?.monaco && globalScope.monaco.editor ? globalScope.monaco : null);
   if (cached) {
     monacoInstance = cached;
     return monacoInstance;
   }
-  const globalRequire = globalScope?.require as any;
+  const globalRequire = globalScope?.require as RequireFunction | undefined;
   if (globalRequire?.defined?.("vs/editor/editor.main")) {
     return new Promise<typeof import("monaco-editor")>((resolve) => {
       globalRequire(["vs/editor/editor.main"], (monaco: typeof import("monaco-editor")) => {
@@ -66,6 +77,7 @@ onMounted(async () => {
   if (typeof window === "undefined" || !container.value) return;
 
   const monaco = await getMonaco();
+  if (!monaco) return;
   editor = monaco.editor.create(container.value, {
     value: props.modelValue,
     language: props.language,
@@ -99,6 +111,7 @@ watch(
   async (language) => {
     if (!editor) return;
     const monaco = await getMonaco();
+    if (!monaco) return;
     const model = editor.getModel();
     if (model) {
       monaco.editor.setModelLanguage(model, language);
@@ -111,6 +124,7 @@ watch(
   async (theme) => {
     if (!editor || !theme) return;
     const monaco = await getMonaco();
+    if (!monaco) return;
     monaco.editor.setTheme(theme);
   },
 );

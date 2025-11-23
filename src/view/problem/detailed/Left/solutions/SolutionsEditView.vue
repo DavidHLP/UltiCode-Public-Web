@@ -161,7 +161,7 @@ class Solution {
    public int[] twoSum(int[] nums, int target) {
        for (int i = 0; i < nums.length; i++) {
            for (int j = i + 1; j < nums.length; j++) {
-               if (nums[i] + nums[j] == target) {
+               if (nums[i] + nums[j] == target) { 
                    return new int[] { i, j };
                }
            }
@@ -289,19 +289,6 @@ const handleUpload = async (
 
 :deep(.md-editor-preview) {
   background: transparent;
-}
-
-:deep(.md-editor-preview code) {
-  background: color-mix(in srgb, var(--muted) 70%, transparent);
-  border-radius: 0.5rem;
-  padding: 1rem;
-}
-
-:deep(.md-editor-preview pre) {
-  background: color-mix(in srgb, var(--muted) 70%, transparent);
-  border-radius: 0.5rem;
-  overflow-x: auto;
-  overflow-y: hidden;
 }
 
 :deep(.md-editor-preview h1) {
