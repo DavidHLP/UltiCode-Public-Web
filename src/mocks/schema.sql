@@ -201,6 +201,14 @@ CREATE TABLE solution_badge_relations (
     CONSTRAINT fk_sbr_meta FOREIGN KEY (meta_id) REFERENCES solution_metas(id)
 );
 
+DROP TABLE IF EXISTS solution_topics;
+CREATE TABLE solution_topics (
+    id             VARCHAR(40) PRIMARY KEY,
+    name           VARCHAR(120) NOT NULL,
+    slug           VARCHAR(120) NOT NULL,
+    name_translated VARCHAR(120)
+);
+
 -- ----------------------------
 -- Submissions
 -- ----------------------------

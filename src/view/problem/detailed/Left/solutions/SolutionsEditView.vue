@@ -50,40 +50,65 @@
               </button>
               <div
                 v-if="showTopicPicker"
-                class="absolute z-10 mt-2 w-52 rounded-lg border border-border bg-popover p-2 text-sm shadow-lg"
+                class="absolute z-10 mt-2 w-72 rounded-lg border border-border bg-popover p-2 text-sm shadow-lg"
               >
                 <p class="px-1 pb-2 text-[11px] uppercase tracking-wide text-muted-foreground">
-                  选择或取消话题
+                  Select or deselect topics
                 </p>
-                <button
-                  v-for="topic in topicOptions"
-                  :key="topic"
-                  type="button"
-                  class="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-sm transition-colors hover:bg-muted"
-                  @click="toggleTopic(topic)"
+                <div
+                  v-if="isLoadingTopics"
+                  class="px-2 py-1 text-xs text-muted-foreground"
                 >
-                  <span>{{ topic }}</span>
-                  <span
-                    v-if="selectedTopics.includes(topic)"
-                    class="text-xs font-semibold text-primary"
+                  Loading topics…
+                </div>
+                <div
+                  v-else-if="topicLoadError"
+                  class="px-2 py-1 text-xs text-destructive"
+                >
+                  {{ topicLoadError }}
+                </div>
+                <div
+                  v-else-if="!topicOptions.length"
+                  class="px-2 py-1 text-xs text-muted-foreground"
+                >
+                  No topics available
+                </div>
+                <template v-else>
+                  <button
+                    v-for="topic in topicOptions"
+                    :key="topic.id"
+                    type="button"
+                    class="flex w-full items-start justify-between gap-2 rounded-md px-2 py-1 text-left text-sm transition-colors hover:bg-muted"
+                    @click="toggleTopic(topic.id)"
                   >
-                    已选
-                  </span>
-                </button>
+                    <span class="flex flex-col gap-0.5">
+                      <span class="font-medium">{{ topic.name }}</span>
+                      <span class="text-[11px] leading-tight text-muted-foreground">
+                        {{ topic.nameTranslated || topic.slug }}
+                      </span>
+                    </span>
+                    <span
+                      v-if="selectedTopicIds.includes(topic.id)"
+                      class="mt-0.5 text-xs font-semibold text-primary"
+                    >
+                      Selected
+                    </span>
+                  </button>
+                </template>
               </div>
             </div>
 
             <Badge
               v-for="topic in selectedTopics"
-              :key="topic"
+              :key="topic.id"
               variant="secondary"
               class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs"
             >
-              <span>{{ topic }}</span>
+              <span>{{ topic.name }}</span>
               <button
                 type="button"
                 class="text-muted-foreground transition hover:text-foreground"
-                @click="removeTopic(topic)"
+                @click="removeTopic(topic.id)"
               >
                 <X class="h-3 w-3" />
               </button>
@@ -116,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useDebounceFn, usePreferredDark } from "@vueuse/core";
 import { MdEditor, config } from "md-editor-v3";
@@ -124,10 +149,12 @@ import type { ToolbarNames, Footers } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import katex from "katex";
 import "katex/dist/katex.css";
-import {  SendHorizonal, Tag, X, ArrowLeft } from "lucide-vue-next";
+import { SendHorizonal, Tag, X, ArrowLeft } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Badge from "@/components/ui/badge/Badge.vue";
+import { fetchSolutionTopics } from "@/api/topic";
+import type { SolutionTopic } from "@/mocks/schema/topic";
 
 config({
   editorExtensions: {
@@ -203,9 +230,33 @@ const toolbarItems: ToolbarNames[] = [
 
 const footerItems: Footers[] = ["markdownTotal", "="];
 
-const topicOptions = ["思路", "算法设计", "复杂度分析", "实现细节", "测试用例"];
-const selectedTopics = ref<string[]>(["思路"]);
+const topicOptions = ref<SolutionTopic[]>([]);
+const selectedTopicIds = ref<string[]>([]);
+const selectedTopics = computed(() =>
+  topicOptions.value.filter((topic) => selectedTopicIds.value.includes(topic.id)),
+);
 const showTopicPicker = ref(false);
+const isLoadingTopics = ref(false);
+const topicLoadError = ref<string | null>(null);
+
+const loadTopics = async () => {
+  isLoadingTopics.value = true;
+  topicLoadError.value = null;
+  try {
+    const { topics } = await fetchSolutionTopics();
+    topicOptions.value = topics;
+    if (!selectedTopicIds.value.length && topics.length) {
+      selectedTopicIds.value = [topics[0]!.id];
+    }
+  } catch (error) {
+    console.error("Failed to load solution topics", error);
+    topicLoadError.value = "Failed to load topics";
+  } finally {
+    isLoadingTopics.value = false;
+  }
+};
+
+onMounted(loadTopics);
 
 const isPreviewMode = ref(false);
 const isDraftSaved = ref(true);
@@ -217,21 +268,25 @@ const markDraftSaved = useDebounceFn(() => {
   isDraftSaved.value = true;
 }, 800);
 
-watch([title, editorContent], () => {
+watch([title, editorContent, selectedTopicIds], () => {
   isDraftSaved.value = false;
   markDraftSaved();
 });
 
-const toggleTopic = (topic: string) => {
-  if (selectedTopics.value.includes(topic)) {
-    selectedTopics.value = selectedTopics.value.filter((item) => item !== topic);
+const toggleTopic = (topicId: string) => {
+  if (selectedTopicIds.value.includes(topicId)) {
+    selectedTopicIds.value = selectedTopicIds.value.filter(
+      (item) => item !== topicId,
+    );
   } else {
-    selectedTopics.value = [...selectedTopics.value, topic];
+    selectedTopicIds.value = [...selectedTopicIds.value, topicId];
   }
 };
 
-const removeTopic = (topic: string) => {
-  selectedTopics.value = selectedTopics.value.filter((item) => item !== topic);
+const removeTopic = (topicId: string) => {
+  selectedTopicIds.value = selectedTopicIds.value.filter(
+    (item) => item !== topicId,
+  );
 };
 
 const handleManualSave = () => {
@@ -242,7 +297,8 @@ const handlePublish = () => {
   isDraftSaved.value = true;
   console.log("Publishing solution", {
     title: title.value,
-    topics: selectedTopics.value,
+    topics: selectedTopicIds.value,
+    topicLabels: selectedTopics.value.map((topic) => topic.name),
     content: editorContent.value,
     problemId: route.params.id,
   });

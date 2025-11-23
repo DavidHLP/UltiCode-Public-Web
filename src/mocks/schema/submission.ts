@@ -21,9 +21,9 @@ export interface SubmissionRow {
   memory_percentile: number; // INT NOT NULL
   code: string; // MEDIUMTEXT NOT NULL
   notes?: string | null; // TEXT NULL
-  tags_json?: any | null; // JSON
-  runtime_dist?: any | null; // JSON
-  runtime_dist_bins?: any | null; // JSON
+  tags?: string[] | null; // JSON
+  runtime_dist?: number[] | null; // JSON
+  runtime_dist_bins?: number[] | null; // JSON
 }
 
 // Matches SQL: submission_tests table

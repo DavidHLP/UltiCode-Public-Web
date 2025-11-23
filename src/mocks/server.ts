@@ -32,6 +32,7 @@ import {
     fetchSolutionQuickFilterOptions,
     fetchSolutionSortOptions,
 } from "@/mocks/api/solution";
+import { fetchSolutionTopics } from "@/mocks/api/topic";
 import {fetchProblemSubmissions} from "@/mocks/api/submission";
 import {fetchTestCasesByProblemId} from "@/mocks/api/test-case";
 import {fetchProblemRunResultByProblemId} from "@/mocks/api/test-results";
@@ -225,6 +226,11 @@ export const mockRoutes: MockRoute[] = [
                 return notFound((error as Error).message);
             }
         },
+    },
+    {
+        method: "GET",
+        path: "/solution-topics",
+        handler: () => ok(fetchSolutionTopics()),
     },
     {
         method: "GET",
