@@ -1,124 +1,101 @@
 <template>
-  <div class="flex min-h-screen w-full flex-col bg-background">
+  <div class="flex h-screen w-full flex-col overflow-hidden bg-background">
     <!-- 顶部导航栏 -->
-    <div class="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div class="flex h-14 items-center gap-4 px-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          class="gap-2"
-          @click="handleGoBack"
-        >
-          <ArrowLeft class="h-4 w-4" />
-          返回
-        </Button>
-        <div class="flex-1" />
-        <span class="text-xs text-muted-foreground">
-          {{ draftStatus }}
-        </span>
-        <Button size="sm" class="h-9 px-3" @click="handlePublish">
-          <SendHorizonal class="h-4 w-4" />
-          <span>发布题解</span>
-        </Button>
-      </div>
-    </div>
+    <header class="flex h-14 flex-shrink-0 items-center border-b px-6">
+      <Button
+        variant="ghost"
+        size="sm"
+        class="gap-2"
+        @click="handleGoBack"
+      >
+        <ArrowLeft class="h-4 w-4" />
+        返回
+      </Button>
+      <div class="flex-1" />
+      <span class="text-xs text-muted-foreground">
+        {{ draftStatus }}
+      </span>
+      <Button size="sm" class="ml-4 gap-2" @click="handlePublish">
+        <SendHorizonal class="h-4 w-4" />
+        发布题解
+      </Button>
+    </header>
 
     <!-- 主体内容 -->
-    <div class="flex w-full flex-1 justify-center px-4 py-6">
-      <div
-        class="bg-card shadow-sm flex w-full max-w-[960px] flex-col overflow-hidden rounded-xl border border-border"
-      >
+    <main class="flex flex-1 overflow-hidden">
+      <div class="flex w-full flex-col overflow-hidden">
         <!-- 标题和话题区域 -->
-        <div
-          class="flex w-full flex-col gap-4 border-b border-border px-6 py-6"
-        >
+        <div class="flex flex-shrink-0 flex-col gap-4 border-b px-6 py-4">
           <Input
             v-model="title"
             placeholder="请输入标题"
-            class="h-12 border-0 bg-transparent px-0 text-lg font-semibold shadow-none focus-visible:border-transparent focus-visible:ring-0"
+            class="h-10 border-0 bg-transparent px-0 text-base font-medium shadow-none focus-visible:ring-0"
           />
 
           <div class="flex flex-wrap items-center gap-2">
-            <div class="relative">
-              <button
-                type="button"
-                class="flex cursor-pointer items-center gap-1 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground transition-colors hover:bg-muted/80"
-                @click="showTopicPicker = !showTopicPicker"
-              >
-                <Tag class="h-3.5 w-3.5" />
-                <span>话题</span>
-              </button>
-              <div
-                v-if="showTopicPicker"
-                class="absolute z-10 mt-2 w-72 rounded-lg border border-border bg-popover p-2 text-sm shadow-lg"
-              >
-                <p class="px-1 pb-2 text-[11px] uppercase tracking-wide text-muted-foreground">
-                  Select or deselect topics
-                </p>
-                <div
-                  v-if="isLoadingTopics"
-                  class="px-2 py-1 text-xs text-muted-foreground"
-                >
-                  Loading topics…
+            <Popover v-model:open="showTopicPicker">
+              <PopoverTrigger as-child>
+                <Button variant="outline" size="sm" class="h-8 gap-2">
+                  <Tag class="h-4 w-4" />
+                  话题
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" class="w-80 p-0">
+                <div class="flex flex-col">
+                  <div class="border-b px-4 py-3">
+                    <h4 class="text-sm font-medium">选择话题</h4>
+                  </div>
+                  
+                  <div v-if="isLoadingTopics" class="flex items-center justify-center py-8">
+                    <Spinner class="h-5 w-5" />
+                    <span class="ml-2 text-sm text-muted-foreground">加载中...</span>
+                  </div>
+                  <div v-else-if="topicLoadError" class="py-8 text-center">
+                    <p class="text-sm text-destructive">{{ topicLoadError }}</p>
+                  </div>
+                  <div v-else-if="!topicOptions.length" class="py-8 text-center">
+                    <p class="text-sm text-muted-foreground">暂无话题</p>
+                  </div>
+                  <ScrollArea v-else class="max-h-64">
+                    <div class="p-2">
+                      <Button
+                        v-for="topic in topicOptions"
+                        :key="topic.id"
+                        variant="ghost"
+                        size="sm"
+                        class="w-full justify-between"
+                        @click="toggleTopic(topic.id)"
+                      >
+                        <span>{{ topic.name }}</span>
+                        <Check v-if="selectedTopicIds.includes(topic.id)" class="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </ScrollArea>
                 </div>
-                <div
-                  v-else-if="topicLoadError"
-                  class="px-2 py-1 text-xs text-destructive"
-                >
-                  {{ topicLoadError }}
-                </div>
-                <div
-                  v-else-if="!topicOptions.length"
-                  class="px-2 py-1 text-xs text-muted-foreground"
-                >
-                  No topics available
-                </div>
-                <template v-else>
-                  <button
-                    v-for="topic in topicOptions"
-                    :key="topic.id"
-                    type="button"
-                    class="flex w-full items-start justify-between gap-2 rounded-md px-2 py-1 text-left text-sm transition-colors hover:bg-muted"
-                    @click="toggleTopic(topic.id)"
-                  >
-                    <span class="flex flex-col gap-0.5">
-                      <span class="font-medium">{{ topic.name }}</span>
-                      <span class="text-[11px] leading-tight text-muted-foreground">
-                        {{ topic.nameTranslated || topic.slug }}
-                      </span>
-                    </span>
-                    <span
-                      v-if="selectedTopicIds.includes(topic.id)"
-                      class="mt-0.5 text-xs font-semibold text-primary"
-                    >
-                      Selected
-                    </span>
-                  </button>
-                </template>
-              </div>
-            </div>
+              </PopoverContent>
+            </Popover>
 
             <Badge
               v-for="topic in selectedTopics"
               :key="topic.id"
               variant="secondary"
-              class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs"
+              class="gap-1.5 pl-2 pr-1.5"
             >
-              <span>{{ topic.name }}</span>
-              <button
-                type="button"
-                class="text-muted-foreground transition hover:text-foreground"
+              {{ topic.name }}
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-4 w-4 p-0 hover:bg-transparent"
                 @click="removeTopic(topic.id)"
               >
                 <X class="h-3 w-3" />
-              </button>
+              </Button>
             </Badge>
           </div>
         </div>
 
-        <!-- 编辑器区域 -->
-        <div
-          class="h-[calc(100vh-14rem)] w-full overflow-hidden px-6 py-4"
+       <div
+          class="h-[calc(100vh-14rem)] w-full overflow-hidden px-4 py-4"
         >
           <div class="h-full overflow-x-hidden overflow-y-auto">
             <MdEditor
@@ -136,7 +113,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
@@ -149,10 +126,13 @@ import type { ToolbarNames, Footers } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import katex from "katex";
 import "katex/dist/katex.css";
-import { SendHorizonal, Tag, X, ArrowLeft } from "lucide-vue-next";
+import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Badge from "@/components/ui/badge/Badge.vue";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/ui/spinner";
 import { fetchSolutionTopics } from "@/api/topic";
 import type { SolutionTopic } from "@/mocks/schema/topic";
 
@@ -235,7 +215,7 @@ const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
   topicOptions.value.filter((topic) => selectedTopicIds.value.includes(topic.id)),
 );
-const showTopicPicker = ref(false);
+const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
 const topicLoadError = ref<string | null>(null);
 
