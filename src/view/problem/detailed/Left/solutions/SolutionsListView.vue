@@ -9,14 +9,12 @@ import MenubarMenu from "@/components/ui/menubar/MenubarMenu.vue";
 import MenubarTrigger from "@/components/ui/menubar/MenubarTrigger.vue";
 import SolutionsCard from "./SolutionsCard.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
-import { ArrowDownUp, Search, SlidersHorizontal } from "lucide-vue-next";
+import Badge from "@/components/ui/badge/Badge.vue";
+import { Search, Plus, PenLine, ArrowDownAZ } from "lucide-vue-next";
 
 const props = defineProps<{
   items: SolutionFeedItem[];
   followUp: string;
-  languageOptions: Array<{ label: string; value: string }>;
-  topicOptions: Array<{ label: string; value: string }>;
-  quickFilterOptions: Array<{ label: string; value: string }>;
   sortOptions: Array<{ label: string; value: string }>;
 }>();
 
@@ -26,18 +24,8 @@ const emit = defineEmits<{
 
 const search = ref("");
 const languageFilter = ref("all");
-const topicFilter = ref("all");
-const quickFilter = ref("popular");
 const sortBy = ref("likes");
 
-const quickFilterOptions = computed(() =>
-  props.quickFilterOptions.length
-    ? props.quickFilterOptions
-    : [
-        { label: "Popular", value: "popular" },
-        { label: "Latest", value: "latest" },
-      ],
-);
 const sortOptions = computed(() =>
   props.sortOptions.length
     ? props.sortOptions
@@ -49,22 +37,22 @@ const sortOptions = computed(() =>
 
 const feedItems = computed<SolutionFeedItem[]>(() => props.items ?? []);
 
-const languageOptions = computed(() =>
-  props.languageOptions.length
-    ? props.languageOptions
-    : [
-        { label: "All languages", value: "all" },
-        { label: "Unknown", value: "unknown" },
-      ],
-);
-const topicOptions = computed(() =>
-  props.topicOptions.length
-    ? props.topicOptions
-    : [
-        { label: "All topics", value: "all" },
-        { label: "General", value: "general" },
-      ],
-);
+// 从题解数据中实时提取语言选项
+const languageOptions = computed(() => {
+  const languages = new Set<string>();
+  feedItems.value.forEach((item) => {
+    if (item.language) {
+      languages.add(item.language);
+    }
+  });
+  
+  return Array.from(languages)
+    .sort()
+    .map((lang) => ({
+      label: lang,
+      value: lang.toLowerCase(),
+    }));
+});
 
 const filteredItems = computed(() => {
   const query = search.value.trim().toLowerCase();
@@ -73,34 +61,18 @@ const filteredItems = computed(() => {
       languageFilter.value === "all" ||
       item.languageFilter === languageFilter.value ||
       item.language.toLowerCase() === languageFilter.value;
-    const matchesTopic =
-      topicFilter.value === "all" || item.topic === topicFilter.value;
     const matchesQuery =
       !query ||
       [item.title, item.highlight, item.summary, item.author.name]
         .join(" ")
         .toLowerCase()
         .includes(query);
-    return matchesLanguage && matchesTopic && matchesQuery;
+    return matchesLanguage && matchesQuery;
   });
 });
 
-const orderedItems = computed(() => {
-  const items = [...filteredItems.value];
-  if (quickFilter.value === "popular") {
-    return items.sort((a, b) => b.score - a.score);
-  }
-  if (quickFilter.value === "latest") {
-    return items;
-  }
-  if (quickFilter.value === "editor") {
-    return items.sort((a, b) => b.stats.likes - a.stats.likes);
-  }
-  return items;
-});
-
 const sortedItems = computed(() => {
-  const items = [...orderedItems.value];
+  const items = [...filteredItems.value];
   switch (sortBy.value) {
     case "likes":
       return items.sort((a, b) => b.stats.likes - a.stats.likes);
@@ -127,106 +99,99 @@ const handleSelect = (item: SolutionFeedItem) => {
 </script>
 
 <template>
-  <section class="space-y-5">
-    <div class="bg-card">
-      <header class="space-y-4 px-5 py-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <div class="relative flex-1">
-            <Search
-              class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-            />
-            <Input
-              v-model="search"
-              placeholder="Search solutions, authors, or keywords"
-              class="pl-9"
-            />
+  <section class="relative flex h-full w-full flex-col overflow-hidden">
+    <div class="flex flex-col gap-2 pb-[1px]">
+      <!-- 搜索栏和工具栏 -->
+      <div class="lc-md:pl-2 lc-md:pr-1 lc-md:h-8 flex h-10 items-center justify-between gap-2.5 border-b py-1 pl-4 pr-3 border-border">
+        <!-- 搜索框 -->
+        <div class="relative rounded-md w-full">
+          <div class="text-muted-foreground absolute inset-y-0 flex items-center pointer-events-none left-0 pl-0.5">
+            <Search class="w-4 h-4" />
           </div>
-          <div class="ml-auto flex flex-wrap items-center gap-2">
-            <Menubar class="border-border">
-              <MenubarMenu>
-                <MenubarTrigger
-                  class="flex items-center gap-2 px-3 py-1 text-xs"
-                >
-                  <ArrowDownUp class="size-4" />
-                  Sort
-                </MenubarTrigger>
-                <MenubarContent class="min-w-[160px] p-1">
-                  <MenubarItem
-                    v-for="option in sortOptions"
-                    :key="option.value"
-                    class="flex items-center justify-between px-2 py-1 text-xs"
-                    @click="sortBy = option.value"
-                  >
-                    <span>{{ option.label }}</span>
-                    <span v-if="sortBy === option.value" class="text-primary"
-                      >●</span
-                    >
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-            </Menubar>
-            <Menubar class="border-border">
-              <MenubarMenu>
-                <MenubarTrigger
-                  class="flex items-center gap-2 px-3 py-1 text-xs"
-                >
-                  <SlidersHorizontal class="size-4" />
-                  Filter
-                </MenubarTrigger>
-                <MenubarContent class="min-w-[160px] p-1">
-                  <MenubarItem
-                    v-for="option in quickFilterOptions"
-                    :key="option.value"
-                    class="flex items-center justify-between px-2 py-1 text-xs"
-                    @click="quickFilter = option.value"
-                  >
-                    <span>{{ option.label }}</span>
-                    <span
-                      v-if="quickFilter === option.value"
-                      class="text-primary"
-                      >●</span
-                    >
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-            </Menubar>
-          </div>
+          <Input
+            v-model="search"
+            placeholder="搜索"
+            class="block w-full rounded-md outline-none border-none pr-3 bg-transparent py-1 pl-[22px] leading-4 focus:bg-transparent"
+          />
         </div>
 
-        <div class="space-y-2 text-xs">
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="option in languageOptions"
+        <!-- 工具按钮组 -->
+        <div class="flex items-center gap-1">
+          <!-- 排序按钮 -->
+          <Menubar class="border-none">
+            <MenubarMenu>
+              <MenubarTrigger
+                class="flex items-center text-left cursor-pointer focus:outline-none whitespace-nowrap rounded-[4px] px-1 py-0.5 text-sm text-muted-foreground hover:text-foreground bg-transparent"
+              >
+                <ArrowDownAZ class="w-4 h-4 mr-2" />
+                排序
+              </MenubarTrigger>
+              <MenubarContent class="min-w-[160px] p-1">
+                <MenubarItem
+                  v-for="option in sortOptions"
+                  :key="option.value"
+                  class="flex items-center justify-between px-2 py-1 text-xs"
+                  @click="sortBy = option.value"
+                >
+                  <span>{{ option.label }}</span>
+                  <span v-if="sortBy === option.value" class="text-primary">●</span>
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+          </Menubar>
+        </div>
+      </div>
+
+      <!-- 语言标签过滤 -->
+      <div class="relative w-full overflow-hidden px-4 pb-2">
+        <div class="flex w-full items-start gap-2 pr-6 overflow-hidden">
+          <Badge
+            variant="secondary"
+            class="lc-md:px-2 lc-md:py-[3px] inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-[6px] text-xs"
+            :class="languageFilter === 'all' ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground' : 'bg-secondary text-secondary-foreground'"
+            @click="languageFilter = 'all'"
+          >
+            不限
+          </Badge>
+          <div class="flex flex-1 gap-2">
+            <Badge
+              v-for="option in languageOptions.filter(opt => opt.value !== 'all')"
               :key="option.value"
-              type="button"
-              class="border px-3 py-1 transition-colors"
-              :class="[
-                option.value === languageFilter
-                  ? 'border-primary bg-primary/5 text-primary'
-                  : 'border-transparent bg-muted text-muted-foreground hover:text-foreground',
-              ]"
+              translate="no"
+              variant="secondary"
+              class="lc-md:px-2 lc-md:py-[3px] inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-[6px] text-xs bg-secondary text-secondary-foreground"
+              :class="languageFilter === option.value && 'bg-primary/10 text-primary'"
               @click="languageFilter = option.value"
             >
               {{ option.label }}
-            </button>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="option in topicOptions"
-              :key="option.value"
-              type="button"
-              class="bg-muted px-3 py-1 font-medium transition-colors"
-              :class="
-                option.value === topicFilter ? 'bg-primary/10 text-primary' : ''
-              "
-              @click="topicFilter = option.value"
-            >
-              {{ option.label }}
-            </button>
+            </Badge>
           </div>
         </div>
-      </header>
+      </div>
 
+      <!-- 提交统计提示框 -->
+      <div class="bg-gray-100 dark:bg-gray-800 mx-4 flex items-center justify-between gap-2 rounded-[10px] p-2">
+        <div class="flex items-center gap-2">
+          <div class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary">
+            <Plus class="h-4 w-4 text-text-primary dark:text-text-primary" />
+          </div>
+          <span class="flex-1 text-xs">
+            你最近一次提交运行时间超过了 
+            <span class="font-medium text-green-600 dark:text-green-400">17%</span> 
+            的用户
+          </span>
+        </div>
+        <button 
+          class="relative justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-600/80 rounded flex h-6 flex-none items-center gap-1 px-2 py-1 text-xs"
+        >
+          <PenLine class="h-3.5 w-3.5" />
+          发布题解
+        </button>
+      </div>
+    </div>
+
+    <!-- 题解列表 -->
+    <div class="flex-1 overflow-y-auto">
       <div class="px-5 py-4">
         <div v-if="sortedItems.length" class="flex flex-col gap-3">
           <div v-for="item in sortedItems" :key="item.id" class="flex flex-col">

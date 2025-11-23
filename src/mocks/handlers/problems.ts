@@ -6,10 +6,8 @@ import { fetchProblemSubmissions } from "@/mocks/api/submission";
 import { fetchTestCasesByProblemId } from "@/mocks/api/test-case";
 import {
   fetchSolutionFeedItems,
-  fetchSolutionLanguageOptions,
   fetchSolutionQuickFilterOptions,
   fetchSolutionSortOptions,
-  fetchSolutionTopicOptions,
 } from "@/mocks/api/solution";
 
 export const problemHandlers = [
@@ -101,8 +99,6 @@ export const problemHandlers = [
     const feedItems = fetchSolutionFeedItems(detail.approaches);
     const response = {
       items: feedItems,
-      languageOptions: fetchSolutionLanguageOptions(feedItems),
-      topicOptions: fetchSolutionTopicOptions(feedItems),
       quickFilterOptions: fetchSolutionQuickFilterOptions(),
       sortOptions: fetchSolutionSortOptions(),
     };

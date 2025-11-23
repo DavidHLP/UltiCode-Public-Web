@@ -100,9 +100,6 @@ const resetSelectedSolution = () => {
       v-else
       :items="feed?.items ?? []"
       :follow-up="props.followUp"
-      :language-options="feed?.languageOptions ?? []"
-      :topic-options="feed?.topicOptions ?? []"
-      :quick-filter-options="feed?.quickFilterOptions ?? []"
       :sort-options="feed?.sortOptions ?? []"
       @select="handleSelect"
     />
