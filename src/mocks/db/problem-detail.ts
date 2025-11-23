@@ -186,6 +186,18 @@ const data = {
       language: "TypeScript",
     },
     {
+      id: "ap-two-sum-brute-force",
+      problem_id: 1,
+      title: "Brute force approach",
+      summary:
+        "Use two nested loops to check every pair of numbers until finding the target sum.",
+      time_complexity: "O(n^2)",
+      space_complexity: "O(1)",
+      code_snippet:
+        "function twoSum(nums: number[], target: number): number[] {\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = i + 1; j < nums.length; j++) {\n      if (nums[i] + nums[j] === target) {\n        return [i, j]\n      }\n    }\n  }\n  return []\n}",
+      language: "TypeScript",
+    },
+    {
       id: "ap-add-two-iterative",
       problem_id: 2,
       title: "Iterative carry propagation",
@@ -195,6 +207,18 @@ const data = {
       space_complexity: "O(max(m,n))",
       code_snippet:
         "function addTwoNumbers(l1, l2) {\n  let carry = 0, head = { val: 0, next: null }, cur = head\n  while (l1 || l2 || carry) {\n    const x = l1?.val ?? 0, y = l2?.val ?? 0\n    const sum = x + y + carry\n    carry = Math.floor(sum / 10)\n    cur.next = { val: sum % 10, next: null }\n    cur = cur.next\n    l1 = l1?.next ?? null\n    l2 = l2?.next ?? null\n  }\n  return head.next\n}",
+      language: "JavaScript",
+    },
+    {
+      id: "ap-add-two-recursive",
+      problem_id: 2,
+      title: "Recursive solution",
+      summary:
+        "Recursively add corresponding digits with carry propagation through function calls.",
+      time_complexity: "O(m+n)",
+      space_complexity: "O(max(m,n))",
+      code_snippet:
+        "function addTwoNumbers(l1, l2, carry = 0) {\n  if (!l1 && !l2 && !carry) return null\n  const sum = (l1?.val ?? 0) + (l2?.val ?? 0) + carry\n  const node = { val: sum % 10, next: null }\n  node.next = addTwoNumbers(\n    l1?.next ?? null,\n    l2?.next ?? null,\n    Math.floor(sum / 10)\n  )\n  return node\n}",
       language: "JavaScript",
     },
     {
@@ -210,6 +234,18 @@ const data = {
       language: "TypeScript",
     },
     {
+      id: "ap-container-brute-force",
+      problem_id: 3,
+      title: "Brute force all pairs",
+      summary:
+        "Check every possible pair of lines to find the maximum container area.",
+      time_complexity: "O(n^2)",
+      space_complexity: "O(1)",
+      code_snippet:
+        "function maxArea(height: number[]): number {\n  let maxArea = 0\n  for (let i = 0; i < height.length; i++) {\n    for (let j = i + 1; j < height.length; j++) {\n      const area = Math.min(height[i], height[j]) * (j - i)\n      maxArea = Math.max(maxArea, area)\n    }\n  }\n  return maxArea\n}",
+      language: "TypeScript",
+    },
+    {
       id: "ap-min-cost-kruskal",
       problem_id: 4,
       title: "Kruskal with union-find",
@@ -219,6 +255,18 @@ const data = {
       space_complexity: "O(n^2)",
       code_snippet:
         "function minCostConnectPoints(points: number[][]): number {\n  const n = points.length\n  const parent = Array.from({ length: n }, (_, i) => i)\n  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])))\n  const union = (a: number, b: number): boolean => {\n    const pa = find(a), pb = find(b)\n    if (pa === pb) return false\n    parent[pb] = pa\n    return true\n  }\n  const edges: Array<[number, number, number]> = []\n  for (let i = 0; i < n; i++) {\n    for (let j = i + 1; j < n; j++) {\n      const w = Math.abs(points[i][0] - points[j][0]) + Math.abs(points[i][1] - points[j][1])\n      edges.push([w, i, j])\n    }\n  }\n  edges.sort((a, b) => a[0] - b[0])\n  let cost = 0, used = 0\n  for (const [w, u, v] of edges) {\n    if (union(u, v)) {\n      cost += w\n      if (++used === n - 1) break\n    }\n  }\n  return cost\n}",
+      language: "TypeScript",
+    },
+    {
+      id: "ap-min-cost-prim",
+      problem_id: 4,
+      title: "Prim's algorithm with priority queue",
+      summary:
+        "Start from any point and greedily add the minimum cost edge to expand the MST.",
+      time_complexity: "O(n^2 log n)",
+      space_complexity: "O(n)",
+      code_snippet:
+        "function minCostConnectPoints(points: number[][]): number {\n  const n = points.length\n  const visited = new Set<number>()\n  const minHeap: [number, number][] = [[0, 0]] // [cost, point]\n  let totalCost = 0\n\n  while (visited.size < n) {\n    minHeap.sort((a, b) => a[0] - b[0])\n    const [cost, point] = minHeap.shift()!\n    if (visited.has(point)) continue\n    \n    visited.add(point)\n    totalCost += cost\n\n    for (let next = 0; next < n; next++) {\n      if (!visited.has(next)) {\n        const dist = Math.abs(points[point][0] - points[next][0]) +\n                     Math.abs(points[point][1] - points[next][1])\n        minHeap.push([dist, next])\n      }\n    }\n  }\n  return totalCost\n}",
       language: "TypeScript",
     },
     {
@@ -234,6 +282,18 @@ const data = {
       language: "TypeScript",
     },
     {
+      id: "ap-level-order-recursive",
+      problem_id: 5,
+      title: "Recursive DFS with level tracking",
+      summary:
+        "Use recursion with depth parameter to collect nodes at each level into the corresponding result array.",
+      time_complexity: "O(n)",
+      space_complexity: "O(h)",
+      code_snippet:
+        "interface TreeNode { val: number; left: TreeNode | null; right: TreeNode | null }\nfunction levelOrder(root: TreeNode | null): number[][] {\n  const result: number[][] = []\n  \n  function dfs(node: TreeNode | null, level: number) {\n    if (!node) return\n    if (result.length === level) result.push([])\n    result[level].push(node.val)\n    dfs(node.left, level + 1)\n    dfs(node.right, level + 1)\n  }\n  \n  dfs(root, 0)\n  return result\n}",
+      language: "TypeScript",
+    },
+    {
       id: "ap-lru-dll",
       problem_id: 6,
       title: "Hash map + doubly linked list",
@@ -243,6 +303,18 @@ const data = {
       space_complexity: "O(capacity)",
       code_snippet:
         "class LRUCache {\n  private capacity: number\n  private map = new Map<number, { key: number; value: number; prev: any; next: any }>()\n  private head = { key: -1, value: -1, prev: null as any, next: null as any }\n  private tail = { key: -1, value: -1, prev: null as any, next: null as any }\n  constructor(capacity: number) {\n    this.capacity = capacity\n    this.head.next = this.tail\n    this.tail.prev = this.head\n  }\n  private remove(node: any) {\n    node.prev.next = node.next\n    node.next.prev = node.prev\n  }\n  private addFront(node: any) {\n    node.next = this.head.next\n    node.prev = this.head\n    this.head.next.prev = node\n    this.head.next = node\n  }\n  get(key: number): number {\n    const node = this.map.get(key)\n    if (!node) return -1\n    this.remove(node)\n    this.addFront(node)\n    return node.value\n  }\n  put(key: number, value: number): void {\n    if (this.map.has(key)) {\n      const node = this.map.get(key)!\n      node.value = value\n      this.remove(node)\n      this.addFront(node)\n      return\n    }\n    if (this.map.size === this.capacity) {\n      const lru = this.tail.prev!\n      this.remove(lru)\n      this.map.delete(lru.key)\n    }\n    const node = { key, value, prev: null as any, next: null as any }\n    this.addFront(node)\n    this.map.set(key, node)\n  }\n}",
+      language: "TypeScript",
+    },
+    {
+      id: "ap-lru-ordered-map",
+      problem_id: 6,
+      title: "Using OrderedDict/Map",
+      summary:
+        "Leverage built-in ordered map to track access order and evict oldest entry when at capacity.",
+      time_complexity: "O(1) per op",
+      space_complexity: "O(capacity)",
+      code_snippet:
+        "class LRUCache {\n  private capacity: number\n  private cache: Map<number, number>\n\n  constructor(capacity: number) {\n    this.capacity = capacity\n    this.cache = new Map()\n  }\n\n  get(key: number): number {\n    if (!this.cache.has(key)) return -1\n    const value = this.cache.get(key)!\n    // Re-insert to update order\n    this.cache.delete(key)\n    this.cache.set(key, value)\n    return value\n  }\n\n  put(key: number, value: number): void {\n    if (this.cache.has(key)) {\n      this.cache.delete(key)\n    } else if (this.cache.size >= this.capacity) {\n      // Remove oldest (first) entry\n      const firstKey = this.cache.keys().next().value\n      this.cache.delete(firstKey)\n    }\n    this.cache.set(key, value)\n  }\n}",
       language: "TypeScript",
     },
   ],

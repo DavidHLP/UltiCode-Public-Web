@@ -100,30 +100,30 @@ const handleSelect = (item: SolutionFeedItem) => {
 
 <template>
   <section class="relative flex h-full w-full flex-col overflow-hidden">
-    <div class="flex flex-col gap-2 pb-[1px]">
-      <!-- 搜索栏和工具栏 -->
-      <div class="lc-md:pl-2 lc-md:pr-1 lc-md:h-8 flex h-10 items-center justify-between gap-2.5 border-b py-1 pl-4 pr-3 border-border">
+    <!-- Header 区域 -->
+    <header class="flex flex-col border-b border-border">
+      <!-- 顶部搜索和排序栏 -->
+      <div class="flex items-center gap-3 px-3 py-3 lc-md:px-2 lc-md:py-2">
         <!-- 搜索框 -->
-        <div class="relative rounded-md w-full">
-          <div class="text-muted-foreground absolute inset-y-0 flex items-center pointer-events-none left-0 pl-0.5">
+        <div class="relative flex-1 min-w-0">
+          <div class="text-muted-foreground absolute inset-y-0 left-0 flex items-center pointer-events-none pl-2">
             <Search class="w-4 h-4" />
           </div>
           <Input
             v-model="search"
             placeholder="搜索"
-            class="block w-full rounded-md outline-none border-none pr-3 bg-transparent py-1 pl-[22px] leading-4 focus:bg-transparent"
+            class="block w-full rounded-md outline-none border-none bg-transparent py-1.5 pl-8 pr-3 leading-4 focus:bg-transparent"
           />
         </div>
 
-        <!-- 工具按钮组 -->
-        <div class="flex items-center gap-1">
-          <!-- 排序按钮 -->
+        <!-- 排序按钮 -->
+        <div class="flex-shrink-0">
           <Menubar class="border-none">
             <MenubarMenu>
               <MenubarTrigger
-                class="flex items-center text-left cursor-pointer focus:outline-none whitespace-nowrap rounded-[4px] px-1 py-0.5 text-sm text-muted-foreground hover:text-foreground bg-transparent"
+                class="flex items-center text-left cursor-pointer focus:outline-none whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 bg-transparent transition-colors"
               >
-                <ArrowDownAZ class="w-4 h-4 mr-2" />
+                <ArrowDownAZ class="w-4 h-4 mr-1.5" />
                 排序
               </MenubarTrigger>
               <MenubarContent class="min-w-[160px] p-1">
@@ -142,66 +142,68 @@ const handleSelect = (item: SolutionFeedItem) => {
         </div>
       </div>
 
-      <!-- 语言标签过滤 -->
-      <div class="relative w-full overflow-hidden px-4 pb-2">
-        <div class="flex w-full items-start gap-2 pr-6 overflow-hidden">
+      <!-- 语言标签过滤栏 -->
+      <div class="relative w-full overflow-hidden px-3 py-2.5 lc-md:px-2">
+        <div class="flex w-full items-center gap-2 overflow-x-auto scrollbar-hide">
           <Badge
             variant="secondary"
-            class="lc-md:px-2 lc-md:py-[3px] inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-[6px] text-xs"
-            :class="languageFilter === 'all' ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground' : 'bg-secondary text-secondary-foreground'"
+            class="lc-md:px-2 lc-md:py-1 inline-flex cursor-pointer items-center flex-shrink-0 gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+            :class="languageFilter === 'all' ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
             @click="languageFilter = 'all'"
           >
             不限
           </Badge>
-          <div class="flex flex-1 gap-2">
-            <Badge
-              v-for="option in languageOptions.filter(opt => opt.value !== 'all')"
-              :key="option.value"
-              translate="no"
-              variant="secondary"
-              class="lc-md:px-2 lc-md:py-[3px] inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-[6px] text-xs bg-secondary text-secondary-foreground"
-              :class="languageFilter === option.value && 'bg-primary/10 text-primary'"
-              @click="languageFilter = option.value"
-            >
-              {{ option.label }}
-            </Badge>
-          </div>
+          <Badge
+            v-for="option in languageOptions.filter(opt => opt.value !== 'all')"
+            :key="option.value"
+            translate="no"
+            variant="secondary"
+            class="lc-md:px-2 lc-md:py-1 inline-flex cursor-pointer items-center flex-shrink-0 gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+            :class="languageFilter === option.value ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
+            @click="languageFilter = option.value"
+          >
+            {{ option.label }}
+          </Badge>
         </div>
       </div>
 
-      <!-- 提交统计提示框 -->
-      <div class="bg-gray-100 dark:bg-gray-800 mx-4 flex items-center justify-between gap-2 rounded-[10px] p-2">
-        <div class="flex items-center gap-2">
-          <div class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary">
-            <Plus class="h-4 w-4 text-text-primary dark:text-text-primary" />
+      <!-- 提交统计和操作栏 -->
+      <div class="mx-3 mb-3 lc-md:mx-2 lc-md:mb-2">
+        <div class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-3 rounded-lg p-3 lc-md:p-2">
+          <div class="flex items-center gap-2.5 flex-1 min-w-0">
+            <div class="rounded-full bg-opacity-100 p-1 bg-fill-primary dark:bg-fill-primary flex-shrink-0">
+              <Plus class="h-3.5 w-3.5 text-text-primary dark:text-text-primary" />
+            </div>
+            <span class="text-xs leading-relaxed">
+              你最近一次提交运行时间超过了 
+              <span class="font-semibold text-green-600 dark:text-green-400">17%</span> 
+              的用户
+            </span>
           </div>
-          <span class="flex-1 text-xs">
-            你最近一次提交运行时间超过了 
-            <span class="font-medium text-green-600 dark:text-green-400">17%</span> 
-            的用户
-          </span>
+          <button 
+            class="relative justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-600/90 active:bg-green-700 rounded-md flex h-7 flex-shrink-0 items-center gap-1.5 px-3 py-1 text-xs shadow-sm hover:shadow"
+          >
+            <PenLine class="h-3.5 w-3.5" />
+            发布题解
+          </button>
         </div>
-        <button 
-          class="relative justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-600/80 rounded flex h-6 flex-none items-center gap-1 px-2 py-1 text-xs"
-        >
-          <PenLine class="h-3.5 w-3.5" />
-          发布题解
-        </button>
       </div>
-    </div>
+    </header>
 
     <!-- 题解列表 -->
     <div class="flex-1 overflow-y-auto">
-      <div class="px-5 py-4">
-        <div v-if="sortedItems.length" class="flex flex-col gap-3">
-          <div v-for="item in sortedItems" :key="item.id" class="flex flex-col">
-            <SolutionsCard :item="item" @select="handleSelect" />
-            <Separator class="my-2" />
+      <div class="py-4">
+        <div v-if="sortedItems.length" class="flex flex-col">
+          <div v-for="(item, index) in sortedItems" :key="item.id" class="flex flex-col">
+            <div class="px-3">
+              <SolutionsCard :item="item" @select="handleSelect" />
+            </div>
+            <Separator v-if="index < sortedItems.length - 1" class="my-2" />
           </div>
         </div>
         <div
           v-else
-          class="flex flex-col items-center gap-2 rounded-2xl bg-muted/30 px-6 py-10 text-center"
+          class="mx-3 flex flex-col items-center gap-2 rounded-2xl bg-muted/30 px-6 py-10 text-center"
         >
           <p class="text-base font-medium text-foreground">No solutions yet</p>
           <p class="text-sm text-muted-foreground">
