@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { SolutionFeedItem } from "@/mocks/schema/solution";
+import type { SolutionFeedItem } from "@/mocks/schema/solution.ts";
 import { Eye, MessageCircle, Triangle } from "lucide-vue-next";
 
 const props = defineProps<{

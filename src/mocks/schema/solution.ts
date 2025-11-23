@@ -42,6 +42,7 @@ export interface SolutionMetaRow {
   topic: string; // VARCHAR(60) NOT NULL
   language_filter: string; // VARCHAR(40) NOT NULL
   score: number; // INT NOT NULL DEFAULT 0
+  content: string; // MEDIUMTEXT NOT NULL - Markdown format
 }
 
 // Matches SQL: solution_badge_relations table
@@ -66,10 +67,12 @@ export interface SolutionFeedMeta extends SolutionFeedMetaRow {
     likes: number;
     comments: number;
   };
+  content: string; // Markdown format
 }
 
-export interface SolutionFeedItem extends ProblemApproach, SolutionFeedMeta {
+export interface SolutionFeedItem extends Omit<ProblemApproach, 'code' | 'steps' | 'complexity'>, SolutionFeedMeta {
   tags: string[];
+  language: string; // From ProblemApproach
 }
 
 export interface SolutionFeedResponse {
@@ -92,4 +95,5 @@ export interface SolutionFeedMetaRow {
   topic: string;
   languageFilter: string;
   score: number;
+  content: string; // Markdown format
 }

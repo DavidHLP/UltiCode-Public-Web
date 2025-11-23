@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import type { SolutionFeedItem } from "@/mocks/schema/solution";
 import SolutionsListView from "./SolutionsListView.vue";
-import SolutionsDetail from "./SolutionsDetail.vue";
+import SolutionsDetail from "./components/SolutionsDetail.vue";
 import { fetchSolutionFeed } from "@/api/solution";
 
 const props = defineProps<{
@@ -72,6 +72,7 @@ const fallbackSolution = computed<SolutionFeedItem>(() => ({
     time: "-",
     space: "-",
   },
+  content: props.followUp, // Markdown 内容
 }));
 
 const handleSelect = (item: SolutionFeedItem) => {

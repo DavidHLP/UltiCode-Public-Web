@@ -8,7 +8,7 @@ import MenubarContent from "@/components/ui/menubar/MenubarContent.vue";
 import MenubarItem from "@/components/ui/menubar/MenubarItem.vue";
 import MenubarMenu from "@/components/ui/menubar/MenubarMenu.vue";
 import MenubarTrigger from "@/components/ui/menubar/MenubarTrigger.vue";
-import SolutionsCard from "./SolutionsCard.vue";
+import SolutionsCard from "./components/SolutionsCard.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import Badge from "@/components/ui/badge/Badge.vue";
 import { Search, Plus, PenLine, ArrowDownAZ } from "lucide-vue-next";
@@ -67,7 +67,7 @@ const filteredItems = computed(() => {
       item.language.toLowerCase() === languageFilter.value;
     const matchesQuery =
       !query ||
-      [item.title, item.highlight, item.summary, item.author.name]
+      [item.highlight, item.author.name, item.content]
         .join(" ")
         .toLowerCase()
         .includes(query);

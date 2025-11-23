@@ -5,7 +5,7 @@ import type {
 } from "@/mocks/schema/solution";
 import solutionDataRaw from "@/mocks/db/solution";
 
-const solutionData = solutionDataRaw as {
+const solutionData = solutionDataRaw as unknown as {
   solution_filter_options: {
     id: string;
     label: string;
@@ -33,6 +33,7 @@ const solutionData = solutionDataRaw as {
     topic: string;
     language_filter: string;
     score: number;
+    content: string;
   }[];
   fallbackMetaId: string;
 };
@@ -103,6 +104,7 @@ const buildMeta = (
     topic: metaRow.topic,
     languageFilter: metaRow.language_filter,
     score: metaRow.score,
+    content: metaRow.content,
   };
 };
 
@@ -140,7 +142,7 @@ export function fetchSolutionFeedItems(
       ),
     );
     return {
-      ...approach,
+      language: approach.language,
       ...meta,
       tags: derivedTags,
     };
