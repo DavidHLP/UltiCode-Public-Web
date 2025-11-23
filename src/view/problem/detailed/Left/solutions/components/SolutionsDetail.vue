@@ -14,6 +14,14 @@ const props = defineProps<{
 const authorInitial = computed(
   () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
+
+const topicLabel = computed(
+  () =>
+    props.item.topicName ||
+    props.item.topicTranslated ||
+    props.item.topic ||
+    "topic",
+);
 </script>
 
 <template>
@@ -55,7 +63,7 @@ const authorInitial = computed(
             {{ props.item.language }}
           </Badge>
           <Badge variant="secondary" class="rounded-full px-2.5 py-0.5 text-[11px] capitalize">
-            {{ props.item.topic }}
+            {{ topicLabel }}
           </Badge>
           <Badge
             v-for="badge in props.item.badges"

@@ -1,4 +1,4 @@
-import type { MockDatabase } from "../validation/validator";
+
 
 const data = {
   problem_list_groups: [
@@ -40,6 +40,6 @@ const data = {
   problem_list_favorite_relations: [
     { user_id: "u-001", list_id: "list-warmup" },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;

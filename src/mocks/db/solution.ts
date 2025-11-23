@@ -75,7 +75,7 @@ const data = {
       comments: 14,
       created_at: "2024-08-01T08:00:00.000Z",
       published_at: "2024-08-01T09:00:00.000Z",
-      topic: "arrays",
+      topic: "array",
       language_filter: "typescript",
       score: 90,
       content: `# Two Sum Solution
@@ -251,7 +251,7 @@ public List<List<Integer>> levelOrder(TreeNode root) {
       comments: 21,
       created_at: "2024-08-05T10:00:00.000Z",
       published_at: "2024-08-05T11:00:00.000Z",
-      topic: "design",
+      topic: "hash-table",
       language_filter: "cpp",
       score: 93,
       content: `# LRU Cache Design
@@ -391,7 +391,7 @@ def climbStairs(n: int) -> int:
       comments: 18,
       created_at: "2024-08-07T09:00:00.000Z",
       published_at: "2024-08-07T10:00:00.000Z",
-      topic: "intervals",
+      topic: "sorting",
       language_filter: "java",
       score: 88,
       content: `# Merge Intervals - Sort + Greedy

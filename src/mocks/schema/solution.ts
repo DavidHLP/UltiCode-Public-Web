@@ -68,6 +68,8 @@ export interface SolutionFeedMeta extends SolutionFeedMetaRow {
     comments: number;
   };
   content: string; // Markdown format
+  topicName?: string;
+  topicTranslated?: string;
 }
 
 export interface SolutionFeedItem extends Omit<ProblemApproach, 'code' | 'steps' | 'complexity'>, SolutionFeedMeta {
@@ -93,6 +95,8 @@ export interface SolutionFeedMetaRow {
   createdAt: string;
   publishedAt: string;
   topic: string;
+  topicName?: string;
+  topicTranslated?: string;
   languageFilter: string;
   score: number;
   content: string; // Markdown format

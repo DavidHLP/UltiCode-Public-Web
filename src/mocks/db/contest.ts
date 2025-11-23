@@ -541,6 +541,6 @@ const data = {
       badge: "IGM",
     },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;

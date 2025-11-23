@@ -112,43 +112,36 @@ const handleCreateSolution = () => {
     <!-- Header 区域 -->
     <header class="flex flex-col border-b border-border">
       <!-- 顶部搜索和排序栏 -->
-      <div class="flex items-center gap-2 px-3 py-1.5 lc-md:px-2 lc-md:py-1">
+      <div class="flex items-center gap-2 px-3 py-2">
         <!-- 搜索框 -->
-        <div class="relative flex-1 min-w-0">
-          <div class="text-muted-foreground absolute inset-y-0 left-0 flex items-center pointer-events-none pl-1.5">
-            <Search class="w-3.5 h-3.5" />
-          </div>
+        <div class="relative flex-1">
+          <Search class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             v-model="search"
-            placeholder="搜索"
-            class="block w-full rounded-md outline-none border-none bg-transparent py-0.5 pl-7 pr-2 text-xs leading-tight focus:bg-transparent h-7"
+            placeholder="搜索题解"
+            class="pl-8 h-8 text-sm"
           />
         </div>
 
         <!-- 排序按钮 -->
-        <div class="flex-shrink-0">
-          <Menubar class="border-none">
-            <MenubarMenu>
-              <MenubarTrigger
-                class="flex items-center text-left cursor-pointer focus:outline-none whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 bg-transparent transition-colors"
+        <Menubar class="border-none">
+          <MenubarMenu>
+            <MenubarTrigger class="flex items-center gap-1 px-2 py-1 text-sm">
+              <ArrowDownAZ class="w-4 h-4" />
+              排序
+            </MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem
+                v-for="option in sortOptions"
+                :key="option.value"
+                @click="sortBy = option.value"
               >
-                <ArrowDownAZ class="w-3.5 h-3.5 mr-1" />
-                排序
-              </MenubarTrigger>
-              <MenubarContent class="min-w-[160px] p-1">
-                <MenubarItem
-                  v-for="option in sortOptions"
-                  :key="option.value"
-                  class="flex items-center justify-between px-2 py-1 text-xs"
-                  @click="sortBy = option.value"
-                >
-                  <span>{{ option.label }}</span>
-                  <span v-if="sortBy === option.value" class="text-primary">●</span>
-                </MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
-          </Menubar>
-        </div>
+                {{ option.label }}
+                <span v-if="sortBy === option.value" class="ml-auto">✓</span>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
       </div>
 
       <!-- 语言标签过滤栏 -->

@@ -19,6 +19,14 @@ const languageLabel = computed(
   () => props.item.language || props.item.languageFilter || "language",
 );
 
+const topicLabel = computed(
+  () =>
+    props.item.topicName ||
+    props.item.topicTranslated ||
+    props.item.topic ||
+    "topic",
+);
+
 const handleSelect = () => emit("select", props.item);
 </script>
 
@@ -62,7 +70,7 @@ const handleSelect = () => emit("select", props.item);
             languageLabel
           }}</span>
           <span class="rounded-full bg-muted/80 px-2 py-0.5 capitalize">{{
-            props.item.topic
+            topicLabel
           }}</span>
           <span
             v-for="badge in props.item.badges"

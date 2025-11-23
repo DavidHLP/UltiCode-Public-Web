@@ -1,5 +1,3 @@
-import type { MockDatabase } from "../validation/validator";
-
 const data = {
   problems: [
     {
@@ -65,33 +63,34 @@ const data = {
     },
   ],
   problem_tags: [
-    { id: "tag-arrays", label: "Arrays" },
-    { id: "tag-hashmap", label: "Hash Map" },
-    { id: "tag-linked-list", label: "Linked List" },
-    { id: "tag-two-pointers", label: "Two Pointers" },
-    { id: "tag-graph", label: "Graph" },
-    { id: "tag-union-find", label: "Union Find" },
-    { id: "tag-tree", label: "Tree" },
-    { id: "tag-bfs", label: "Breadth-First Search" },
-    { id: "tag-queue", label: "Queue" },
-    { id: "tag-design", label: "Design" },
-    { id: "tag-cache", label: "Cache" },
+    { id: "array", label: "Array" },
+    { id: "hash-table", label: "Hash Table" },
+    { id: "two-pointers", label: "Two Pointers" },
+    { id: "linked-list", label: "Linked List" },
+    { id: "doubly-linked-list", label: "Doubly-Linked List" },
+    { id: "graph", label: "Graph" },
+    { id: "union-find", label: "Union Find" },
+    { id: "binary-tree", label: "Binary Tree" },
+    { id: "breadth-first-search", label: "Breadth-First Search" },
+    { id: "queue", label: "Queue" },
+    { id: "minimum-spanning-tree", label: "Minimum Spanning Tree" },
+    { id: "heap-priority-queue", label: "Heap (Priority Queue)" },
   ],
   problem_tag_relations: [
-    { problem_id: 1, tag_id: "tag-arrays" },
-    { problem_id: 1, tag_id: "tag-hashmap" },
-    { problem_id: 2, tag_id: "tag-linked-list" },
-    { problem_id: 3, tag_id: "tag-two-pointers" },
-    { problem_id: 4, tag_id: "tag-graph" },
-    { problem_id: 4, tag_id: "tag-union-find" },
-    { problem_id: 5, tag_id: "tag-tree" },
-    { problem_id: 5, tag_id: "tag-bfs" },
-    { problem_id: 5, tag_id: "tag-queue" },
-    { problem_id: 6, tag_id: "tag-design" },
-    { problem_id: 6, tag_id: "tag-cache" },
-    { problem_id: 6, tag_id: "tag-hashmap" },
-    { problem_id: 6, tag_id: "tag-linked-list" },
+    { problem_id: 1, tag_id: "array" },
+    { problem_id: 1, tag_id: "hash-table" },
+    { problem_id: 1, tag_id: "two-pointers" },
+    { problem_id: 2, tag_id: "linked-list" },
+    { problem_id: 3, tag_id: "two-pointers" },
+    { problem_id: 4, tag_id: "graph" },
+    { problem_id: 4, tag_id: "minimum-spanning-tree" },
+    { problem_id: 4, tag_id: "heap-priority-queue" },
+    { problem_id: 5, tag_id: "binary-tree" },
+    { problem_id: 5, tag_id: "breadth-first-search" },
+    { problem_id: 5, tag_id: "queue" },
+    { problem_id: 6, tag_id: "hash-table" },
+    { problem_id: 6, tag_id: "doubly-linked-list" },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;

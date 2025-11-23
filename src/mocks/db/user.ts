@@ -1,4 +1,4 @@
-import type { MockDatabase } from "../validation/validator";
+
 
 const data = {
   currentUserId: "u-001",
@@ -137,6 +137,6 @@ const data = {
       avatar: "https://i.pravatar.cc/150?u=petr",
     },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;

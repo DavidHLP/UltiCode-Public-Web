@@ -1,4 +1,4 @@
-import type { MockDatabase } from "../validation/validator";
+
 
 const data = {
   run_results: [
@@ -177,6 +177,6 @@ const data = {
       value: "[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]",
     },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;

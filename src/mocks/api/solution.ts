@@ -4,6 +4,7 @@ import type {
   SolutionFeedMeta,
 } from "@/mocks/schema/solution";
 import solutionDataRaw from "@/mocks/db/solution";
+import solutionTopics from "@/mocks/db/topic";
 
 const solutionData = solutionDataRaw as unknown as {
   solution_filter_options: {
@@ -71,6 +72,8 @@ const badgesByMetaId = solutionData.solution_badge_relations.reduce<
   return acc;
 }, new Map());
 
+const topicsBySlug = new Map(solutionTopics.map((topic) => [topic.slug, topic]));
+
 const buildMeta = (
   metaRow: (typeof solutionData.solution_metas)[number],
 ): SolutionFeedMeta => {
@@ -78,6 +81,8 @@ const buildMeta = (
   if (!author) {
     throw new Error(`Missing solution author ${metaRow.author_id}`);
   }
+
+  const topic = topicsBySlug.get(metaRow.topic);
 
   return {
     id: metaRow.id,
@@ -102,6 +107,8 @@ const buildMeta = (
     createdAt: metaRow.created_at,
     publishedAt: metaRow.published_at,
     topic: metaRow.topic,
+    topicName: topic?.name,
+    topicTranslated: topic?.nameTranslated,
     languageFilter: metaRow.language_filter,
     score: metaRow.score,
     content: metaRow.content,
@@ -136,11 +143,13 @@ export function fetchSolutionFeedItems(
       new Set(
         [
           approach.language,
+          meta.topicName,
+          meta.topicTranslated,
           ...approach.title.split(/\s+/).filter(Boolean),
           ...meta.badges,
         ]
-          .map((tag) => tag.trim())
-          .filter(Boolean),
+          .filter((tag): tag is string => typeof tag === "string" && tag.trim().length)
+          .map((tag) => tag.trim()),
       ),
     );
     return {
@@ -176,7 +185,7 @@ export function fetchSolutionTopicOptions(items: SolutionFeedItem[]) {
   return [
     { label: "All topics", value: "all" },
     ...uniqueTopics.map((topic) => ({
-      label: topic,
+      label: topicsBySlug.get(topic)?.name ?? topic,
       value: topic,
     })),
   ];

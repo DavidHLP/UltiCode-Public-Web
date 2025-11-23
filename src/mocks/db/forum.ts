@@ -1,4 +1,4 @@
-import type { MockDatabase } from "../validation/validator";
+
 
 const communityId = "community-ulticode";
 
@@ -137,6 +137,6 @@ const data = {
       trend: "up",
     },
   ],
-} as const satisfies MockDatabase;
+} as const;
 
 export default data;
