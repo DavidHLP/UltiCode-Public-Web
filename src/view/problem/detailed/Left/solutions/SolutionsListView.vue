@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import type { SolutionFeedItem } from "@/mocks/schema/solution";
 import { Input } from "@/components/ui/input";
 import Menubar from "@/components/ui/menubar/Menubar.vue";
@@ -21,6 +22,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [item: SolutionFeedItem];
 }>();
+
+const router = useRouter();
+const route = useRoute();
 
 const search = ref("");
 const languageFilter = ref("all");
@@ -96,6 +100,11 @@ const sortedItems = computed(() => {
 const handleSelect = (item: SolutionFeedItem) => {
   emit("select", item);
 };
+
+const handleCreateSolution = () => {
+  const problemId = route.params.id || "1";
+  router.push({ name: "solution-create", params: { id: problemId } });
+};
 </script>
 
 <template>
@@ -103,16 +112,16 @@ const handleSelect = (item: SolutionFeedItem) => {
     <!-- Header 区域 -->
     <header class="flex flex-col border-b border-border">
       <!-- 顶部搜索和排序栏 -->
-      <div class="flex items-center gap-3 px-3 py-3 lc-md:px-2 lc-md:py-2">
+      <div class="flex items-center gap-2 px-3 py-1.5 lc-md:px-2 lc-md:py-1">
         <!-- 搜索框 -->
         <div class="relative flex-1 min-w-0">
-          <div class="text-muted-foreground absolute inset-y-0 left-0 flex items-center pointer-events-none pl-2">
-            <Search class="w-4 h-4" />
+          <div class="text-muted-foreground absolute inset-y-0 left-0 flex items-center pointer-events-none pl-1.5">
+            <Search class="w-3.5 h-3.5" />
           </div>
           <Input
             v-model="search"
             placeholder="搜索"
-            class="block w-full rounded-md outline-none border-none bg-transparent py-1.5 pl-8 pr-3 leading-4 focus:bg-transparent"
+            class="block w-full rounded-md outline-none border-none bg-transparent py-0.5 pl-7 pr-2 text-xs leading-tight focus:bg-transparent h-7"
           />
         </div>
 
@@ -121,9 +130,9 @@ const handleSelect = (item: SolutionFeedItem) => {
           <Menubar class="border-none">
             <MenubarMenu>
               <MenubarTrigger
-                class="flex items-center text-left cursor-pointer focus:outline-none whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 bg-transparent transition-colors"
+                class="flex items-center text-left cursor-pointer focus:outline-none whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 bg-transparent transition-colors"
               >
-                <ArrowDownAZ class="w-4 h-4 mr-1.5" />
+                <ArrowDownAZ class="w-3.5 h-3.5 mr-1" />
                 排序
               </MenubarTrigger>
               <MenubarContent class="min-w-[160px] p-1">
@@ -143,11 +152,11 @@ const handleSelect = (item: SolutionFeedItem) => {
       </div>
 
       <!-- 语言标签过滤栏 -->
-      <div class="relative w-full overflow-hidden px-3 py-2.5 lc-md:px-2">
-        <div class="flex w-full items-center gap-2 overflow-x-auto scrollbar-hide">
+      <div class="relative w-full overflow-hidden px-3 py-1.5 lc-md:px-2 lc-md:py-1">
+        <div class="flex w-full items-center gap-1.5 overflow-x-auto scrollbar-hide">
           <Badge
             variant="secondary"
-            class="lc-md:px-2 lc-md:py-1 inline-flex cursor-pointer items-center flex-shrink-0 gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+            class="lc-md:px-1.5 lc-md:py-0.5 inline-flex cursor-pointer items-center flex-shrink-0 gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors"
             :class="languageFilter === 'all' ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
             @click="languageFilter = 'all'"
           >
@@ -158,7 +167,7 @@ const handleSelect = (item: SolutionFeedItem) => {
             :key="option.value"
             translate="no"
             variant="secondary"
-            class="lc-md:px-2 lc-md:py-1 inline-flex cursor-pointer items-center flex-shrink-0 gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+            class="lc-md:px-1.5 lc-md:py-0.5 inline-flex cursor-pointer items-center flex-shrink-0 gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors"
             :class="languageFilter === option.value ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
             @click="languageFilter = option.value"
           >
@@ -168,22 +177,23 @@ const handleSelect = (item: SolutionFeedItem) => {
       </div>
 
       <!-- 提交统计和操作栏 -->
-      <div class="mx-3 mb-3 lc-md:mx-2 lc-md:mb-2">
-        <div class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-3 rounded-lg p-3 lc-md:p-2">
-          <div class="flex items-center gap-2.5 flex-1 min-w-0">
-            <div class="rounded-full bg-opacity-100 p-1 bg-fill-primary dark:bg-fill-primary flex-shrink-0">
-              <Plus class="h-3.5 w-3.5 text-text-primary dark:text-text-primary" />
+      <div class="mx-3 mb-1.5 lc-md:mx-2 lc-md:mb-1">
+        <div class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1">
+          <div class="flex items-center gap-1.5 flex-1 min-w-0">
+            <div class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0">
+              <Plus class="h-2.5 w-2.5 text-text-primary dark:text-text-primary" />
             </div>
-            <span class="text-xs leading-relaxed">
+            <span class="text-[11px] leading-tight">
               你最近一次提交运行时间超过了 
               <span class="font-semibold text-green-600 dark:text-green-400">17%</span> 
               的用户
             </span>
           </div>
           <button 
-            class="relative justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-600/90 active:bg-green-700 rounded-md flex h-7 flex-shrink-0 items-center gap-1.5 px-3 py-1 text-xs shadow-sm hover:shadow"
+            class="relative justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-white hover:bg-green-600/90 active:bg-green-700 rounded flex h-5 flex-shrink-0 items-center gap-0.5 px-2 py-0.5 text-[11px] shadow-sm hover:shadow"
+            @click="handleCreateSolution"
           >
-            <PenLine class="h-3.5 w-3.5" />
+            <PenLine class="h-2.5 w-2.5" />
             发布题解
           </button>
         </div>
@@ -192,7 +202,7 @@ const handleSelect = (item: SolutionFeedItem) => {
 
     <!-- 题解列表 -->
     <div class="flex-1 overflow-y-auto">
-      <div class="py-4">
+      <div class="py-3">
         <div v-if="sortedItems.length" class="flex flex-col">
           <div v-for="(item, index) in sortedItems" :key="item.id" class="flex flex-col">
             <div class="px-3">
