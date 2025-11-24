@@ -58,7 +58,6 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-full flex-col">
     <!-- Tab Header -->
     <header class="flex items-center border-b">
       <div
@@ -135,5 +134,4 @@ watch(
         class="flex-1 min-h-0"
       />
     </main>
-  </div>
 </template>
