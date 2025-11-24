@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { FooterAction, FooterAlign, FooterVariant } from "../composables";
-import { useIcon } from "../composables/useIcon";
+import type { FooterAction, FooterAlign, FooterVariant } from "../composables/types";
+import { useDemoUI } from "../composables/useDemoUI";
+import { useDemoStore } from "@/view/demo";
+import { storeToRefs } from "pinia";
 
 defineOptions({
   name: "FooterComponent"
@@ -12,15 +15,30 @@ interface FooterComponentProps {
   actions?: FooterAction[];
   align?: FooterAlign;
   variant?: FooterVariant;
+  useStore?: boolean; // 是否使用 Pinia store
 }
 
 const props = withDefaults(defineProps<FooterComponentProps>(), {
   align: 'left',
-  variant: 'default'
+  variant: 'default',
+  useStore: false
 });
 
 // 使用 composables
-const { getIconComponent } = useIcon();
+const { getIconComponent } = useDemoUI();
+
+// 使用 Pinia store（可选）
+const demoStore = useDemoStore();
+const { 
+  footerActions: storeActions, 
+  footerAlign: storeAlign, 
+  footerVariant: storeVariant 
+} = storeToRefs(demoStore);
+
+// 根据配置选择数据源
+const currentActions = computed(() => props.useStore ? storeActions.value : props.actions);
+const currentAlign = computed(() => props.useStore ? storeAlign.value : props.align);
+const currentVariant = computed(() => props.useStore ? storeVariant.value : props.variant);
 
 /**
  * 获取对齐方式的 CSS 类
@@ -40,11 +58,11 @@ const getAlignClass = (align: FooterAlign) => {
   <footer 
     class="flex items-center gap-2 px-3 py-2"
     :class="[
-      getAlignClass(props.align),
+      getAlignClass(currentAlign),
       {
-        'bg-muted/50': props.variant === 'default',
-        'bg-background shadow-lg border-t': props.variant === 'elevated',
-        'border-t': props.variant === 'bordered'
+        'bg-muted/50': currentVariant === 'default',
+        'bg-background shadow-lg border-t': currentVariant === 'elevated',
+        'border-t': currentVariant === 'bordered'
       }
     ]"
   >
@@ -53,15 +71,15 @@ const getAlignClass = (align: FooterAlign) => {
     
     <!-- 分隔线 -->
     <Separator 
-      v-if="$slots.default && props.actions && props.actions.length > 0" 
+      v-if="$slots.default && currentActions && currentActions.length > 0" 
       orientation="vertical" 
       class="h-5" 
     />
     
     <!-- 快捷操作按钮 -->
-    <div v-if="props.actions && props.actions.length > 0" class="flex items-center gap-2">
+    <div v-if="currentActions && currentActions.length > 0" class="flex items-center gap-2">
       <Button
-        v-for="(action, index) in props.actions"
+        v-for="(action, index) in currentActions"
         :key="index"
         :variant="action.variant || 'ghost'"
         size="sm"

@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import type { HeaderModel, HeaderVariant } from "../composables";
+import { computed } from 'vue';
+import type { HeaderModel, HeaderVariant } from "../composables/types";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useIcon } from "../composables/useIcon";
-import { useHeaderStyles } from "../composables/useHeaderStyles";
+import { useDemoUI } from "../composables/useDemoUI";
+import { useDemoStore } from "@/view/demo";
+import { storeToRefs } from "pinia";
 
 defineOptions({
   name: "HeaderComponent"
 });
 
 interface HeaderComponentProps {
-  headers: HeaderModel[];
+  headers?: HeaderModel[];
   variant?: HeaderVariant;
+  useStore?: boolean; // 是否使用 Pinia store
 }
 
-withDefaults(defineProps<HeaderComponentProps>(), {
-  variant: 'default'
+const props = withDefaults(defineProps<HeaderComponentProps>(), {
+  variant: 'default',
+  useStore: false
 });
 
 const emit = defineEmits<{
@@ -23,14 +27,27 @@ const emit = defineEmits<{
 }>();
 
 // 使用 composables
-const { getIconComponent } = useIcon();
-const { getVariantClasses } = useHeaderStyles();
+const { getIconComponent, getHeaderClasses } = useDemoUI();
+
+// 使用 Pinia store（可选）
+const demoStore = useDemoStore();
+const { headers: storeHeaders, headerVariant: storeVariant } = storeToRefs(demoStore);
+
+// 根据配置选择数据源
+const currentHeaders = computed(() => props.useStore ? storeHeaders.value : (props.headers || []));
+const currentVariant = computed(() => props.useStore ? storeVariant.value : props.variant);
 
 /**
  * 处理 header 点击事件
  */
 const handleClick = (index: number, disabled?: boolean) => {
   if (disabled) return;
+  
+  // 如果使用 store，自动更新激活状态
+  if (props.useStore) {
+    demoStore.activateHeader(index);
+  }
+  
   emit('click', index);
 };
 </script>
@@ -39,17 +56,17 @@ const handleClick = (index: number, disabled?: boolean) => {
   <header 
     class="flex items-center gap-2 px-3 py-2 rounded-t-lg border-b"
     :class="{
-      'bg-muted/50': variant !== 'tabs',
-      'bg-background border-b': variant === 'tabs'
+      'bg-muted/50': currentVariant !== 'tabs',
+      'bg-background border-b': currentVariant === 'tabs'
     }"
   >
-    <template v-for="(header, index) in headers" :key="index">
+    <template v-for="(header, index) in currentHeaders" :key="index">
       <!-- 带 Tooltip 的 Header -->
       <TooltipProvider v-if="header.tooltip" :delay-duration="300">
         <Tooltip>
           <TooltipTrigger as-child>
             <button 
-              :class="getVariantClasses(header, variant)"
+              :class="getHeaderClasses(header, currentVariant)"
               @click="handleClick(header.index, header.disabled)"
               :disabled="header.disabled"
             >
@@ -78,7 +95,7 @@ const handleClick = (index: number, disabled?: boolean) => {
       <!-- 普通 Header -->
       <button 
         v-else
-        :class="getVariantClasses(header, variant)"
+        :class="getHeaderClasses(header, currentVariant)"
         @click="handleClick(header.index, header.disabled)"
         :disabled="header.disabled"
       >

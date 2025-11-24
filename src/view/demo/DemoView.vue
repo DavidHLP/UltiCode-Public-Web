@@ -7,7 +7,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
-import type { HeaderModel } from "./composables";
+import type { HeaderModel } from "./composables/types";
 
 const activeHeaderId = ref(0); // 使用 header.index 作为唯一标识
 

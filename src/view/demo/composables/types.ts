@@ -1,21 +1,17 @@
 /**
- * Header 变体类型
+ * Demo 模块类型定义
  */
+
+/** Header 变体类型 */
 export type HeaderVariant = 'default' | 'tabs' | 'pills';
 
-/**
- * Footer 对齐方式
- */
+/** Footer 对齐方式 */
 export type FooterAlign = 'left' | 'center' | 'right' | 'space-between';
 
-/**
- * Footer 变体类型
- */
+/** Footer 变体类型 */
 export type FooterVariant = 'default' | 'elevated' | 'bordered';
 
-/**
- * 按钮变体类型
- */
+/** 按钮变体类型 */
 export type ButtonVariant = 'default' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link';
 
 /**
