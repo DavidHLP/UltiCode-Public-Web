@@ -1,119 +1,48 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { HeaderModel, HeaderVariant } from "../composables/types";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useDemoUI } from "../composables/useDemoUI";
-import { useDemoStore } from "@/view/demo";
-import { storeToRefs } from "pinia";
+import { type Component } from "vue";
+import * as LucideIcons from "lucide-vue-next";
+import type { HeaderModel } from "../store";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
-defineOptions({
-  name: "HeaderComponent"
-});
-
-interface HeaderComponentProps {
-  headers?: HeaderModel[];
-  variant?: HeaderVariant;
-  useStore?: boolean; // 是否使用 Pinia store
-}
-
-const props = withDefaults(defineProps<HeaderComponentProps>(), {
-  variant: 'default',
-  useStore: false
-});
-
-const emit = defineEmits<{
-  (e: 'click', index: number): void;
+const { headers } = defineProps<{
+  headers: HeaderModel[];
 }>();
 
-// 使用 composables
-const { getIconComponent, getHeaderClasses } = useDemoUI();
-
-// 使用 Pinia store（可选）
-const demoStore = useDemoStore();
-const { headers: storeHeaders, headerVariant: storeVariant } = storeToRefs(demoStore);
-
-// 根据配置选择数据源
-const currentHeaders = computed(() => props.useStore ? storeHeaders.value : (props.headers || []));
-const currentVariant = computed(() => props.useStore ? storeVariant.value : props.variant);
-
-/**
- * 处理 header 点击事件
- */
-const handleClick = (index: number, disabled?: boolean) => {
-  if (disabled) return;
-  
-  // 如果使用 store，自动更新激活状态
-  if (props.useStore) {
-    demoStore.activateHeader(index);
+const getIconComponent = (iconName?: string): Component | null => {
+  if (!iconName) return null;
+  const icon = (LucideIcons as Record<string, unknown>)[iconName];
+  // 检查是否是有效的组件（可以是对象或函数）
+  if (icon && (typeof icon === "object" || typeof icon === "function")) {
+    return icon as Component;
   }
-  
-  emit('click', index);
+  return null;
 };
 </script>
 
 <template>
-  <header 
-    class="flex items-center gap-2 px-3 py-2 rounded-t-lg border-b"
-    :class="{
-      'bg-muted/50': currentVariant !== 'tabs',
-      'bg-background border-b': currentVariant === 'tabs'
-    }"
-  >
-    <template v-for="(header, index) in currentHeaders" :key="index">
-      <!-- 带 Tooltip 的 Header -->
-      <TooltipProvider v-if="header.tooltip" :delay-duration="300">
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <button 
-              :class="getHeaderClasses(header, currentVariant)"
-              @click="handleClick(header.index, header.disabled)"
-              :disabled="header.disabled"
-            >
-              <component 
-                :is="getIconComponent(header.icon)" 
-                v-if="getIconComponent(header.icon)" 
-                class="h-4 w-4 flex-shrink-0" 
-                :class="header.active ? '' : (header.color || 'text-muted-foreground')"
-              />
-              <span class="whitespace-nowrap text-sm">{{ header.title }}</span>
-              <Badge 
-                v-if="header.badge !== undefined" 
-                variant="secondary" 
-                class="ml-1 h-5 min-w-5 px-1.5 text-xs font-semibold"
-              >
-                {{ header.badge }}
-              </Badge>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{{ header.tooltip }}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      
-      <!-- 普通 Header -->
-      <button 
-        v-else
-        :class="getHeaderClasses(header, currentVariant)"
-        @click="handleClick(header.index, header.disabled)"
-        :disabled="header.disabled"
+  <header class="flex items-center gap-1 bg-muted/50 px-2 py-1.5">
+    <template v-for="(header, idx) in headers" :key="header.id">
+      <Separator v-if="idx > 0" orientation="vertical" class="h-4" />
+      <Button
+        variant="ghost"
+        size="sm"
+        class="flex items-center gap-1"
+        :style="{
+          color: header.color,
+          backgroundColor: header.bgColor,
+        }"
       >
-        <component 
-          :is="getIconComponent(header.icon)" 
-          v-if="getIconComponent(header.icon)" 
-          class="h-4 w-4 flex-shrink-0" 
-          :class="header.active ? '' : (header.color || 'text-muted-foreground')"
+        <component
+          :is="getIconComponent(header.icon)"
+          v-if="getIconComponent(header.icon)"
+          class="h-3.5 w-3.5"
+          :style="{ color: header.iconColor || header.color }"
         />
-        <span class="whitespace-nowrap text-sm">{{ header.title }}</span>
-        <Badge 
-          v-if="header.badge !== undefined" 
-          variant="secondary" 
-          class="ml-1 h-5 min-w-5 px-1.5 text-xs font-semibold"
-        >
-          {{ header.badge }}
-        </Badge>
-      </button>
+        <div class="whitespace-nowrap text-sm font-medium">
+          {{ header.title }}
+        </div>
+      </Button>
     </template>
   </header>
 </template>
