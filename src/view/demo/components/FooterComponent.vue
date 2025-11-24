@@ -1,42 +1,38 @@
 <script setup lang="ts">
-import type { Component } from "vue";
-import * as LucideIcons from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import type { FooterAction } from "../composables/types";
+import type { FooterAction, FooterAlign, FooterVariant } from "../composables";
+import { useIcon } from "../composables/useIcon";
 
 defineOptions({
   name: "FooterComponent"
 });
 
-defineProps<{
+interface FooterComponentProps {
   actions?: FooterAction[];
-  align?: 'left' | 'center' | 'right' | 'space-between';
-  variant?: 'default' | 'elevated' | 'bordered';
-}>();
+  align?: FooterAlign;
+  variant?: FooterVariant;
+}
 
-const IconComponent = (iconName: string) => {
-  if (!iconName) return null;
-  const icon = (LucideIcons as Record<string, unknown>)[iconName];
-  if (icon && (typeof icon === "object" || typeof icon === "function")) {
-    return icon as Component;
-  }
-  return null;
-};
+const props = withDefaults(defineProps<FooterComponentProps>(), {
+  align: 'left',
+  variant: 'default'
+});
 
-const getAlignClass = (align?: string) => {
-  switch (align) {
-    case 'left':
-      return 'justify-start';
-    case 'center':
-      return 'justify-center';
-    case 'right':
-      return 'justify-end';
-    case 'space-between':
-      return 'justify-between';
-    default:
-      return 'justify-start';
-  }
+// 使用 composables
+const { getIconComponent } = useIcon();
+
+/**
+ * 获取对齐方式的 CSS 类
+ */
+const getAlignClass = (align: FooterAlign) => {
+  const alignMap: Record<FooterAlign, string> = {
+    left: 'justify-start',
+    center: 'justify-center',
+    right: 'justify-end',
+    'space-between': 'justify-between'
+  };
+  return alignMap[align];
 };
 </script>
 
@@ -44,11 +40,11 @@ const getAlignClass = (align?: string) => {
   <footer 
     class="flex items-center gap-2 px-3 py-2"
     :class="[
-      getAlignClass(align),
+      getAlignClass(props.align),
       {
-        'bg-muted/50': variant !== 'elevated' && variant !== 'bordered',
-        'bg-background shadow-lg border-t': variant === 'elevated',
-        'border-t': variant === 'bordered'
+        'bg-muted/50': props.variant === 'default',
+        'bg-background shadow-lg border-t': props.variant === 'elevated',
+        'border-t': props.variant === 'bordered'
       }
     ]"
   >
@@ -56,12 +52,16 @@ const getAlignClass = (align?: string) => {
     <slot />
     
     <!-- 分隔线 -->
-    <Separator v-if="$slots.default && actions && actions.length > 0" orientation="vertical" class="h-5" />
+    <Separator 
+      v-if="$slots.default && props.actions && props.actions.length > 0" 
+      orientation="vertical" 
+      class="h-5" 
+    />
     
     <!-- 快捷操作按钮 -->
-    <div v-if="actions && actions.length > 0" class="flex items-center gap-2">
+    <div v-if="props.actions && props.actions.length > 0" class="flex items-center gap-2">
       <Button
-        v-for="(action, index) in actions"
+        v-for="(action, index) in props.actions"
         :key="index"
         :variant="action.variant || 'ghost'"
         size="sm"
@@ -69,8 +69,8 @@ const getAlignClass = (align?: string) => {
         class="h-7"
       >
         <component 
-          :is="IconComponent(action.icon)" 
-          v-if="action.icon && IconComponent(action.icon)"
+          :is="getIconComponent(action.icon)" 
+          v-if="action.icon && getIconComponent(action.icon)"
           class="h-3.5 w-3.5 mr-1.5"
         />
         {{ action.label }}

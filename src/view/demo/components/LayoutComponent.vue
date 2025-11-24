@@ -2,22 +2,11 @@
 import HeaderComponent from './HeaderComponent.vue';
 import MainComponent from './MainComponent.vue';
 import FooterComponent from './FooterComponent.vue';
-import type { HeaderModel, FooterAction, MainContentProps } from '../composables/types';
+import type { LayoutProps } from '../composables';
 
 defineOptions({
   name: "LayoutComponent"
 });
-
-interface LayoutProps extends Partial<MainContentProps> {
-  headers: HeaderModel[];
-  headerVariant?: 'default' | 'tabs' | 'pills';
-  footerActions?: FooterAction[];
-  footerAlign?: 'left' | 'center' | 'right' | 'space-between';
-  footerVariant?: 'default' | 'elevated' | 'bordered';
-  rounded?: boolean;
-  bordered?: boolean;
-  shadow?: boolean;
-}
 
 const props = withDefaults(defineProps<LayoutProps>(), {
   rounded: true,
@@ -32,6 +21,9 @@ const emit = defineEmits<{
   (e: 'headerClick', index: number): void;
 }>();
 
+/**
+ * 处理 header 点击事件
+ */
 const handleHeaderClick = (index: number) => {
   emit('headerClick', index);
 };
@@ -41,14 +33,14 @@ const handleHeaderClick = (index: number) => {
   <div 
     class="flex flex-col h-full overflow-hidden"
     :class="{
-      'rounded-lg': rounded,
-      'border': bordered,
-      'shadow-md': shadow
+      'rounded-lg': props.rounded,
+      'border': props.bordered,
+      'shadow-md': props.shadow
     }"
   >
     <HeaderComponent 
-      :headers="headers" 
-      :variant="headerVariant"
+      :headers="props.headers" 
+      :variant="props.headerVariant"
       @click="handleHeaderClick" 
     />
     <MainComponent 
@@ -64,9 +56,9 @@ const handleHeaderClick = (index: number) => {
       </template>
     </MainComponent>
     <FooterComponent 
-      :actions="footerActions"
-      :align="footerAlign"
-      :variant="footerVariant"
+      :actions="props.footerActions"
+      :align="props.footerAlign"
+      :variant="props.footerVariant"
     >
       <slot name="footer" />
     </FooterComponent>
