@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import CodeEditor from "./components/CodeEditor.vue";
+import HeaderComponent from "../../components/HeaderComponent.vue";
 import type { ProblemLanguageOption } from "@/mocks/schema/problem-detail";
 import {
   AlignLeft,
@@ -19,7 +20,6 @@ import {
   Maximize2,
   Scan,
   CheckIcon,
-  CodeIcon,
 } from "lucide-vue-next";
 
 const props = defineProps<{
@@ -59,22 +59,11 @@ watch(
 
 <template>
     <!-- Tab Header -->
-    <header class="flex items-center border-b">
-      <div
-        class="flex items-center gap-1.5 border-b-2 border-green-500 px-3 py-2"
-      >
-        <div class="relative text-[14px] leading-none text-green-500">
-          <CodeIcon class="h-3.5 w-3.5" />
-        </div>
-        <div class="relative">
-          <div class="whitespace-nowrap text-sm font-medium">代码</div>
-        </div>
-      </div>
-    </header>
+    <HeaderComponent title="代码" icon="Code2Icon" />
 
     <!-- Main Content Area -->
-    <main class="flex flex-col gap-2 p-2 flex-1 min-h-0">
-      <div class="flex flex-wrap items-center justify-between gap-2">
+    <main class="flex flex-col gap-1 p-1 flex-1 min-h-0">
+      <div class="flex flex-wrap items-center justify-between gap-1">
         <NavigationMenu :viewport="false">
           <NavigationMenuList>
             <NavigationMenuItem>
