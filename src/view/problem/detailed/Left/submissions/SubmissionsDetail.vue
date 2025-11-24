@@ -83,6 +83,12 @@ const initRuntimeChart = () => {
   runtimeChart = echarts.init(runtimeChartRef.value);
   
   const userIndex = highlightIndex.value;
+  const userAvatar = 'https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png';
+  
+  // 创建圆形头像 Image 对象
+  const avatarImg = new Image();
+  avatarImg.crossOrigin = 'anonymous';
+  avatarImg.src = userAvatar;
   
   const option = {
     tooltip: {
@@ -153,31 +159,60 @@ const initRuntimeChart = () => {
             borderRadius: [4, 4, 0, 0]
           }
         })),
-        barMaxWidth: 40,
-        markPoint: userIndex >= 0 ? {
-          data: [
-            {
-              coord: [userIndex, pairedDist.value[userIndex]?.count ?? 0],
-              symbol: 'pin',
-              symbolSize: 50,
-              itemStyle: {
-                color: 'hsl(var(--chart-series-1))'
-              },
-              label: {
-                show: true,
-                position: 'top',
-                fontSize: 11,
-                fontWeight: 'bold',
-                color: 'hsl(var(--chart-series-1))'
-              }
-            }
-          ]
-        } : undefined,
+        barMaxWidth: 40
       }
     ]
   };
   
   runtimeChart.setOption(option);
+  
+  // 图表渲染完成后添加圆形头像
+  if (userIndex >= 0) {
+    avatarImg.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      
+      const size = 28;
+      canvas.width = size;
+      canvas.height = size;
+      
+      // 绘制圆形裁剪路径
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      
+      // 绘制头像
+      ctx.drawImage(avatarImg, 0, 0, size, size);
+      
+      // 添加边框
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
+      ctx.strokeStyle = 'hsl(var(--chart-series-1))';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      const circularAvatar = canvas.toDataURL();
+      
+      // 使用圆形头像更新图表
+      runtimeChart?.setOption({
+        series: [{
+          markPoint: {
+            data: [
+              {
+                coord: [userIndex, pairedDist.value[userIndex]?.count ?? 0],
+                symbol: 'image://' + circularAvatar,
+                symbolSize: 32,
+                symbolOffset: [0, -20]
+              }
+            ]
+          }
+        }]
+      });
+    };
+  }
 };
 
 const initMemoryChart = () => {
@@ -198,6 +233,12 @@ const initMemoryChart = () => {
   
   const memoryCounts = Array.from({ length: 80 }, () => Math.floor(Math.random() * 100));
   const userMemoryIndex = 40; // 用户位置索引
+  const userAvatar = 'https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png';
+  
+  // 创建圆形头像 Image 对象
+  const avatarImg = new Image();
+  avatarImg.crossOrigin = 'anonymous';
+  avatarImg.src = userAvatar;
   
   const option = {
     tooltip: {
@@ -265,31 +306,58 @@ const initMemoryChart = () => {
             borderRadius: [4, 4, 0, 0]
           }
         })),
-        barMaxWidth: 40,
-        markPoint: {
-          data: [
-            {
-              coord: [userMemoryIndex, memoryCounts[userMemoryIndex] ?? 0],
-              symbol: 'pin',
-              symbolSize: 50,
-              itemStyle: {
-                color: 'hsl(var(--chart-series-1))'
-              },
-              label: {
-                show: true,
-                position: 'top',
-                fontSize: 11,
-                fontWeight: 'bold',
-                color: 'hsl(var(--chart-series-1))'
-              }
-            }
-          ]
-        },
+        barMaxWidth: 40
       }
     ]
   };
   
   memoryChart.setOption(option);
+  
+  // 图表渲染完成后添加圆形头像
+  avatarImg.onload = () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const size = 28;
+    canvas.width = size;
+    canvas.height = size;
+    
+    // 绘制圆形裁剪路径
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+    
+    // 绘制头像
+    ctx.drawImage(avatarImg, 0, 0, size, size);
+    
+    // 添加边框
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
+    ctx.strokeStyle = 'hsl(var(--chart-series-1))';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    const circularAvatar = canvas.toDataURL();
+    
+    // 使用圆形头像更新图表
+    memoryChart?.setOption({
+      series: [{
+        markPoint: {
+          data: [
+            {
+              coord: [userMemoryIndex, memoryCounts[userMemoryIndex] ?? 0],
+              symbol: 'image://' + circularAvatar,
+              symbolSize: 32,
+              symbolOffset: [0, -20]
+            }
+          ]
+        }
+      }]
+    });
+  };
 };
 
 onMounted(() => {
