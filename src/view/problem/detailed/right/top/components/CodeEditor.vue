@@ -137,6 +137,6 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="container"
-    class="h-full w-full rounded-lg border bg-background/60"
+    class="h-full w-full"
   />
 </template>

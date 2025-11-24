@@ -109,7 +109,7 @@ onMounted(async () => {
 
         <ResizablePanel :defaultSize="55" class="min-w-[320px]">
           <Card class="flex h-full min-h-0 flex-col">
-            <CardContent class="flex min-h-0 flex-1 flex-col pt-3">
+            <CardContent class="flex min-h-0 flex-1 flex-col px-2 pt-3">
               <ResizablePanelGroup
                 direction="vertical"
                 class="flex-1 min-h-0 gap-3"
