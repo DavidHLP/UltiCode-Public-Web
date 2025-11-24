@@ -9,9 +9,7 @@ import {
 } from '@/components/ui/resizable';
 import type { HeaderModel } from "./components/types";
 
-const activeIndex = ref(0);
-const activeIndexTop = ref(0);
-const activeIndexBottom = ref(0);
+const activeHeaderId = ref(0); // 使用 header.index 作为唯一标识
 
 // 定义所有可用的 header 数据
 const allHeaderData: HeaderModel[] = [
@@ -69,31 +67,21 @@ const headerDataBottom = ref<HeaderModel[]>([
   allHeaderData[5]!, // 测试结果
 ]);
 
-const handleHeaderClick = (index: number) => {
-  activeIndex.value = index;
-  console.log('切换到标签页(左侧):', index);
-};
-
-const handleHeaderClickTop = (index: number) => {
-  activeIndexTop.value = index;
-  console.log('切换到标签页(右上):', index);
-};
-
-const handleHeaderClickBottom = (index: number) => {
-  activeIndexBottom.value = index;
-  console.log('切换到标签页(右下):', index);
+const handleHeaderClick = (headerId: number) => {
+  activeHeaderId.value = headerId;
+  console.log('切换到标签页:', headerId);
 };
 
 const currentTitle = computed(() => {
-  return headerDataLeft.value[activeIndex.value]?.title || '';
-});
-
-const currentTitleTop = computed(() => {
-  return headerDataTop.value[activeIndexTop.value]?.title || '';
-});
-
-const currentTitleBottom = computed(() => {
-  return headerDataBottom.value[activeIndexBottom.value]?.title || '';
+  // 在所有面板中查找当前激活的 header
+  const allHeaders = [
+    ...(headerDataLeft.value || []),
+    ...(headerDataTop.value || []),
+    ...(headerDataBottom.value || [])
+  ].filter(Boolean); // 过滤掉 undefined 或 null
+  
+  const activeHeader = allHeaders.find(h => h?.index === activeHeaderId.value);
+  return activeHeader?.title || '';
 });
 
 // 获取图标组件
@@ -122,21 +110,23 @@ const getIconComponent = (iconName: string) => {
               class="flex items-center gap-2"
               handle=".drag-handle"
             >
-              <template v-for="(header, index) in headerDataLeft" :key="header.index">
-                <button 
-                  class="drag-handle flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-move" 
-                  :class="header.color"
-                  @click="handleHeaderClick(index)"
-                >
-                  <component 
-                    :is="getIconComponent(header.icon)" 
-                    v-if="getIconComponent(header.icon)" 
-                    class="h-4 w-4" 
-                    :class="header.color || 'text-muted-foreground'"
-                  />
-                  <span class="whitespace-nowrap text-sm font-medium">{{ header.title }}</span>
-                </button>
-                <div v-if="index < headerDataLeft.length - 1" class="h-4 w-px bg-border" />
+              <template v-for="header in headerDataLeft" :key="header?.index || Math.random()">
+                <template v-if="header">
+                  <button 
+                    class="drag-handle flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-move"
+                    :class="[header.color, { 'opacity-50': activeHeaderId !== header.index }]"
+                    @click="handleHeaderClick(header.index)"
+                  >
+                    <component 
+                      :is="getIconComponent(header.icon)" 
+                      v-if="getIconComponent(header.icon)" 
+                      class="h-4 w-4" 
+                      :class="header.color || 'text-muted-foreground'"
+                    />
+                    <span class="whitespace-nowrap text-sm font-medium">{{ header.title }}</span>
+                  </button>
+                  <div v-if="header && header.index !== headerDataLeft[headerDataLeft.length - 1]?.index" class="h-4 w-px bg-border" />
+                </template>
               </template>
             </VueDraggable>
           </header>
@@ -147,7 +137,7 @@ const getIconComponent = (iconName: string) => {
               <h2 class="text-lg font-semibold">{{ currentTitle }}</h2>
             </div>
             <div class="flex-1 p-4 overflow-auto">
-              <p>当前选中的标签页索引: {{ activeIndex }}</p>
+              <p>当前选中的页面 ID: {{ activeHeaderId }}</p>
               <p class="mt-2 text-muted-foreground">这里是 {{ currentTitle }} 的内容区域</p>
             </div>
           </div>
@@ -156,7 +146,7 @@ const getIconComponent = (iconName: string) => {
           <footer class="flex items-center gap-2 bg-muted/50 px-2 py-1.5">
             <div class="flex items-center justify-between w-full">
               <div class="text-xs text-muted-foreground">Footer - {{ currentTitle }}</div>
-              <div class="text-xs text-muted-foreground">索引: {{ activeIndex }}</div>
+              <div class="text-xs text-muted-foreground">ID: {{ activeHeaderId }}</div>
             </div>
           </footer>
         </div>
@@ -179,21 +169,23 @@ const getIconComponent = (iconName: string) => {
                   class="flex items-center gap-2"
                   handle=".drag-handle"
                 >
-                  <template v-for="(header, index) in headerDataTop" :key="header.index">
-                    <button 
-                      class="drag-handle flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-move" 
-                      :class="header.color"
-                      @click="handleHeaderClickTop(index)"
-                    >
-                      <component 
-                        :is="getIconComponent(header.icon)" 
-                        v-if="getIconComponent(header.icon)" 
-                        class="h-4 w-4" 
-                        :class="header.color || 'text-muted-foreground'"
-                      />
-                      <span class="whitespace-nowrap text-sm font-medium">{{ header.title }}</span>
-                    </button>
-                    <div v-if="index < headerDataTop.length - 1" class="h-4 w-px bg-border" />
+                  <template v-for="header in headerDataTop" :key="header?.index || Math.random()">
+                    <template v-if="header">
+                      <button 
+                        class="drag-handle flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-move"
+                        :class="[header.color, { 'opacity-50': activeHeaderId !== header.index }]"
+                        @click="handleHeaderClick(header.index)"
+                      >
+                        <component 
+                          :is="getIconComponent(header.icon)" 
+                          v-if="getIconComponent(header.icon)" 
+                          class="h-4 w-4" 
+                          :class="header.color || 'text-muted-foreground'"
+                        />
+                        <span class="whitespace-nowrap text-sm font-medium">{{ header.title }}</span>
+                      </button>
+                      <div v-if="header && header.index !== headerDataTop[headerDataTop.length - 1]?.index" class="h-4 w-px bg-border" />
+                    </template>
                   </template>
                 </VueDraggable>
               </header>
@@ -201,16 +193,16 @@ const getIconComponent = (iconName: string) => {
               <!-- Main 区域 -->
               <div class="flex flex-1 flex-col min-h-0">
                 <div class="px-4 py-3 border-b">
-                  <h2 class="text-lg font-semibold">上部面板 - {{ currentTitleTop }}</h2>
+                  <h2 class="text-lg font-semibold">上部面板 - {{ currentTitle }}</h2>
                 </div>
                 <div class="flex-1 p-4 overflow-auto">
-                  <p class="text-muted-foreground">这是右侧上部的内容 - {{ currentTitleTop }}</p>
+                  <p class="text-muted-foreground">这是右侧上部的内容 - {{ currentTitle }}</p>
                 </div>
               </div>
               
               <!-- Footer 区域 -->
               <footer class="flex items-center gap-2 bg-muted/50 px-2 py-1.5">
-                <div class="text-xs text-muted-foreground">上部 Footer - {{ currentTitleTop }}</div>
+                <div class="text-xs text-muted-foreground">上部 Footer - {{ currentTitle }}</div>
               </footer>
             </div>
           </ResizablePanel>
@@ -229,21 +221,23 @@ const getIconComponent = (iconName: string) => {
                   class="flex items-center gap-2"
                   handle=".drag-handle"
                 >
-                  <template v-for="(header, index) in headerDataBottom" :key="header.index">
-                    <button 
-                      class="drag-handle flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-move" 
-                      :class="header.color"
-                      @click="handleHeaderClickBottom(index)"
-                    >
-                      <component 
-                        :is="getIconComponent(header.icon)" 
-                        v-if="getIconComponent(header.icon)" 
-                        class="h-4 w-4" 
-                        :class="header.color || 'text-muted-foreground'"
-                      />
-                      <span class="whitespace-nowrap text-sm font-medium">{{ header.title }}</span>
-                    </button>
-                    <div v-if="index < headerDataBottom.length - 1" class="h-4 w-px bg-border" />
+                  <template v-for="header in headerDataBottom" :key="header?.index || Math.random()">
+                    <template v-if="header">
+                      <button 
+                        class="drag-handle flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-move"
+                        :class="[header.color, { 'opacity-50': activeHeaderId !== header.index }]"
+                        @click="handleHeaderClick(header.index)"
+                      >
+                        <component 
+                          :is="getIconComponent(header.icon)" 
+                          v-if="getIconComponent(header.icon)" 
+                          class="h-4 w-4" 
+                          :class="header.color || 'text-muted-foreground'"
+                        />
+                        <span class="whitespace-nowrap text-sm font-medium">{{ header.title }}</span>
+                      </button>
+                      <div v-if="header && header.index !== headerDataBottom[headerDataBottom.length - 1]?.index" class="h-4 w-px bg-border" />
+                    </template>
                   </template>
                 </VueDraggable>
               </header>
@@ -251,16 +245,16 @@ const getIconComponent = (iconName: string) => {
               <!-- Main 区域 -->
               <div class="flex flex-1 flex-col min-h-0">
                 <div class="px-4 py-3 border-b">
-                  <h2 class="text-lg font-semibold">下部面板 - {{ currentTitleBottom }}</h2>
+                  <h2 class="text-lg font-semibold">下部面板 - {{ currentTitle }}</h2>
                 </div>
                 <div class="flex-1 p-4 overflow-auto">
-                  <p class="text-muted-foreground">这是右侧下部的内容 - {{ currentTitleBottom }}</p>
+                  <p class="text-muted-foreground">这是右侧下部的内容 - {{ currentTitle }}</p>
                 </div>
               </div>
               
               <!-- Footer 区域 -->
               <footer class="flex items-center gap-2 bg-muted/50 px-2 py-1.5">
-                <div class="text-xs text-muted-foreground">下部 Footer - {{ currentTitleBottom }}</div>
+                <div class="text-xs text-muted-foreground">下部 Footer - {{ currentTitle }}</div>
               </footer>
             </div>
           </ResizablePanel>
