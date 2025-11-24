@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import HeaderComponent from './HeaderComponent.vue';
 import MainComponent from './MainComponent.vue';
 import FooterComponent from './FooterComponent.vue';
-import type { LayoutProps } from '../composables/types';
+import type { LayoutProps } from '../composables/types.ts';
 import { useDemoStore } from '@/view/demo';
 import { storeToRefs } from 'pinia';
 
