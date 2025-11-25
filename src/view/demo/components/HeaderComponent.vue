@@ -2,9 +2,9 @@
 import { type Component, ref, watch } from "vue";
 import { VueDraggable } from "vue-draggable-plus";
 import * as LucideIcons from "lucide-vue-next";
-import type { HeaderModel } from "../store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import type { HeaderModel } from "@/stores/headerStore";
 
 const props = defineProps<{
   headers: HeaderModel[];
@@ -39,20 +39,20 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <header class="flex items-center border-b bg-[#fafafa] py-2">
+  <header class="flex items-center border-b bg-[#fafafa] py-1">
     <VueDraggable
       v-model="localHeaders"
       :animation="200"
       :group="props.group || 'headers'"
-      class="flex items-center min-h-[40px]"
+      class="flex items-center min-h-[32px]"
       @end="handleDragEnd"
     >
       <div
         v-for="(header, idx) in localHeaders"
         :key="header.id"
-        class="flex items-center h-4 cursor-move"
+        class="flex items-center h-3 cursor-move"
       >
-        <Separator v-if="idx > 0" orientation="vertical" />
+        <Separator v-if="idx > 0" orientation="vertical" class="h-3" />
         <Button
           variant="ghost"
           size="sm"
