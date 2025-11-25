@@ -1,13 +1,27 @@
 <script setup lang="ts">
-import { type Component } from "vue";
+import { type Component, ref, watch } from "vue";
+import { VueDraggable } from "vue-draggable-plus";
 import * as LucideIcons from "lucide-vue-next";
 import type { HeaderModel } from "../store";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-const { headers } = defineProps<{
+const props = defineProps<{
   headers: HeaderModel[];
+  onUpdate: (newHeaders: HeaderModel[]) => void;
+  group?: string;
 }>();
+
+const localHeaders = ref<HeaderModel[]>([...props.headers]);
+
+// 监听 props 变化并同步到本地状态
+watch(
+  () => props.headers,
+  (newHeaders) => {
+    localHeaders.value = [...newHeaders];
+  },
+  { deep: true }
+);
 
 const getIconComponent = (iconName?: string): Component | null => {
   if (!iconName) return null;
@@ -18,31 +32,45 @@ const getIconComponent = (iconName?: string): Component | null => {
   }
   return null;
 };
+
+const handleDragEnd = () => {
+  props.onUpdate(localHeaders.value);
+};
 </script>
 
 <template>
-  <header class="flex items-center gap-1 bg-muted/50 px-2 py-1.5">
-    <template v-for="(header, idx) in headers" :key="header.id">
-      <Separator v-if="idx > 0" orientation="vertical" class="h-4" />
-      <Button
-        variant="ghost"
-        size="sm"
-        class="flex items-center gap-1"
-        :style="{
-          color: header.color,
-          backgroundColor: header.bgColor,
-        }"
+  <header class="flex items-center border-b bg-[#fafafa] py-2">
+    <VueDraggable
+      v-model="localHeaders"
+      :animation="200"
+      :group="props.group || 'headers'"
+      class="flex items-center min-h-[40px]"
+      @end="handleDragEnd"
+    >
+      <div
+        v-for="(header, idx) in localHeaders"
+        :key="header.id"
+        class="flex items-center h-4 cursor-move"
       >
-        <component
-          :is="getIconComponent(header.icon)"
-          v-if="getIconComponent(header.icon)"
-          class="h-3.5 w-3.5"
-          :style="{ color: header.iconColor || header.color }"
-        />
-        <div class="whitespace-nowrap text-sm font-medium">
-          {{ header.title }}
-        </div>
-      </Button>
-    </template>
+        <Separator v-if="idx > 0" orientation="vertical" />
+        <Button
+          variant="ghost"
+          size="sm"
+          :style="{
+            color: header.color,
+            backgroundColor: header.bgColor,
+          }"
+        >
+          <component
+            :is="getIconComponent(header.icon)"
+            v-if="getIconComponent(header.icon)"
+            :style="{ color: header.iconColor || header.color }"
+          />
+          <span>
+            {{ header.title }}
+          </span>
+        </Button>
+      </div>
+    </VueDraggable>
   </header>
 </template>
