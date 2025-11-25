@@ -12,12 +12,13 @@ const props = defineProps<{
   group: string;
   isDragging: boolean;
   isOver: boolean;
+  dropPosition?: 'before' | 'after' | null;
   showSeparator: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'drag-start', event: PointerEvent, handleStart: (e: PointerEvent) => void): void;
-  (e: 'drag-over'): void;
+  (e: 'drag-over', event: PointerEvent): void;
   (e: 'drag-end'): void;
 }>();
 
@@ -47,6 +48,10 @@ const onPointerDown = (e: PointerEvent) => {
   emit('drag-start', e, handleDragStart);
 };
 
+const onPointerOver = (e: PointerEvent) => {
+  emit('drag-over', e);
+};
+
 const setRef = (el: unknown) => {
   if (el) {
     draggableRef.value = el as HTMLElement;
@@ -58,13 +63,14 @@ const setRef = (el: unknown) => {
 <template>
   <div
     :ref="setRef"
-    class="flex items-center h-3 cursor-move"
+    class="flex items-center h-3 cursor-move relative"
     :class="{
-      'border-l-2 border-blue-500': isOver,
+      'before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500': isOver && dropPosition === 'before',
+      'after:absolute after:right-0 after:top-0 after:bottom-0 after:w-0.5 after:bg-blue-500': isOver && dropPosition === 'after',
     }"
     :style="{ touchAction: 'none' }"
     @pointerdown="onPointerDown"
-    @pointerover="emit('drag-over')"
+    @pointerover="onPointerOver"
     @pointerup="emit('drag-end')"
   >
     <Separator v-if="showSeparator" orientation="vertical" class="h-3" />

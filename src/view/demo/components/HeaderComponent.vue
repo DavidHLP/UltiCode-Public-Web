@@ -12,6 +12,7 @@ const props = defineProps<{
 const localHeaders = ref<HeaderModel[]>([...props.headers]);
 const draggedIndex = ref<number | null>(null);
 const overIndex = ref<number | null>(null);
+const dropPosition = ref<'before' | 'after' | null>(null);
 
 const dragState = inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>('dragState');
 const moveHeaderBetweenGroups = inject<(
@@ -38,9 +39,17 @@ const handleDragStart = (index: number, event: PointerEvent, handleStart: (e: Po
   handleStart(event);
 };
 
-const handleDragOver = (index: number) => {
+const handleDragOver = (index: number, event: PointerEvent) => {
   if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null) {
+    const target = event.currentTarget as HTMLElement;
+    if (!target) return;
+    
+    const rect = target.getBoundingClientRect();
+    const mouseX = event.clientX;
+    const elementCenter = rect.left + rect.width / 2;
+    
     overIndex.value = index;
+    dropPosition.value = mouseX < elementCenter ? 'before' : 'after';
   }
 };
 
@@ -49,14 +58,19 @@ const handleDragEnd = () => {
     const sourceGroupId = dragState.value.sourceGroupId;
     const sourceIndex = dragState.value.sourceIndex;
     const targetGroupId = props.group || 'default';
-    const targetIndex = overIndex.value;
+    let targetIndex = overIndex.value;
+    
+    if (dropPosition.value === 'after') {
+      targetIndex += 1;
+    }
 
     if (sourceGroupId === targetGroupId) {
       if (sourceIndex !== targetIndex) {
         const newHeaders = [...localHeaders.value];
         const [movedItem] = newHeaders.splice(sourceIndex, 1);
         if (movedItem) {
-          newHeaders.splice(targetIndex, 0, movedItem);
+          const adjustedTargetIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
+          newHeaders.splice(adjustedTargetIndex, 0, movedItem);
           localHeaders.value = newHeaders;
           props.onUpdate(newHeaders);
         }
@@ -70,6 +84,7 @@ const handleDragEnd = () => {
   
   draggedIndex.value = null;
   overIndex.value = null;
+  dropPosition.value = null;
   if (dragState) {
     dragState.value.sourceGroupId = null;
     dragState.value.sourceIndex = null;
@@ -88,9 +103,10 @@ const handleDragEnd = () => {
         :group="group || 'default'"
         :is-dragging="draggedIndex === idx"
         :is-over="overIndex === idx && draggedIndex !== idx"
+        :drop-position="overIndex === idx ? dropPosition : null"
         :show-separator="idx > 0"
         @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
-        @drag-over="handleDragOver(idx)"
+        @drag-over="(event) => handleDragOver(idx, event)"
         @drag-end="handleDragEnd"
       />
     </div>
