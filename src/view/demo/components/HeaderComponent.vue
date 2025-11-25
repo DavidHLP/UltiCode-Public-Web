@@ -14,6 +14,7 @@ const props = defineProps<{
   isOver: boolean;
   dropPosition?: 'before' | 'after' | null;
   showSeparator: boolean;
+  isActive?: boolean; // 添加是否激活的属性
 }>();
 
 const emit = defineEmits<{
@@ -83,6 +84,10 @@ const setRef = (el: unknown) => {
     <Button
       variant="ghost"
       size="sm"
+      class="relative"
+      :class="{
+        'opacity-60': !isActive,
+      }"
       :style="{
         color: header.color,
         backgroundColor: header.bgColor,
@@ -94,7 +99,20 @@ const setRef = (el: unknown) => {
         v-if="getIconComponent(header.icon)"
         :style="{ color: header.iconColor || header.color }"
       />
-      <span>{{ header.title }}</span>
+      <span class="relative">
+        <span class="font-medium">{{ header.title }}</span>
+        <span 
+          v-if="!isActive"
+          class="absolute left-0 top-0 whitespace-nowrap font-normal opacity-60"
+        >
+          {{ header.title }}
+        </span>
+      </span>
     </Button>
+    <!-- 未激活时添加遮罩层 -->
+    <div 
+      v-if="!isActive"
+      class="absolute inset-0 bg-gray-200/30 pointer-events-none"
+    />
   </div>
 </template>

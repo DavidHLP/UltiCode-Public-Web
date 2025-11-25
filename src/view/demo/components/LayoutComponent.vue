@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, inject, type Ref } from "vue";
+import { ref, watch, inject, type Ref, onMounted } from "vue";
 import type { HeaderModel } from "@/stores/headerStore";
 import HeaderComponent from "./HeaderComponent.vue";
 import MainComponent from "./MainComponent.vue";
@@ -32,6 +32,24 @@ watch(
     localHeaders.value = [...newHeaders];
   },
   { deep: true }
+);
+
+// 在组件挂载时设置默认选中第一个头部
+onMounted(() => {
+  if (localHeaders.value.length > 0 && !activeHeader.value) {
+    activeHeader.value = localHeaders.value[0] || null;
+  }
+});
+
+// 监听 headers 变化，如果当前没有选中项且有头部项，则选中第一个
+watch(
+  () => localHeaders.value,
+  (newHeaders) => {
+    if (newHeaders.length > 0 && !activeHeader.value) {
+      activeHeader.value = newHeaders[0] || null;
+    }
+  },
+  { immediate: true }
 );
 
 const handleDragStart = (index: number, event: PointerEvent, handleStart: (e: PointerEvent) => void) => {
@@ -102,7 +120,7 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col h-full">
     <header class="flex items-center border-b bg-[#fafafa] py-1">
       <div class="flex items-center min-h-[32px]">
         <HeaderComponent
@@ -115,6 +133,7 @@ const handleDragEnd = () => {
           :is-over="overIndex === idx && draggedIndex !== idx"
           :drop-position="overIndex === idx ? dropPosition : null"
           :show-separator="idx > 0"
+          :is-active="activeHeader?.id === header.id"
           @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
           @drag-over="(event) => handleDragOver(idx, event)"
           @drag-end="handleDragEnd"
@@ -125,7 +144,7 @@ const handleDragEnd = () => {
     <main>
       <div class="flex-grow overflow-auto">
         <!-- 将活动头部传递给 MainComponent -->
-        <MainComponent :active-header="activeHeader" />
+        <MainComponent :active-header="activeHeader || null" />
       </div>
     </main>
   </div>
