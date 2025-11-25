@@ -4,16 +4,14 @@ import type { HeaderModel } from "@/stores/headerStore";
 import HeaderComponent from "./HeaderComponent.vue";
 import MainComponent from "./MainComponent.vue";
 
-
 const props = defineProps<{
   headers: HeaderModel[];
   onUpdate: (newHeaders: HeaderModel[]) => void;
   group?: string;
 }>();
 
-const emit = defineEmits<{
-  (e: 'header-select', header: HeaderModel, group: string): void;
-}>();
+// 每个 LayoutComponent 维护自己的活动头部状态
+const activeHeader = ref<HeaderModel | null>(null);
 
 const localHeaders = ref<HeaderModel[]>([...props.headers]);
 const draggedIndex = ref<number | null>(null);
@@ -59,8 +57,9 @@ const handleDragOver = (index: number, event: PointerEvent) => {
   }
 };
 
-const handleHeaderClick = (header: HeaderModel, group: string) => {
-  emit('header-select', header, group);
+// 处理头部选择事件
+const handleHeaderSelect = (header: HeaderModel) => {
+  activeHeader.value = header;
 };
 
 const handleDragEnd = () => {
@@ -103,28 +102,31 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <header class="flex items-center border-b bg-[#fafafa] py-1">
-    <div class="flex items-center min-h-[32px]">
-      <HeaderComponent
-        v-for="(header, idx) in localHeaders"
-        :key="header.id"
-        :header="header"
-        :index="idx"
-        :group="group || 'default'"
-        :is-dragging="draggedIndex === idx"
-        :is-over="overIndex === idx && draggedIndex !== idx"
-        :drop-position="overIndex === idx ? dropPosition : null"
-        :show-separator="idx > 0"
-        @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
-        @drag-over="(event) => handleDragOver(idx, event)"
-        @drag-end="handleDragEnd"
-        @header-click="handleHeaderClick"
-      />
-    </div>
-  </header>
-  <main>
-    <div class="flex-grow overflow-auto">
-      <MainComponent />
-    </div>
-  </main>
+  <div>
+    <header class="flex items-center border-b bg-[#fafafa] py-1">
+      <div class="flex items-center min-h-[32px]">
+        <HeaderComponent
+          v-for="(header, idx) in localHeaders"
+          :key="header.id"
+          :header="header"
+          :index="idx"
+          :group="group || 'default'"
+          :is-dragging="draggedIndex === idx"
+          :is-over="overIndex === idx && draggedIndex !== idx"
+          :drop-position="overIndex === idx ? dropPosition : null"
+          :show-separator="idx > 0"
+          @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
+          @drag-over="(event) => handleDragOver(idx, event)"
+          @drag-end="handleDragEnd"
+          @header-click="handleHeaderSelect"
+        />
+      </div>
+    </header>
+    <main>
+      <div class="flex-grow overflow-auto">
+        <!-- 将活动头部传递给 MainComponent -->
+        <MainComponent :active-header="activeHeader" />
+      </div>
+    </main>
+  </div>
 </template>

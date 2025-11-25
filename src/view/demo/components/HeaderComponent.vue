@@ -20,7 +20,7 @@ const emit = defineEmits<{
   (e: 'drag-start', event: PointerEvent, handleStart: (e: PointerEvent) => void): void;
   (e: 'drag-over', event: PointerEvent): void;
   (e: 'drag-end'): void;
-  (e: 'header-click', header: HeaderModel, group: string): void;
+  (e: 'header-click', header: HeaderModel): void; // 修改事件定义，不再传递 group
 }>();
 
 const headerId = computed(() => `header-${props.group}-${props.header.id}-${props.index}`);
@@ -54,7 +54,8 @@ const onPointerOver = (e: PointerEvent) => {
 };
 
 const onHeaderClick = () => {
-  emit('header-click', props.header, props.group);
+  // 修改事件触发，不再传递 group
+  emit('header-click', props.header);
 };
 
 const setRef = (el: unknown) => {
