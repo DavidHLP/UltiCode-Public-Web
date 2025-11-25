@@ -18,7 +18,6 @@ export interface HeaderGroup {
 }
 
 export const useHeaderStore = defineStore("header", () => {
-  // 动态菜单组列表
   const headerGroups = ref<HeaderGroup[]>([
     {
       id: "main-menu",
@@ -38,7 +37,6 @@ export const useHeaderStore = defineStore("header", () => {
     },
   ]);
 
-  // 更新指定组的 headers
   const updateGroupHeaders = (groupId: string, newHeaders: HeaderModel[]) => {
     const group = headerGroups.value.find((g) => g.id === groupId);
     if (group) {
@@ -49,8 +47,36 @@ export const useHeaderStore = defineStore("header", () => {
     }
   };
 
+  const moveHeaderBetweenGroups = (
+    sourceGroupId: string,
+    targetGroupId: string,
+    sourceIndex: number,
+    targetIndex: number
+  ) => {
+    const sourceGroup = headerGroups.value.find((g) => g.id === sourceGroupId);
+    const targetGroup = headerGroups.value.find((g) => g.id === targetGroupId);
+
+    if (!sourceGroup || !targetGroup) return;
+
+    const [movedItem] = sourceGroup.headers.splice(sourceIndex, 1);
+    if (movedItem) {
+      targetGroup.headers.splice(targetIndex, 0, movedItem);
+      
+      sourceGroup.headers = sourceGroup.headers.map((header, idx) => ({
+        ...header,
+        index: idx,
+      }));
+      
+      targetGroup.headers = targetGroup.headers.map((header, idx) => ({
+        ...header,
+        index: idx,
+      }));
+    }
+  };
+
   return {
     headerGroups,
     updateGroupHeaders,
+    moveHeaderBetweenGroups,
   };
 });

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { type Component, ref, watch } from "vue";
-import { VueDraggable } from "vue-draggable-plus";
-import * as LucideIcons from "lucide-vue-next";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { ref, watch, inject, type Ref } from "vue";
 import type { HeaderModel } from "@/stores/headerStore";
+import HeaderItem from "./HeaderItem.vue";
 
 const props = defineProps<{
   headers: HeaderModel[];
@@ -13,8 +10,17 @@ const props = defineProps<{
 }>();
 
 const localHeaders = ref<HeaderModel[]>([...props.headers]);
+const draggedIndex = ref<number | null>(null);
+const overIndex = ref<number | null>(null);
 
-// 监听 props 变化并同步到本地状态
+const dragState = inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>('dragState');
+const moveHeaderBetweenGroups = inject<(
+  sourceGroupId: string,
+  targetGroupId: string,
+  sourceIndex: number,
+  targetIndex: number
+) => void>('moveHeaderBetweenGroups');
+
 watch(
   () => props.headers,
   (newHeaders) => {
@@ -23,54 +29,70 @@ watch(
   { deep: true }
 );
 
-const getIconComponent = (iconName?: string): Component | null => {
-  if (!iconName) return null;
-  const icon = (LucideIcons as Record<string, unknown>)[iconName];
-  // 检查是否是有效的组件（可以是对象或函数）
-  if (icon && (typeof icon === "object" || typeof icon === "function")) {
-    return icon as Component;
+const handleDragStart = (index: number, event: PointerEvent, handleStart: (e: PointerEvent) => void) => {
+  draggedIndex.value = index;
+  if (dragState) {
+    dragState.value.sourceGroupId = props.group || 'default';
+    dragState.value.sourceIndex = index;
   }
-  return null;
+  handleStart(event);
+};
+
+const handleDragOver = (index: number) => {
+  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null) {
+    overIndex.value = index;
+  }
 };
 
 const handleDragEnd = () => {
-  props.onUpdate(localHeaders.value);
+  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null && overIndex.value !== null) {
+    const sourceGroupId = dragState.value.sourceGroupId;
+    const sourceIndex = dragState.value.sourceIndex;
+    const targetGroupId = props.group || 'default';
+    const targetIndex = overIndex.value;
+
+    if (sourceGroupId === targetGroupId) {
+      if (sourceIndex !== targetIndex) {
+        const newHeaders = [...localHeaders.value];
+        const [movedItem] = newHeaders.splice(sourceIndex, 1);
+        if (movedItem) {
+          newHeaders.splice(targetIndex, 0, movedItem);
+          localHeaders.value = newHeaders;
+          props.onUpdate(newHeaders);
+        }
+      }
+    } else {
+      if (moveHeaderBetweenGroups) {
+        moveHeaderBetweenGroups(sourceGroupId, targetGroupId, sourceIndex, targetIndex);
+      }
+    }
+  }
+  
+  draggedIndex.value = null;
+  overIndex.value = null;
+  if (dragState) {
+    dragState.value.sourceGroupId = null;
+    dragState.value.sourceIndex = null;
+  }
 };
 </script>
 
 <template>
   <header class="flex items-center border-b bg-[#fafafa] py-1">
-    <VueDraggable
-      v-model="localHeaders"
-      :animation="200"
-      :group="props.group || 'headers'"
-      class="flex items-center min-h-[32px]"
-      @end="handleDragEnd"
-    >
-      <div
+    <div class="flex items-center min-h-[32px]">
+      <HeaderItem
         v-for="(header, idx) in localHeaders"
         :key="header.id"
-        class="flex items-center h-3 cursor-move"
-      >
-        <Separator v-if="idx > 0" orientation="vertical" class="h-3" />
-        <Button
-          variant="ghost"
-          size="sm"
-          :style="{
-            color: header.color,
-            backgroundColor: header.bgColor,
-          }"
-        >
-          <component
-            :is="getIconComponent(header.icon)"
-            v-if="getIconComponent(header.icon)"
-            :style="{ color: header.iconColor || header.color }"
-          />
-          <span>
-            {{ header.title }}
-          </span>
-        </Button>
-      </div>
-    </VueDraggable>
+        :header="header"
+        :index="idx"
+        :group="group || 'default'"
+        :is-dragging="draggedIndex === idx"
+        :is-over="overIndex === idx && draggedIndex !== idx"
+        :show-separator="idx > 0"
+        @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
+        @drag-over="handleDragOver(idx)"
+        @drag-end="handleDragEnd"
+      />
+    </div>
   </header>
 </template>
