@@ -45,7 +45,10 @@ onMounted(() => {
 watch(
   () => localHeaders.value,
   (newHeaders) => {
-    if (newHeaders.length > 0 && !activeHeader.value) {
+    const activeId = activeHeader.value?.id;
+    const stillExists = activeId !== undefined && newHeaders.some((header) => header.id === activeId);
+    // 如果当前激活项被移出（例如被拖拽到其他组），重置为当前列表的第一个或空
+    if (!stillExists) {
       activeHeader.value = newHeaders[0] || null;
     }
   },
