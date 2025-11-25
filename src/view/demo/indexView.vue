@@ -5,19 +5,18 @@ import HeaderComponent from "./components/HeaderComponent.vue";
 
 // 使用 Pinia store
 const headerStore = useHeaderStore();
-const { mainMenuHeaders, userMenuHeaders } = storeToRefs(headerStore);
-const { updateMainMenuHeaders, updateUserMenuHeaders } = headerStore;
+const { headerGroups } = storeToRefs(headerStore);
+const {
+  updateGroupHeaders
+} = headerStore;
 </script>
 
 <template>
-  <HeaderComponent
-    :headers="mainMenuHeaders"
-    :on-update="updateMainMenuHeaders"
-    group="shared-headers"
-  />
-  <HeaderComponent
-    :headers="userMenuHeaders"
-    :on-update="updateUserMenuHeaders"
-    group="shared-headers"
+  <HeaderComponent 
+    v-for="group in headerGroups" 
+    :key="group.id" 
+    :headers="group.headers" 
+    :on-update="(newHeaders) => updateGroupHeaders(group.id, newHeaders)"
+    v-show="group.headers.length > 0"
   />
 </template>
