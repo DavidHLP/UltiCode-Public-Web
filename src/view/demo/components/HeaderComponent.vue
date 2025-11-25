@@ -1,114 +1,99 @@
 <script setup lang="ts">
-import { ref, watch, inject, type Ref } from "vue";
+import { computed } from "vue";
+import { useDraggable, useDroppable } from "@vue-dnd-kit/core";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import type { HeaderModel } from "@/stores/headerStore";
-import HeaderItem from "./HeaderItem.vue";
+import * as LucideIcons from "lucide-vue-next";
 
 const props = defineProps<{
-  headers: HeaderModel[];
-  onUpdate: (newHeaders: HeaderModel[]) => void;
-  group?: string;
+  header: HeaderModel;
+  index: number;
+  group: string;
+  isDragging: boolean;
+  isOver: boolean;
+  dropPosition?: 'before' | 'after' | null;
+  showSeparator: boolean;
 }>();
 
-const localHeaders = ref<HeaderModel[]>([...props.headers]);
-const draggedIndex = ref<number | null>(null);
-const overIndex = ref<number | null>(null);
-const dropPosition = ref<'before' | 'after' | null>(null);
+const emit = defineEmits<{
+  (e: 'drag-start', event: PointerEvent, handleStart: (e: PointerEvent) => void): void;
+  (e: 'drag-over', event: PointerEvent): void;
+  (e: 'drag-end'): void;
+  (e: 'header-click', header: HeaderModel, group: string): void;
+}>();
 
-const dragState = inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>('dragState');
-const moveHeaderBetweenGroups = inject<(
-  sourceGroupId: string,
-  targetGroupId: string,
-  sourceIndex: number,
-  targetIndex: number
-) => void>('moveHeaderBetweenGroups');
+const headerId = computed(() => `header-${props.group}-${props.header.id}-${props.index}`);
 
-watch(
-  () => props.headers,
-  (newHeaders) => {
-    localHeaders.value = [...newHeaders];
-  },
-  { deep: true }
-);
+const { elementRef: draggableRef, handleDragStart } = useDraggable({
+  id: headerId.value,
+  data: { index: props.index, groupId: props.group },
+  groups: ['headers'],
+});
 
-const handleDragStart = (index: number, event: PointerEvent, handleStart: (e: PointerEvent) => void) => {
-  draggedIndex.value = index;
-  if (dragState) {
-    dragState.value.sourceGroupId = props.group || 'default';
-    dragState.value.sourceIndex = index;
+const { elementRef: droppableRef } = useDroppable({
+  data: { index: props.index, groupId: props.group },
+  groups: ['headers'],
+});
+
+const getIconComponent = (iconName?: string) => {
+  if (!iconName) return null;
+  const icon = (LucideIcons as Record<string, unknown>)[iconName];
+  if (icon && (typeof icon === "object" || typeof icon === "function")) {
+    return icon;
   }
-  handleStart(event);
+  return null;
 };
 
-const handleDragOver = (index: number, event: PointerEvent) => {
-  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null) {
-    const target = event.currentTarget as HTMLElement;
-    if (!target) return;
-    
-    const rect = target.getBoundingClientRect();
-    const mouseX = event.clientX;
-    const elementCenter = rect.left + rect.width / 2;
-    
-    overIndex.value = index;
-    dropPosition.value = mouseX < elementCenter ? 'before' : 'after';
-  }
+const onPointerDown = (e: PointerEvent) => {
+  emit('drag-start', e, handleDragStart);
 };
 
-const handleDragEnd = () => {
-  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null && overIndex.value !== null) {
-    const sourceGroupId = dragState.value.sourceGroupId;
-    const sourceIndex = dragState.value.sourceIndex;
-    const targetGroupId = props.group || 'default';
-    let targetIndex = overIndex.value;
-    
-    if (dropPosition.value === 'after') {
-      targetIndex += 1;
-    }
+const onPointerOver = (e: PointerEvent) => {
+  emit('drag-over', e);
+};
 
-    if (sourceGroupId === targetGroupId) {
-      if (sourceIndex !== targetIndex) {
-        const newHeaders = [...localHeaders.value];
-        const [movedItem] = newHeaders.splice(sourceIndex, 1);
-        if (movedItem) {
-          const adjustedTargetIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
-          newHeaders.splice(adjustedTargetIndex, 0, movedItem);
-          localHeaders.value = newHeaders;
-          props.onUpdate(newHeaders);
-        }
-      }
-    } else {
-      if (moveHeaderBetweenGroups) {
-        moveHeaderBetweenGroups(sourceGroupId, targetGroupId, sourceIndex, targetIndex);
-      }
-    }
-  }
-  
-  draggedIndex.value = null;
-  overIndex.value = null;
-  dropPosition.value = null;
-  if (dragState) {
-    dragState.value.sourceGroupId = null;
-    dragState.value.sourceIndex = null;
+const onHeaderClick = () => {
+  emit('header-click', props.header, props.group);
+};
+
+const setRef = (el: unknown) => {
+  if (el) {
+    draggableRef.value = el as HTMLElement;
+    droppableRef.value = el as HTMLElement;
   }
 };
 </script>
 
 <template>
-  <header class="flex items-center border-b bg-[#fafafa] py-1">
-    <div class="flex items-center min-h-[32px]">
-      <HeaderItem
-        v-for="(header, idx) in localHeaders"
-        :key="header.id"
-        :header="header"
-        :index="idx"
-        :group="group || 'default'"
-        :is-dragging="draggedIndex === idx"
-        :is-over="overIndex === idx && draggedIndex !== idx"
-        :drop-position="overIndex === idx ? dropPosition : null"
-        :show-separator="idx > 0"
-        @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
-        @drag-over="(event) => handleDragOver(idx, event)"
-        @drag-end="handleDragEnd"
+  <div
+    :ref="setRef"
+    class="flex items-center h-3 cursor-move relative"
+    :class="{
+      'before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500': isOver && dropPosition === 'before',
+      'after:absolute after:right-0 after:top-0 after:bottom-0 after:w-0.5 after:bg-blue-500': isOver && dropPosition === 'after',
+    }"
+    :style="{ touchAction: 'none' }"
+    @pointerdown="onPointerDown"
+    @pointerover="onPointerOver"
+    @pointerup="emit('drag-end')"
+  >
+    <Separator v-if="showSeparator" orientation="vertical" class="h-3" />
+    <Button
+      variant="ghost"
+      size="sm"
+      :style="{
+        color: header.color,
+        backgroundColor: header.bgColor,
+      }"
+      @click="onHeaderClick"
+    >
+      <component
+        :is="getIconComponent(header.icon)"
+        v-if="getIconComponent(header.icon)"
+        :style="{ color: header.iconColor || header.color }"
       />
-    </div>
-  </header>
+      <span>{{ header.title }}</span>
+    </Button>
+  </div>
 </template>
