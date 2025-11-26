@@ -1,13 +1,32 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useHeaderStore, type HeaderGroup, type LayoutNode } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import DynamicLayout from "./components/layout/DynamicLayout.vue";
 import { Button } from "@/components/ui/button";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
+import {
+  Bookmark,
+  ThumbsDown,
+  ThumbsUp,
+} from "lucide-vue-next";
+import logoIcon from "@/ico/favicon.ico";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
 const { updateLayout } = headerStore;
+
+// 模拟problem对象用于header显示
+const problem = ref({
+  likes: 12,
+  dislikes: 3,
+});
 
 // 定义页面结构元数据 - 按照新的分组方式
 const initialHeaderGroups: HeaderGroup[] = [
@@ -107,19 +126,94 @@ onMounted(() => {
 
 <template>
   <div class="h-screen w-full flex flex-col">
-    <!-- 布局切换控制栏 -->
-    <div class="flex gap-2 p-4 border-b bg-gray-50">
-      <Button variant="outline" @click="updateLayout(programmingLayout)">
-        编程练习布局
-      </Button>
-      <Button variant="outline" @click="updateLayout(balancedLayout)">
-        平衡布局
-      </Button>
-    </div>
+    <!-- Header -->
+    <nav
+      class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 border-b bg-[#f0f0f0] px-2.5"
+    >
+      <Menubar
+        class="flex h-8 min-w-[240px] flex-1 items-center gap-2 overflow-hidden border-none bg-transparent p-0 shadow-none"
+      >
+        <RouterLink to="/" class="mr-1 flex items-center gap-1">
+          <img :src="logoIcon" alt="Ulticode" class="h-5 w-5" />
+        </RouterLink>
+        <span class="h-4 w-px bg-border" />
+
+        <MenubarMenu>
+          <MenubarTrigger
+            class="flex h-8 items-center gap-2 px-2 py-1 text-xs text-muted-foreground hover:bg-accent/40"
+          >
+            <span>题库</span>
+          </MenubarTrigger>
+          <MenubarContent>
+            <MenubarItem as-child>
+              <RouterLink :to="{ name: 'problemset' }" class="block w-full">
+                题库首页
+              </RouterLink>
+            </MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+
+        <span class="h-7 w-px bg-border" />
+
+        <div class="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-8 rounded-none px-3 text-xs font-medium"
+            @click="updateLayout(programmingLayout)"
+          >
+            编程练习布局
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            class="h-8 rounded-none px-3 text-xs font-medium"
+            @click="updateLayout(balancedLayout)"
+          >
+            平衡布局
+          </Button>
+        </div>
+      </Menubar>
+
+      <div
+        class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2"
+      >
+        <div
+          class="pointer-events-auto flex overflow-hidden rounded bg-muted/60 text-xs shadow-sm backdrop-blur-sm dark:bg-muted/40"
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            class="h-8 rounded-none px-3 text-xs font-medium text-muted-foreground hover:bg-transparent"
+          >
+            Run
+          </Button>
+          <span class="my-1 h-6 w-px bg-border/60" />
+          <Button size="sm" class="h-8 rounded-none px-3 text-xs font-medium">
+            Submit
+          </Button>
+        </div>
+      </div>
+
+      <div class="hidden flex-none items-center gap-2 md:flex">
+        <Button variant="outline" size="sm" class="gap-1">
+          <ThumbsUp class="h-4 w-4" />
+          <span class="text-xs">{{ problem?.likes || 0 }}</span>
+        </Button>
+        <Button variant="outline" size="sm" class="gap-1">
+          <ThumbsDown class="h-4 w-4" />
+          <span class="text-xs">{{ problem?.dislikes || 0 }}</span>
+        </Button>
+        <Button variant="outline" size="sm" class="gap-1">
+          <Bookmark class="h-4 w-4" />
+          <span class="text-xs">Save</span>
+        </Button>
+      </div>
+    </nav>
 
     <!-- 动态布局区域 -->
-    <div class="flex-1 overflow-hidden">
+    <main class="flex-1 overflow-hidden">
       <DynamicLayout v-if="layoutConfig" :layout="layoutConfig" />
-    </div>
+    </main>
   </div>
 </template>
