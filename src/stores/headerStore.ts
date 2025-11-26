@@ -17,18 +17,25 @@ export interface HeaderGroup {
   headers: HeaderModel[];
 }
 
-export type LayoutMode = 'preset' | 'leet';
+export interface LayoutNode {
+  id: string;
+  type: 'container' | 'leaf';
+  direction?: 'horizontal' | 'vertical';
+  size?: number;
+  children?: LayoutNode[];
+  groupId?: string;
+}
 
 export const useHeaderStore = defineStore("header", () => {
-  const layoutMode = ref<LayoutMode>('preset');
+  const layoutConfig = ref<LayoutNode | null>(null);
   const activeGroupId = ref<string | null>(null);
   const headerGroups = ref<HeaderGroup[]>([]);
 
   const visibleGroups = computed(() => headerGroups.value.filter(g => g.headers.length > 0));
 
-  const initData = (groups: HeaderGroup[], mode: LayoutMode = 'preset') => {
+  const initData = (groups: HeaderGroup[], layout: LayoutNode) => {
     headerGroups.value = groups;
-    layoutMode.value = mode;
+    layoutConfig.value = layout;
     // 默认选中第一个有内容的组
     const firstVisible = groups.find(g => g.headers.length > 0);
     if (firstVisible) {
@@ -73,23 +80,23 @@ export const useHeaderStore = defineStore("header", () => {
     }
   };
 
-  const setLayoutMode = (mode: LayoutMode) => {
-    layoutMode.value = mode;
-  };
-
   const setActiveGroup = (groupId: string) => {
     activeGroupId.value = groupId;
+  };
+
+  const updateLayout = (layout: LayoutNode) => {
+    layoutConfig.value = layout;
   };
 
   return {
     headerGroups,
     visibleGroups,
-    layoutMode,
+    layoutConfig,
     activeGroupId,
     initData,
     updateGroupHeaders,
     moveHeaderBetweenGroups,
-    setLayoutMode,
     setActiveGroup,
+    updateLayout,
   };
 });
