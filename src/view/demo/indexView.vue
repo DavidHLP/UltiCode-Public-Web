@@ -31,9 +31,9 @@ const visibleGroups = computed(() => headerGroups.value.filter(g => g.headers.le
       <template v-if="visibleGroups[0]">
         <ResizablePanel :default-size="50">
           <HeaderComponent
-            :headers="visibleGroups[0].headers"
-            :group="visibleGroups[0].id"
-            :on-update="(newHeaders) => visibleGroups[0] && updateGroupHeaders(visibleGroups[0].id, newHeaders)"
+            :headers="visibleGroups[0]!.headers"
+            :group="visibleGroups[0]!.id"
+            :on-update="(newHeaders) => updateGroupHeaders(visibleGroups[0]!.id, newHeaders)"
             class="h-full"
           />
         </ResizablePanel>
@@ -47,9 +47,9 @@ const visibleGroups = computed(() => headerGroups.value.filter(g => g.headers.le
         <!-- 如果只有两个组，直接显示第二个组 -->
         <template v-if="visibleGroups.length === 2">
           <HeaderComponent
-            :headers="visibleGroups[1].headers"
-            :group="visibleGroups[1].id"
-            :on-update="(newHeaders) => visibleGroups[1] && updateGroupHeaders(visibleGroups[1].id, newHeaders)"
+            :headers="visibleGroups[1]!.headers"
+            :group="visibleGroups[1]!.id"
+            :on-update="(newHeaders) => updateGroupHeaders(visibleGroups[1]!.id, newHeaders)"
             class="h-full"
           />
         </template>
@@ -59,9 +59,9 @@ const visibleGroups = computed(() => headerGroups.value.filter(g => g.headers.le
           <!-- 第二个面板 -->
           <ResizablePanel :default-size="25">
             <HeaderComponent
-              :headers="visibleGroups[1].headers"
-              :group="visibleGroups[1].id"
-              :on-update="(newHeaders) => visibleGroups[1] && updateGroupHeaders(visibleGroups[1].id, newHeaders)"
+              :headers="visibleGroups[1]!.headers"
+              :group="visibleGroups[1]!.id"
+              :on-update="(newHeaders) => updateGroupHeaders(visibleGroups[1]!.id, newHeaders)"
               class="h-full"
             />
           </ResizablePanel>
