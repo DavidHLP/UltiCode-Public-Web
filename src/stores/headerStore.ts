@@ -35,6 +35,14 @@ export const useHeaderStore = defineStore("header", () => {
         { id: 3, index: 1, title: "系统配置", icon: "Settings" },
       ],
     },
+    {
+      id: "tools-menu",
+      name: "工具菜单",
+      headers: [
+        { id: 5, index: 0, title: "数据分析", icon: "BarChart" },
+        { id: 6, index: 1, title: "报表", icon: "FileText" },
+      ],
+    },
   ]);
 
   const updateGroupHeaders = (groupId: string, newHeaders: HeaderModel[]) => {
