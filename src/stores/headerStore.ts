@@ -7,7 +7,6 @@ export interface HeaderModel {
   title: string;
   icon: string;
   color?: string;
-  bgColor?: string;
   iconColor?: string;
 }
 

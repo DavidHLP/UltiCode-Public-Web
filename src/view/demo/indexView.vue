@@ -15,24 +15,24 @@ const initialHeaderGroups: HeaderGroup[] = [
     id: "problem-info",
     name: "题目信息",
     headers: [
-      { id: 1, index: 0, title: "题目描述", icon: "FileText", color: "#1a1a1a", bgColor: "#f0fdf4", iconColor: "#1a1a1a" },
-      { id: 2, index: 1, title: "题解", icon: "FlaskConical", color: "#1a1a1a", bgColor: "#eff6ff", iconColor: "#1a1a1a" },
-      { id: 3, index: 2, title: "提交记录", icon: "History", color: "#1a1a1a", bgColor: "#f5f3ff", iconColor: "#1a1a1a" },
+      { id: 1, index: 0, title: "题目描述", icon: "FileText", color: "#1a1a1a", iconColor: "#007bff" },
+      { id: 2, index: 1, title: "题解", icon: "FlaskConical", color: "#1a1a1a", iconColor: "#007bff" },
+      { id: 3, index: 2, title: "提交记录", icon: "History", color: "#1a1a1a", iconColor: "#007bff" },
     ],
   },
   {
     id: "code-editor",
     name: "代码编辑器",
     headers: [
-      { id: 4, index: 0, title: "代码", icon: "Code", color: "#1a1a1a", bgColor: "#fef2f2", iconColor: "#1a1a1a" },
+      { id: 4, index: 0, title: "代码", icon: "Code2", color: "#1a1a1a", iconColor: "#02b128" },
     ],
   },
   {
     id: "test-info",
     name: "测试信息",
     headers: [
-      { id: 5, index: 0, title: "测试用例", icon: "SquareCheck", color: "#1a1a1a", bgColor: "#fff7ed", iconColor: "#1a1a1a" },
-      { id: 6, index: 1, title: "测试结果", icon: "Terminal", color: "#1a1a1a", bgColor: "#f0f9ff", iconColor: "#1a1a1a" },
+      { id: 5, index: 0, title: "测试用例", icon: "SquareCheck", color: "#1a1a1a", iconColor: "#02b128" },
+      { id: 6, index: 1, title: "测试结果", icon: "Terminal", color: "#1a1a1a", iconColor: "#02b128" },
     ],
   },
 ];

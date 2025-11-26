@@ -90,7 +90,6 @@ const setRef = (el: unknown) => {
       }"
       :style="{
         color: header.color,
-        backgroundColor: header.bgColor,
       }"
       @click="onHeaderClick"
     >

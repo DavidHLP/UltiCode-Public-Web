@@ -12,7 +12,10 @@ const props = defineProps<{
 
 const localHeaders = ref<HeaderModel[]>([...props.headers]);
 
-const updateHeaderColor = (headerId: number, colorType: keyof HeaderModel, color: string) => {
+const updateHeaderColor = (headerId: number, colorType: string, color: string) => {
+  // 只允许更新color和iconColor属性
+  if (colorType !== 'color' && colorType !== 'iconColor') return;
+  
   const headerIndex = localHeaders.value.findIndex(h => h.id === headerId);
   if (headerIndex !== -1) {
     const updatedHeaders = [...localHeaders.value];
@@ -67,13 +70,7 @@ const resetToDefault = (headerId: number) => {
             />
           </div>
           
-          <div class="flex items-center gap-1">
-            <label class="text-xs">背景:</label>
-            <ColorPicker 
-              :model-value="header.bgColor || '#ffffff'" 
-              @update:model-value="(color) => updateHeaderColor(header.id, 'bgColor', color)" 
-            />
-          </div>
+
           
           <div class="flex items-center gap-1">
             <label class="text-xs">图标:</label>
