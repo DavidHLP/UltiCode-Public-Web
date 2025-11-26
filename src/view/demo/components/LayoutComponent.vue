@@ -1,154 +1,46 @@
 <script setup lang="ts">
-import { ref, watch, inject, type Ref, onMounted } from "vue";
-import type { HeaderModel } from "@/stores/headerStore";
-import HeaderComponent from "./HeaderComponent.vue";
-import MainComponent from "./MainComponent.vue";
+import { storeToRefs } from "pinia";
+import { ref, provide } from "vue";
+import { useHeaderStore } from "@/stores/headerStore";
+import { Button } from "@/components/ui/button";
+import PresetLayout from "./layouts/PresetLayout.vue";
+import LeetLayout from "./layouts/LeetLayout.vue";
 
-const props = defineProps<{
-  headers: HeaderModel[];
-  onUpdate: (newHeaders: HeaderModel[]) => void;
-  group?: string;
-}>();
+const headerStore = useHeaderStore();
+const { layoutMode } = storeToRefs(headerStore);
+const { moveHeaderBetweenGroups, setLayoutMode } = headerStore;
 
-// 每个 LayoutComponent 维护自己的活动头部状态
-const activeHeader = ref<HeaderModel | null>(null);
+const dragState = ref<{
+  sourceGroupId: string | null;
+  sourceIndex: number | null;
+}>({ sourceGroupId: null, sourceIndex: null });
 
-const localHeaders = ref<HeaderModel[]>([...props.headers]);
-const draggedIndex = ref<number | null>(null);
-const overIndex = ref<number | null>(null);
-const dropPosition = ref<'before' | 'after' | null>(null);
-
-const dragState = inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>('dragState');
-const moveHeaderBetweenGroups = inject<(
-  sourceGroupId: string,
-  targetGroupId: string,
-  sourceIndex: number,
-  targetIndex: number
-) => void>('moveHeaderBetweenGroups');
-
-watch(
-  () => props.headers,
-  (newHeaders) => {
-    localHeaders.value = [...newHeaders];
-  },
-  { deep: true }
-);
-
-// 在组件挂载时设置默认选中第一个头部
-onMounted(() => {
-  if (localHeaders.value.length > 0 && !activeHeader.value) {
-    activeHeader.value = localHeaders.value[0] || null;
-  }
-});
-
-// 监听 headers 变化，如果当前没有选中项且有头部项，则选中第一个
-watch(
-  () => localHeaders.value,
-  (newHeaders) => {
-    const activeId = activeHeader.value?.id;
-    const stillExists = activeId !== undefined && newHeaders.some((header) => header.id === activeId);
-    // 如果当前激活项被移出（例如被拖拽到其他组），重置为当前列表的第一个或空
-    if (!stillExists) {
-      activeHeader.value = newHeaders[0] || null;
-    }
-  },
-  { immediate: true }
-);
-
-const handleDragStart = (index: number, event: PointerEvent, handleStart: (e: PointerEvent) => void) => {
-  draggedIndex.value = index;
-  if (dragState) {
-    dragState.value.sourceGroupId = props.group || 'default';
-    dragState.value.sourceIndex = index;
-  }
-  handleStart(event);
-};
-
-const handleDragOver = (index: number, event: PointerEvent) => {
-  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null) {
-    const target = event.currentTarget as HTMLElement;
-    if (!target) return;
-    
-    const rect = target.getBoundingClientRect();
-    const mouseX = event.clientX;
-    const elementCenter = rect.left + rect.width / 2;
-    
-    overIndex.value = index;
-    dropPosition.value = mouseX < elementCenter ? 'before' : 'after';
-  }
-};
-
-// 处理头部选择事件
-const handleHeaderSelect = (header: HeaderModel) => {
-  activeHeader.value = header;
-};
-
-const handleDragEnd = () => {
-  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null && overIndex.value !== null) {
-    const sourceGroupId = dragState.value.sourceGroupId;
-    const sourceIndex = dragState.value.sourceIndex;
-    const targetGroupId = props.group || 'default';
-    let targetIndex = overIndex.value;
-    
-    if (dropPosition.value === 'after') {
-      targetIndex += 1;
-    }
-
-    if (sourceGroupId === targetGroupId) {
-      if (sourceIndex !== targetIndex) {
-        const newHeaders = [...localHeaders.value];
-        const [movedItem] = newHeaders.splice(sourceIndex, 1);
-        if (movedItem) {
-          const adjustedTargetIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
-          newHeaders.splice(adjustedTargetIndex, 0, movedItem);
-          localHeaders.value = newHeaders;
-          props.onUpdate(newHeaders);
-        }
-      }
-    } else {
-      if (moveHeaderBetweenGroups) {
-        moveHeaderBetweenGroups(sourceGroupId, targetGroupId, sourceIndex, targetIndex);
-      }
-    }
-  }
-  
-  draggedIndex.value = null;
-  overIndex.value = null;
-  dropPosition.value = null;
-  if (dragState) {
-    dragState.value.sourceGroupId = null;
-    dragState.value.sourceIndex = null;
-  }
-};
+provide('dragState', dragState);
+provide('moveHeaderBetweenGroups', moveHeaderBetweenGroups);
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <header class="flex items-center border-b bg-[#fafafa] py-1">
-      <div class="flex items-center min-h-[32px]">
-        <HeaderComponent
-          v-for="(header, idx) in localHeaders"
-          :key="header.id"
-          :header="header"
-          :index="idx"
-          :group="group || 'default'"
-          :is-dragging="draggedIndex === idx"
-          :is-over="overIndex === idx && draggedIndex !== idx"
-          :drop-position="overIndex === idx ? dropPosition : null"
-          :show-separator="idx > 0"
-          :is-active="activeHeader?.id === header.id"
-          @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
-          @drag-over="(event) => handleDragOver(idx, event)"
-          @drag-end="handleDragEnd"
-          @header-click="handleHeaderSelect"
-        />
-      </div>
-    </header>
-    <main>
-      <div class="flex-grow overflow-auto">
-        <!-- 将活动头部传递给 MainComponent -->
-        <MainComponent :active-header="activeHeader || null" />
-      </div>
-    </main>
+  <div class="h-screen w-full flex flex-col">
+    <!-- 布局切换按钮 -->
+    <div class="flex gap-2 p-4 border-b bg-gray-50">
+      <Button
+        :variant="layoutMode === 'preset' ? 'default' : 'outline'"
+        @click="setLayoutMode('preset')"
+      >
+        预设布局 (2列)
+      </Button>
+      <Button
+        :variant="layoutMode === 'leet' ? 'default' : 'outline'"
+        @click="setLayoutMode('leet')"
+      >
+        Leet布局 (1+3)
+      </Button>
+    </div>
+
+    <!-- 布局区域 -->
+    <div class="flex-1 overflow-hidden">
+      <PresetLayout v-if="layoutMode === 'preset'" />
+      <LeetLayout v-else-if="layoutMode === 'leet'" />
+    </div>
   </div>
 </template>

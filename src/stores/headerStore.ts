@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 export interface HeaderModel {
   id: number;
@@ -17,33 +17,24 @@ export interface HeaderGroup {
   headers: HeaderModel[];
 }
 
+export type LayoutMode = 'preset' | 'leet';
+
 export const useHeaderStore = defineStore("header", () => {
-  const headerGroups = ref<HeaderGroup[]>([
-    {
-      id: "main-menu",
-      name: "主菜单",
-      headers: [
-        { id: 1, index: 0, title: "首页", icon: "Home" },
-        { id: 2, index: 1, title: "设置", icon: "Settings" },
-      ],
-    },
-    {
-      id: "user-menu",
-      name: "用户菜单",
-      headers: [
-        { id: 4, index: 0, title: "个人中心", icon: "User" },
-        { id: 3, index: 1, title: "系统配置", icon: "Settings" },
-      ],
-    },
-    {
-      id: "tools-menu",
-      name: "工具菜单",
-      headers: [
-        { id: 5, index: 0, title: "数据分析", icon: "BarChart" },
-        { id: 6, index: 1, title: "报表", icon: "FileText" },
-      ],
-    },
-  ]);
+  const layoutMode = ref<LayoutMode>('preset');
+  const activeGroupId = ref<string | null>(null);
+  const headerGroups = ref<HeaderGroup[]>([]);
+
+  const visibleGroups = computed(() => headerGroups.value.filter(g => g.headers.length > 0));
+
+  const initData = (groups: HeaderGroup[], mode: LayoutMode = 'preset') => {
+    headerGroups.value = groups;
+    layoutMode.value = mode;
+    // 默认选中第一个有内容的组
+    const firstVisible = groups.find(g => g.headers.length > 0);
+    if (firstVisible) {
+      activeGroupId.value = firstVisible.id;
+    }
+  };
 
   const updateGroupHeaders = (groupId: string, newHeaders: HeaderModel[]) => {
     const group = headerGroups.value.find((g) => g.id === groupId);
@@ -82,9 +73,23 @@ export const useHeaderStore = defineStore("header", () => {
     }
   };
 
+  const setLayoutMode = (mode: LayoutMode) => {
+    layoutMode.value = mode;
+  };
+
+  const setActiveGroup = (groupId: string) => {
+    activeGroupId.value = groupId;
+  };
+
   return {
     headerGroups,
+    visibleGroups,
+    layoutMode,
+    activeGroupId,
+    initData,
     updateGroupHeaders,
     moveHeaderBetweenGroups,
+    setLayoutMode,
+    setActiveGroup,
   };
 });

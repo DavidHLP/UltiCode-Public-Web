@@ -5,6 +5,7 @@ import type { HeaderModel } from "@/stores/headerStore";
 // 接收活动头部作为属性
 const props = defineProps<{
   activeHeader: HeaderModel | null;
+  isActive?: boolean; // 当前组是否为激活状态
 }>();
 
 const content = computed(() => {
@@ -17,7 +18,7 @@ const content = computed(() => {
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="p-4 h-full">
     <div class="border rounded p-4 min-h-[200px]">
       <p>{{ content }}</p>
     </div>
