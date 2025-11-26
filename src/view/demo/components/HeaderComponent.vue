@@ -99,20 +99,7 @@ const setRef = (el: unknown) => {
         v-if="getIconComponent(header.icon)"
         :style="{ color: header.iconColor || header.color }"
       />
-      <span class="relative">
-        <span class="font-medium">{{ header.title }}</span>
-        <span 
-          v-if="!isActive"
-          class="absolute left-0 top-0 whitespace-nowrap font-normal opacity-60"
-        >
-          {{ header.title }}
-        </span>
-      </span>
+      <span class="font-medium">{{ header.title }}</span>
     </Button>
-    <!-- 未激活时添加遮罩层 -->
-    <div 
-      v-if="!isActive"
-      class="absolute inset-0 bg-gray-200/30 pointer-events-none"
-    />
   </div>
 </template>
