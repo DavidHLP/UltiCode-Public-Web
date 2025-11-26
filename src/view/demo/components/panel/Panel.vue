@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, inject, type Ref, onMounted } from "vue";
 import type { HeaderModel } from "@/stores/headerStore";
-import HeaderComponent from "./HeaderComponent.vue";
-import MainComponent from "./MainComponent.vue";
+import PanelHeader from "./PanelHeader.vue";
+import PanelContent from "./PanelContent.vue";
 
 const props = defineProps<{
   headers: HeaderModel[];
@@ -127,7 +127,7 @@ const handleDragEnd = () => {
   <div class="flex flex-col h-full">
     <header class="flex items-center border-b bg-[#fafafa] py-1">
       <div class="flex items-center min-h-[32px]">
-        <HeaderComponent
+        <PanelHeader
           v-for="(header, idx) in localHeaders"
           :key="header.id"
           :header="header"
@@ -147,7 +147,7 @@ const handleDragEnd = () => {
     </header>
     <main class="flex-1 overflow-hidden">
       <div class="h-full overflow-auto">
-        <MainComponent :active-header="activeHeader || null" :is-active="isActive" />
+        <PanelContent :active-header="activeHeader || null" :is-active="isActive" />
       </div>
     </main>
   </div>

@@ -17,6 +17,54 @@ export default defineConfigWithVueTs(
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
   pluginVue.configs['flat/essential'],
+  {
+    rules: {
+      'vue/multi-word-component-names': ['error', {
+        ignores: [
+          'Accordion',
+          'Alert',
+          'Avatar',
+          'Badge',
+          'Breadcrumb',
+          'Button',
+          'Calendar',
+          'Card',
+          'Carousel',
+          'Checkbox',
+          'Collapsible',
+          'Combobox',
+          'Command',
+          'Dialog',
+          'Drawer',
+          'Empty',
+          'Field',
+          'Input',
+          'Item',
+          'Kbd',
+          'Label',
+          'Menubar',
+          'Pagination',
+          'Panel',
+          'Popover',
+          'Select',
+          'Separator',
+          'Sheet',
+          'Sidebar',
+          'Skeleton',
+          'Slider',
+          'Sonner',
+          'Spinner',
+          'Stepper',
+          'Switch',
+          'Table',
+          'Tabs',
+          'Textarea',
+          'Toggle',
+          'Tooltip'
+        ]
+      }]
+    }
+  },
   vueTsConfigs.recommended,
   skipFormatting,
 )

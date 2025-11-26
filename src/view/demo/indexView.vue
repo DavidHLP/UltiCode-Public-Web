@@ -2,7 +2,7 @@
 import { onMounted } from "vue";
 import { useHeaderStore, type HeaderGroup, type LayoutNode } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
-import DynamicLayout from "./components/DynamicLayout.vue";
+import DynamicLayout from "./components/layout/DynamicLayout.vue";
 import { Button } from "@/components/ui/button";
 
 const headerStore = useHeaderStore();

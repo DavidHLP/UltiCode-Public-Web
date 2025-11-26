@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHeaderStore, type LayoutNode } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
-import PanelComponent from "./PanelComponent.vue";
+import Panel from "../panel/Panel.vue";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -50,7 +50,7 @@ const getGroupHeaders = (groupId: string) => {
       :class="{ 'border border-[#dedede]': activeGroupId === node.groupId }"
       @click="handleGroupClick(node.groupId)"
     >
-      <PanelComponent
+      <Panel
         :headers="getGroupHeaders(node.groupId)"
         :group="node.groupId"
         :on-update="(newHeaders) => updateGroupHeaders(node.groupId!, newHeaders)"
