@@ -4,7 +4,7 @@ import { Layout, User } from "lucide-vue-next";
 </script>
 
 <template>
-  <ButtonGroup class="relative flex items-center justify-end gap-2">
+  <ButtonGroup class="relative flex items-center justify-end gap-2 flex-none">
     <!-- 布局按钮 -->
     <Button
       variant="ghost"

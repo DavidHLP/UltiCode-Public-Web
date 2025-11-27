@@ -5,7 +5,7 @@ import { Play, CloudUpload, StickyNote } from "lucide-vue-next";
 </script>
 
 <template>
-  <ButtonGroup>
+  <ButtonGroup class="flex items-center gap-2">
     <!-- 运行和提交按钮组 -->
     <ButtonGroup>
       <Button variant="ghost" size="icon" aria-label="运行">

@@ -126,14 +126,20 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-[#f0f0f0] antialiased">
-    <header class="border-b flex h-14 w-full items-center bg-[#f0f0f0] relative">
-      <div class="flex-shrink-0">
+    <header
+      class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 border-b bg-[#f0f0f0] px-2.5"
+    >
+      <div class="relative z-10 flex h-full min-w-[240px] flex-1 items-center overflow-hidden">
         <HeaderLeft />
       </div>
-      <div class="absolute left-1/2 -translate-x-1/2">
-        <HeaderMid />
+      <div
+        class="pointer-events-none absolute inset-0 flex items-center justify-center"
+      >
+        <div class="pointer-events-auto">
+          <HeaderMid />
+        </div>
       </div>
-      <div class="flex-shrink-0 ml-auto">
+      <div class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2">
         <HeaderRight />
       </div>
     </header>
