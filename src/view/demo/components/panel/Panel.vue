@@ -17,15 +17,20 @@ const activeHeader = ref<HeaderModel | null>(null);
 const localHeaders = ref<HeaderModel[]>([...props.headers]);
 const draggedIndex = ref<number | null>(null);
 const overIndex = ref<number | null>(null);
-const dropPosition = ref<'before' | 'after' | null>(null);
+const dropPosition = ref<"before" | "after" | null>(null);
 
-const dragState = inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>('dragState');
-const moveHeaderBetweenGroups = inject<(
-  sourceGroupId: string,
-  targetGroupId: string,
-  sourceIndex: number,
-  targetIndex: number
-) => void>('moveHeaderBetweenGroups');
+const dragState =
+  inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>(
+    "dragState"
+  );
+const moveHeaderBetweenGroups = inject<
+  (
+    sourceGroupId: string,
+    targetGroupId: string,
+    sourceIndex: number,
+    targetIndex: number
+  ) => void
+>("moveHeaderBetweenGroups");
 
 watch(
   () => props.headers,
@@ -47,7 +52,9 @@ watch(
   () => localHeaders.value,
   (newHeaders) => {
     const activeId = activeHeader.value?.id;
-    const stillExists = activeId !== undefined && newHeaders.some((header) => header.id === activeId);
+    const stillExists =
+      activeId !== undefined &&
+      newHeaders.some((header) => header.id === activeId);
     // 如果当前激活项被移出（例如被拖拽到其他组），重置为当前列表的第一个或空
     if (!stillExists) {
       activeHeader.value = newHeaders[0] || null;
@@ -56,10 +63,14 @@ watch(
   { immediate: true }
 );
 
-const handleDragStart = (index: number, event: PointerEvent, handleStart: (e: PointerEvent) => void) => {
+const handleDragStart = (
+  index: number,
+  event: PointerEvent,
+  handleStart: (e: PointerEvent) => void
+) => {
   draggedIndex.value = index;
   if (dragState) {
-    dragState.value.sourceGroupId = props.group || 'default';
+    dragState.value.sourceGroupId = props.group || "default";
     dragState.value.sourceIndex = index;
   }
   handleStart(event);
@@ -75,7 +86,7 @@ const handleDragOver = (index: number, event: PointerEvent) => {
     const elementCenter = rect.left + rect.width / 2;
 
     overIndex.value = index;
-    dropPosition.value = mouseX < elementCenter ? 'before' : 'after';
+    dropPosition.value = mouseX < elementCenter ? "before" : "after";
   }
 };
 
@@ -85,13 +96,17 @@ const handleHeaderSelect = (header: HeaderModel) => {
 };
 
 const handleDragEnd = () => {
-  if (dragState?.value.sourceGroupId && dragState.value.sourceIndex !== null && overIndex.value !== null) {
+  if (
+    dragState?.value.sourceGroupId &&
+    dragState.value.sourceIndex !== null &&
+    overIndex.value !== null
+  ) {
     const sourceGroupId = dragState.value.sourceGroupId;
     const sourceIndex = dragState.value.sourceIndex;
-    const targetGroupId = props.group || 'default';
+    const targetGroupId = props.group || "default";
     let targetIndex = overIndex.value;
 
-    if (dropPosition.value === 'after') {
+    if (dropPosition.value === "after") {
       targetIndex += 1;
     }
 
@@ -100,7 +115,8 @@ const handleDragEnd = () => {
         const newHeaders = [...localHeaders.value];
         const [movedItem] = newHeaders.splice(sourceIndex, 1);
         if (movedItem) {
-          const adjustedTargetIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
+          const adjustedTargetIndex =
+            targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
           newHeaders.splice(adjustedTargetIndex, 0, movedItem);
           localHeaders.value = newHeaders;
           props.onUpdate(newHeaders);
@@ -108,7 +124,12 @@ const handleDragEnd = () => {
       }
     } else {
       if (moveHeaderBetweenGroups) {
-        moveHeaderBetweenGroups(sourceGroupId, targetGroupId, sourceIndex, targetIndex);
+        moveHeaderBetweenGroups(
+          sourceGroupId,
+          targetGroupId,
+          sourceIndex,
+          targetIndex
+        );
       }
     }
   }
@@ -124,8 +145,8 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[#ffffff]">
-    <header class="flex items-center border-b bg-[#ffffff] py-1">
+  <div class="flex flex-col h-full bg-[#fafafa]">
+    <header class="flex items-center border-b bg-[#fafafa] py-1">
       <div class="flex items-center min-h-[32px] flex-1">
         <PanelHeader
           v-for="(header, idx) in localHeaders"
@@ -138,7 +159,9 @@ const handleDragEnd = () => {
           :drop-position="overIndex === idx ? dropPosition : null"
           :show-separator="idx > 0"
           :is-active="activeHeader?.id === header.id"
-          @drag-start="(event, handleStart) => handleDragStart(idx, event, handleStart)"
+          @drag-start="
+            (event, handleStart) => handleDragStart(idx, event, handleStart)
+          "
           @drag-over="(event) => handleDragOver(idx, event)"
           @drag-end="handleDragEnd"
           @header-click="handleHeaderSelect"
@@ -147,7 +170,10 @@ const handleDragEnd = () => {
     </header>
     <main class="flex-1 overflow-hidden">
       <div class="h-full overflow-auto">
-        <PanelContent :active-header="activeHeader || null" :is-active="isActive" />
+        <PanelContent
+          :active-header="activeHeader || null"
+          :is-active="isActive"
+        />
       </div>
     </main>
   </div>

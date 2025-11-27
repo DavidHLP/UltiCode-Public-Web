@@ -84,7 +84,7 @@ const setRef = (el: unknown) => {
     <Button
       variant="ghost"
       size="sm"
-      class="relative"
+      class="relative bg-[#fafafa]"
       :class="{
         'opacity-60': !isActive,
       }"
