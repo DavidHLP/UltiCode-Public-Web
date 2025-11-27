@@ -7,10 +7,13 @@ import {
 } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import DynamicLayout from "./components/layout/DynamicLayout.vue";
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import logoIcon from "@/ico/favicon.ico";
-import { ChevronRight, ListVideo, ChevronLeft, Shuffle } from "lucide-vue-next";
+import {
+  ChevronRight,
+  ListVideo,
+  ChevronLeft,
+  Shuffle,
+  ExternalLink,
+} from "lucide-vue-next";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
@@ -131,27 +134,119 @@ onMounted(() => {
     <nav
       class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 border-b bg-[#f0f0f0] px-2.5"
     >
-      <RouterLink to="/" class="mr-1 flex items-center gap-1">
-        <img :src="logoIcon" alt="Ulticode" class="h-5 w-5" />
-      </RouterLink>
+      <div class="flex min-w-[240px] flex-1 items-center overflow-hidden">
+        <ul class="relative ml-2.5 mr-2 flex h-10 flex-none items-center">
+          <RouterLink to="/" class="mr-2 self-center">
+            <div class="mb-0.5 pl-1">
+              <div class="hidden h-5 dark:flex">
+                <img
+                  src="https://static.leetcode.cn/cn-frontendx-assets/production/_next/static/images/logo-dark-c96c407d175e36c81e236fcfdd682a0b.png?x-oss-process=image%2Fformat%2Cwebp"
+                  alt="Ulticode Logo"
+                  class="h-full"
+                />
+              </div>
+              <div class="flex h-5 dark:hidden">
+                <img
+                  src="https://static.leetcode.cn/cn-frontendx-assets/production/_next/static/images/logo-ff2b712834cf26bf50a5de58ee27bcef.png?x-oss-process=image%2Fformat%2Cwebp"
+                  alt="Ulticode Logo"
+                  class="h-full"
+                />
+              </div>
+            </div>
+          </RouterLink>
+          <li class="h-[16px] w-[1px] bg-gray-300 dark:bg-gray-600"></li>
+        </ul>
 
-      <ButtonGroup>
-        <ButtonGroup>
-          <Button variant="outline" class="flex items-center gap-2">
-            <ListVideo class="h-4 w-4" />
-            <span>题库</span>
-          </Button>adsada
-          <Button variant="outline" size="icon" aria-label="More Options">
-            <ChevronLeft />
-          </Button>
-          <Button variant="outline" size="icon" aria-label="More Options">
-            <ChevronRight />
-          </Button>
-          <Button variant="outline" size="icon" aria-label="More Options">
-            <Shuffle />
-          </Button>
-        </ButtonGroup>
-      </ButtonGroup>
+        <div
+          class="flex group items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <div
+            class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2"
+            role="button"
+            aria-label="展开面板"
+          >
+            <div
+              class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none"
+            >
+              <ListVideo
+                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
+            </div>
+            <div class="relative flex items-center gap-2 overflow-hidden">
+              <div
+                class="truncate font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200"
+              >
+                题库
+              </div>
+              <div class="hidden group-hover/nav-back:block">
+                <div class="flex flex-none" data-state="closed">
+                  <RouterLink
+                    to="/problemset/"
+                    aria-label="在新的标签页打开 题库"
+                    class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
+                  >
+                    <ExternalLink class="h-3 w-3" />
+                  </RouterLink>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
+          ></div>
+
+          <RouterLink
+            class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
+            aria-label="上一题"
+            to="/problems/sparse-similarity-lcci"
+          >
+            <div
+              class="relative text-[16px] leading-[normal] before:block before:h-4 before:w-4 m-auto items-center"
+            >
+              <ChevronLeft
+                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
+            </div>
+          </RouterLink>
+
+          <div
+            class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
+          ></div>
+
+          <RouterLink
+            class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
+            aria-label="下一题"
+            to="/problems/add-two-numbers"
+          >
+            <div
+              class="relative text-[16px] leading-[normal] before:block before:h-4 before:w-4 m-auto items-center"
+            >
+              <ChevronRight
+                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
+            </div>
+          </RouterLink>
+
+          <div
+            class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
+          ></div>
+
+          <RouterLink
+            to="/problems/random"
+            class="flex-none cursor-pointer justify-center hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
+            aria-label="随机一题"
+          >
+            <div
+              class="relative text-[16px] leading-[normal] before:block before:h-4 before:w-4"
+            >
+              <Shuffle
+                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
+            </div>
+          </RouterLink>
+        </div>
+      </div>
     </nav>
 
     <!-- 动态布局区域 -->
