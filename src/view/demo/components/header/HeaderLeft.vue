@@ -51,14 +51,21 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
             </div>
             <div class="hidden group-hover/nav-back:block">
               <div class="flex flex-none" data-state="closed">
-                <RouterLink
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="no-underline truncate rounded p-0.5 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary flex items-center justify-center"
-                  to="/problemset/"
-                >
-                  <ExternalLink :size="10" />
-                </RouterLink>
+                <HoverCard :open-delay="200">
+                  <HoverCardTrigger as-child>
+                    <RouterLink
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="no-underline truncate rounded p-0.5 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary flex items-center justify-center"
+                      to="/problemset/"
+                    >
+                      <ExternalLink :size="10" />
+                    </RouterLink>
+                  </HoverCardTrigger>
+                  <HoverCardContent class="h-auto w-auto p-2">
+                    <p class="text-xs leading-none">在新的标签页打开 题库</p>
+                  </HoverCardContent>
+                </HoverCard>
               </div>
             </div>
           </Button>
