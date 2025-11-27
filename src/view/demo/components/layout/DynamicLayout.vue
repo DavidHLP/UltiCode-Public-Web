@@ -22,7 +22,7 @@ provide('moveHeaderBetweenGroups', moveHeaderBetweenGroups);
 <template>
   <div class="h-full w-full">
     <div class="h-full w-full">
-      <LayoutNodeComponent :node="layout" />
+      <LayoutNodeComponent :node="layout" :is-root="true" />
     </div>
   </div>
 </template>

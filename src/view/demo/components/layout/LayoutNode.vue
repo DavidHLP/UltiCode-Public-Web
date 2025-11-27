@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { toRefs } from "vue";
 import { useHeaderStore, type LayoutNode } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import Panel from "../panel/Panel.vue";
@@ -6,11 +7,14 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@/components/ui/resizable';
+} from "@/components/ui/resizable";
 
-defineProps<{
+const props = defineProps<{
   node: LayoutNode;
+  isRoot?: boolean;
 }>();
+
+const { node, isRoot } = toRefs(props);
 
 const headerStore = useHeaderStore();
 const { headerGroups, activeGroupId } = storeToRefs(headerStore);
@@ -31,7 +35,7 @@ const getGroupHeaders = (groupId: string) => {
     <ResizablePanelGroup
       v-if="node.type === 'container' && node.children"
       :direction="node.direction || 'horizontal'"
-      class="h-full w-full gap-2 p-2"
+      :class="['h-full w-full gap-2', { 'p-2': isRoot }]"
     >
       <template v-for="(child, index) in node.children" :key="child.id">
         <ResizablePanel :default-size="child.size" :min-size="20" class="rounded-xl overflow-hidden">
