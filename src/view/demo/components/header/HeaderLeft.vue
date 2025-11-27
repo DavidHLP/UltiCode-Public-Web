@@ -15,6 +15,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 </script>
 
 <template>
@@ -32,41 +33,49 @@ import {
     <div
       class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
     >
-      <div
+      <HoverCard
         class="group/nav-back cursor-pointer gap-2 overflow-hidden flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2"
         role="button"
         aria-label="展开面板"
       >
-        <div
-          class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none"
-        >
-          <Indent
-            class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          />
-        </div>
-        <div class="relative flex items-center gap-2 overflow-hidden">
-          <HoverCard
-            class="truncate font-medium text-gray-800 dark:text-gray-200"
-          >
-            <HoverCardTrigger as-child>
-              <div class="flex items-center gap-2 overflow-hidden">题库</div>
-            </HoverCardTrigger>
-            <HoverCardContent class="w-80"> 展开面板 </HoverCardContent>
-          </HoverCard>
-          <div class="hidden group-hover/nav-back:block">
-            <div class="flex flex-none" data-state="closed">
-              <RouterLink
-                to="/problemset/"
-                target="_blank"
-                aria-label="在新的标签页打开 题库"
-                class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
-              >
-                <ExternalLink class="h-3 w-3" />
-              </RouterLink>
+        <HoverCardTrigger as-child>
+          <div class="flex items-center gap-2">
+            <!-- 简化的外层容器 -->
+            <div
+              class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none"
+            >
+              <Indent
+                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              />
+            </div>
+            <div class="truncate font-medium text-gray-800 dark:text-gray-200">
+              题库
             </div>
           </div>
+        </HoverCardTrigger>
+        <HoverCardContent class="px-3 py-2"> <!-- 使用内边距而不是固定宽高 -->
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-medium whitespace-nowrap">展开面板:</span>
+            <KbdGroup class="flex items-center space-x-1">
+              <Kbd class="px-2 py-1 text-xs">Ctrl</Kbd>
+              <span class="text-xs">+</span>
+              <Kbd class="px-2 py-1 text-xs">B</Kbd>
+            </KbdGroup>
+          </div>
+        </HoverCardContent>
+        <div class="hidden group-hover/nav-back:block">
+          <div class="flex flex-none" data-state="closed">
+            <RouterLink
+              to="/problemset/"
+              target="_blank"
+              aria-label="在新的标签页打开 题库"
+              class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
+            >
+              <ExternalLink class="h-3 w-3" />
+            </RouterLink>
+          </div>
         </div>
-      </div>
+      </HoverCard>
 
       <div class="hidden group-hover/nav-back:block ml-1">
         <Button
