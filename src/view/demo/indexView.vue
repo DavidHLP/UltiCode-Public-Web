@@ -126,10 +126,16 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-[#f0f0f0] antialiased">
-    <header class="border-b container flex h-14 max-w-screen-2xl items-center bg-[#f0f0f0]">
-      <HeaderLeft />
-      <HeaderMid />
-      <HeaderRight />
+    <header class="border-b flex h-14 w-full items-center bg-[#f0f0f0] relative">
+      <div class="flex-shrink-0">
+        <HeaderLeft />
+      </div>
+      <div class="absolute left-1/2 -translate-x-1/2">
+        <HeaderMid />
+      </div>
+      <div class="flex-shrink-0 ml-auto">
+        <HeaderRight />
+      </div>
     </header>
 
     <!-- 动态布局区域 -->
