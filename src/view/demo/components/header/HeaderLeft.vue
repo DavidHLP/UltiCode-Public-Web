@@ -10,6 +10,12 @@ import {
   Shuffle,
 } from "lucide-vue-next";
 import logoIcon from "@/ico/favicon.ico";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 </script>
 
 <template>
@@ -27,33 +33,47 @@ import logoIcon from "@/ico/favicon.ico";
     <div
       class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
     >
-      <Button
-        variant="ghost"
-        class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary dark:hover:text-dark-lc-icon-primary flex items-center h-[32px] transition-none hover:bg-fill-quaternary dark:hover:bg-fill-quaternary text-gray-60 dark:text-gray-60 px-2"
-        role="button"
-        data-state="closed"
-      >
-        <Indent class="h-4 w-4" />
-        <div class="relative flex items-center gap-2 overflow-hidden">
-          <div
-            class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
+      <HoverCard :open-delay="200">
+        <HoverCardTrigger as-child>
+          <Button
+            variant="ghost"
+            class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary dark:hover:text-dark-lc-icon-primary flex items-center h-[32px] transition-none hover:bg-fill-quaternary dark:hover:bg-fill-quaternary text-gray-60 dark:text-gray-60 px-2"
+            role="button"
+            data-state="closed"
           >
-            题库
+            <Indent class="h-4 w-4" />
+            <div class="relative flex items-center gap-2 overflow-hidden">
+              <div
+                class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
+              >
+                题库
+              </div>
+            </div>
+            <div class="hidden group-hover/nav-back:block">
+              <div class="flex flex-none" data-state="closed">
+                <RouterLink
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="no-underline truncate rounded p-0.5 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary flex items-center justify-center"
+                  to="/problemset/"
+                >
+                  <ExternalLink :size="10" />
+                </RouterLink>
+              </div>
+            </div>
+          </Button>
+        </HoverCardTrigger>
+        <HoverCardContent class="h-auto w-auto p-2">
+          <div class="flex items-center gap-1">
+            <p class="text-xs leading-none">展开面板</p>
+            <KbdGroup class="text-xs">
+              <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
+              <span class="text-xs">+</span>
+              <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">]</Kbd>
+            </KbdGroup>
           </div>
-        </div>
-        <div class="hidden group-hover/nav-back:block">
-          <div class="flex flex-none" data-state="closed">
-            <RouterLink
-              target="_blank"
-              rel="noopener noreferrer"
-              class="no-underline truncate rounded p-0.5 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary flex items-center justify-center"
-              to="/problemset/"
-            >
-              <ExternalLink />
-            </RouterLink>
-          </div>
-        </div>
-      </Button>
+        </HoverCardContent>
+      </HoverCard>
 
       <Separator
         orientation="vertical"
