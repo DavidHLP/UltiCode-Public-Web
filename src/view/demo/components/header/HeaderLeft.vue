@@ -10,9 +10,6 @@ import {
   Shuffle,
 } from "lucide-vue-next";
 import logoIcon from "@/ico/favicon.ico";
-
-import { CalendarDaysIcon } from "lucide-vue-next";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   HoverCard,
   HoverCardContent,
