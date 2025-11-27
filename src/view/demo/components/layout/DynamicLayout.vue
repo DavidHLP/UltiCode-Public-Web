@@ -20,8 +20,8 @@ provide('moveHeaderBetweenGroups', moveHeaderBetweenGroups);
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col">
-    <div class="flex-1 min-h-0 overflow-hidden">
+  <div class="h-full w-full">
+    <div class="h-full w-full">
       <LayoutNodeComponent :node="layout" />
     </div>
   </div>

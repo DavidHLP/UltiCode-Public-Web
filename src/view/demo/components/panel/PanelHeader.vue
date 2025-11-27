@@ -84,7 +84,7 @@ const setRef = (el: unknown) => {
     <Button
       variant="ghost"
       size="sm"
-      class="relative bg-[#fafafa]"
+      class="relative bg-[#fafafa] h-6"
       :class="{
         'opacity-60': !isActive,
       }"
@@ -97,8 +97,9 @@ const setRef = (el: unknown) => {
         :is="getIconComponent(header.icon)"
         v-if="getIconComponent(header.icon)"
         :style="{ color: header.iconColor || header.color }"
+        class="h-3 w-3"
       />
-      <span class="font-medium">{{ header.title }}</span>
+      <span class="font-medium text-xs">{{ header.title }}</span>
     </Button>
   </div>
 </template>
