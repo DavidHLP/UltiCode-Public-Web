@@ -31,10 +31,10 @@ const getGroupHeaders = (groupId: string) => {
     <ResizablePanelGroup
       v-if="node.type === 'container' && node.children"
       :direction="node.direction || 'horizontal'"
-      class="h-full w-full"
+      class="h-full w-full gap-2 p-2"
     >
       <template v-for="(child, index) in node.children" :key="child.id">
-        <ResizablePanel :default-size="child.size" :min-size="20">
+        <ResizablePanel :default-size="child.size" :min-size="20" class="rounded-xl overflow-hidden">
           <!-- Recursively render children -->
           <LayoutNode :node="child" />
         </ResizablePanel>
@@ -46,7 +46,7 @@ const getGroupHeaders = (groupId: string) => {
     <!-- Leaf Node -->
     <div 
       v-else-if="node.type === 'leaf' && node.groupId"
-      class="h-full cursor-pointer rounded-xl border border-transparent overflow-hidden bg-white"
+      class="h-full cursor-pointer rounded-xl border border-transparent overflow-hidden bg-white m-1"
       :class="{ 'border-[#dedede] shadow-sm': activeGroupId === node.groupId }"
       @click="handleGroupClick(node.groupId)"
     >

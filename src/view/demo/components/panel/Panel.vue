@@ -145,8 +145,8 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[#fafafa]">
-    <header class="flex items-center border-b bg-[#fafafa] py-1">
+  <div class="flex flex-col h-full bg-[#fafafa] rounded-lg overflow-hidden shadow-sm">
+    <header class="flex items-center border-b bg-[#fafafa] py-1 px-2">
       <div class="flex items-center min-h-[32px] flex-1">
         <PanelHeader
           v-for="(header, idx) in localHeaders"
@@ -168,8 +168,8 @@ const handleDragEnd = () => {
         />
       </div>
     </header>
-    <main class="flex-1 overflow-hidden">
-      <div class="h-full overflow-auto">
+    <main class="flex-1 overflow-hidden p-2">
+      <div class="h-full overflow-auto rounded-md bg-white">
         <PanelContent
           :active-header="activeHeader || null"
           :is-active="isActive"
