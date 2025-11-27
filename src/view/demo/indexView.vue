@@ -147,90 +147,93 @@ onMounted(() => {
           <li class="h-[16px] w-[1px] bg-gray-300 dark:bg-gray-600"></li>
         </ul>
         
-        <div class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2" role="button" aria-label="展开面板">
-          <div class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none">
-            <Indent class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
-          </div>
-          <div class="relative flex items-center gap-2 overflow-hidden">
-            <div class="truncate font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200">
-              题库
+        <!-- 导航菜单复合组件 -->
+        <div class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+          <div class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2" role="button" aria-label="展开面板">
+            <div class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none">
+              <Indent class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
             </div>
-            <div class="hidden group-hover/nav-back:block">
-              <div class="flex flex-none" data-state="closed">
-                <RouterLink 
-                  to="/problemset/" 
-                  target="_blank" 
-                  aria-label="在新的标签页打开 题库"
-                  class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
-                >
-                  <ExternalLink class="h-3 w-3" />
-                </RouterLink>
+            <div class="relative flex items-center gap-2 overflow-hidden">
+              <div class="truncate font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200">
+                题库
+              </div>
+              <div class="hidden group-hover/nav-back:block">
+                <div class="flex flex-none" data-state="closed">
+                  <RouterLink 
+                    to="/problemset/" 
+                    target="_blank" 
+                    aria-label="在新的标签页打开 题库"
+                    class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
+                  >
+                    <ExternalLink class="h-3 w-3" />
+                  </RouterLink>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div class="hidden group-hover/nav-back:block ml-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6"
-            aria-label="在新的标签页打开 题库"
+          
+          <div class="hidden group-hover/nav-back:block ml-1">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6"
+              aria-label="在新的标签页打开 题库"
+              as-child
+            >
+              <RouterLink to="/problemset/" target="_blank">
+                <ExternalLink class="h-3 w-3" />
+              </RouterLink>
+            </Button>
+          </div>
+            
+          <Separator orientation="vertical" class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600" />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
+            aria-label="上一题"
             as-child
           >
-            <RouterLink to="/problemset/" target="_blank">
-              <ExternalLink class="h-3 w-3" />
+            <RouterLink to="/problems/sparse-similarity-lcci">
+              <ChevronLeft class="h-4 w-4" />
+            </RouterLink>
+          </Button>
+
+          <Separator
+            orientation="vertical"
+            class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
+          />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
+            aria-label="下一题"
+            as-child
+          >
+            <RouterLink to="/problems/add-two-numbers">
+              <ChevronRight class="h-4 w-4" />
+            </RouterLink>
+          </Button>
+
+          <Separator
+            orientation="vertical"
+            class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
+          />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            class="flex-none cursor-pointer justify-center hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
+            aria-label="随机一题"
+            as-child
+          >
+            <RouterLink to="/problems/random">
+              <Shuffle class="h-4 w-4" />
             </RouterLink>
           </Button>
         </div>
-          
-        <Separator orientation="vertical" class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600" />
-
-        <Button
-          variant="ghost"
-          size="icon"
-          class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
-          aria-label="上一题"
-          as-child
-        >
-          <RouterLink to="/problems/sparse-similarity-lcci">
-            <ChevronLeft class="h-4 w-4" />
-          </RouterLink>
-        </Button>
-
-        <Separator
-          orientation="vertical"
-          class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
-        />
-
-        <Button
-          variant="ghost"
-          size="icon"
-          class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
-          aria-label="下一题"
-          as-child
-        >
-          <RouterLink to="/problems/add-two-numbers">
-            <ChevronRight class="h-4 w-4" />
-          </RouterLink>
-        </Button>
-
-        <Separator
-          orientation="vertical"
-          class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
-        />
-
-        <Button
-          variant="ghost"
-          size="icon"
-          class="flex-none cursor-pointer justify-center hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
-          aria-label="随机一题"
-          as-child
-        >
-          <RouterLink to="/problems/random">
-            <Shuffle class="h-4 w-4" />
-          </RouterLink>
-        </Button>
       </div>
     </nav>
 
