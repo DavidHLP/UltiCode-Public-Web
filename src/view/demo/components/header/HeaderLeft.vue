@@ -10,12 +10,6 @@ import {
   Shuffle,
 } from "lucide-vue-next";
 import logoIcon from "@/ico/favicon.ico";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { Kbd, KbdGroup } from "@/components/ui/kbd";
 </script>
 
 <template>
@@ -33,63 +27,33 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
     <div
       class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
     >
-      <HoverCard
-        class="group/nav-back cursor-pointer gap-2 overflow-hidden flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2"
+      <Button
+        variant="ghost"
+        class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary dark:hover:text-dark-lc-icon-primary flex items-center h-[32px] transition-none hover:bg-fill-quaternary dark:hover:bg-fill-quaternary text-gray-60 dark:text-gray-60 px-2"
         role="button"
-        aria-label="展开面板"
+        data-state="closed"
       >
-        <HoverCardTrigger as-child>
-          <div class="flex items-center gap-2">
-            <!-- 简化的外层容器 -->
-            <div
-              class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none"
-            >
-              <Indent
-                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-              />
-            </div>
-            <div class="truncate font-medium text-gray-800 dark:text-gray-200">
-              题库
-            </div>
+        <Indent class="h-4 w-4" />
+        <div class="relative flex items-center gap-2 overflow-hidden">
+          <div
+            class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
+          >
+            题库
           </div>
-        </HoverCardTrigger>
-        <HoverCardContent class="px-3 py-2"> <!-- 使用内边距而不是固定宽高 -->
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-medium whitespace-nowrap">展开面板:</span>
-            <KbdGroup class="flex items-center space-x-1">
-              <Kbd class="px-2 py-1 text-xs">Ctrl</Kbd>
-              <span class="text-xs">+</span>
-              <Kbd class="px-2 py-1 text-xs">B</Kbd>
-            </KbdGroup>
-          </div>
-        </HoverCardContent>
+        </div>
         <div class="hidden group-hover/nav-back:block">
           <div class="flex flex-none" data-state="closed">
             <RouterLink
-              to="/problemset/"
               target="_blank"
-              aria-label="在新的标签页打开 题库"
-              class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
+              rel="noopener noreferrer"
+              class="no-underline truncate rounded p-0.5 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary flex items-center justify-center"
+              to="/problemset/"
             >
-              <ExternalLink class="h-3 w-3" />
+              <ExternalLink />
             </RouterLink>
           </div>
         </div>
-      </HoverCard>
-
-      <div class="hidden group-hover/nav-back:block ml-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          aria-label="在新的标签页打开 题库"
-          as-child
-        >
-          <RouterLink to="/problemset/" target="_blank">
-            <ExternalLink class="h-3 w-3" />
-          </RouterLink>
-        </Button>
-      </div>
+      </Button>
 
       <Separator
         orientation="vertical"
