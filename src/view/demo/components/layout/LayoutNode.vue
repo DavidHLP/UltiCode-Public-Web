@@ -46,8 +46,8 @@ const getGroupHeaders = (groupId: string) => {
     <!-- Leaf Node -->
     <div 
       v-else-if="node.type === 'leaf' && node.groupId"
-      class="h-full cursor-pointer"
-      :class="{ 'border border-[#dedede]': activeGroupId === node.groupId }"
+      class="h-full cursor-pointer rounded-xl border border-transparent overflow-hidden bg-white"
+      :class="{ 'border-[#dedede] shadow-sm': activeGroupId === node.groupId }"
       @click="handleGroupClick(node.groupId)"
     >
       <Panel

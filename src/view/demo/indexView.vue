@@ -93,14 +93,14 @@ const programmingLayout: LayoutNode = {
     {
       id: "programming-left",
       type: "leaf",
-      size: 40,
+      size: 50,
       groupId: "problem-info",
     },
     {
       id: "programming-right",
       type: "container",
       direction: "vertical",
-      size: 60,
+      size: 50,
       children: [
         {
           id: "programming-right-top",
