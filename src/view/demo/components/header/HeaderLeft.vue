@@ -1,9 +1,23 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Indent, ExternalLink, ChevronLeft, ChevronRight, Shuffle } from 'lucide-vue-next'
-import logoIcon from '@/ico/favicon.ico'
+import { RouterLink } from "vue-router";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Indent,
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+  Shuffle,
+} from "lucide-vue-next";
+import logoIcon from "@/ico/favicon.ico";
+
+import { CalendarDaysIcon } from "lucide-vue-next";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 </script>
 
 <template>
@@ -16,22 +30,39 @@ import logoIcon from '@/ico/favicon.ico'
       </RouterLink>
       <li class="h-[16px] w-[1px] bg-gray-300 dark:bg-gray-600"></li>
     </ul>
-    
+
     <!-- 导航菜单复合组件 -->
-    <div class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none">
-      <div class="group/nav-back cursor-pointer gap-2 overflow-hidden flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2" role="button" aria-label="展开面板">
-        <div class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none">
-          <Indent class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
+    <div
+      class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
+    >
+      <div
+        class="group/nav-back cursor-pointer gap-2 overflow-hidden flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 px-2"
+        role="button"
+        aria-label="展开面板"
+      >
+        <div
+          class="relative text-[16px] leading-[normal] p-0.5 before:block before:h-4 before:w-4 flex-none"
+        >
+          <Indent
+            class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          />
         </div>
         <div class="relative flex items-center gap-2 overflow-hidden">
-          <div class="truncate font-medium text-gray-800 dark:text-gray-200">
-            题库
-          </div>
+          <HoverCard
+            class="truncate font-medium text-gray-800 dark:text-gray-200"
+          >
+            <HoverCardTrigger as-child>
+              <div class="flex items-center gap-2 overflow-hidden">题库</div>
+            </HoverCardTrigger>
+            <HoverCardContent class="w-80">
+                展开面板
+            </HoverCardContent>
+          </HoverCard>
           <div class="hidden group-hover/nav-back:block">
             <div class="flex flex-none" data-state="closed">
-              <RouterLink 
-                to="/problemset/" 
-                target="_blank" 
+              <RouterLink
+                to="/problemset/"
+                target="_blank"
                 aria-label="在新的标签页打开 题库"
                 class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
               >
@@ -41,11 +72,11 @@ import logoIcon from '@/ico/favicon.ico'
           </div>
         </div>
       </div>
-      
+
       <div class="hidden group-hover/nav-back:block ml-1">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0"
           aria-label="在新的标签页打开 题库"
           as-child
@@ -55,8 +86,11 @@ import logoIcon from '@/ico/favicon.ico'
           </RouterLink>
         </Button>
       </div>
-        
-      <Separator orientation="vertical" class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600" />
+
+      <Separator
+        orientation="vertical"
+        class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
+      />
 
       <Button
         variant="ghost"
