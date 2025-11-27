@@ -22,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import logoIcon from "@/ico/favicon.ico";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
@@ -146,20 +147,7 @@ onMounted(() => {
         <ul class="relative ml-2.5 mr-2 flex h-10 flex-none items-center">
           <RouterLink to="/" class="mr-2 self-center">
             <div class="mb-0.5 pl-1">
-              <div class="hidden h-5 dark:flex">
-                <img
-                  src="https://static.leetcode.cn/cn-frontendx-assets/production/_next/static/images/logo-dark-c96c407d175e36c81e236fcfdd682a0b.png?x-oss-process=image%2Fformat%2Cwebp"
-                  alt="Ulticode Logo"
-                  class="h-full"
-                />
-              </div>
-              <div class="flex h-5 dark:hidden">
-                <img
-                  src="https://static.leetcode.cn/cn-frontendx-assets/production/_next/static/images/logo-ff2b712834cf26bf50a5de58ee27bcef.png?x-oss-process=image%2Fformat%2Cwebp"
-                  alt="Ulticode Logo"
-                  class="h-full"
-                />
-              </div>
+              <img :src="logoIcon" alt="Ulticode" class="h-5 w-5" />
             </div>
           </RouterLink>
           <li class="h-[16px] w-[1px] bg-gray-300 dark:bg-gray-600"></li>
