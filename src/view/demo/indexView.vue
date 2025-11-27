@@ -14,6 +14,14 @@ import {
   Shuffle,
   ExternalLink,
 } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
@@ -180,71 +188,84 @@ onMounted(() => {
               </div>
               <div class="hidden group-hover/nav-back:block">
                 <div class="flex flex-none" data-state="closed">
-                  <RouterLink
-                    to="/problemset/"
-                    aria-label="在新的标签页打开 题库"
-                    class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
-                  >
-                    <ExternalLink class="h-3 w-3" />
-                  </RouterLink>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        class="no-underline truncate rounded p-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-800 dark:hover:text-gray-200 h-6 w-6"
+                        aria-label="在新的标签页打开 题库"
+                      >
+                        <ExternalLink class="h-3 w-3" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      side="bottom"
+                      class="w-48"
+                    >
+                      <DropdownMenuItem as-child>
+                        <RouterLink to="/problemset/" target="_blank">
+                          在新的标签页打开题库
+                        </RouterLink>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
           </div>
 
-          <div
+          <Separator
+            orientation="vertical"
             class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
-          ></div>
+          />
 
-          <RouterLink
+          <Button
+            variant="ghost"
+            size="icon"
             class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
             aria-label="上一题"
-            to="/problems/sparse-similarity-lcci"
+            as-child
           >
-            <div
-              class="relative text-[16px] leading-[normal] before:block before:h-4 before:w-4 m-auto items-center"
-            >
-              <ChevronLeft
-                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-              />
-            </div>
-          </RouterLink>
+            <RouterLink to="/problems/sparse-similarity-lcci">
+              <ChevronLeft class="h-4 w-4" />
+            </RouterLink>
+          </Button>
 
-          <div
+          <Separator
+            orientation="vertical"
             class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
-          ></div>
+          />
 
-          <RouterLink
+          <Button
+            variant="ghost"
+            size="icon"
             class="group flex-none cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
             aria-label="下一题"
-            to="/problems/add-two-numbers"
+            as-child
           >
-            <div
-              class="relative text-[16px] leading-[normal] before:block before:h-4 before:w-4 m-auto items-center"
-            >
-              <ChevronRight
-                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-              />
-            </div>
-          </RouterLink>
+            <RouterLink to="/problems/add-two-numbers">
+              <ChevronRight class="h-4 w-4" />
+            </RouterLink>
+          </Button>
 
-          <div
+          <Separator
+            orientation="vertical"
             class="h-[28px] w-[1px] flex-none bg-gray-300 dark:bg-gray-600"
-          ></div>
+          />
 
-          <RouterLink
-            to="/problems/random"
+          <Button
+            variant="ghost"
+            size="icon"
             class="flex-none cursor-pointer justify-center hover:text-blue-600 dark:hover:text-blue-400 flex items-center h-[32px] transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-[32px]"
             aria-label="随机一题"
+            as-child
           >
-            <div
-              class="relative text-[16px] leading-[normal] before:block before:h-4 before:w-4"
-            >
-              <Shuffle
-                class="h-4 w-4 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-              />
-            </div>
-          </RouterLink>
+            <RouterLink to="/problems/random">
+              <Shuffle class="h-4 w-4" />
+            </RouterLink>
+          </Button>
         </div>
       </div>
     </nav>
