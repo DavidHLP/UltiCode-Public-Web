@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import HeaderLeft from "./components/header/HeaderLeft.vue";
+import HeaderRight from "./components/header/HeaderRight.vue";
 import {
   useHeaderStore,
   type HeaderGroup,
@@ -8,6 +9,7 @@ import {
 } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import DynamicLayout from "./components/layout/DynamicLayout.vue";
+import HeaderMid from "./components/header/HeaderMid.vue";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
@@ -126,6 +128,8 @@ onMounted(() => {
   <div class="min-h-screen bg-[#f0f0f0] antialiased">
     <header class="border-b container flex h-14 max-w-screen-2xl items-center bg-[#f0f0f0]">
       <HeaderLeft />
+      <HeaderMid />
+      <HeaderRight />
     </header>
 
     <!-- 动态布局区域 -->
