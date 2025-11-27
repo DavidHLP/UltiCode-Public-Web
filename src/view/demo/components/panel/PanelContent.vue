@@ -18,8 +18,8 @@ const content = computed(() => {
 </script>
 
 <template>
-  <div class="p-4 h-full w-full">
-    <div class="border-2 border-dashed border-muted-foreground rounded-lg p-8 h-full w-full flex items-center justify-center">
+  <div class="p-4 h-full w-full bg-[#ffffff]">
+    <div class="border-2 border-dashed border-muted-foreground rounded-lg p-8 h-full w-full flex items-center justify-center bg-[#ffffff]">
       <p class="text-center text-muted-foreground">{{ content }}</p>
     </div>
   </div>

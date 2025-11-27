@@ -124,8 +124,8 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <header class="flex items-center border-b bg-[#fafafa] py-1">
+  <div class="flex flex-col h-full bg-[#ffffff]">
+    <header class="flex items-center border-b bg-[#ffffff] py-1">
       <div class="flex items-center min-h-[32px] flex-1">
         <PanelHeader
           v-for="(header, idx) in localHeaders"
