@@ -33,54 +33,57 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
     <div
       class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
     >
-      <HoverCard :open-delay="200">
-        <HoverCardTrigger as-child>
-          <Button
-            variant="ghost"
-            class="group/nav-back cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary dark:hover:text-dark-lc-icon-primary flex items-center h-[32px] transition-none hover:bg-fill-quaternary dark:hover:bg-fill-quaternary text-gray-60 dark:text-gray-60 px-2"
-            role="button"
-            data-state="closed"
-          >
-            <Indent class="h-4 w-4" />
-            <div class="relative flex items-center gap-2 overflow-hidden">
-              <div
-                class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
-              >
-                题库
+      <div class="relative group/nav-back">
+        <HoverCard :open-delay="200">
+          <HoverCardTrigger as-child>
+            <Button
+              variant="ghost"
+              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary dark:hover:text-dark-lc-icon-primary flex items-center h-[32px] transition-none hover:bg-fill-quaternary dark:hover:bg-fill-quaternary text-gray-60 dark:text-gray-60 px-2"
+              role="button"
+              data-state="closed"
+            >
+              <Indent class="h-4 w-4" />
+              <div class="relative flex items-center gap-2 overflow-hidden">
+                <div
+                  class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
+                >
+                  题库
+                </div>
+                <div class="hidden group-hover/nav-back:block">
+                  <div class="flex flex-none" data-state="closed">
+                    <HoverCard :open-delay="200">
+                      <HoverCardTrigger as-child>
+                        <RouterLink
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="no-underline truncate rounded p-1 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary"
+                          to="/problemset/"
+                          aria-label="在新的标签页打开 题库"
+                        >
+                          <ExternalLink class="h-3 w-3" />
+                        </RouterLink>
+                      </HoverCardTrigger>
+                      <HoverCardContent class="h-auto w-auto p-2">
+                        <p class="text-xs leading-none">在新的标签页打开 题库</p>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                </div>
               </div>
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent class="h-auto w-auto p-2">
+            <div class="flex items-center gap-1">
+              <p class="text-xs leading-none">展开面板</p>
+              <KbdGroup class="text-xs">
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
+                <span class="text-xs">+</span>
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">]</Kbd>
+              </KbdGroup>
             </div>
-            <div class="hidden group-hover/nav-back:block">
-              <div class="flex flex-none" data-state="closed">
-                <HoverCard :open-delay="200">
-                  <HoverCardTrigger as-child>
-                    <RouterLink
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="no-underline truncate rounded p-0.5 bg-fill-tertiary dark:bg-fill-tertiary text-text-tertiary dark:text-text-tertiary hover:bg-fill-secondary dark:hover:bg-fill-secondary hover:text-text-primary dark:hover:text-text-primary flex items-center justify-center"
-                      to="/problemset/"
-                    >
-                      <ExternalLink :size="10" />
-                    </RouterLink>
-                  </HoverCardTrigger>
-                  <HoverCardContent class="h-auto w-auto p-2">
-                    <p class="text-xs leading-none">在新的标签页打开 题库</p>
-                  </HoverCardContent>
-                </HoverCard>
-              </div>
-            </div>
-          </Button>
-        </HoverCardTrigger>
-        <HoverCardContent class="h-auto w-auto p-2">
-          <div class="flex items-center gap-1">
-            <p class="text-xs leading-none">展开面板</p>
-            <KbdGroup class="text-xs">
-              <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
-              <span class="text-xs">+</span>
-              <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">]</Kbd>
-            </KbdGroup>
-          </div>
-        </HoverCardContent>
-      </HoverCard>
+          </HoverCardContent>
+        </HoverCard>
+      </div>
 
       <Separator
         orientation="vertical"
