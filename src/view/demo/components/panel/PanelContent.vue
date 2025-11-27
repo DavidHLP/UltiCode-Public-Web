@@ -13,14 +13,14 @@ const content = computed(() => {
     return "请选择一个选项";
   }
   
-  return `你选择了: ${props.activeHeader.title}`;
+  return props.activeHeader.title;
 });
 </script>
 
 <template>
-  <div class="p-4 h-full">
-    <div class="border rounded p-4 min-h-[200px]">
-      <p>{{ content }}</p>
+  <div class="p-4 h-full w-full">
+    <div class="border-2 border-dashed border-muted-foreground rounded-lg p-8 h-full w-full flex items-center justify-center">
+      <p class="text-center text-muted-foreground">{{ content }}</p>
     </div>
   </div>
 </template>

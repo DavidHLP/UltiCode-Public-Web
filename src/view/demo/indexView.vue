@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { onMounted } from "vue";
 import {
   useHeaderStore,
@@ -8,15 +7,13 @@ import {
 } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import DynamicLayout from "./components/layout/DynamicLayout.vue";
-import { ArchiveIcon, ArrowLeftIcon, CalendarPlusIcon, ClockIcon, ListFilterPlusIcon, MailCheckIcon, MoreHorizontalIcon, TagIcon, Trash2Icon } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { ButtonGroup } from '@/components/ui/button-group'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import logoIcon from "@/ico/favicon.ico";
+import { ChevronRight, ListVideo, ChevronLeft, Shuffle } from "lucide-vue-next";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
-const label = ref("personal");
 
 // 定义页面结构元数据 - 按照新的分组方式
 const initialHeaderGroups: HeaderGroup[] = [
@@ -139,84 +136,31 @@ onMounted(() => {
       </RouterLink>
 
       <ButtonGroup>
-        <ButtonGroup class="hidden sm:flex">
-          <Button variant="outline" size="icon" aria-label="Go Back">
-            <ArrowLeftIcon />
+        <ButtonGroup>
+          <Button variant="outline" class="flex items-center gap-2">
+            <ListVideo class="h-4 w-4" />
+            <span>题库</span>
+          </Button>adsada
+          <Button variant="outline" size="icon" aria-label="More Options">
+            <ChevronLeft />
           </Button>
-        </ButtonGroup>
-        <ButtonGroup>
-          <Button variant="outline"> Archive </Button>
-          <Button variant="outline"> Report </Button>
-        </ButtonGroup>
-        <ButtonGroup>
-          <Button variant="outline"> Snooze </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="outline" size="icon" aria-label="More Options">
-                <MoreHorizontalIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-52">
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <MailCheckIcon />
-                  Mark as Read
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <ArchiveIcon />
-                  Archive
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <ClockIcon />
-                  Snooze
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <CalendarPlusIcon />
-                  Add to Calendar
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <ListFilterPlusIcon />
-                  Add to List
-                </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <TagIcon class="mr-2 size-4" />
-                    Label As...
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuRadioGroup v-model="label">
-                      <DropdownMenuRadioItem value="personal">
-                        Personal
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="work">
-                        Work
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="other">
-                        Other
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem variant="destructive">
-                  <Trash2Icon />
-                  Trash
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="outline" size="icon" aria-label="More Options">
+            <ChevronRight />
+          </Button>
+          <Button variant="outline" size="icon" aria-label="More Options">
+            <Shuffle />
+          </Button>
         </ButtonGroup>
       </ButtonGroup>
     </nav>
 
     <!-- 动态布局区域 -->
-    <main class="flex-1 overflow-hidden">
-      <DynamicLayout v-if="layoutConfig" :layout="layoutConfig" />
+    <main class="flex-1 overflow-hidden h-full w-full">
+      <DynamicLayout
+        v-if="layoutConfig"
+        :layout="layoutConfig"
+        class="h-full w-full"
+      />
     </main>
   </div>
 </template>
