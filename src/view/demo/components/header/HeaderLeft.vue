@@ -54,9 +54,7 @@ import {
             <HoverCardTrigger as-child>
               <div class="flex items-center gap-2 overflow-hidden">题库</div>
             </HoverCardTrigger>
-            <HoverCardContent class="w-80">
-                展开面板
-            </HoverCardContent>
+            <HoverCardContent class="w-80"> 展开面板 </HoverCardContent>
           </HoverCard>
           <div class="hidden group-hover/nav-back:block">
             <div class="flex flex-none" data-state="closed">
