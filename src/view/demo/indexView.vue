@@ -125,7 +125,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#f0f0f0] antialiased">
+  <div class="h-screen flex flex-col bg-[#f0f0f0] antialiased">
     <header
       class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 border-b bg-[#f0f0f0] px-2.5"
     >
@@ -145,7 +145,7 @@ onMounted(() => {
     </header>
 
     <!-- 动态布局区域 -->
-    <main class="flex-1 overflow-hidden h-full w-full">
+    <main class="flex-1 min-h-0 overflow-hidden w-full">
       <DynamicLayout
         v-if="layoutConfig"
         :layout="layoutConfig"
