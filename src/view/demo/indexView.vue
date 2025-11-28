@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import HeaderLeft from "./components/header/HeaderLeft.vue";
 import HeaderRight from "./components/header/HeaderRight.vue";
 import {
@@ -13,6 +13,9 @@ import HeaderMid from "./components/header/HeaderMid.vue";
 
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
+
+// Initialize layout state
+const currentLayout = ref<'preview' | 'leet'>('leet');
 
 // Define page structure metadata - according to new grouping method
 const initialHeaderGroups: HeaderGroup[] = [
@@ -84,8 +87,43 @@ const initialHeaderGroups: HeaderGroup[] = [
   },
 ];
 
-// Layout 1: Programming Exercise Layout (Left1 + Right(Up1 + Down1))
-const programmingLayout: LayoutNode = {
+// Layout 1: Preview Layout
+const previewLayout: LayoutNode = {
+  id: "preview-root",
+  type: "container",
+  direction: "horizontal",
+  children: [
+    {
+      id: "preview-left",
+      type: "container",
+      direction: "vertical",
+      size: 40,
+      children: [
+        {
+          id: "preview-left-top",
+          type: "leaf",
+          size: 33,
+          groupId: "problem-info",
+        },
+        {
+          id: "preview-left-bottom",
+          type: "leaf",
+          size: 67,
+          groupId: "code-editor",
+        },
+      ],
+    },
+    {
+      id: "preview-right",
+      type: "leaf",
+      size: 60,
+      groupId: "test-info",
+    },
+  ],
+};
+
+// Layout 2: Leet Layout
+const leetLayout: LayoutNode = {
   id: "programming-root",
   type: "container",
   direction: "horizontal",
@@ -118,9 +156,16 @@ const programmingLayout: LayoutNode = {
     },
   ],
 };
+
+// Handle layout changes from HeaderRight
+const handleLayoutChange = (newLayout: 'preview' | 'leet') => {
+  currentLayout.value = newLayout;
+  headerStore.updateLayout(newLayout === 'leet' ? leetLayout : previewLayout);
+};
+
 // Initialize data
 onMounted(() => {
-  headerStore.initData(initialHeaderGroups, programmingLayout);
+  headerStore.initData(initialHeaderGroups, currentLayout.value === 'leet' ? leetLayout : previewLayout);
 });
 </script>
 
@@ -144,7 +189,7 @@ onMounted(() => {
       <div
         class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2"
       >
-        <HeaderRight />
+        <HeaderRight :current-layout="currentLayout" @layout-change="handleLayoutChange" />
       </div>
     </header>
 

@@ -11,15 +11,17 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
 </script>
 
 <template>
-  <div class="flex min-w-60 flex-1 items-center overflow-hidden">
-    <div class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none">
+  <div
+    class="relative z-20 flex min-w-60 flex-1 items-center overflow-hidden pointer-events-auto"
+  >
+    <div class="flex items-center overflow-hidden rounded focus:outline-none">
       <div class="relative group/nav-back flex items-center">
         <!-- Run button with HoverCard -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               aria-label="Run"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
             >
@@ -36,18 +38,27 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
           </HoverCardContent>
         </HoverCard>
 
-        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
+        <Separator
+          orientation="vertical"
+          class="h-7 w-px flex-none bg-gray-200"
+        />
 
-        <!-- Submit button with HoverCard -->
+        <!-- Submit button using navigation layout style -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               aria-label="Submit"
-              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary text-gray-60 px-2"
+              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-gray-200 text-gray-60 px-2"
             >
               <CloudUpload class="h-4 w-4" />
-              <span>Submit</span>
+              <div class="relative flex items-center gap-1 overflow-hidden">
+                <div
+                  class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
+                >
+                  Submit
+                </div>
+              </div>
             </Button>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
@@ -62,14 +73,12 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
           </HoverCardContent>
         </HoverCard>
 
-        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
-
         <!-- Notes button with HoverCard -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               aria-label="Notes"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
             >
