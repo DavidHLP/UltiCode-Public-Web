@@ -44,7 +44,7 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
                 data-state="closed"
             >
               <Indent class="h-4 w-4"/>
-              <div class="relative flex items-center gap-2 overflow-hidden">
+              <div class="relative flex items-center gap-1 overflow-hidden">
                 <div
                     class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
                 >
@@ -71,11 +71,11 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
             <div class="hidden group-hover/nav-back:block ml-0.5">
               <RouterLink
                   target="_blank"
-                  class="flex-none cursor-pointer justify-center flex items-center h-8 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline"
+                  class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline  -translate-x-3"
                   to="/problemset/"
                   doc="在新的标签页打开 题库"
               >
-                <ExternalLink class="h-4 w-4 text-gray-600 dark:text-gray-400"/>
+                <ExternalLink class="h-3 w-3 text-gray-600 dark:text-gray-400" />
               </RouterLink>
             </div>
           </HoverCardTrigger>
