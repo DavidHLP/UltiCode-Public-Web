@@ -145,9 +145,9 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full bg-[#fafafa] rounded-lg overflow-hidden shadow-sm">
-    <header class="flex items-center border-b bg-[#fafafa] py-1 px-2 min-h-[36px]">
-      <div class="flex items-center min-h-[32px] flex-1">
+  <div class="flex flex-col h-full rounded-lg overflow-hidden shadow-sm">
+    <header class="flex items-center border-b bg-[#fafafa] py-1 px-2 min-h-9">
+      <div class="flex items-center min-h-8 flex-1">
         <PanelHeader
           v-for="(header, idx) in localHeaders"
           :key="header.id"

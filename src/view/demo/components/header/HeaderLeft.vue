@@ -26,12 +26,12 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
           <img :src="logoIcon" alt="Ulticode" class="h-5 w-5"/>
         </div>
       </RouterLink>
-      <li class="h-4 w-px bg-gray-300 dark:bg-gray-600"></li>
+      <li class="h-4 w-px bg-gray-200"></li>
     </ul>
 
     <!-- 导航菜单复合组件 -->
     <div
-        class="flex items-center overflow-hidden rounded hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none"
+        class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none"
     >
       <div class="relative group/nav-back flex items-center">
         <!-- 主按钮的HoverCard - 展开面板 -->
@@ -39,14 +39,14 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
           <HoverCardTrigger as-child>
             <Button
                 variant="ghost"
-                class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary dark:hover:text-dark-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary dark:hover:bg-fill-quaternary text-gray-60 dark:text-gray-60 px-2"
+                class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary text-gray-60 px-2"
                 role="button"
                 data-state="closed"
             >
               <Indent class="h-4 w-4"/>
               <div class="relative flex items-center gap-1 overflow-hidden">
                 <div
-                    class="truncate font-medium group-hover:text-lc-text-primary dark:group-hover:text-dark-lc-text-primary text-text-primary dark:text-text-primary hover:text-text-primary dark:hover:text-text-primary"
+                    class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
                 >
                   题库
                 </div>
@@ -71,11 +71,11 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
             <div class="hidden group-hover/nav-back:block ml-0">
               <RouterLink
                   target="_blank"
-                  class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3"
+                  class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
                   to="/problemset/"
                   doc="在新的标签页打开 题库"
               >
-                <ExternalLink class="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                <ExternalLink class="h-3 w-3 text-gray-600" />
               </RouterLink>
             </div>
           </HoverCardTrigger>
@@ -88,51 +88,51 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
 
     <Separator
         orientation="vertical"
-        class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
+        class="h-7 w-px flex-none bg-gray-200"
     />
 
     <Button
         variant="ghost"
         size="icon"
-        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
         doc="上一题"
         as-child
     >
-      <RouterLink to="/problems/sparse-similarity-lcci">
+      <RouterLink to="/problems/sparse-similarity-lcci" active-class="bg-[#0000000a]">
         <ChevronLeft class="h-4 w-4"/>
       </RouterLink>
     </Button>
 
     <Separator
         orientation="vertical"
-        class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
+        class="h-7 w-px flex-none bg-gray-200"
     />
 
     <Button
         variant="ghost"
         size="icon"
-        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
         doc="下一题"
         as-child
     >
-      <RouterLink to="/problems/add-two-numbers">
+      <RouterLink to="/problems/add-two-numbers" active-class="bg-[#0000000a]">
         <ChevronRight class="h-4 w-4"/>
       </RouterLink>
     </Button>
 
     <Separator
         orientation="vertical"
-        class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
+        class="h-7 w-px flex-none bg-gray-200"
     />
 
     <Button
         variant="ghost"
         size="icon"
-        class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+        class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
         doc="随机一题"
         as-child
     >
-      <RouterLink to="/problems/random">
+      <RouterLink to="/problems/random" active-class="bg-[#0000000a]">
         <Shuffle class="h-4 w-4"/>
       </RouterLink>
     </Button>
