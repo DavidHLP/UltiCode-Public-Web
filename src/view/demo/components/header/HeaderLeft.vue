@@ -75,7 +75,7 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
                   to="/problemset/"
                   doc="在新的标签页打开 题库"
               >
-                <ExternalLink class="h-3 w-3 text-gray-600" />
+                <ExternalLink class="h-3 w-3 text-gray-600"/>
               </RouterLink>
             </div>
           </HoverCardTrigger>
