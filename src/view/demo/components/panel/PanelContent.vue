@@ -2,15 +2,15 @@
 import { computed } from "vue";
 import type { HeaderModel } from "@/stores/headerStore";
 
-// 接收活动头部作为属性
+// Receive active header as property
 const props = defineProps<{
   activeHeader: HeaderModel | null;
-  isActive?: boolean; // 当前组是否为激活状态
+  isActive?: boolean; // Whether the current group is active
 }>();
 
 const content = computed(() => {
   if (!props.activeHeader) {
-    return "请选择一个选项";
+    return "Please select an option";
   }
   
   return props.activeHeader.title;

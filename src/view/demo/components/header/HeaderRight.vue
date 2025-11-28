@@ -5,17 +5,17 @@ import { Layout, User } from "lucide-vue-next";
 
 <template>
   <ButtonGroup class="relative flex items-center justify-end gap-2 flex-none">
-    <!-- 布局按钮 -->
+    <!-- Layout button -->
     <Button
       variant="ghost"
       size="icon"
-      aria-label="布局"
+      aria-label="Layout"
       class="rounded-lg p-2"
     >
       <Layout class="h-4 w-4" />
     </Button>
 
-    <Button variant="ghost" size="icon" class="rounded-full">
+    <Button variant="ghost" size="icon" class="rounded-full" aria-label="User">
       <User class="h-5 w-5" />
     </Button>
   </ButtonGroup>

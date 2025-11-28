@@ -1,25 +1,93 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
+import { Separator } from "@/components/ui/separator";
 import { Play, CloudUpload, StickyNote } from "lucide-vue-next";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 </script>
 
 <template>
-  <ButtonGroup class="flex items-center gap-2">
-    <!-- 运行和提交按钮组 -->
-    <ButtonGroup>
-      <Button variant="ghost" size="icon" aria-label="运行">
-        <Play class="h-4 w-4" />
-      </Button>
-      <Button variant="ghost" aria-label="提交">
-        <CloudUpload class="h-4 w-4" />
-        <span>提交</span>
-      </Button>
-    </ButtonGroup>
-    <ButtonGroup>
-      <Button variant="ghost" size="icon" aria-label="笔记">
-        <StickyNote class="h-4 w-4" />
-      </Button>
-    </ButtonGroup>
-  </ButtonGroup>
+  <div class="flex min-w-60 flex-1 items-center overflow-hidden">
+    <div class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none">
+      <div class="relative group/nav-back flex items-center">
+        <!-- Run button with HoverCard -->
+        <HoverCard :open-delay="200">
+          <HoverCardTrigger as-child>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              aria-label="Run"
+              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+            >
+              <Play class="h-4 w-4" />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent class="h-auto w-auto p-2">
+            <div class="flex items-center gap-1">
+              <p class="text-xs leading-none">Run Code</p>
+              <KbdGroup class="text-xs">
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">F5</Kbd>
+              </KbdGroup>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
+
+        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
+
+        <!-- Submit button with HoverCard -->
+        <HoverCard :open-delay="200">
+          <HoverCardTrigger as-child>
+            <Button 
+              variant="ghost" 
+              aria-label="Submit"
+              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary text-gray-60 px-2"
+            >
+              <CloudUpload class="h-4 w-4" />
+              <span>Submit</span>
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent class="h-auto w-auto p-2">
+            <div class="flex items-center gap-1">
+              <p class="text-xs leading-none">Submit Solution</p>
+              <KbdGroup class="text-xs">
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">Ctrl</Kbd>
+                <span class="text-xs">+</span>
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">Enter</Kbd>
+              </KbdGroup>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
+
+        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
+
+        <!-- Notes button with HoverCard -->
+        <HoverCard :open-delay="200">
+          <HoverCardTrigger as-child>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              aria-label="Notes"
+              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+            >
+              <StickyNote class="h-4 w-4" />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent class="h-auto w-auto p-2">
+            <div class="flex items-center gap-1">
+              <p class="text-xs leading-none">Notes</p>
+              <KbdGroup class="text-xs">
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">Ctrl</Kbd>
+                <span class="text-xs">+</span>
+                <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">N</Kbd>
+              </KbdGroup>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
+      </div>
+    </div>
+  </div>
 </template>

@@ -14,16 +14,16 @@ import HeaderMid from "./components/header/HeaderMid.vue";
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
 
-// 定义页面结构元数据 - 按照新的分组方式
+// Define page structure metadata - according to new grouping method
 const initialHeaderGroups: HeaderGroup[] = [
   {
     id: "problem-info",
-    name: "题目信息",
+    name: "Problem Information",
     headers: [
       {
         id: 1,
         index: 0,
-        title: "题目描述",
+        title: "Problem Description",
         icon: "FileText",
         color: "#1a1a1a",
         iconColor: "#007bff",
@@ -31,7 +31,7 @@ const initialHeaderGroups: HeaderGroup[] = [
       {
         id: 2,
         index: 1,
-        title: "题解",
+        title: "Solution",
         icon: "FlaskConical",
         color: "#1a1a1a",
         iconColor: "#007bff",
@@ -39,7 +39,7 @@ const initialHeaderGroups: HeaderGroup[] = [
       {
         id: 3,
         index: 2,
-        title: "提交记录",
+        title: "Submission Records",
         icon: "History",
         color: "#1a1a1a",
         iconColor: "#007bff",
@@ -48,12 +48,12 @@ const initialHeaderGroups: HeaderGroup[] = [
   },
   {
     id: "code-editor",
-    name: "代码编辑器",
+    name: "Code Editor",
     headers: [
       {
         id: 4,
         index: 0,
-        title: "代码",
+        title: "Code",
         icon: "Code2",
         color: "#1a1a1a",
         iconColor: "#02b128",
@@ -62,12 +62,12 @@ const initialHeaderGroups: HeaderGroup[] = [
   },
   {
     id: "test-info",
-    name: "测试信息",
+    name: "Test Information",
     headers: [
       {
         id: 5,
         index: 0,
-        title: "测试用例",
+        title: "Test Cases",
         icon: "SquareCheck",
         color: "#1a1a1a",
         iconColor: "#02b128",
@@ -75,7 +75,7 @@ const initialHeaderGroups: HeaderGroup[] = [
       {
         id: 6,
         index: 1,
-        title: "测试结果",
+        title: "Test Results",
         icon: "Terminal",
         color: "#1a1a1a",
         iconColor: "#02b128",
@@ -84,7 +84,7 @@ const initialHeaderGroups: HeaderGroup[] = [
   },
 ];
 
-// 布局1: 编程练习布局 (左1 + 右(上1 + 下1))
+// Layout 1: Programming Exercise Layout (Left1 + Right(Up1 + Down1))
 const programmingLayout: LayoutNode = {
   id: "programming-root",
   type: "container",
@@ -118,7 +118,7 @@ const programmingLayout: LayoutNode = {
     },
   ],
 };
-// 初始化数据
+// Initialize data
 onMounted(() => {
   headerStore.initData(initialHeaderGroups, programmingLayout);
 });
@@ -127,9 +127,11 @@ onMounted(() => {
 <template>
   <div class="h-screen flex flex-col bg-[#f0f0f0] antialiased">
     <header
-      class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 border-b bg-[#f0f0f0] px-2.5"
+      class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 bg-[#f0f0f0] px-2.5"
     >
-      <div class="relative z-10 flex h-full min-w-[240px] flex-1 items-center overflow-hidden">
+      <div
+        class="relative z-10 flex h-full min-w-[240px] flex-1 items-center overflow-hidden"
+      >
         <HeaderLeft />
       </div>
       <div
@@ -139,12 +141,14 @@ onMounted(() => {
           <HeaderMid />
         </div>
       </div>
-      <div class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2">
+      <div
+        class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2"
+      >
         <HeaderRight />
       </div>
     </header>
 
-    <!-- 动态布局区域 -->
+    <!-- Dynamic layout area -->
     <main class="flex-1 min-h-0 overflow-hidden w-full">
       <DynamicLayout
         v-if="layoutConfig"

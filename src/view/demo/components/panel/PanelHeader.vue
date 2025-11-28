@@ -70,11 +70,7 @@ const setRef = (el: unknown) => {
 <template>
   <div
     :ref="setRef"
-    class="flex items-center h-3 cursor-move relative"
-    :class="{
-      'before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-500': isOver && dropPosition === 'before',
-      'after:absolute after:right-0 after:top-0 after:bottom-0 after:w-0.5 after:bg-blue-500': isOver && dropPosition === 'after',
-    }"
+    class="flex items-center h-4 cursor-move relative"
     :style="{ touchAction: 'none' }"
     @pointerdown="onPointerDown"
     @pointerover="onPointerOver"
@@ -84,7 +80,7 @@ const setRef = (el: unknown) => {
     <Button
       variant="ghost"
       size="sm"
-      class="relative bg-[#fafafa] h-6 hover:bg-gray-200"
+      class="relative bg-[#fafafa] h-7 hover:bg-gray-200 rounded-sm"
       :class="{
         'opacity-60': !isActive,
       }"
@@ -99,7 +95,7 @@ const setRef = (el: unknown) => {
         :style="{ color: header.iconColor || header.color }"
         class="h-3 w-3"
       />
-      <span class="font-medium text-xs">{{ header.title }}</span>
+      <span class="font-medium text-sm">{{ header.title }}</span>
     </Button>
   </div>
 </template>

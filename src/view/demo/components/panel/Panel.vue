@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {ref, watch, inject, type Ref, onMounted} from "vue";
-import type {HeaderModel} from "@/stores/headerStore";
+import { ref, watch, inject, type Ref, onMounted } from "vue";
+import type { HeaderModel } from "@/stores/headerStore";
 import PanelHeader from "./PanelHeader.vue";
 import PanelContent from "./PanelContent.vue";
 
@@ -20,24 +20,24 @@ const overIndex = ref<number | null>(null);
 const dropPosition = ref<"before" | "after" | null>(null);
 
 const dragState =
-    inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>(
-        "dragState"
-    );
+  inject<Ref<{ sourceGroupId: string | null; sourceIndex: number | null }>>(
+    "dragState"
+  );
 const moveHeaderBetweenGroups = inject<
-    (
-        sourceGroupId: string,
-        targetGroupId: string,
-        sourceIndex: number,
-        targetIndex: number
-    ) => void
+  (
+    sourceGroupId: string,
+    targetGroupId: string,
+    sourceIndex: number,
+    targetIndex: number
+  ) => void
 >("moveHeaderBetweenGroups");
 
 watch(
-    () => props.headers,
-    (newHeaders) => {
-      localHeaders.value = [...newHeaders];
-    },
-    {deep: true}
+  () => props.headers,
+  (newHeaders) => {
+    localHeaders.value = [...newHeaders];
+  },
+  { deep: true }
 );
 
 // 在组件挂载时设置默认选中第一个头部
@@ -49,24 +49,24 @@ onMounted(() => {
 
 // 监听 headers 变化，如果当前没有选中项且有头部项，则选中第一个
 watch(
-    () => localHeaders.value,
-    (newHeaders) => {
-      const activeId = activeHeader.value?.id;
-      const stillExists =
-          activeId !== undefined &&
-          newHeaders.some((header) => header.id === activeId);
-      // 如果当前激活项被移出（例如被拖拽到其他组），重置为当前列表的第一个或空
-      if (!stillExists) {
-        activeHeader.value = newHeaders[0] || null;
-      }
-    },
-    {immediate: true}
+  () => localHeaders.value,
+  (newHeaders) => {
+    const activeId = activeHeader.value?.id;
+    const stillExists =
+      activeId !== undefined &&
+      newHeaders.some((header) => header.id === activeId);
+    // 如果当前激活项被移出（例如被拖拽到其他组），重置为当前列表的第一个或空
+    if (!stillExists) {
+      activeHeader.value = newHeaders[0] || null;
+    }
+  },
+  { immediate: true }
 );
 
 const handleDragStart = (
-    index: number,
-    event: PointerEvent,
-    handleStart: (e: PointerEvent) => void
+  index: number,
+  event: PointerEvent,
+  handleStart: (e: PointerEvent) => void
 ) => {
   draggedIndex.value = index;
   if (dragState) {
@@ -97,9 +97,9 @@ const handleHeaderSelect = (header: HeaderModel) => {
 
 const handleDragEnd = () => {
   if (
-      dragState?.value.sourceGroupId &&
-      dragState.value.sourceIndex !== null &&
-      overIndex.value !== null
+    dragState?.value.sourceGroupId &&
+    dragState.value.sourceIndex !== null &&
+    overIndex.value !== null
   ) {
     const sourceGroupId = dragState.value.sourceGroupId;
     const sourceIndex = dragState.value.sourceIndex;
@@ -116,7 +116,7 @@ const handleDragEnd = () => {
         const [movedItem] = newHeaders.splice(sourceIndex, 1);
         if (movedItem) {
           const adjustedTargetIndex =
-              targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
+            targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
           newHeaders.splice(adjustedTargetIndex, 0, movedItem);
           localHeaders.value = newHeaders;
           props.onUpdate(newHeaders);
@@ -125,10 +125,10 @@ const handleDragEnd = () => {
     } else {
       if (moveHeaderBetweenGroups) {
         moveHeaderBetweenGroups(
-            sourceGroupId,
-            targetGroupId,
-            sourceIndex,
-            targetIndex
+          sourceGroupId,
+          targetGroupId,
+          sourceIndex,
+          targetIndex
         );
       }
     }
@@ -146,33 +146,33 @@ const handleDragEnd = () => {
 
 <template>
   <div class="flex flex-col h-full rounded-lg overflow-hidden shadow-sm">
-    <header class="flex items-center border-b bg-[#fafafa] py-1 px-2 min-h-9">
+    <header class="flex items-center bg-[#fafafa] py-1 px-2 min-h-9">
       <div class="flex items-center min-h-8 flex-1">
         <PanelHeader
-            v-for="(header, idx) in localHeaders"
-            :key="header.id"
-            :header="header"
-            :index="idx"
-            :group="group || 'default'"
-            :is-dragging="draggedIndex === idx"
-            :is-over="overIndex === idx && draggedIndex !== idx"
-            :drop-position="overIndex === idx ? dropPosition : null"
-            :show-separator="idx > 0"
-            :is-active="activeHeader?.id === header.id"
-            @drag-start="
+          v-for="(header, idx) in localHeaders"
+          :key="header.id"
+          :header="header"
+          :index="idx"
+          :group="group || 'default'"
+          :is-dragging="draggedIndex === idx"
+          :is-over="overIndex === idx && draggedIndex !== idx"
+          :drop-position="overIndex === idx ? dropPosition : null"
+          :show-separator="idx > 0"
+          :is-active="activeHeader?.id === header.id"
+          @drag-start="
             (event, handleStart) => handleDragStart(idx, event, handleStart)
           "
-            @drag-over="(event) => handleDragOver(idx, event)"
-            @drag-end="handleDragEnd"
-            @header-click="handleHeaderSelect"
+          @drag-over="(event) => handleDragOver(idx, event)"
+          @drag-end="handleDragEnd"
+          @header-click="handleHeaderSelect"
         />
       </div>
     </header>
     <main class="flex-1 overflow-hidden p-2">
       <div class="h-full overflow-auto rounded-md bg-white">
         <PanelContent
-            :active-header="activeHeader || null"
-            :is-active="isActive"
+          :active-header="activeHeader || null"
+          :is-active="isActive"
         />
       </div>
     </main>

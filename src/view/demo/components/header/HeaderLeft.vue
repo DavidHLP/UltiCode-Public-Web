@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {RouterLink} from "vue-router";
-import {Button} from "@/components/ui/button";
-import {Separator} from "@/components/ui/separator";
+import { RouterLink } from "vue-router";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Indent,
   ExternalLink,
@@ -15,7 +15,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import {Kbd, KbdGroup} from "@/components/ui/kbd";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 </script>
 
 <template>
@@ -23,39 +23,39 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
     <ul class="relative ml-2.5 mr-2 flex h-10 flex-none items-center">
       <RouterLink to="/" class="mr-2 self-center">
         <div class="mb-0.5 pl-1">
-          <img :src="logoIcon" alt="Ulticode" class="h-5 w-5"/>
+          <img :src="logoIcon" alt="Ulticode" class="h-5 w-5" />
         </div>
       </RouterLink>
       <li class="h-4 w-px bg-gray-200"></li>
     </ul>
 
-    <!-- 导航菜单复合组件 -->
+    <!-- Navigation menu composite component -->
     <div
-        class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none"
+      class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none"
     >
       <div class="relative group/nav-back flex items-center">
-        <!-- 主按钮的HoverCard - 展开面板 -->
+        <!-- Main button HoverCard - Expand panel -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
             <Button
-                variant="ghost"
-                class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary text-gray-60 px-2"
-                role="button"
-                data-state="closed"
+              variant="ghost"
+              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary text-gray-60 px-2"
+              role="button"
+              data-state="closed"
             >
-              <Indent class="h-4 w-4"/>
+              <Indent class="h-4 w-4" />
               <div class="relative flex items-center gap-1 overflow-hidden">
                 <div
-                    class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
+                  class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
                 >
-                  题库
+                  Problem Set
                 </div>
               </div>
             </Button>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
             <div class="flex items-center gap-1">
-              <p class="text-xs leading-none">展开面板</p>
+              <p class="text-xs leading-none">Expand Panel</p>
               <KbdGroup class="text-xs">
                 <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
                 <span class="text-xs">+</span>
@@ -65,76 +65,115 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
           </HoverCardContent>
         </HoverCard>
 
-        <!-- 外部链接按钮的HoverCard - 在新的标签页打开 题库 -->
+        <!-- External link button HoverCard - Open problem set in new tab -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
             <div class="hidden group-hover/nav-back:block ml-0">
               <RouterLink
-                  target="_blank"
-                  class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
-                  to="/problemset/"
-                  doc="在新的标签页打开 题库"
+                target="_blank"
+                class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
+                to="/problemset/"
+                doc="Open problem set in new tab"
               >
-                <ExternalLink class="h-3 w-3 text-gray-600"/>
+                <ExternalLink class="h-3 w-3 text-gray-600" />
               </RouterLink>
             </div>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
-            <p class="text-xs leading-none">在新的标签页打开 题库</p>
+            <p class="text-xs leading-none">Open problem set in new tab</p>
           </HoverCardContent>
         </HoverCard>
       </div>
     </div>
 
-    <Separator
-        orientation="vertical"
-        class="h-7 w-px flex-none bg-gray-200"
-    />
+    <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
 
-    <Button
-        variant="ghost"
-        size="icon"
-        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-        doc="上一题"
-        as-child
-    >
-      <RouterLink to="/problems/sparse-similarity-lcci" active-class="bg-[#0000000a]">
-        <ChevronLeft class="h-4 w-4"/>
-      </RouterLink>
-    </Button>
+    <!-- Previous problem button with HoverCard -->
+    <HoverCard :open-delay="200">
+      <HoverCardTrigger as-child>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+          doc="Previous Problem"
+          as-child
+        >
+          <RouterLink
+            to="/problems/sparse-similarity-lcci"
+            active-class="bg-[#0000000a]"
+          >
+            <ChevronLeft class="h-4 w-4" />
+          </RouterLink>
+        </Button>
+      </HoverCardTrigger>
+      <HoverCardContent class="h-auto w-auto p-2">
+        <div class="flex items-center gap-1">
+          <p class="text-xs leading-none">Previous Problem</p>
+          <KbdGroup class="text-xs">
+            <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
+            <span class="text-xs">+</span>
+            <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">←</Kbd>
+          </KbdGroup>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
 
-    <Separator
-        orientation="vertical"
-        class="h-7 w-px flex-none bg-gray-200"
-    />
+    <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
 
-    <Button
-        variant="ghost"
-        size="icon"
-        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-        doc="下一题"
-        as-child
-    >
-      <RouterLink to="/problems/add-two-numbers" active-class="bg-[#0000000a]">
-        <ChevronRight class="h-4 w-4"/>
-      </RouterLink>
-    </Button>
+    <!-- Next problem button with HoverCard -->
+    <HoverCard :open-delay="200">
+      <HoverCardTrigger as-child>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+          doc="Next Problem"
+          as-child
+        >
+          <RouterLink to="/problems/add-two-numbers" active-class="bg-[#0000000a]">
+            <ChevronRight class="h-4 w-4" />
+          </RouterLink>
+        </Button>
+      </HoverCardTrigger>
+      <HoverCardContent class="h-auto w-auto p-2">
+        <div class="flex items-center gap-1">
+          <p class="text-xs leading-none">Next Problem</p>
+          <KbdGroup class="text-xs">
+            <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
+            <span class="text-xs">+</span>
+            <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">→</Kbd>
+          </KbdGroup>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
 
-    <Separator
-        orientation="vertical"
-        class="h-7 w-px flex-none bg-gray-200"
-    />
+    <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
 
-    <Button
-        variant="ghost"
-        size="icon"
-        class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-        doc="随机一题"
-        as-child
-    >
-      <RouterLink to="/problems/random" active-class="bg-[#0000000a]">
-        <Shuffle class="h-4 w-4"/>
-      </RouterLink>
-    </Button>
+    <!-- Random problem button with HoverCard -->
+    <HoverCard :open-delay="200">
+      <HoverCardTrigger as-child>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+          doc="Random Problem"
+          as-child
+        >
+          <RouterLink to="/problems/random" active-class="bg-[#0000000a]">
+            <Shuffle class="h-4 w-4" />
+          </RouterLink>
+        </Button>
+      </HoverCardTrigger>
+      <HoverCardContent class="h-auto w-auto p-2">
+        <div class="flex items-center gap-1">
+          <p class="text-xs leading-none">Random Problem</p>
+          <KbdGroup class="text-xs">
+            <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
+            <span class="text-xs">+</span>
+            <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">R</Kbd>
+          </KbdGroup>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
   </div>
 </template>
