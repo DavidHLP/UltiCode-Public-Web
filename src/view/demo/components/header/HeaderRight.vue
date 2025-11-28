@@ -29,17 +29,17 @@ const layoutOptions = [
   },
   {
     id: "classic",
-    label: "经典",
+    label: "Classic",
     value: "classic",
   },
   {
     id: "compact",
-    label: "紧凑",
+    label: "Compact",
     value: "compact",
   },
   {
     id: "wide",
-    label: "宽屏",
+    label: "Wide",
     value: "wide",
   },
 ];
