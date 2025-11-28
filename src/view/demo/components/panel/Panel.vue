@@ -3,6 +3,7 @@ import { ref, watch, inject, type Ref, onMounted } from "vue";
 import type { HeaderModel } from "@/stores/headerStore";
 import PanelHeader from "./PanelHeader.vue";
 import PanelContent from "./PanelContent.vue";
+import DropOverlay from "./DropOverlay.vue";
 
 const props = defineProps<{
   headers: HeaderModel[];
@@ -31,6 +32,15 @@ const moveHeaderBetweenGroups = inject<
     targetIndex: number
   ) => void
 >("moveHeaderBetweenGroups");
+
+const splitGroup = inject<
+  (
+    sourceGroupId: string,
+    targetGroupId: string,
+    sourceIndex: number,
+    direction: 'top' | 'bottom' | 'left' | 'right' | 'center'
+  ) => void
+>("splitGroup");
 
 watch(
   () => props.headers,
@@ -142,6 +152,26 @@ const handleDragEnd = () => {
     dragState.value.sourceIndex = null;
   }
 };
+
+const handleOverlayDrop = (zone: 'top' | 'bottom' | 'left' | 'right' | 'center') => {
+  if (
+    dragState?.value.sourceGroupId &&
+    dragState.value.sourceIndex !== null &&
+    splitGroup
+  ) {
+    splitGroup(
+      dragState.value.sourceGroupId,
+      props.group || 'default',
+      dragState.value.sourceIndex,
+      zone
+    );
+    
+    // Drag state cleanup is handled by the source component's dragEnd, 
+    // but we can also reset it here to be safe/responsive
+    dragState.value.sourceGroupId = null;
+    dragState.value.sourceIndex = null;
+  }
+};
 </script>
 
 <template>
@@ -168,13 +198,17 @@ const handleDragEnd = () => {
         />
       </div>
     </header>
-    <main class="flex-1 overflow-hidden p-2">
+    <main class="flex-1 overflow-hidden p-2 relative">
       <div class="h-full overflow-auto rounded-md bg-white">
         <PanelContent
           :active-header="activeHeader || null"
           :is-active="isActive"
         />
       </div>
+      <DropOverlay 
+        v-if="dragState?.sourceGroupId"
+        @drop="handleOverlayDrop"
+      />
     </main>
   </div>
 </template>

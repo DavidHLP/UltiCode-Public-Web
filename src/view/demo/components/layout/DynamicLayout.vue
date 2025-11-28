@@ -8,7 +8,7 @@ defineProps<{
 }>();
 
 const headerStore = useHeaderStore();
-const { moveHeaderBetweenGroups } = headerStore;
+const { moveHeaderBetweenGroups, splitGroup } = headerStore;
 
 const dragState = ref<{
   sourceGroupId: string | null;
@@ -17,6 +17,7 @@ const dragState = ref<{
 
 provide('dragState', dragState);
 provide('moveHeaderBetweenGroups', moveHeaderBetweenGroups);
+provide('splitGroup', splitGroup);
 </script>
 
 <template>

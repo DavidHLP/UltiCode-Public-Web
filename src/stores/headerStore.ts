@@ -87,6 +87,90 @@ export const useHeaderStore = defineStore("header", () => {
     layoutConfig.value = layout;
   };
 
+  const splitGroup = (
+    sourceGroupId: string,
+    targetGroupId: string,
+    sourceIndex: number,
+    direction: 'top' | 'bottom' | 'left' | 'right' | 'center'
+  ) => {
+    const sourceGroup = headerGroups.value.find((g) => g.id === sourceGroupId);
+    const targetGroup = headerGroups.value.find((g) => g.id === targetGroupId);
+
+    if (!sourceGroup || !targetGroup) return;
+
+    // Remove from source
+    const [movedItem] = sourceGroup.headers.splice(sourceIndex, 1);
+    if (!movedItem) return;
+
+    // Re-index source group
+    sourceGroup.headers.forEach((h, i) => (h.index = i));
+
+    if (direction === 'center') {
+      // Move to target group (append)
+      targetGroup.headers.push(movedItem);
+      targetGroup.headers.forEach((h, i) => (h.index = i));
+      return;
+    }
+
+    // Create new group for the split
+    const newGroupId = `group-${Date.now()}`;
+    const newGroup: HeaderGroup = {
+      id: newGroupId,
+      name: 'New Group', // Could be dynamic based on header title
+      headers: [movedItem],
+    };
+    newGroup.headers.forEach((h, i) => (h.index = i));
+    headerGroups.value.push(newGroup);
+
+    // Helper to modify layout tree
+    const modifyLayout = (node: LayoutNode): boolean => {
+      if (node.type === 'leaf' && node.groupId === targetGroupId) {
+        // Convert leaf to container
+        const originalGroupId = node.groupId;
+        
+        // Reset properties of the current node to become a container
+        node.type = 'container';
+        node.groupId = undefined;
+        node.direction = (direction === 'left' || direction === 'right') ? 'horizontal' : 'vertical';
+        
+        const newLeafNode: LayoutNode = {
+            id: `leaf-${newGroupId}`,
+            type: 'leaf',
+            groupId: newGroupId,
+            size: 50
+        };
+
+        const originalLeafNode: LayoutNode = {
+            id: `leaf-${originalGroupId}-${Date.now()}`,
+            type: 'leaf',
+            groupId: originalGroupId,
+            size: 50
+        };
+
+        if (direction === 'left' || direction === 'top') {
+            node.children = [newLeafNode, originalLeafNode];
+        } else {
+            node.children = [originalLeafNode, newLeafNode];
+        }
+        return true;
+      }
+
+      if (node.children) {
+        for (const child of node.children) {
+          if (modifyLayout(child)) return true;
+        }
+      }
+      return false;
+    };
+
+    if (layoutConfig.value) {
+        modifyLayout(layoutConfig.value);
+    }
+    
+    // Ensure new group is active
+    activeGroupId.value = newGroupId;
+  };
+
   return {
     headerGroups,
     visibleGroups,
@@ -97,5 +181,6 @@ export const useHeaderStore = defineStore("header", () => {
     moveHeaderBetweenGroups,
     setActiveGroup,
     updateLayout,
+    splitGroup,
   };
 });
