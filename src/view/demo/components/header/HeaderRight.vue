@@ -12,21 +12,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface Props {
-  currentLayout: 'preview' | 'leet' | 'classic' | 'compact' | 'wide';
+  currentLayout: 'leet' | 'classic' | 'compact' | 'wide';
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  'layout-change': [layout: 'preview' | 'leet' | 'classic' | 'compact' | 'wide'];
+  'layout-change': [layout: 'leet' | 'classic' | 'compact' | 'wide'];
 }>();
 
 // Layout options
 const layoutOptions = [
-  {
-    id: "preview",
-    label: "预设",
-    value: "preview",
-  },
   {
     id: "leet",
     label: "Leet",
@@ -52,7 +47,7 @@ const layoutOptions = [
 const selectedLayout = computed({
   get: () => props.currentLayout,
   set: (value: string) => {
-    emit('layout-change', value as 'preview' | 'leet' | 'classic' | 'compact' | 'wide');
+    emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide');
   },
 });
 </script>
@@ -78,9 +73,9 @@ const selectedLayout = computed({
               <div class="text-sm font-semibold text-gray-900">布局</div>
               <DropdownMenuRadioGroup
                 :model-value="selectedLayout"
-                @update:model-value="(value) => emit('layout-change', value as 'preview' | 'leet' | 'classic' | 'compact' | 'wide')"
+                @update:model-value="(value) => emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide')"
               >
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 gap-4">
                   <DropdownMenuRadioItem
                     v-for="option in layoutOptions"
                     :key="option.id"
@@ -96,16 +91,9 @@ const selectedLayout = computed({
                       />
                       
                       <!-- Layout preview visualization -->
-                      <div v-if="option.value === 'preview'" class="w-full h-full p-2 flex flex-col gap-1.5">
-                        <div class="flex gap-1.5 flex-1">
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                        </div>
+                      <div v-if="option.value === 'leet'" class="w-full h-full p-2 flex flex-row gap-1.5">
                         <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                      </div>
-                      <div v-else-if="option.value === 'leet'" class="w-full h-full p-2 flex flex-col gap-1.5">
-                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                        <div class="flex gap-1.5 flex-1">
+                        <div class="flex flex-col gap-1.5 flex-1">
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         </div>

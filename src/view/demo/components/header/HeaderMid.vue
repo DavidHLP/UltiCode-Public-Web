@@ -23,7 +23,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
               variant="ghost"
               size="icon"
               aria-label="Run"
-              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-200"
             >
               <Play class="h-4 w-4" />
             </Button>
@@ -49,7 +49,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
             <Button
               variant="ghost"
               aria-label="Submit"
-              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-gray-200 text-gray-60 px-2"
+              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-gray-200 text-gray-60 px-2 bg-gray-200"
             >
               <CloudUpload class="h-4 w-4" />
               <div class="relative flex items-center gap-1 overflow-hidden">
@@ -80,7 +80,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
               variant="ghost"
               size="icon"
               aria-label="Notes"
-              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-200"
             >
               <StickyNote class="h-4 w-4" />
             </Button>

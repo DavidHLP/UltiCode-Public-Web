@@ -15,7 +15,7 @@ const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
 
 // Initialize layout state
-const currentLayout = ref<'preview' | 'leet' | 'classic' | 'compact' | 'wide'>('leet');
+const currentLayout = ref<'leet' | 'classic' | 'compact' | 'wide'>('leet');
 
 // Define page structure metadata - according to new grouping method
 const initialHeaderGroups: HeaderGroup[] = [
@@ -87,42 +87,7 @@ const initialHeaderGroups: HeaderGroup[] = [
   },
 ];
 
-// Layout 1: Preview Layout
-const previewLayout: LayoutNode = {
-  id: "preview-root",
-  type: "container",
-  direction: "horizontal",
-  children: [
-    {
-      id: "preview-left",
-      type: "container",
-      direction: "vertical",
-      size: 40,
-      children: [
-        {
-          id: "preview-left-top",
-          type: "leaf",
-          size: 33,
-          groupId: "problem-info",
-        },
-        {
-          id: "preview-left-bottom",
-          type: "leaf",
-          size: 67,
-          groupId: "code-editor",
-        },
-      ],
-    },
-    {
-      id: "preview-right",
-      type: "leaf",
-      size: 60,
-      groupId: "test-info",
-    },
-  ],
-};
-
-// Layout 2: Leet Layout
+// Layout 1: Leet Layout
 const leetLayout: LayoutNode = {
   id: "programming-root",
   type: "container",
@@ -157,7 +122,7 @@ const leetLayout: LayoutNode = {
   ],
 };
 
-// Layout 3: Classic Layout - Similar to traditional IDE layout
+// Layout 2: Classic Layout - Similar to traditional IDE layout
 const classicLayout: LayoutNode = {
   id: "classic-root",
   type: "container",
@@ -192,7 +157,7 @@ const classicLayout: LayoutNode = {
   ],
 };
 
-// Layout 4: Compact Layout - Optimized for smaller screens
+// Layout 3: Compact Layout - Optimized for smaller screens
 const compactLayout: LayoutNode = {
   id: "compact-root",
   type: "container",
@@ -227,7 +192,7 @@ const compactLayout: LayoutNode = {
   ],
 };
 
-// Layout 5: Wide Layout - Emphasizes code editor
+// Layout 4: Wide Layout - Emphasizes code editor
 const wideLayout: LayoutNode = {
   id: "wide-root",
   type: "container",
@@ -255,7 +220,7 @@ const wideLayout: LayoutNode = {
 };
 
 // Handle layout changes from HeaderRight
-const handleLayoutChange = (newLayout: 'preview' | 'leet' | 'classic' | 'compact' | 'wide') => {
+const handleLayoutChange = (newLayout: 'leet' | 'classic' | 'compact' | 'wide') => {
   currentLayout.value = newLayout;
   let selectedLayout: LayoutNode;
   
@@ -272,8 +237,6 @@ const handleLayoutChange = (newLayout: 'preview' | 'leet' | 'classic' | 'compact
     case 'wide':
       selectedLayout = wideLayout;
       break;
-    default: // preview
-      selectedLayout = previewLayout;
   }
   
   headerStore.updateLayout(selectedLayout);
@@ -296,8 +259,6 @@ onMounted(() => {
     case 'wide':
       initialLayout = wideLayout;
       break;
-    default: // preview
-      initialLayout = previewLayout;
   }
   
   headerStore.initData(initialHeaderGroups, initialLayout);
