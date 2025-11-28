@@ -68,10 +68,10 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
         <!-- 外部链接按钮的HoverCard - 在新的标签页打开 题库 -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
-            <div class="hidden group-hover/nav-back:block ml-0.5">
+            <div class="hidden group-hover/nav-back:block ml-0">
               <RouterLink
                   target="_blank"
-                  class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline  -translate-x-3"
+                  class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3"
                   to="/problemset/"
                   doc="在新的标签页打开 题库"
               >
@@ -84,57 +84,57 @@ import {Kbd, KbdGroup} from "@/components/ui/kbd";
           </HoverCardContent>
         </HoverCard>
       </div>
-
-      <Separator
-          orientation="vertical"
-          class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
-      />
-
-      <Button
-          variant="ghost"
-          size="icon"
-          class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          doc="上一题"
-          as-child
-      >
-        <RouterLink to="/problems/sparse-similarity-lcci">
-          <ChevronLeft class="h-4 w-4"/>
-        </RouterLink>
-      </Button>
-
-      <Separator
-          orientation="vertical"
-          class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
-      />
-
-      <Button
-          variant="ghost"
-          size="icon"
-          class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          doc="下一题"
-          as-child
-      >
-        <RouterLink to="/problems/add-two-numbers">
-          <ChevronRight class="h-4 w-4"/>
-        </RouterLink>
-      </Button>
-
-      <Separator
-          orientation="vertical"
-          class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
-      />
-
-      <Button
-          variant="ghost"
-          size="icon"
-          class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          doc="随机一题"
-          as-child
-      >
-        <RouterLink to="/problems/random">
-          <Shuffle class="h-4 w-4"/>
-        </RouterLink>
-      </Button>
     </div>
+
+    <Separator
+        orientation="vertical"
+        class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
+    />
+
+    <Button
+        variant="ghost"
+        size="icon"
+        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+        doc="上一题"
+        as-child
+    >
+      <RouterLink to="/problems/sparse-similarity-lcci">
+        <ChevronLeft class="h-4 w-4"/>
+      </RouterLink>
+    </Button>
+
+    <Separator
+        orientation="vertical"
+        class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
+    />
+
+    <Button
+        variant="ghost"
+        size="icon"
+        class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+        doc="下一题"
+        as-child
+    >
+      <RouterLink to="/problems/add-two-numbers">
+        <ChevronRight class="h-4 w-4"/>
+      </RouterLink>
+    </Button>
+
+    <Separator
+        orientation="vertical"
+        class="h-7 w-px flex-none bg-gray-300 dark:bg-gray-600"
+    />
+
+    <Button
+        variant="ghost"
+        size="icon"
+        class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+        doc="随机一题"
+        as-child
+    >
+      <RouterLink to="/problems/random">
+        <Shuffle class="h-4 w-4"/>
+      </RouterLink>
+    </Button>
   </div>
 </template>
