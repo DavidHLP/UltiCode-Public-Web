@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs } from "vue";
+import { toRefs, computed } from "vue";
 import { useHeaderStore, type LayoutNode } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import Panel from "../panel/Panel.vue";
@@ -27,19 +27,37 @@ const handleGroupClick = (groupId: string) => {
 const getGroupHeaders = (groupId: string) => {
   return headerGroups.value.find(g => g.id === groupId)?.headers || [];
 };
+
+const shouldShowNode = (layoutNode: LayoutNode): boolean => {
+  if (layoutNode.type === 'leaf' && layoutNode.groupId) {
+    return getGroupHeaders(layoutNode.groupId).length > 0;
+  }
+  if (layoutNode.type === 'container' && layoutNode.children) {
+    return layoutNode.children.some(child => shouldShowNode(child));
+  }
+  return false;
+};
+
+const visibleChildren = computed(() => {
+  const currentNode = node.value;
+  if (currentNode.type !== 'container' || !currentNode.children) {
+    return [];
+  }
+  return currentNode.children.filter(child => shouldShowNode(child));
+});
 </script>
 
 <template>
   <div class="h-full w-full">
     <!-- Container Node -->
     <ResizablePanelGroup
-      v-if="node.type === 'container' && node.children"
+      v-if="node.type === 'container' && visibleChildren.length > 0"
       :id="node.id"
       :key="node.id"
       :direction="node.direction || 'horizontal'"
       :class="['h-full w-full gap-2', { 'p-2': isRoot }]"
     >
-      <template v-for="(child, index) in node.children" :key="child.id">
+      <template v-for="(child, index) in visibleChildren" :key="child.id">
         <ResizablePanel
           :id="child.id"
           :default-size="child.size"
@@ -50,13 +68,13 @@ const getGroupHeaders = (groupId: string) => {
           <LayoutNode :node="child" />
         </ResizablePanel>
         
-        <ResizableHandle v-if="index < node.children.length - 1" with-handle />
+        <ResizableHandle v-if="index < visibleChildren.length - 1" with-handle />
       </template>
     </ResizablePanelGroup>
 
     <!-- Leaf Node -->
     <div 
-      v-else-if="node.type === 'leaf' && node.groupId"
+      v-else-if="node.type === 'leaf' && node.groupId && getGroupHeaders(node.groupId).length > 0"
       class="h-full cursor-pointer rounded-xl border border-transparent overflow-hidden bg-white"
       :class="{ 'border-[#dedede] shadow-sm': activeGroupId === node.groupId }"
       @click="handleGroupClick(node.groupId)"
