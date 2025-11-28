@@ -12,12 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface Props {
-  currentLayout: 'preview' | 'leet';
+  currentLayout: 'preview' | 'leet' | 'classic' | 'compact' | 'wide';
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  'layout-change': [layout: 'preview' | 'leet'];
+  'layout-change': [layout: 'preview' | 'leet' | 'classic' | 'compact' | 'wide'];
 }>();
 
 // Layout options
@@ -32,12 +32,27 @@ const layoutOptions = [
     label: "Leet",
     value: "leet",
   },
+  {
+    id: "classic",
+    label: "经典",
+    value: "classic",
+  },
+  {
+    id: "compact",
+    label: "紧凑",
+    value: "compact",
+  },
+  {
+    id: "wide",
+    label: "宽屏",
+    value: "wide",
+  },
 ];
 
 const selectedLayout = computed({
   get: () => props.currentLayout,
   set: (value: string) => {
-    emit('layout-change', value as 'preview' | 'leet');
+    emit('layout-change', value as 'preview' | 'leet' | 'classic' | 'compact' | 'wide');
   },
 });
 </script>
@@ -63,7 +78,7 @@ const selectedLayout = computed({
               <div class="text-sm font-semibold text-gray-900">布局</div>
               <DropdownMenuRadioGroup
                 :model-value="selectedLayout"
-                @update:model-value="(value) => emit('layout-change', value as 'preview' | 'leet')"
+                @update:model-value="(value) => emit('layout-change', value as 'preview' | 'leet' | 'classic' | 'compact' | 'wide')"
               >
                 <div class="grid grid-cols-3 gap-4">
                   <DropdownMenuRadioItem
@@ -88,12 +103,31 @@ const selectedLayout = computed({
                         </div>
                         <div class="flex-1 bg-white rounded border border-gray-300"></div>
                       </div>
-                      <div v-else class="w-full h-full p-2 flex flex-col gap-1.5">
+                      <div v-else-if="option.value === 'leet'" class="w-full h-full p-2 flex flex-col gap-1.5">
                         <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         <div class="flex gap-1.5 flex-1">
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         </div>
+                      </div>
+                      <div v-else-if="option.value === 'classic'" class="w-full h-full p-2 flex flex-col gap-1.5">
+                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        <div class="flex gap-1.5 flex-1">
+                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        </div>
+                      </div>
+                      <div v-else-if="option.value === 'compact'" class="w-full h-full p-2 flex flex-row gap-1.5">
+                        <div class="flex flex-col gap-1.5 w-1/3">
+                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        </div>
+                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                      </div>
+                      <div v-else class="w-full h-full p-2 flex flex-row gap-1.5">
+                        <div class="w-1/4 bg-white rounded border border-gray-300"></div>
+                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        <div class="w-1/4 bg-white rounded border border-gray-300"></div>
                       </div>
                       
                       <!-- Check mark indicator -->

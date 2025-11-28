@@ -15,7 +15,7 @@ const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
 
 // Initialize layout state
-const currentLayout = ref<'preview' | 'leet'>('leet');
+const currentLayout = ref<'preview' | 'leet' | 'classic' | 'compact' | 'wide'>('leet');
 
 // Define page structure metadata - according to new grouping method
 const initialHeaderGroups: HeaderGroup[] = [
@@ -157,15 +157,150 @@ const leetLayout: LayoutNode = {
   ],
 };
 
+// Layout 3: Classic Layout - Similar to traditional IDE layout
+const classicLayout: LayoutNode = {
+  id: "classic-root",
+  type: "container",
+  direction: "vertical",
+  children: [
+    {
+      id: "classic-top",
+      type: "leaf",
+      size: 40,
+      groupId: "problem-info",
+    },
+    {
+      id: "classic-bottom",
+      type: "container",
+      direction: "horizontal",
+      size: 60,
+      children: [
+        {
+          id: "classic-bottom-left",
+          type: "leaf",
+          size: 50,
+          groupId: "code-editor",
+        },
+        {
+          id: "classic-bottom-right",
+          type: "leaf",
+          size: 50,
+          groupId: "test-info",
+        },
+      ],
+    },
+  ],
+};
+
+// Layout 4: Compact Layout - Optimized for smaller screens
+const compactLayout: LayoutNode = {
+  id: "compact-root",
+  type: "container",
+  direction: "horizontal",
+  children: [
+    {
+      id: "compact-left",
+      type: "container",
+      direction: "vertical",
+      size: 30,
+      children: [
+        {
+          id: "compact-left-top",
+          type: "leaf",
+          size: 50,
+          groupId: "problem-info",
+        },
+        {
+          id: "compact-left-bottom",
+          type: "leaf",
+          size: 50,
+          groupId: "test-info",
+        },
+      ],
+    },
+    {
+      id: "compact-right",
+      type: "leaf",
+      size: 70,
+      groupId: "code-editor",
+    },
+  ],
+};
+
+// Layout 5: Wide Layout - Emphasizes code editor
+const wideLayout: LayoutNode = {
+  id: "wide-root",
+  type: "container",
+  direction: "horizontal",
+  children: [
+    {
+      id: "wide-left",
+      type: "leaf",
+      size: 25,
+      groupId: "problem-info",
+    },
+    {
+      id: "wide-center",
+      type: "leaf",
+      size: 50,
+      groupId: "code-editor",
+    },
+    {
+      id: "wide-right",
+      type: "leaf",
+      size: 25,
+      groupId: "test-info",
+    },
+  ],
+};
+
 // Handle layout changes from HeaderRight
-const handleLayoutChange = (newLayout: 'preview' | 'leet') => {
+const handleLayoutChange = (newLayout: 'preview' | 'leet' | 'classic' | 'compact' | 'wide') => {
   currentLayout.value = newLayout;
-  headerStore.updateLayout(newLayout === 'leet' ? leetLayout : previewLayout);
+  let selectedLayout: LayoutNode;
+  
+  switch (newLayout) {
+    case 'leet':
+      selectedLayout = leetLayout;
+      break;
+    case 'classic':
+      selectedLayout = classicLayout;
+      break;
+    case 'compact':
+      selectedLayout = compactLayout;
+      break;
+    case 'wide':
+      selectedLayout = wideLayout;
+      break;
+    default: // preview
+      selectedLayout = previewLayout;
+  }
+  
+  headerStore.updateLayout(selectedLayout);
 };
 
 // Initialize data
 onMounted(() => {
-  headerStore.initData(initialHeaderGroups, currentLayout.value === 'leet' ? leetLayout : previewLayout);
+  let initialLayout: LayoutNode;
+  
+  switch (currentLayout.value) {
+    case 'leet':
+      initialLayout = leetLayout;
+      break;
+    case 'classic':
+      initialLayout = classicLayout;
+      break;
+    case 'compact':
+      initialLayout = compactLayout;
+      break;
+    case 'wide':
+      initialLayout = wideLayout;
+      break;
+    default: // preview
+      initialLayout = previewLayout;
+  }
+  
+  headerStore.initData(initialHeaderGroups, initialLayout);
 });
 </script>
 
