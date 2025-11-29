@@ -18,250 +18,314 @@ const { layoutConfig } = storeToRefs(headerStore);
 const currentLayout = ref<'leet' | 'classic' | 'compact' | 'wide'>('leet');
 
 // Define page structure metadata - according to new grouping method
-const initialHeaderGroups: HeaderGroup[] = [
-  {
-    id: "problem-info",
-    name: "Problem Information",
-    headers: [
-      {
-        id: 1,
-        index: 0,
-        title: "Problem Description",
-        icon: "FileText",
-        color: "#1a1a1a",
-        iconColor: "#007bff",
-      },
-      {
-        id: 2,
-        index: 1,
-        title: "Solution",
-        icon: "FlaskConical",
-        color: "#1a1a1a",
-        iconColor: "#007bff",
-      },
-      {
-        id: 3,
-        index: 2,
-        title: "Submission Records",
-        icon: "History",
-        color: "#1a1a1a",
-        iconColor: "#007bff",
-      },
-    ],
-  },
-  {
-    id: "code-editor",
-    name: "Code Editor",
-    headers: [
-      {
-        id: 4,
-        index: 0,
-        title: "Code",
-        icon: "Code2",
-        color: "#1a1a1a",
-        iconColor: "#02b128",
-      },
-    ],
-  },
-  {
-    id: "test-info",
-    name: "Test Information",
-    headers: [
-      {
-        id: 5,
-        index: 0,
-        title: "Test Cases",
-        icon: "SquareCheck",
-        color: "#1a1a1a",
-        iconColor: "#02b128",
-      },
-      {
-        id: 6,
-        index: 1,
-        title: "Test Results",
-        icon: "Terminal",
-        color: "#1a1a1a",
-        iconColor: "#02b128",
-      },
-    ],
-  },
-];
-
-// Layout 1: Leet Layout
-const leetLayout: LayoutNode = {
-  id: "programming-root",
-  type: "container",
-  direction: "horizontal",
-  children: [
+// 创建深拷贝函数以确保数据隔离
+const createInitialHeaderGroups = (): HeaderGroup[] => {
+  return [
     {
-      id: "programming-left",
-      type: "leaf",
-      size: 50,
-      groupId: "problem-info",
-    },
-    {
-      id: "programming-right",
-      type: "container",
-      direction: "vertical",
-      size: 50,
-      children: [
+      id: "problem-info",
+      name: "Problem Information",
+      headers: [
         {
-          id: "programming-right-top",
-          type: "leaf",
-          size: 50,
-          groupId: "code-editor",
+          id: 1,
+          index: 0,
+          title: "Problem Description",
+          icon: "FileText",
+          color: "#1a1a1a",
+          iconColor: "#007bff",
         },
         {
-          id: "programming-right-bottom",
-          type: "leaf",
-          size: 50,
-          groupId: "test-info",
-        },
-      ],
-    },
-  ],
-};
-
-// Layout 2: Classic Layout - Similar to traditional IDE layout
-const classicLayout: LayoutNode = {
-  id: "classic-root",
-  type: "container",
-  direction: "vertical",
-  children: [
-    {
-      id: "classic-top",
-      type: "leaf",
-      size: 40,
-      groupId: "problem-info",
-    },
-    {
-      id: "classic-bottom",
-      type: "container",
-      direction: "horizontal",
-      size: 60,
-      children: [
-        {
-          id: "classic-bottom-left",
-          type: "leaf",
-          size: 50,
-          groupId: "code-editor",
+          id: 2,
+          index: 1,
+          title: "Solution",
+          icon: "FlaskConical",
+          color: "#1a1a1a",
+          iconColor: "#007bff",
         },
         {
-          id: "classic-bottom-right",
-          type: "leaf",
-          size: 50,
-          groupId: "test-info",
-        },
-      ],
-    },
-  ],
-};
-
-// Layout 3: Compact Layout - Optimized for smaller screens
-const compactLayout: LayoutNode = {
-  id: "compact-root",
-  type: "container",
-  direction: "horizontal",
-  children: [
-    {
-      id: "compact-left",
-      type: "container",
-      direction: "vertical",
-      size: 30,
-      children: [
-        {
-          id: "compact-left-top",
-          type: "leaf",
-          size: 50,
-          groupId: "problem-info",
-        },
-        {
-          id: "compact-left-bottom",
-          type: "leaf",
-          size: 50,
-          groupId: "test-info",
+          id: 3,
+          index: 2,
+          title: "Submission Records",
+          icon: "History",
+          color: "#1a1a1a",
+          iconColor: "#007bff",
         },
       ],
     },
     {
-      id: "compact-right",
-      type: "leaf",
-      size: 70,
-      groupId: "code-editor",
+      id: "code-editor",
+      name: "Code Editor",
+      headers: [
+        {
+          id: 4,
+          index: 0,
+          title: "Code",
+          icon: "Code2",
+          color: "#1a1a1a",
+          iconColor: "#02b128",
+        },
+      ],
     },
-  ],
+    {
+      id: "test-info",
+      name: "Test Information",
+      headers: [
+        {
+          id: 5,
+          index: 0,
+          title: "Test Cases",
+          icon: "SquareCheck",
+          color: "#1a1a1a",
+          iconColor: "#02b128",
+        },
+        {
+          id: 6,
+          index: 1,
+          title: "Test Results",
+          icon: "Terminal",
+          color: "#1a1a1a",
+          iconColor: "#02b128",
+        },
+      ],
+    },
+  ];
 };
 
-// Layout 4: Wide Layout - Emphasizes code editor
-const wideLayout: LayoutNode = {
-  id: "wide-root",
-  type: "container",
-  direction: "horizontal",
-  children: [
-    {
-      id: "wide-left",
-      type: "leaf",
-      size: 25,
-      groupId: "problem-info",
-    },
-    {
-      id: "wide-center",
-      type: "leaf",
-      size: 50,
-      groupId: "code-editor",
-    },
-    {
-      id: "wide-right",
-      type: "leaf",
-      size: 25,
-      groupId: "test-info",
-    },
-  ],
+// 为每个布局创建独立的 header groups 副本和布局配置
+const getLeetLayoutConfig = () => {
+  const groups = createInitialHeaderGroups();
+  const layout: LayoutNode = {
+    id: "programming-root",
+    type: "container",
+    direction: "horizontal",
+    children: [
+      {
+        id: "programming-left",
+        type: "leaf",
+        size: 50,
+        groupId: "problem-info",
+        groupMetadata: {
+          id: "problem-info",
+          name: "Problem Information"
+        }
+      },
+      {
+        id: "programming-right",
+        type: "container",
+        direction: "vertical",
+        size: 50,
+        children: [
+          {
+            id: "programming-right-top",
+            type: "leaf",
+            size: 50,
+            groupId: "code-editor",
+            groupMetadata: {
+              id: "code-editor",
+              name: "Code Editor"
+            }
+          },
+          {
+            id: "programming-right-bottom",
+            type: "leaf",
+            size: 50,
+            groupId: "test-info",
+            groupMetadata: {
+              id: "test-info",
+              name: "Test Information"
+            }
+          },
+        ],
+      },
+    ],
+  };
+  return { groups, layout };
+};
+
+const getClassicLayoutConfig = () => {
+  const groups = createInitialHeaderGroups();
+  const layout: LayoutNode = {
+    id: "classic-root",
+    type: "container",
+    direction: "vertical",
+    children: [
+      {
+        id: "classic-top",
+        type: "leaf",
+        size: 40,
+        groupId: "problem-info",
+        groupMetadata: {
+          id: "problem-info",
+          name: "Problem Information"
+        }
+      },
+      {
+        id: "classic-bottom",
+        type: "container",
+        direction: "horizontal",
+        size: 60,
+        children: [
+          {
+            id: "classic-bottom-left",
+            type: "leaf",
+            size: 50,
+            groupId: "code-editor",
+            groupMetadata: {
+              id: "code-editor",
+              name: "Code Editor"
+            }
+          },
+          {
+            id: "classic-bottom-right",
+            type: "leaf",
+            size: 50,
+            groupId: "test-info",
+            groupMetadata: {
+              id: "test-info",
+              name: "Test Information"
+            }
+          },
+        ],
+      },
+    ],
+  };
+  return { groups, layout };
+};
+
+const getCompactLayoutConfig = () => {
+  const groups = createInitialHeaderGroups();
+  const layout: LayoutNode = {
+    id: "compact-root",
+    type: "container",
+    direction: "horizontal",
+    children: [
+      {
+        id: "compact-left",
+        type: "container",
+        direction: "vertical",
+        size: 30,
+        children: [
+          {
+            id: "compact-left-top",
+            type: "leaf",
+            size: 50,
+            groupId: "problem-info",
+            groupMetadata: {
+              id: "problem-info",
+              name: "Problem Information"
+            }
+          },
+          {
+            id: "compact-left-bottom",
+            type: "leaf",
+            size: 50,
+            groupId: "test-info",
+            groupMetadata: {
+              id: "test-info",
+              name: "Test Information"
+            }
+          },
+        ],
+      },
+      {
+        id: "compact-right",
+        type: "leaf",
+        size: 70,
+        groupId: "code-editor",
+        groupMetadata: {
+          id: "code-editor",
+          name: "Code Editor"
+        }
+      },
+    ],
+  };
+  return { groups, layout };
+};
+
+const getWideLayoutConfig = () => {
+  const groups = createInitialHeaderGroups();
+  const layout: LayoutNode = {
+    id: "wide-root",
+    type: "container",
+    direction: "horizontal",
+    children: [
+      {
+        id: "wide-left",
+        type: "leaf",
+        size: 25,
+        groupId: "problem-info",
+        groupMetadata: {
+          id: "problem-info",
+          name: "Problem Information"
+        }
+      },
+      {
+        id: "wide-center",
+        type: "leaf",
+        size: 50,
+        groupId: "code-editor",
+        groupMetadata: {
+          id: "code-editor",
+          name: "Code Editor"
+        }
+      },
+      {
+        id: "wide-right",
+        type: "leaf",
+        size: 25,
+        groupId: "test-info",
+        groupMetadata: {
+          id: "test-info",
+          name: "Test Information"
+        }
+      },
+    ],
+  };
+  return { groups, layout };
 };
 
 // Handle layout changes from HeaderRight
 const handleLayoutChange = (newLayout: 'leet' | 'classic' | 'compact' | 'wide') => {
   currentLayout.value = newLayout;
-  let selectedLayout: LayoutNode;
+  let config: { groups: HeaderGroup[], layout: LayoutNode };
   
   switch (newLayout) {
     case 'leet':
-      selectedLayout = leetLayout;
+      config = getLeetLayoutConfig();
       break;
     case 'classic':
-      selectedLayout = classicLayout;
+      config = getClassicLayoutConfig();
       break;
     case 'compact':
-      selectedLayout = compactLayout;
+      config = getCompactLayoutConfig();
       break;
     case 'wide':
-      selectedLayout = wideLayout;
+      config = getWideLayoutConfig();
       break;
   }
   
-  headerStore.updateLayout(selectedLayout);
+  headerStore.initData(config.groups, config.layout);
 };
 
 // Initialize data
 onMounted(() => {
-  let initialLayout: LayoutNode;
+  let initialConfig: { groups: HeaderGroup[], layout: LayoutNode };
   
   switch (currentLayout.value) {
     case 'leet':
-      initialLayout = leetLayout;
+      initialConfig = getLeetLayoutConfig();
       break;
     case 'classic':
-      initialLayout = classicLayout;
+      initialConfig = getClassicLayoutConfig();
       break;
     case 'compact':
-      initialLayout = compactLayout;
+      initialConfig = getCompactLayoutConfig();
       break;
     case 'wide':
-      initialLayout = wideLayout;
+      initialConfig = getWideLayoutConfig();
       break;
   }
   
-  headerStore.initData(initialHeaderGroups, initialLayout);
+  headerStore.initData(initialConfig.groups, initialConfig.layout);
 });
 </script>
 

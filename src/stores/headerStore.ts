@@ -23,6 +23,10 @@ export interface LayoutNode {
   size?: number;
   children?: LayoutNode[];
   groupId?: string;
+  groupMetadata?: {
+    id: string;
+    name: string;
+  };
 }
 
 export const useHeaderStore = defineStore("header", () => {
@@ -127,16 +131,22 @@ export const useHeaderStore = defineStore("header", () => {
       if (node.type === 'leaf' && node.groupId === targetGroupId) {
         // Convert leaf to container
         const originalGroupId = node.groupId;
+        const originalGroupMetadata = node.groupMetadata;
         
         // Reset properties of the current node to become a container
         node.type = 'container';
         node.groupId = undefined;
+        node.groupMetadata = undefined;
         node.direction = (direction === 'left' || direction === 'right') ? 'horizontal' : 'vertical';
         
         const newLeafNode: LayoutNode = {
             id: `leaf-${newGroupId}`,
             type: 'leaf',
             groupId: newGroupId,
+            groupMetadata: {
+              id: newGroupId,
+              name: 'New Group'
+            },
             size: 50
         };
 
@@ -144,6 +154,7 @@ export const useHeaderStore = defineStore("header", () => {
             id: `leaf-${originalGroupId}-${Date.now()}`,
             type: 'leaf',
             groupId: originalGroupId,
+            groupMetadata: originalGroupMetadata,
             size: 50
         };
 

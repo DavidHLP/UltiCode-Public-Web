@@ -3,7 +3,7 @@ import { ref } from 'vue';
 
 const emit = defineEmits<{
   (e: 'zone-change', zone: 'top' | 'bottom' | 'left' | 'right' | 'center' | null): void;
-  (e: 'drop'): void;
+  (e: 'drop', zone: 'top' | 'bottom' | 'left' | 'right' | 'center'): void;
 }>();
 
 const activeZone = ref<'top' | 'bottom' | 'left' | 'right' | 'center' | null>(null);
@@ -44,7 +44,7 @@ const handleMouseLeave = () => {
 
 const handleMouseUp = () => {
   if (activeZone.value) {
-    emit('drop', activeZone.value);
+    emit('drop', activeZone.value as 'top' | 'bottom' | 'left' | 'right' | 'center');
   }
 };
 </script>
