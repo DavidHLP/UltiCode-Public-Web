@@ -1,21 +1,11 @@
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import {
-  Indent,
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
-  Shuffle,
-} from "lucide-vue-next";
-import logoIcon from "@/ico/favicon.ico";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { RouterLink } from 'vue-router'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Indent, ExternalLink, ChevronLeft, ChevronRight, Shuffle } from 'lucide-vue-next'
+import logoIcon from '@/ico/favicon.ico'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 </script>
 
 <template>
@@ -30,9 +20,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
     </ul>
 
     <!-- Navigation menu composite component -->
-    <div
-      class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none"
-    >
+    <div class="flex items-center overflow-hidden rounded hover:bg-gray-200 focus:outline-none">
       <div class="relative group/nav-back flex items-center">
         <!-- Main button HoverCard - Expand panel -->
         <HoverCard :open-delay="200">
@@ -98,10 +86,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
           doc="Previous Problem"
           as-child
         >
-          <RouterLink
-            to="/problems/sparse-similarity-lcci"
-            active-class="bg-[#0000000a]"
-          >
+          <RouterLink to="/problems/sparse-similarity-lcci" active-class="bg-[#0000000a]">
             <ChevronLeft class="h-4 w-4" />
           </RouterLink>
         </Button>

@@ -1,55 +1,55 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Layout, User, Check } from "lucide-vue-next";
+import { computed } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Layout, User, Check } from 'lucide-vue-next'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu'
 
 interface Props {
-  currentLayout: 'leet' | 'classic' | 'compact' | 'wide';
+  currentLayout: 'leet' | 'classic' | 'compact' | 'wide'
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 const emit = defineEmits<{
-  'layout-change': [layout: 'leet' | 'classic' | 'compact' | 'wide'];
-}>();
+  'layout-change': [layout: 'leet' | 'classic' | 'compact' | 'wide']
+}>()
 
 // Layout options
 const layoutOptions = [
   {
-    id: "leet",
-    label: "Leet",
-    value: "leet",
+    id: 'leet',
+    label: 'Leet',
+    value: 'leet',
   },
   {
-    id: "classic",
-    label: "Classic",
-    value: "classic",
+    id: 'classic',
+    label: 'Classic',
+    value: 'classic',
   },
   {
-    id: "compact",
-    label: "Compact",
-    value: "compact",
+    id: 'compact',
+    label: 'Compact',
+    value: 'compact',
   },
   {
-    id: "wide",
-    label: "Wide",
-    value: "wide",
+    id: 'wide',
+    label: 'Wide',
+    value: 'wide',
   },
-];
+]
 
 const selectedLayout = computed({
   get: () => props.currentLayout,
   set: (value: string) => {
-    emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide');
+    emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide')
   },
-});
+})
 </script>
 
 <template>
@@ -70,10 +70,12 @@ const selectedLayout = computed({
           </DropdownMenuTrigger>
           <DropdownMenuContent class="w-96 p-4">
             <div class="space-y-3">
-              <div class="text-sm font-semibold text-gray-900">布局</div>
+              <div class="text-sm font-semibold text-gray-900">Layout</div>
               <DropdownMenuRadioGroup
                 :model-value="selectedLayout"
-                @update:model-value="(value) => emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide')"
+                @update:model-value="
+                  (value) => emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide')
+                "
               >
                 <div class="grid grid-cols-2 gap-4">
                   <DropdownMenuRadioItem
@@ -83,29 +85,40 @@ const selectedLayout = computed({
                     class="relative flex flex-col items-center gap-2 p-2 rounded-lg border-2 transition-all duration-200 cursor-pointer data-[state=checked]:border-blue-500 data-[state=unchecked]:border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                   >
                     <!-- Layout preview container -->
-                    <div class="w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-md flex items-center justify-center relative overflow-hidden border border-gray-200">
+                    <div
+                      class="w-full aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-md flex items-center justify-center relative overflow-hidden border border-gray-200"
+                    >
                       <!-- Selected indicator -->
                       <div
                         v-if="option.value === selectedLayout"
                         class="absolute inset-0 border-2 border-blue-500 rounded-md"
                       />
-                      
+
                       <!-- Layout preview visualization -->
-                      <div v-if="option.value === 'leet'" class="w-full h-full p-2 flex flex-row gap-1.5">
+                      <div
+                        v-if="option.value === 'leet'"
+                        class="w-full h-full p-2 flex flex-row gap-1.5"
+                      >
                         <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         <div class="flex flex-col gap-1.5 flex-1">
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         </div>
                       </div>
-                      <div v-else-if="option.value === 'classic'" class="w-full h-full p-2 flex flex-col gap-1.5">
+                      <div
+                        v-else-if="option.value === 'classic'"
+                        class="w-full h-full p-2 flex flex-col gap-1.5"
+                      >
                         <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         <div class="flex gap-1.5 flex-1">
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         </div>
                       </div>
-                      <div v-else-if="option.value === 'compact'" class="w-full h-full p-2 flex flex-row gap-1.5">
+                      <div
+                        v-else-if="option.value === 'compact'"
+                        class="w-full h-full p-2 flex flex-row gap-1.5"
+                      >
                         <div class="flex flex-col gap-1.5 w-1/3">
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
                           <div class="flex-1 bg-white rounded border border-gray-300"></div>
@@ -117,7 +130,7 @@ const selectedLayout = computed({
                         <div class="flex-1 bg-white rounded border border-gray-300"></div>
                         <div class="w-1/4 bg-white rounded border border-gray-300"></div>
                       </div>
-                      
+
                       <!-- Check mark indicator -->
                       <div
                         v-if="option.value === selectedLayout"
@@ -126,11 +139,9 @@ const selectedLayout = computed({
                         <Check class="w-3 h-3 text-white" />
                       </div>
                     </div>
-                    
+
                     <!-- Label -->
-                    <span class="text-xs font-medium text-gray-700 mt-1">{{
-                      option.label
-                    }}</span>
+                    <span class="text-xs font-medium text-gray-700 mt-1">{{ option.label }}</span>
                   </DropdownMenuRadioItem>
                 </div>
               </DropdownMenuRadioGroup>
