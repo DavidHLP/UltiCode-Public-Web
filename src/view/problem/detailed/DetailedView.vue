@@ -27,6 +27,9 @@ import type { ProblemDetail } from "@/mocks/schema/problem-detail";
 import type { ProblemRunResult } from "@/mocks/schema/test-results";
 import { fetchProblemDetailById } from "@/api/problem-detail";
 import { fetchProblemRunResultByProblemId } from "@/api/test-results";
+import { useBottomPanelStore } from "./right/bottom/bottom";
+import { fetchCurrentUserId } from "@/mocks/api/user";
+import type { ProblemTestCase } from "@/mocks/schema/problem-detail";
 
 import DescriptionView from "./Left/description/DescriptionView.vue";
 import SolutionsView from "./Left/solutions/SolutionsView.vue";
@@ -39,6 +42,7 @@ import TestResultsView from "./right/bottom/TestResultsView.vue";
 const route = useRoute();
 const problem = ref<ProblemDetail | null>(null);
 const runResult = ref<ProblemRunResult | null>(null);
+const bottomPanelStore = useBottomPanelStore();
 
 watch(
   () => problem.value?.id,
@@ -70,6 +74,60 @@ onMounted(async () => {
     problem.value = null;
   }
 });
+
+const buildRunResultFromCases = (
+  cases: ProblemTestCase[],
+  problemId: number,
+): ProblemRunResult => {
+  const runId = `run-${problemId}-${Date.now()}`;
+  const userId = fetchCurrentUserId();
+  const runtimeMs = 40 + cases.length * 5;
+  const memoryMb = 8 + cases.length * 2;
+
+  const mappedCases = cases.map((testCase, index) => {
+    const displayLabel = `Case ${index + 1}`;
+    const output =
+      testCase.inputs?.map((input) => input.value || "").join(" | ") || "OK";
+
+    return {
+      id: `${runId}-case-${index + 1}`,
+      runId,
+      submissionTestId: testCase.id,
+      testCaseId: testCase.id,
+      caseLabel: displayLabel,
+      status: "Accepted" as const,
+      runtime: `${Math.max(1, testCase.inputs?.length ?? 1) * 2} ms`,
+      memory: `${10 + index} MB`,
+      detail: "Sample run using provided inputs.",
+      output,
+      expectedOutput: output,
+      inputs: testCase.inputs ?? [],
+    };
+  });
+
+  return {
+    id: runId,
+    submissionId: `${runId}-submission`,
+    problemId,
+    userId,
+    verdict: "Accepted",
+    runtime: `${runtimeMs} ms`,
+    memory: `${memoryMb} MB`,
+    cases: mappedCases,
+  };
+};
+
+watch(
+  () => bottomPanelStore.lastRunToken.value,
+  () => {
+    if (!problem.value) return;
+    const cases =
+      bottomPanelStore.testCases.value.length > 0
+        ? bottomPanelStore.testCases.value
+        : problem.value.testCases ?? [];
+    runResult.value = buildRunResultFromCases(cases, problem.value.id);
+  },
+);
 
 // --- Context Provider ---
 // Define the context type

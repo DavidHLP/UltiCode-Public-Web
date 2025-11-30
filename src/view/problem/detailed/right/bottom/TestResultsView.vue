@@ -102,121 +102,96 @@ const selectCase = (label: string) => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col gap-4">
-    <p v-if="!props.runResult" class="text-sm text-muted-foreground">
-      No run results yet. Run or submit your code to see feedback here.
-    </p>
+  <div v-if="props.runResult" class="flex h-full flex-col gap-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span :class="['text-base font-semibold', verdictClass]">
+          {{ verdictLabel }}
+        </span>
+      </div>
+    </div>
 
-    <div v-else class="flex h-full flex-col gap-4">
-      <div class="flex items-baseline justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <span :class="['text-base font-semibold', verdictClass]">
-            {{ verdictLabel }}
+    <div v-if="cases.length" class="flex flex-col gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <Button
+          v-for="result in cases"
+          :key="result.id"
+          :variant="
+            result.caseLabel === activeCaseLabel ? 'secondary' : 'ghost'
+          "
+          size="sm"
+          class="h-7 rounded-md px-3 text-xs font-medium"
+          :class="
+            result.caseLabel === activeCaseLabel
+              ? 'text-foreground shadow-none'
+              : 'text-muted-foreground hover:text-foreground'
+          "
+          @click="selectCase(result.caseLabel)"
+        >
+          <span class="mr-1 inline-flex items-center gap-1">
+            <CheckCircle2
+              v-if="result.status === 'Accepted'"
+              class="h-3 w-3"
+              :class="caseStatusIconClass(result.status)"
+            />
+            <XCircle
+              v-else-if="result.status === 'Wrong Answer'"
+              class="h-3 w-3"
+              :class="caseStatusIconClass(result.status)"
+            />
+            <Circle
+              v-else
+              class="h-3 w-3"
+              :class="caseStatusIconClass(result.status)"
+            />
           </span>
-        </div>
+          <span>{{ result.caseLabel }}</span>
+        </Button>
       </div>
 
-      <div v-if="cases.length" class="flex flex-col gap-4">
-        <div class="flex flex-wrap items-center gap-3">
-          <Button
-            v-for="result in cases"
-            :key="result.id"
-            :variant="
-              result.caseLabel === activeCaseLabel ? 'secondary' : 'ghost'
-            "
-            size="sm"
-            class="h-7 rounded-md px-3 text-xs font-medium"
-            :class="
-              result.caseLabel === activeCaseLabel
-                ? 'text-foreground shadow-none'
-                : 'text-muted-foreground hover:text-foreground'
-            "
-            @click="selectCase(result.caseLabel)"
-          >
-            <span class="mr-1 inline-flex items-center gap-1">
-              <CheckCircle2
-                v-if="result.status === 'Accepted'"
-                class="h-3 w-3"
-                :class="caseStatusIconClass(result.status)"
-              />
-              <XCircle
-                v-else-if="result.status === 'Wrong Answer'"
-                class="h-3 w-3"
-                :class="caseStatusIconClass(result.status)"
-              />
-              <Circle
-                v-else
-                class="h-3 w-3"
-                :class="caseStatusIconClass(result.status)"
-              />
-            </span>
-            <span>{{ result.caseLabel }}</span>
-          </Button>
-        </div>
-
-        <div v-if="activeResult" class="space-y-4 text-xs md:text-sm">
-          <div class="space-y-1">
-            <p class="text-sm font-semibold text-foreground">
-              {{ activeResult.caseLabel }}
-            </p>
-            <p class="text-xs text-muted-foreground">
-              Current status: {{ activeResult.status }}
-              <span v-if="activeResult.runtime">
-                · Runtime: {{ activeResult.runtime }}</span
+      <div v-if="activeResult" class="space-y-4 text-xs md:text-sm">
+        <div class="space-y-3">
+          <div class="space-y-2">
+            <template v-if="activeResult.inputs.length">
+              <div
+                v-for="field in activeResult.inputs"
+                :key="field.id"
+                class="space-y-1"
               >
-              <span v-if="activeResult.memory" class="hidden sm:inline">
-                · Memory: {{ activeResult.memory }}
-              </span>
-            </p>
-          </div>
-
-          <div class="space-y-3">
-            <div class="space-y-2">
-              <template v-if="activeResult.inputs.length">
-                <div
-                  v-for="field in activeResult.inputs"
-                  :key="field.id"
-                  class="space-y-1"
-                >
-                  <div class="text-xs font-medium text-muted-foreground">
-                    {{ field.label }} =
-                  </div>
-                  <Input
-                    :model-value="field.value"
-                    readonly
-                    class="font-mono text-xs md:text-sm bg-muted border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  />
+                <div class="text-xs font-medium text-muted-foreground">
+                  {{ field.label }} =
                 </div>
-              </template>
-              <p v-else class="text-muted-foreground">此用例没有输入。</p>
-            </div>
-
-            <div class="space-y-2">
-              <div class="text-xs font-medium text-muted-foreground">
-                Output =
+                <Input
+                  :model-value="field.value"
+                  readonly
+                  class="font-mono text-xs md:text-sm bg-muted border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
               </div>
-              <Input
-                :model-value="activeResult.output"
-                readonly
-                class="font-mono text-xs md:text-sm bg-muted border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
-
-            <div class="space-y-2">
-              <div class="text-xs font-medium text-muted-foreground">
-                Expected =
-              </div>
-              <Input
-                :model-value="activeResult.expectedOutput"
-                readonly
-                class="font-mono text-xs md:text-sm bg-muted border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
+            </template>
+            <p v-else class="text-muted-foreground">此用例没有输入。</p>
           </div>
 
-          <p v-if="activeResult.detail" class="text-xs text-muted-foreground">
-            {{ activeResult.detail }}
-          </p>
+          <div class="space-y-2">
+            <div class="text-xs font-medium text-muted-foreground">
+              Output =
+            </div>
+            <Input
+              :model-value="activeResult.output"
+              readonly
+              class="font-mono text-xs md:text-sm bg-muted border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-xs font-medium text-muted-foreground">
+              Expected =
+            </div>
+            <Input
+              :model-value="activeResult.expectedOutput"
+              readonly
+              class="font-mono text-xs md:text-sm bg-muted border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
         </div>
       </div>
     </div>

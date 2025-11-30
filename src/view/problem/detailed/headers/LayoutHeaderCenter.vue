@@ -8,6 +8,13 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { useBottomPanelStore } from "../right/bottom/bottom";
+
+const { requestRun } = useBottomPanelStore();
+
+const handleRun = () => {
+  requestRun();
+};
 </script>
 
 <template>
@@ -24,6 +31,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
               size="icon"
               aria-label="Run"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-200"
+              @click="handleRun"
             >
               <Play class="h-4 w-4" />
             </Button>

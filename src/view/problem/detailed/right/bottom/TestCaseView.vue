@@ -16,7 +16,7 @@ const props = defineProps<{
 const activeId = ref("");
 const localCases = ref<ProblemTestCase[]>([]);
 
-const { activeCaseLabel } = useBottomPanelStore();
+const { activeCaseLabel, updateTestCases } = useBottomPanelStore();
 
 const generateId = (prefix: string) =>
   `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
@@ -48,6 +48,7 @@ watch(
       ...testCase,
       inputs: testCase.inputs?.map((input) => ({ ...input })) ?? [],
     }));
+    updateTestCases(localCases.value);
   },
   { immediate: true, deep: true },
 );
@@ -56,6 +57,7 @@ watch(
   localCases,
   (cases) => {
     const firstCase = cases[0];
+    updateTestCases(cases);
 
     if (!firstCase) {
       activeId.value = "";
@@ -70,9 +72,9 @@ watch(
   { immediate: true, deep: true },
 );
 
-watch(activeCaseLabel, (label) => {
-  if (!label || !localCases.value.length) return;
-  const matched = caseTabs.value.find((testCase) => testCase.displayLabel === label);
+watch(activeCaseLabel, (newLabel) => {
+  if (!newLabel || !localCases.value.length) return;
+  const matched = caseTabs.value.find((testCase) => testCase.displayLabel === newLabel);
   if (matched && matched.id !== activeId.value) {
     activeId.value = matched.id;
   }
@@ -94,7 +96,7 @@ const caseTabs = computed(() =>
 
 watch(
   () => activeCase.value?.label,
-  (label) => {
+  () => {
     const tab = caseTabs.value.find((item) => item.id === activeCase.value?.id);
     activeCaseLabel.value = tab?.displayLabel ?? null;
   },
@@ -117,6 +119,7 @@ const addCase = () => {
 
   localCases.value = [...localCases.value, newCase];
   activeId.value = newId;
+  updateTestCases(localCases.value);
 };
 
 const selectCase = (id: string) => {
@@ -126,6 +129,7 @@ const selectCase = (id: string) => {
 const removeCase = (id: string) => {
   if (!canRemoveCases.value) return;
   localCases.value = localCases.value.filter((testCase) => testCase.id !== id);
+  updateTestCases(localCases.value);
 };
 </script>
 
