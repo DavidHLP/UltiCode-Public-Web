@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import ProblemView from "@/view/problem/components/ProblemView.vue";
+import ProblemExplorer from "@/view/problem/components/ProblemExplorer.vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart } from "@/components/ui/chart-line";
@@ -196,7 +196,7 @@ const percentAxisFormatter = (value: number | Date) => {
 
 <template>
   <div class="mx-auto w-full max-w-[60%] space-y-8 py-6">
-    <ProblemView :problems="problems">
+    <ProblemExplorer :problems="problems">
     <template #header>
       <div class="space-y-6">
         <!-- 标题和操作按钮 -->
@@ -352,7 +352,7 @@ const percentAxisFormatter = (value: number | Date) => {
       </div>
     </template>
 
-    <!-- 问题列表将由 ProblemView 组件处理 -->
+    <!-- 问题列表将由 ProblemExplorer 组件处理 -->
     <template v-if="problems.length === 0">
       <Empty class="h-80 border border-border bg-muted/40">
         <EmptyContent>
@@ -371,6 +371,6 @@ const percentAxisFormatter = (value: number | Date) => {
         </EmptyContent>
       </Empty>
     </template>
-    </ProblemView>
+    </ProblemExplorer>
   </div>
 </template>

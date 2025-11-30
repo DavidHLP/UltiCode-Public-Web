@@ -30,9 +30,9 @@ import { useBottomPanelStore } from "./right/bottom/bottom";
 import { fetchCurrentUserId } from "@/mocks/api/user";
 import type { ProblemTestCase } from "@/mocks/schema/problem-detail";
 
-import DescriptionView from "./Left/description/DescriptionView.vue";
-import SolutionsView from "./Left/solutions/SolutionsView.vue";
-import SubmissionsView from "./Left/submissions/SubmissionsView.vue";
+import DescriptionView from "./left-panel/description/DescriptionView.vue";
+import SolutionsView from "./left-panel/solutions/SolutionsView.vue";
+import SubmissionsView from "./left-panel/submissions/SubmissionsView.vue";
 import CodeView from "./right/top/CodeView.vue";
 import TestCaseView from "./right/bottom/TestCaseView.vue";
 import TestResultsView from "./right/bottom/TestResultsView.vue";

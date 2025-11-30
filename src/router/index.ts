@@ -46,19 +46,19 @@ const router = createRouter({
       children: [
         {
           path: "",
-          component: () => import("@/view/problem/ProblemView.vue"),
+          component: () => import("@/view/problem/ProblemLayout.vue"),
           children: [
             { path: "", redirect: { name: "problemset" } },
             {
               path: "problemset",
               name: "problemset",
-              component: () => import("@/view/problem/problemset/ProblemSet.vue"),
+              component: () => import("@/view/problem/problem-set/ProblemSetView.vue"),
             },
             {
               path: "problemlist/:id",
               name: "problemlist",
               component: () =>
-                import("@/view/problem/problemlist/ProblemList.vue"),
+                import("@/view/problem/problem-list/ProblemListView.vue"),
             },
           ],
         },
@@ -67,12 +67,12 @@ const router = createRouter({
     {
       path: "/problem/detail/:id(\\d+)",
       name: "problem-detail",
-      component: () => import("@/view/problem/detailed/DetailedView.vue"),
+      component: () => import("@/view/problem/detail/ProblemDetailView.vue"),
     },
     {
       path: "/problem/:id(\\d+)/solution/create",
       name: "solution-create",
-      component: () => import("@/view/problem/detailed/Left/solutions/SolutionsEditView.vue"),
+      component: () => import("@/view/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
     }
   ],
 });

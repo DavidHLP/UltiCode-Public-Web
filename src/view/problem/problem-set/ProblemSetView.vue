@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProblemView from "@/view/problem/components/ProblemView.vue";
+import ProblemExplorer from "@/view/problem/components/ProblemExplorer.vue";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -34,6 +34,6 @@ import {
       <CarouselPrevious class="left-0" />
       <CarouselNext class="right-0" />
     </Carousel>
-    <ProblemView />
+    <ProblemExplorer />
   </div>
 </template>
