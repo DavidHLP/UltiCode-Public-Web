@@ -27,7 +27,7 @@ defineProps<{
         <ul class="space-y-1">
           <li v-for="item in list.items" :key="item.id">
             <RouterLink
-              :to="`/problem/problemlist/${item.id}`"
+              :to="`/problem/problem-list/${item.id}`"
               class="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               <span class="flex-1 truncate">{{ item.name }}</span>

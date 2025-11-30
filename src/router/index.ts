@@ -1,79 +1,83 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+const forumRoutes: RouteRecordRaw = {
+  path: "/forum",
+  component: () => import("@/layout/AppLayout.vue"),
+  children: [
     {
-      path: "/",
-      redirect: { name: "forum-home" },
+      path: "",
+      name: "forum-home",
+      component: () => import("@/view/forum/ForumView.vue"),
     },
     {
-      path: "/forum",
-      component: () => import("@/layout/AppLayout.vue"),
+      path: "detailed/:postId",
+      name: "forum-thread",
+      component: () => import("@/view/forum/detailed/ForumDetailedView.vue"),
+    },
+  ],
+};
+
+const contestRoutes: RouteRecordRaw = {
+  path: "/contest",
+  component: () => import("@/layout/AppLayout.vue"),
+  children: [
+    {
+      path: "",
+      name: "contest-home",
+      component: () => import("@/view/contest/ContestView.vue"),
+    },
+    {
+      path: ":contestId",
+      name: "contest-detail",
+      component: () => import("@/view/contest/detailed/ContestDetailView.vue"),
+    },
+  ],
+};
+
+const problemRoutes: RouteRecordRaw = {
+  path: "/problem",
+  component: () => import("@/layout/AppLayout.vue"),
+  children: [
+    {
+      path: "",
+      component: () => import("@/view/problem/ProblemLayout.vue"),
       children: [
+        { path: "", redirect: { name: "problem-set" } },
         {
-          path: "",
-          name: "forum-home",
-          component: () => import("@/view/forum/ForumView.vue"),
-        },
-        {
-          path: "detailed/:postId",
-          name: "forum-thread",
+          path: "problem-set",
+          name: "problem-set",
           component: () =>
-            import("@/view/forum/detailed/ForumDetailedView.vue"),
+            import("@/view/problem/problem-set/ProblemSetView.vue"),
+        },
+        {
+          path: "problem-list/:id",
+          name: "problem-list",
+          component: () =>
+            import("@/view/problem/problem-list/ProblemListView.vue"),
         },
       ],
     },
     {
-      path: "/contest",
-      component: () => import("@/layout/AppLayout.vue"),
-      children: [
-        {
-          path: "",
-          name: "contest-home",
-          component: () => import("@/view/contest/ContestView.vue"),
-        },
-        {
-          path: ":contestId",
-          name: "contest-detail",
-          component: () => import("@/view/contest/detailed/ContestDetailView.vue"),
-        },
-      ],
-    },
-    {
-      path: "/problem",
-      component: () => import("@/layout/AppLayout.vue"),
-      children: [
-        {
-          path: "",
-          component: () => import("@/view/problem/ProblemLayout.vue"),
-          children: [
-            { path: "", redirect: { name: "problemset" } },
-            {
-              path: "problemset",
-              name: "problemset",
-              component: () => import("@/view/problem/problem-set/ProblemSetView.vue"),
-            },
-            {
-              path: "problemlist/:id",
-              name: "problemlist",
-              component: () =>
-                import("@/view/problem/problem-list/ProblemListView.vue"),
-            },
-          ],
-        },
-      ],
-    },
-    {
-      path: "/problem/detail/:id(\\d+)",
+      path: "detail/:id(\\d+)",
       name: "problem-detail",
       component: () => import("@/view/problem/detail/ProblemDetailView.vue"),
     },
     {
-      path: "/problem/:id(\\d+)/solution/create",
+      path: ":id(\\d+)/solution/create",
       name: "solution-create",
-      component: () => import("@/view/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
-    }
+      component: () =>
+        import("@/view/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
+    },
+  ],
+};
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    { path: "/", redirect: { name: "forum-home" } },
+    forumRoutes,
+    contestRoutes,
+    problemRoutes,
   ],
 });
 
