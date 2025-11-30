@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { onBeforeUnmount, ref } from "vue";
 import { Play, CloudUpload, StickyNote } from "lucide-vue-next";
 import {
   HoverCard,
@@ -12,9 +13,27 @@ import { useBottomPanelStore } from "../right/bottom/bottom";
 
 const { requestRun } = useBottomPanelStore();
 
+const isRunning = ref(false);
+const runPulseKey = ref(0);
+const runTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+
 const handleRun = () => {
   requestRun();
+  runPulseKey.value = Date.now();
+  isRunning.value = true;
+  if (runTimer.value) {
+    clearTimeout(runTimer.value);
+  }
+  runTimer.value = setTimeout(() => {
+    isRunning.value = false;
+  }, 1200);
 };
+
+onBeforeUnmount(() => {
+  if (runTimer.value) {
+    clearTimeout(runTimer.value);
+  }
+});
 </script>
 
 <template>
@@ -30,10 +49,27 @@ const handleRun = () => {
               variant="ghost"
               size="icon"
               aria-label="Run"
-              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-200"
+              :aria-busy="isRunning"
+              class="group relative flex-none cursor-pointer flex items-center h-8 transition hover:bg-primary/10 text-gray-600 w-9 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-100 overflow-hidden rounded-md"
               @click="handleRun"
             >
-              <Play class="h-4 w-4" />
+              <span
+                v-if="isRunning"
+                :key="runPulseKey"
+                class="pointer-events-none absolute inset-0 animate-[ping_1s_ease-out] rounded-md bg-primary/20"
+              />
+              <span
+                class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-50"
+                :class="isRunning ? 'bg-primary/15' : 'bg-primary/5'"
+              />
+              <Play
+                class="h-4 w-4 transition-transform duration-200"
+                :class="
+                  isRunning
+                    ? 'text-primary animate-[spin_0.9s_linear]'
+                    : 'text-gray-700'
+                "
+              />
             </Button>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
