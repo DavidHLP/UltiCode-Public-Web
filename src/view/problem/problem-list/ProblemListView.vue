@@ -195,23 +195,40 @@ const percentAxisFormatter = (value: number | Date) => {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-[60%] space-y-8 py-6">
+  <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     <ProblemExplorer :problems="problems">
     <template #header>
-      <div class="space-y-6">
+      <div class="space-y-8 pb-8 border-b border-border/40">
         <!-- 标题和操作按钮 -->
-        <div class="flex items-end justify-between gap-4">
-          <div class="flex items-end gap-3">
-            <h1 class="text-3xl font-bold tracking-tight">
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div class="space-y-2">
+            <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
               {{ currentList?.name || "Problem List" }}
             </h1>
+             <!-- 描述 -->
+            <p
+              v-if="currentList?.description"
+              class="text-lg text-muted-foreground leading-relaxed max-w-3xl"
+            >
+              {{ currentList.description }}
+            </p>
+             <!-- 元数据 -->
+            <div class="flex items-center gap-4 text-sm text-muted-foreground pt-2">
+              <span v-if="currentList?.createdAt" class="flex items-center gap-1">
+                Created {{ formatDate(currentList.createdAt) }}
+              </span>
+              <span v-if="currentList?.updatedAt" class="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-muted-foreground/50">
+                Updated {{ formatDate(currentList.updatedAt) }}
+              </span>
+            </div>
           </div>
-          <div class="flex items-center gap-3">
-            <Button variant="outline" size="sm">
+          
+          <div class="flex items-center gap-2 shrink-0">
+            <Button variant="outline" size="sm" class="h-9">
               <Share2 class="mr-2 h-4 w-4" />
               Share
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" class="h-9">
               <GitFork class="mr-2 h-4 w-4" />
               Fork
             </Button>
@@ -232,72 +249,43 @@ const percentAxisFormatter = (value: number | Date) => {
           </div>
         </div>
 
-        <!-- 描述 -->
-        <p
-          v-if="currentList?.description"
-          class="text-base text-muted-foreground leading-relaxed"
-        >
-          {{ currentList.description }}
-        </p>
-
         <!-- 统计信息 - 使用图表颜色系统 -->
-        <div class="flex flex-wrap items-center gap-8 text-sm">
-          <div class="flex items-center gap-2.5">
-            <span class="text-muted-foreground">Total:</span>
-            <span class="font-semibold">{{ safeStats.totalCount }}</span>
-          </div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-muted-foreground">Solved:</span>
-            <span class="chart-solved font-semibold">{{
-              safeStats.solvedCount
-            }}</span>
-          </div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-muted-foreground">Attempted:</span>
-            <span class="chart-attempted font-semibold">{{
-              safeStats.attemptedCount
-            }}</span>
-          </div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-muted-foreground">Todo:</span>
-            <span class="chart-todo font-semibold">{{
-              safeStats.todoCount
-            }}</span>
-          </div>
-          <div class="flex items-center gap-2.5">
-            <span class="text-muted-foreground">Progress:</span>
-            <span class="font-semibold"
-              >{{ safeStats.progress.toFixed(1) }}%</span
-            >
-          </div>
-        </div>
-
-        <!-- 元数据 -->
-        <div class="flex items-center gap-6 text-xs text-muted-foreground">
-          <span v-if="currentList?.createdAt">
-            Created: {{ formatDate(currentList.createdAt) }}
-          </span>
-          <span v-if="currentList?.updatedAt">
-            Updated: {{ formatDate(currentList.updatedAt) }}
-          </span>
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:w-fit">
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</span>
+                <span class="text-2xl font-bold">{{ safeStats.totalCount }}</span>
+            </div>
+             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Solved</span>
+                <span class="text-2xl font-bold text-[hsl(var(--chart-status-solved))]">{{ safeStats.solvedCount }}</span>
+            </div>
+             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Attempted</span>
+                <span class="text-2xl font-bold text-[hsl(var(--chart-status-attempted))]">{{ safeStats.attemptedCount }}</span>
+            </div>
+             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Todo</span>
+                <span class="text-2xl font-bold text-[hsl(var(--chart-status-todo))]">{{ safeStats.todoCount }}</span>
+            </div>
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Progress</span>
+                <span class="text-2xl font-bold">{{ safeStats.progress.toFixed(1) }}%</span>
+            </div>
         </div>
 
         <!-- 图表区域 -->
         <div
           v-if="problems.length"
-          class="grid grid-cols-1 gap-8 xl:grid-cols-3"
+          class="grid grid-cols-1 gap-6 lg:grid-cols-3 pt-4"
         >
           <!-- Status Overview Card -->
-          <Card class="chart-fade-in bg-card/60 backdrop-blur transition-shadow hover:shadow-lg">
-            <CardHeader class="pb-3 space-y-2">
-              <CardTitle class="text-lg">Status Overview</CardTitle>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                Status mix rendered with the shared donut design
-              </p>
+          <Card class="chart-fade-in bg-card transition-all hover:shadow-md">
+            <CardHeader class="pb-2">
+              <CardTitle class="text-base font-medium">Status Overview</CardTitle>
             </CardHeader>
-            <CardContent class="space-y-6">
+            <CardContent>
               <DonutChart
-                class="h-64"
+                class="h-60"
                 index="name"
                 :category="'total'"
                 :data="statusDonutData"
@@ -308,21 +296,18 @@ const percentAxisFormatter = (value: number | Date) => {
           </Card>
 
           <!-- Difficulty Insights Card -->
-          <Card class="chart-fade-in xl:col-span-2 transition-shadow hover:shadow-lg">
-            <CardHeader class="pb-3 space-y-2">
-              <CardTitle class="text-lg">Difficulty Insights</CardTitle>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                Status mix, premium load, and acceptance per difficulty
-              </p>
+          <Card class="chart-fade-in lg:col-span-2 transition-all hover:shadow-md">
+            <CardHeader class="pb-2">
+              <CardTitle class="text-base font-medium">Difficulty Insights</CardTitle>
             </CardHeader>
             <CardContent>
               <BarChart
-                class="h-96"
+                class="h-60"
                 :data="difficultyInsights"
                 index="difficulty"
                 :categories="statusCategories"
                 type="stacked"
-                :rounded-corners="6"
+                :rounded-corners="4"
                 :y-formatter="countFormatter"
                 :colors="statusColorScale"
               />
@@ -330,16 +315,13 @@ const percentAxisFormatter = (value: number | Date) => {
           </Card>
 
           <!-- Progress Momentum Card -->
-          <Card class="chart-fade-in xl:col-span-3 transition-shadow hover:shadow-lg">
-            <CardHeader class="pb-3 space-y-2">
-              <CardTitle class="text-lg">Progress Momentum</CardTitle>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                Rolling share of solved / attempted / todo alongside acceptance
-              </p>
+          <Card class="chart-fade-in lg:col-span-3 transition-all hover:shadow-md">
+            <CardHeader class="pb-2">
+              <CardTitle class="text-base font-medium">Progress Momentum</CardTitle>
             </CardHeader>
             <CardContent>
               <LineChart
-                class="h-[400px]"
+                class="h-[300px]"
                 :data="progressMomentum"
                 index="label"
                 :categories="momentumCategories"

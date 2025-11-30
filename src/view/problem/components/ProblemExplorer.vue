@@ -205,200 +205,213 @@ function loadMore() {
 </script>
 
 <template>
-  <section class="flex flex-col gap-4">
+  <section class="flex flex-col gap-6">
     <slot name="header" />
-    <header class="flex items-center gap-2">
-      <div class="relative w-full max-w-sm">
-        <Search
-          class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
-        />
-        <Input
-          v-model="searchQuery"
-          placeholder="Search problems..."
-          class="pl-9"
-        />
+    
+    <div class="space-y-4">
+      <!-- Controls Bar -->
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <!-- Left: Search -->
+        <div class="relative w-full max-w-md">
+          <Search
+            class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
+          <Input
+            v-model="searchQuery"
+            placeholder="Search problems by title or ID..."
+            class="pl-9 h-10"
+          />
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <Button variant="outline" class="h-10 gap-2 border-dashed">
+                <ListFilter class="h-4 w-4" />
+                Filters
+                <Badge 
+                  v-if="selectedStatus.length + selectedDifficulty.length + (showPremium !== null ? 1 : 0) > 0" 
+                  variant="secondary" 
+                  class="ml-1 h-5 px-1 text-[10px]"
+                >
+                  {{ selectedStatus.length + selectedDifficulty.length + (showPremium !== null ? 1 : 0) }}
+                </Badge>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent class="w-56" align="end">
+              <DropdownMenuLabel>Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                :checked="selectedStatus.includes('solved')"
+                @click="
+                  () => toggleStatusSolved(!selectedStatus.includes('solved'))
+                "
+              >
+                <span class="flex items-center w-full">
+                  Solved
+                  <CheckIcon
+                    v-if="selectedStatus.includes('solved')"
+                    class="ml-auto h-4 w-4"
+                  />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                :checked="selectedStatus.includes('attempted')"
+                @click="
+                  () => toggleStatusAttempted(!selectedStatus.includes('attempted'))
+                "
+              >
+                <span class="flex items-center w-full">
+                  Attempted
+                  <CheckIcon
+                    v-if="selectedStatus.includes('attempted')"
+                    class="ml-auto h-4 w-4"
+                  />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                :checked="selectedStatus.includes('todo')"
+                @click="() => toggleStatusTodo(!selectedStatus.includes('todo'))"
+              >
+                <span class="flex items-center w-full">
+                  Todo
+                  <CheckIcon
+                    v-if="selectedStatus.includes('todo')"
+                    class="ml-auto h-4 w-4"
+                  />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Difficulty</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                :checked="selectedDifficulty.includes('Easy')"
+                @click="
+                  () => toggleDifficultyEasy(!selectedDifficulty.includes('Easy'))
+                "
+              >
+                <span class="flex items-center w-full">
+                  Easy
+                  <CheckIcon
+                    v-if="selectedDifficulty.includes('Easy')"
+                    class="ml-auto h-4 w-4"
+                  />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                :checked="selectedDifficulty.includes('Medium')"
+                @click="
+                  () =>
+                    toggleDifficultyMedium(!selectedDifficulty.includes('Medium'))
+                "
+              >
+                <span class="flex items-center w-full">
+                  Medium
+                  <CheckIcon
+                    v-if="selectedDifficulty.includes('Medium')"
+                    class="ml-auto h-4 w-4"
+                  />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                :checked="selectedDifficulty.includes('Hard')"
+                @click="
+                  () => toggleDifficultyHard(!selectedDifficulty.includes('Hard'))
+                "
+              >
+                <span class="flex items-center w-full">
+                  Hard
+                  <CheckIcon
+                    v-if="selectedDifficulty.includes('Hard')"
+                    class="ml-auto h-4 w-4"
+                  />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Premium</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                :checked="showPremium === false"
+                @click="() => togglePremiumFree(!(showPremium === false))"
+              >
+                <span class="flex items-center w-full">
+                  Free
+                  <CheckIcon v-if="showPremium === false" class="ml-auto h-4 w-4" />
+                </span>
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                :checked="showPremium === true"
+                @click="() => togglePremiumPremium(!(showPremium === true))"
+              >
+                <span class="flex items-center w-full">
+                  Premium
+                  <CheckIcon v-if="showPremium === true" class="ml-auto h-4 w-4" />
+                </span>
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Button variant="outline" class="h-10" @click="pickOne">
+             Pick One 
+          </Button>
+          
+          <Button
+            v-if="
+              searchQuery ||
+              selectedTags.length ||
+              selectedStatus.length ||
+              selectedDifficulty.length ||
+              showPremium !== null
+            "
+            variant="ghost"
+            size="icon"
+            class="h-10 w-10"
+            @click="clearFilters"
+            aria-label="Clear filters"
+          >
+            <X class="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <Button variant="outline" class="gap-2">
-            <ListFilter class="h-4 w-4" />
-            Filters
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent class="w-56">
-          <DropdownMenuLabel>Status</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem
-            :checked="selectedStatus.includes('solved')"
-            @click="
-              () => toggleStatusSolved(!selectedStatus.includes('solved'))
-            "
+
+      <!-- Tags Section -->
+      <Collapsible class="w-full space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <Badge
+            v-for="tag in popularTags"
+            :key="tag"
+            :variant="isTagSelected(tag) ? 'default' : 'outline'"
+            class="cursor-pointer px-3 py-1 hover:bg-primary/80 hover:text-primary-foreground transition-colors"
+            :class="{ 'bg-primary text-primary-foreground hover:bg-primary/90': isTagSelected(tag) }"
+            @click="toggleTag(tag)"
           >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon
-                  v-if="selectedStatus.includes('solved')"
-                  class="h-4 w-4"
-                />
-              </span>
-              Solved
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            :checked="selectedStatus.includes('attempted')"
-            @click="
-              () => toggleStatusAttempted(!selectedStatus.includes('attempted'))
-            "
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon
-                  v-if="selectedStatus.includes('attempted')"
-                  class="h-4 w-4"
-                />
-              </span>
-              Attempted
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            :checked="selectedStatus.includes('todo')"
-            @click="() => toggleStatusTodo(!selectedStatus.includes('todo'))"
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon
-                  v-if="selectedStatus.includes('todo')"
-                  class="h-4 w-4"
-                />
-              </span>
-              Todo
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Difficulty</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem
-            :checked="selectedDifficulty.includes('Easy')"
-            @click="
-              () => toggleDifficultyEasy(!selectedDifficulty.includes('Easy'))
-            "
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon
-                  v-if="selectedDifficulty.includes('Easy')"
-                  class="h-4 w-4"
-                />
-              </span>
-              Easy
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            :checked="selectedDifficulty.includes('Medium')"
-            @click="
-              () =>
-                toggleDifficultyMedium(!selectedDifficulty.includes('Medium'))
-            "
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon
-                  v-if="selectedDifficulty.includes('Medium')"
-                  class="h-4 w-4"
-                />
-              </span>
-              Medium
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            :checked="selectedDifficulty.includes('Hard')"
-            @click="
-              () => toggleDifficultyHard(!selectedDifficulty.includes('Hard'))
-            "
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon
-                  v-if="selectedDifficulty.includes('Hard')"
-                  class="h-4 w-4"
-                />
-              </span>
-              Hard
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Premium</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem
-            :checked="showPremium === false"
-            @click="() => togglePremiumFree(!(showPremium === false))"
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon v-if="showPremium === false" class="h-4 w-4" />
-              </span>
-              Free
-            </span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            :checked="showPremium === true"
-            @click="() => togglePremiumPremium(!(showPremium === true))"
-          >
-            <span class="flex items-center">
-              <span class="w-4 h-4 mr-2">
-                <CheckIcon v-if="showPremium === true" class="h-4 w-4" />
-              </span>
-              Premium
-            </span>
-          </DropdownMenuCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Button variant="outline" @click="pickOne"> Pick One </Button>
-      <Button
-        v-if="
-          searchQuery ||
-          selectedTags.length ||
-          selectedStatus.length ||
-          selectedDifficulty.length ||
-          showPremium !== null
-        "
-        variant="ghost"
-        size="icon"
-        @click="clearFilters"
-      >
-        <X class="h-4 w-4" />
-      </Button>
-    </header>
-    <Collapsible class="w-full space-y-2">
-      <section class="flex flex-wrap items-center gap-2">
-        <Badge
-          v-for="tag in popularTags"
-          :key="tag"
-          :variant="isTagSelected(tag) ? 'default' : 'secondary'"
-          class="cursor-pointer"
-          @click="toggleTag(tag)"
-        >
-          {{ tag }}
-        </Badge>
-        <CollapsibleTrigger as-child>
-          <Button variant="ghost" size="sm" class="gap-1">
-            More
-            <ChevronDown class="h-4 w-4" />
-          </Button>
-        </CollapsibleTrigger>
-      </section>
-      <CollapsibleContent class="flex flex-wrap gap-2">
-        <Badge
-          v-for="tag in otherTags"
-          :key="tag"
-          :variant="isTagSelected(tag) ? 'default' : 'secondary'"
-          class="cursor-pointer"
-          @click="toggleTag(tag)"
-        >
-          {{ tag }}
-        </Badge>
-      </CollapsibleContent>
-    </Collapsible>
+            {{ tag }}
+          </Badge>
+          <CollapsibleTrigger as-child>
+            <Button variant="ghost" size="sm" class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground">
+              Show more tags
+              <ChevronDown class="h-3 w-3" />
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+        <CollapsibleContent class="animate-slide-down">
+          <div class="flex flex-wrap gap-2 pt-2">
+            <Badge
+              v-for="tag in otherTags"
+              :key="tag"
+              :variant="isTagSelected(tag) ? 'default' : 'outline'"
+              class="cursor-pointer hover:bg-primary/80 hover:text-primary-foreground transition-colors"
+              :class="{ 'bg-primary text-primary-foreground hover:bg-primary/90': isTagSelected(tag) }"
+              @click="toggleTag(tag)"
+            >
+              {{ tag }}
+            </Badge>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+
     <ProblemTable
       :displayed-problems="displayedProblems"
       :num-problems-to-show="numProblemsToShow"
