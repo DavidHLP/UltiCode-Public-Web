@@ -57,18 +57,20 @@ const problemRoutes: RouteRecordRaw = {
         },
       ],
     },
-    {
-      path: "detail/:id(\\d+)",
-      name: "problem-detail",
-      component: () => import("@/view/problem/detail/ProblemDetailView.vue"),
-    },
-    {
-      path: ":id(\\d+)/solution/create",
-      name: "solution-create",
-      component: () =>
-        import("@/view/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
-    },
   ],
+};
+
+const problemDetailRoute: RouteRecordRaw = {
+  path: "/problem/detail/:id(\\d+)",
+  name: "problem-detail",
+  component: () => import("@/view/problem/detail/ProblemDetailView.vue"),
+};
+
+const solutionCreateRoute: RouteRecordRaw = {
+  path: "/problem/:id(\\d+)/solution/create",
+  name: "solution-create",
+  component: () =>
+    import("@/view/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
 };
 
 const router = createRouter({
@@ -78,6 +80,8 @@ const router = createRouter({
     forumRoutes,
     contestRoutes,
     problemRoutes,
+    problemDetailRoute,
+    solutionCreateRoute,
   ],
 });
 
