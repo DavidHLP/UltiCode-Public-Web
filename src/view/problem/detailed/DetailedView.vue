@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, provide, h, defineComponent, inject, type Component } from "vue";
+import { onMounted, ref, watch, provide, h, defineComponent, inject, type Component, type Ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from 'pinia'
 import { Button } from "@/components/ui/button";
@@ -60,15 +60,23 @@ onMounted(async () => {
 });
 
 // --- Context Provider ---
+// Define the context type
+interface ProblemContextType {
+  problem: Ref<ProblemDetail | null>;
+  runResult: Ref<ProblemRunResult | null>;
+}
+
 // Provide problem and runResult to connector components
-provide('problemContext', { problem, runResult });
+provide<ProblemContextType>('problemContext', { problem, runResult });
 
 // --- Connector Components ---
 // These wrappers adapt the injected context to the specific props required by the views
 
 const ConnectedDescriptionView = defineComponent({
   setup() {
-    const { problem } = inject('problemContext') as any
+    const context = inject<ProblemContextType>('problemContext')
+    if (!context) throw new Error('problemContext not provided')
+    const { problem } = context
     return () => problem.value 
       ? h('div', { class: 'px-1 py-2' }, h(DescriptionView, { problem: problem.value })) 
       : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
@@ -77,7 +85,9 @@ const ConnectedDescriptionView = defineComponent({
 
 const ConnectedSolutionsView = defineComponent({
   setup() {
-    const { problem } = inject('problemContext') as any
+    const context = inject<ProblemContextType>('problemContext')
+    if (!context) throw new Error('problemContext not provided')
+    const { problem } = context
     return () => problem.value 
       ? h('div', { class: 'px-1 py-2' }, h(SolutionsView, { problemId: problem.value.id, followUp: problem.value.followUp ?? '' })) 
       : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
@@ -86,7 +96,9 @@ const ConnectedSolutionsView = defineComponent({
 
 const ConnectedSubmissionsView = defineComponent({
   setup() {
-    const { problem } = inject('problemContext') as any
+    const context = inject<ProblemContextType>('problemContext')
+    if (!context) throw new Error('problemContext not provided')
+    const { problem } = context
     return () => problem.value 
       ? h('div', { class: 'px-1 py-2' }, h(SubmissionsView, { problemId: problem.value.id })) 
       : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
@@ -95,7 +107,9 @@ const ConnectedSubmissionsView = defineComponent({
 
 const ConnectedCodeView = defineComponent({
   setup() {
-    const { problem } = inject('problemContext') as any
+    const context = inject<ProblemContextType>('problemContext')
+    if (!context) throw new Error('problemContext not provided')
+    const { problem } = context
     return () => problem.value && problem.value.languages.length
       ? h(CodeView, { languages: problem.value.languages, starterNotes: problem.value.starterNotes }) 
       : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
@@ -104,7 +118,9 @@ const ConnectedCodeView = defineComponent({
 
 const ConnectedTestCaseView = defineComponent({
   setup() {
-    const { problem } = inject('problemContext') as any
+    const context = inject<ProblemContextType>('problemContext')
+    if (!context) throw new Error('problemContext not provided')
+    const { problem } = context
     return () => problem.value 
       ? h('div', { class: 'px-1 py-2' }, h(TestCaseView, { testCases: problem.value.testCases })) 
       : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
@@ -113,7 +129,9 @@ const ConnectedTestCaseView = defineComponent({
 
 const ConnectedTestResultsView = defineComponent({
   setup() {
-    const { runResult } = inject('problemContext') as any
+    const context = inject<ProblemContextType>('problemContext')
+    if (!context) throw new Error('problemContext not provided')
+    const { runResult } = context
     return () => h('div', { class: 'px-1 py-2' }, h(TestResultsView, { runResult: runResult.value }))
   }
 })
