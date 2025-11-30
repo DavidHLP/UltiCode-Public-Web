@@ -10,6 +10,7 @@ import {
   type ProblemTestResult,
   type ProblemApproachRow,
   type ResultStatus,
+  type ProblemInteractionSnapshot,
 } from "@/mocks/schema/problem-detail";
 import problemDetailData from "@/mocks/db/problem-detail";
 import { fetchProblemById } from "@/mocks/api/problem";
@@ -85,15 +86,32 @@ const recentResultsByProblemId = groupByProblemId(
   problemDetailData.problem_recent_results,
 );
 
+const normalizeInteractions = (
+  snapshot: any,
+): ProblemInteractionSnapshot => {
+  const counts = snapshot?.counts ?? {};
+  const viewer = snapshot?.viewer ?? {};
+  return {
+    counts: {
+      likes: Number(counts.likes ?? 0),
+      dislikes: Number(counts.dislikes ?? 0),
+      favorites: Number(counts.favorites ?? 0),
+    },
+    viewer: {
+      reaction: (viewer.reaction ?? null) as ProblemInteractionSnapshot["viewer"]["reaction"],
+      isFavorite: Boolean(viewer.isFavorite),
+    },
+  };
+};
+
 problemDetailData.problem_details.forEach((detail) => {
+  const interactions = normalizeInteractions(detail.interactions);
   detailRecords.set(detail.problem_id, {
     id: detail.id,
     problemId: detail.problem_id,
     slug: detail.slug,
     summary: detail.summary,
     companies: detail.companies,
-    likes: detail.likes,
-    dislikes: detail.dislikes,
     difficultyRating: detail.difficulty_rating,
     updatedAt: detail.updated_at,
     followUp: detail.follow_up,
@@ -131,6 +149,7 @@ problemDetailData.problem_details.forEach((detail) => {
         detail,
       }),
     ),
+    interactions,
   });
 });
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Layout, User, Check } from 'lucide-vue-next'
+import { Layout, User, Check, ThumbsUp, ThumbsDown, Bookmark } from 'lucide-vue-next'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,15 +10,79 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu'
+import type {
+  ProblemDetail,
+  ProblemInteractionCounts,
+  ProblemInteractionSnapshot,
+  ProblemReaction,
+} from '@/mocks/schema/problem-detail'
 
 interface Props {
   currentLayout: 'leet' | 'classic' | 'compact' | 'wide'
+  problem?: ProblemDetail | null
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'layout-change': [layout: 'leet' | 'classic' | 'compact' | 'wide']
 }>()
+
+const interactionCounts = ref<ProblemInteractionCounts>({
+  likes: 0,
+  dislikes: 0,
+  favorites: 0,
+})
+
+const viewerInteraction = ref<ProblemInteractionSnapshot['viewer']>({
+  reaction: null,
+  isFavorite: false,
+})
+
+watch(
+  () => props.problem?.interactions,
+  (interactions) => {
+    if (!interactions) return
+    interactionCounts.value = { ...interactions.counts }
+    viewerInteraction.value = { ...interactions.viewer }
+  },
+  { immediate: true, deep: true },
+)
+
+const reactionCounts = computed(() => interactionCounts.value)
+const isLiked = computed(() => viewerInteraction.value.reaction === 'like')
+const isDisliked = computed(() => viewerInteraction.value.reaction === 'dislike')
+const isFavorited = computed(() => viewerInteraction.value.isFavorite)
+
+const adjustReactionCount = (reaction: ProblemReaction, delta: number) => {
+  if (reaction === 'like') {
+    interactionCounts.value.likes = Math.max(0, interactionCounts.value.likes + delta)
+  } else if (reaction === 'dislike') {
+    interactionCounts.value.dislikes = Math.max(0, interactionCounts.value.dislikes + delta)
+  }
+}
+
+const toggleReaction = (reaction: ProblemReaction) => {
+  if (!reaction) return
+  const previous = viewerInteraction.value.reaction
+  if (previous === reaction) {
+    adjustReactionCount(reaction, -1)
+    viewerInteraction.value.reaction = null
+    return
+  }
+
+  if (previous) adjustReactionCount(previous, -1)
+  viewerInteraction.value.reaction = reaction
+  adjustReactionCount(reaction, 1)
+}
+
+const toggleFavorite = () => {
+  const next = !viewerInteraction.value.isFavorite
+  viewerInteraction.value.isFavorite = next
+  interactionCounts.value.favorites = Math.max(
+    0,
+    interactionCounts.value.favorites + (next ? 1 : -1),
+  )
+}
 
 // Layout options
 const layoutOptions = [
@@ -55,6 +119,56 @@ const selectedLayout = computed({
 <template>
   <div class="flex min-w-60 flex-1 items-center justify-end overflow-hidden">
     <div class="flex items-center overflow-hidden rounded focus:outline-none">
+      <!-- Likes / Dislikes / Save buttons -->
+      <div v-if="problem" class="relative group/actions flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Like"
+          :aria-pressed="isLiked"
+          :class="[
+            'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
+            isLiked ? 'text-blue-600' : 'text-gray-600',
+          ]"
+          @click="toggleReaction('like')"
+        >
+          <ThumbsUp class="h-4 w-4" />
+          <span class="text-xs">{{ reactionCounts.likes }}</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Dislike"
+          :aria-pressed="isDisliked"
+          :class="[
+            'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
+            isDisliked ? 'text-rose-600' : 'text-gray-600',
+          ]"
+          @click="toggleReaction('dislike')"
+        >
+          <ThumbsDown class="h-4 w-4" />
+          <span class="text-xs">{{ reactionCounts.dislikes }}</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Save"
+          :aria-pressed="isFavorited"
+          :class="[
+            'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
+            isFavorited ? 'text-amber-600' : 'text-gray-600',
+          ]"
+          @click="toggleFavorite"
+        >
+          <Bookmark class="h-4 w-4" />
+          <span class="text-xs">{{ reactionCounts.favorites }}</span>
+        </Button>
+
+        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
+      </div>
+
       <div class="relative group/nav-back flex items-center">
         <!-- Layout button with Dropdown Menu -->
         <DropdownMenu>

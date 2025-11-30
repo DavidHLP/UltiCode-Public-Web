@@ -11,8 +11,10 @@ const data = {
       summary:
         "Given an integer array and a target, return the indices of the two numbers that add up to the target so that $nums[i] + nums[j] = target$. Exactly one valid pair exists per test case, and an element cannot be reused.",
       companies: ["Amazon", "Google"],
-      likes: 1240,
-      dislikes: 42,
+      interactions: {
+        counts: { likes: 1240, dislikes: 42, favorites: 580 },
+        viewer: { reaction: "like", isFavorite: true },
+      },
       difficulty_rating: 1197,
       updated_at: now,
       follow_up: "How would you handle a sorted array without extra space?",
@@ -25,8 +27,10 @@ const data = {
       summary:
         "Two non-empty linked lists represent non-negative integers in reverse order. Add them digit by digit with carry where $carry = \\lfloor (x + y + carry) / 10 \\rfloor$, and return the sum as a linked list in the same reversed order.",
       companies: ["Microsoft", "ByteDance"],
-      likes: 980,
-      dislikes: 31,
+      interactions: {
+        counts: { likes: 980, dislikes: 31, favorites: 460 },
+        viewer: { reaction: null, isFavorite: false },
+      },
       difficulty_rating: 1420,
       updated_at: now,
       follow_up: "Try writing a recursive variant and discuss its stack cost.",
@@ -39,8 +43,10 @@ const data = {
       summary:
         "Given n vertical lines represented by an array of heights, pick two lines that maximize container area $A(i,j) = \\min(h_i, h_j) \\times (j - i)$. Return the maximal area.",
       companies: ["Meta"],
-      likes: 840,
-      dislikes: 22,
+      interactions: {
+        counts: { likes: 840, dislikes: 22, favorites: 390 },
+        viewer: { reaction: "like", isFavorite: false },
+      },
       difficulty_rating: 1360,
       updated_at: now,
       follow_up: "Discuss why a greedy inward two-pointer scan is optimal.",
@@ -53,8 +59,10 @@ const data = {
       summary:
         "You are given n points on a 2D plane. Connect all points so the total cost of edges defined by $|x_i - x_j| + |y_i - y_j|$ is minimized; return the minimum spanning tree cost.",
       companies: ["Amazon", "Uber"],
-      likes: 760,
-      dislikes: 28,
+      interactions: {
+        counts: { likes: 760, dislikes: 28, favorites: 320 },
+        viewer: { reaction: null, isFavorite: false },
+      },
       difficulty_rating: 1820,
       updated_at: now,
       follow_up:
@@ -72,8 +80,10 @@ const data = {
       summary:
         "Given the root of a binary tree, return its node values level by level from top to bottom using breadth-first search with $O(n)$ time and $O(n)$ space.",
       companies: ["Google", "Bloomberg"],
-      likes: 1340,
-      dislikes: 58,
+      interactions: {
+        counts: { likes: 1340, dislikes: 58, favorites: 640 },
+        viewer: { reaction: "dislike", isFavorite: true },
+      },
       difficulty_rating: 1510,
       updated_at: now,
       follow_up: "How would you produce a zigzag level order in one pass?",
@@ -90,8 +100,10 @@ const data = {
       summary:
         "Design a Least Recently Used (LRU) cache that supports $O(1)$ `get` and `put` by combining a hash map with a doubly linked list, evicting the least recently used key when capacity is exceeded.",
       companies: ["Amazon", "Apple"],
-      likes: 1780,
-      dislikes: 210,
+      interactions: {
+        counts: { likes: 1780, dislikes: 210, favorites: 880 },
+        viewer: { reaction: "like", isFavorite: false },
+      },
       difficulty_rating: 1910,
       updated_at: now,
       follow_up: "Discuss how you would make the cache thread-safe or add TTL eviction.",

@@ -15,6 +15,21 @@ export type SubmissionStatus =
   | "Runtime Error"
   | "Time Limit Exceeded";
 export type ResultStatus = SubmissionStatus | "Pending";
+export type ProblemReaction = "like" | "dislike" | null;
+
+export interface ProblemInteractionCounts {
+  likes: number;
+  dislikes: number;
+  favorites: number;
+}
+
+export interface ProblemInteractionSnapshot {
+  counts: ProblemInteractionCounts;
+  viewer: {
+    reaction: ProblemReaction;
+    isFavorite: boolean;
+  };
+}
 
 // Matches SQL: problem_details table
 export interface ProblemDetailRow {
@@ -23,8 +38,6 @@ export interface ProblemDetailRow {
   slug: string; // VARCHAR(120) NOT NULL
   summary: string; // TEXT NOT NULL
   companies?: any | null; // JSON
-  likes: number; // INT NOT NULL DEFAULT 0
-  dislikes: number; // INT NOT NULL DEFAULT 0
   difficulty_rating: number; // DECIMAL(4,1) NOT NULL DEFAULT 1500
   updated_at: string; // DATETIME NOT NULL
   follow_up?: string | null; // TEXT
@@ -165,6 +178,8 @@ export interface ProblemDetailRecord
     | "updated_at"
     | "follow_up"
     | "constraints_json"
+    | "likes"
+    | "dislikes"
   > {
   problemId: number;
   difficultyRating: number;
@@ -176,6 +191,7 @@ export interface ProblemDetailRecord
   languages: ProblemLanguageOption[];
   starterNotes: string[];
   recentResults: ProblemTestResult[];
+  interactions: ProblemInteractionSnapshot;
 }
 
 export interface ProblemDetail

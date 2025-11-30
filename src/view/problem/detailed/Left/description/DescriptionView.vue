@@ -30,6 +30,8 @@ const difficultyClass = computed(() => {
 const showTags = ref(false);
 const showCompanies = ref(false);
 
+const reactionCounts = computed(() => props.problem.interactions.counts);
+
 // Refs for accordion sections
 const tagsSection = ref<HTMLElement | null>(null);
 const companiesSection = ref<HTMLElement | null>(null);
@@ -50,8 +52,8 @@ const scrollToSection = (element: HTMLElement | null) => {
  * Calculate acceptance rate
  */
 const acceptanceRate = computed(() => {
-  const accepted = props.problem.likes;
-  const total = props.problem.likes + props.problem.dislikes;
+  const accepted = reactionCounts.value.likes;
+  const total = reactionCounts.value.likes + reactionCounts.value.dislikes;
   return total > 0 ? ((accepted / total) * 100).toFixed(1) : '0.0';
 });
 
@@ -173,9 +175,9 @@ const problemDescription = computed<ProblemDescription>(() => ({
           <div class="flex items-center gap-2 whitespace-nowrap">
             <div class="text-xs text-muted-foreground">Accepted</div>
             <div>
-              <span class="text-sm text-foreground">{{ props.problem.likes.toLocaleString() }}</span>
+              <span class="text-sm text-foreground">{{ reactionCounts.likes.toLocaleString() }}</span>
               <span class="ml-0.5 text-xs text-muted-foreground">
-                / {{ (props.problem.likes + props.problem.dislikes).toLocaleString() }}
+                / {{ (reactionCounts.likes + reactionCounts.dislikes).toLocaleString() }}
               </span>
             </div>
           </div>

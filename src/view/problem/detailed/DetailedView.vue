@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, provide, h, defineComponent, inject, type Component, type Ref } from "vue";
+import {
+  onMounted,
+  ref,
+  watch,
+  provide,
+  h,
+  defineComponent,
+  inject,
+  type Component,
+  type Ref,
+} from "vue";
 import { useRoute } from "vue-router";
-import { storeToRefs } from 'pinia'
-import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, Bookmark } from "lucide-vue-next";
+import { storeToRefs } from "pinia";
 
-import LayoutHeaderLeft from './headers/LayoutHeaderLeft.vue'
-import LayoutHeaderCenter from './headers/LayoutHeaderCenter.vue'
-import LayoutHeaderControls from './headers/LayoutHeaderControls.vue'
-import LayoutTree from '@/features/layout/tree/LayoutTree.vue'
-import { useHeaderStore, type HeaderGroup, type LayoutNode } from '@/stores/headerStore'
+import LayoutHeaderLeft from "./headers/LayoutHeaderLeft.vue";
+import LayoutHeaderCenter from "./headers/LayoutHeaderCenter.vue";
+import LayoutHeaderControls from "./headers/LayoutHeaderControls.vue";
+import LayoutTree from "@/features/layout/tree/LayoutTree.vue";
+import {
+  useHeaderStore,
+  type HeaderGroup,
+  type LayoutNode,
+} from "@/stores/headerStore";
 
 import type { ProblemDetail } from "@/mocks/schema/problem-detail";
 import type { ProblemRunResult } from "@/mocks/schema/test-results";
@@ -41,7 +53,7 @@ watch(
       console.error("Failed to load run result", error);
       runResult.value = null;
     }
-  },
+  }
 );
 
 onMounted(async () => {
@@ -67,74 +79,126 @@ interface ProblemContextType {
 }
 
 // Provide problem and runResult to connector components
-provide<ProblemContextType>('problemContext', { problem, runResult });
+provide<ProblemContextType>("problemContext", { problem, runResult });
 
 // --- Connector Components ---
 // These wrappers adapt the injected context to the specific props required by the views
 
 const ConnectedDescriptionView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>('problemContext')
-    if (!context) throw new Error('problemContext not provided')
-    const { problem } = context
-    return () => problem.value 
-      ? h('div', { class: 'px-1 py-2' }, h(DescriptionView, { problem: problem.value })) 
-      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
-  }
-})
+    const context = inject<ProblemContextType>("problemContext");
+    if (!context) throw new Error("problemContext not provided");
+    const { problem } = context;
+    return () =>
+      problem.value
+        ? h(
+            "div",
+            { class: "px-1 py-2" },
+            h(DescriptionView, { problem: problem.value })
+          )
+        : h(
+            "div",
+            { class: "flex items-center justify-center h-full" },
+            "Loading..."
+          );
+  },
+});
 
 const ConnectedSolutionsView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>('problemContext')
-    if (!context) throw new Error('problemContext not provided')
-    const { problem } = context
-    return () => problem.value 
-      ? h('div', { class: 'px-1 py-2' }, h(SolutionsView, { problemId: problem.value.id, followUp: problem.value.followUp ?? '' })) 
-      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
-  }
-})
+    const context = inject<ProblemContextType>("problemContext");
+    if (!context) throw new Error("problemContext not provided");
+    const { problem } = context;
+    return () =>
+      problem.value
+        ? h(
+            "div",
+            { class: "px-1 py-2" },
+            h(SolutionsView, {
+              problemId: problem.value.id,
+              followUp: problem.value.followUp ?? "",
+            })
+          )
+        : h(
+            "div",
+            { class: "flex items-center justify-center h-full" },
+            "Loading..."
+          );
+  },
+});
 
 const ConnectedSubmissionsView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>('problemContext')
-    if (!context) throw new Error('problemContext not provided')
-    const { problem } = context
-    return () => problem.value 
-      ? h('div', { class: 'px-1 py-2' }, h(SubmissionsView, { problemId: problem.value.id })) 
-      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
-  }
-})
+    const context = inject<ProblemContextType>("problemContext");
+    if (!context) throw new Error("problemContext not provided");
+    const { problem } = context;
+    return () =>
+      problem.value
+        ? h(
+            "div",
+            { class: "px-1 py-2" },
+            h(SubmissionsView, { problemId: problem.value.id })
+          )
+        : h(
+            "div",
+            { class: "flex items-center justify-center h-full" },
+            "Loading..."
+          );
+  },
+});
 
 const ConnectedCodeView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>('problemContext')
-    if (!context) throw new Error('problemContext not provided')
-    const { problem } = context
-    return () => problem.value && problem.value.languages.length
-      ? h(CodeView, { languages: problem.value.languages, starterNotes: problem.value.starterNotes }) 
-      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
-  }
-})
+    const context = inject<ProblemContextType>("problemContext");
+    if (!context) throw new Error("problemContext not provided");
+    const { problem } = context;
+    return () =>
+      problem.value && problem.value.languages.length
+        ? h(CodeView, {
+            languages: problem.value.languages,
+            starterNotes: problem.value.starterNotes,
+          })
+        : h(
+            "div",
+            { class: "flex items-center justify-center h-full" },
+            "Loading..."
+          );
+  },
+});
 
 const ConnectedTestCaseView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>('problemContext')
-    if (!context) throw new Error('problemContext not provided')
-    const { problem } = context
-    return () => problem.value 
-      ? h('div', { class: 'px-1 py-2' }, h(TestCaseView, { testCases: problem.value.testCases })) 
-      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
-  }
-})
+    const context = inject<ProblemContextType>("problemContext");
+    if (!context) throw new Error("problemContext not provided");
+    const { problem } = context;
+    return () =>
+      problem.value
+        ? h(
+            "div",
+            { class: "px-1 py-2" },
+            h(TestCaseView, { testCases: problem.value.testCases })
+          )
+        : h(
+            "div",
+            { class: "flex items-center justify-center h-full" },
+            "Loading..."
+          );
+  },
+});
 
 const ConnectedTestResultsView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>('problemContext')
-    if (!context) throw new Error('problemContext not provided')
-    const { runResult } = context
-    return () => h('div', { class: 'px-1 py-2' }, h(TestResultsView, { runResult: runResult.value }))
-  }
-})
+    const context = inject<ProblemContextType>("problemContext");
+    if (!context) throw new Error("problemContext not provided");
+    const { runResult } = context;
+    return () =>
+      h(
+        "div",
+        { class: "px-1 py-2" },
+        h(TestResultsView, { runResult: runResult.value })
+      );
+  },
+});
 
 // Map Header IDs to Components
 const panelComponentMap: Record<number, Component> = {
@@ -143,217 +207,269 @@ const panelComponentMap: Record<number, Component> = {
   3: ConnectedSubmissionsView,
   4: ConnectedCodeView,
   5: ConnectedTestCaseView,
-  6: ConnectedTestResultsView
-}
+  6: ConnectedTestResultsView,
+};
 
-provide('panelComponentMap', panelComponentMap)
+provide("panelComponentMap", panelComponentMap);
 
 // --- Layout Logic ---
-const headerStore = useHeaderStore()
-const { layoutConfig } = storeToRefs(headerStore)
-const currentLayout = ref<'leet' | 'classic' | 'compact' | 'wide'>('leet')
+const headerStore = useHeaderStore();
+const { layoutConfig } = storeToRefs(headerStore);
+const currentLayout = ref<"leet" | "classic" | "compact" | "wide">("leet");
 
 const createInitialHeaderGroups = (): HeaderGroup[] => {
   return [
     {
-      id: 'problem-info',
-      name: 'Problem Information',
+      id: "problem-info",
+      name: "Problem Information",
       headers: [
-        { id: 1, index: 0, title: 'Problem Description', icon: 'FileText', color: '#1a1a1a', iconColor: '#007bff' },
-        { id: 2, index: 1, title: 'Solution', icon: 'FlaskConical', color: '#1a1a1a', iconColor: '#007bff' },
-        { id: 3, index: 2, title: 'Submission Records', icon: 'History', color: '#1a1a1a', iconColor: '#007bff' },
+        {
+          id: 1,
+          index: 0,
+          title: "Problem Description",
+          icon: "FileText",
+          color: "#1a1a1a",
+          iconColor: "#007bff",
+        },
+        {
+          id: 2,
+          index: 1,
+          title: "Solution",
+          icon: "FlaskConical",
+          color: "#1a1a1a",
+          iconColor: "#007bff",
+        },
+        {
+          id: 3,
+          index: 2,
+          title: "Submission Records",
+          icon: "History",
+          color: "#1a1a1a",
+          iconColor: "#007bff",
+        },
       ],
     },
     {
-      id: 'code-editor',
-      name: 'Code Editor',
+      id: "code-editor",
+      name: "Code Editor",
       headers: [
-        { id: 4, index: 0, title: 'Code', icon: 'Code2', color: '#1a1a1a', iconColor: '#02b128' },
+        {
+          id: 4,
+          index: 0,
+          title: "Code",
+          icon: "Code2",
+          color: "#1a1a1a",
+          iconColor: "#02b128",
+        },
       ],
     },
     {
-      id: 'test-info',
-      name: 'Test Information',
+      id: "test-info",
+      name: "Test Information",
       headers: [
-        { id: 5, index: 0, title: 'Test Cases', icon: 'SquareCheck', color: '#1a1a1a', iconColor: '#02b128' },
-        { id: 6, index: 1, title: 'Test Results', icon: 'Terminal', color: '#1a1a1a', iconColor: '#02b128' },
+        {
+          id: 5,
+          index: 0,
+          title: "Test Cases",
+          icon: "SquareCheck",
+          color: "#1a1a1a",
+          iconColor: "#02b128",
+        },
+        {
+          id: 6,
+          index: 1,
+          title: "Test Results",
+          icon: "Terminal",
+          color: "#1a1a1a",
+          iconColor: "#02b128",
+        },
       ],
     },
-  ]
-}
+  ];
+};
 
 const getLeetLayoutConfig = () => {
-  const groups = createInitialHeaderGroups()
+  const groups = createInitialHeaderGroups();
   const layout: LayoutNode = {
-    id: 'programming-root',
-    type: 'container',
-    direction: 'horizontal',
+    id: "programming-root",
+    type: "container",
+    direction: "horizontal",
     children: [
       {
-        id: 'programming-left',
-        type: 'leaf',
+        id: "programming-left",
+        type: "leaf",
         size: 50,
-        groupId: 'problem-info',
-        groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+        groupId: "problem-info",
+        groupMetadata: { id: "problem-info", name: "Problem Information" },
       },
       {
-        id: 'programming-right',
-        type: 'container',
-        direction: 'vertical',
+        id: "programming-right",
+        type: "container",
+        direction: "vertical",
         size: 50,
         children: [
           {
-            id: 'programming-right-top',
-            type: 'leaf',
+            id: "programming-right-top",
+            type: "leaf",
             size: 50,
-            groupId: 'code-editor',
-            groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+            groupId: "code-editor",
+            groupMetadata: { id: "code-editor", name: "Code Editor" },
           },
           {
-            id: 'programming-right-bottom',
-            type: 'leaf',
+            id: "programming-right-bottom",
+            type: "leaf",
             size: 50,
-            groupId: 'test-info',
-            groupMetadata: { id: 'test-info', name: 'Test Information' },
+            groupId: "test-info",
+            groupMetadata: { id: "test-info", name: "Test Information" },
           },
         ],
       },
     ],
-  }
-  return { groups, layout }
-}
+  };
+  return { groups, layout };
+};
 
 const getClassicLayoutConfig = () => {
-  const groups = createInitialHeaderGroups()
+  const groups = createInitialHeaderGroups();
   const layout: LayoutNode = {
-    id: 'classic-root',
-    type: 'container',
-    direction: 'vertical',
+    id: "classic-root",
+    type: "container",
+    direction: "vertical",
     children: [
       {
-        id: 'classic-top',
-        type: 'leaf',
+        id: "classic-top",
+        type: "leaf",
         size: 40,
-        groupId: 'problem-info',
-        groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+        groupId: "problem-info",
+        groupMetadata: { id: "problem-info", name: "Problem Information" },
       },
       {
-        id: 'classic-bottom',
-        type: 'container',
-        direction: 'horizontal',
+        id: "classic-bottom",
+        type: "container",
+        direction: "horizontal",
         size: 60,
         children: [
           {
-            id: 'classic-bottom-left',
-            type: 'leaf',
+            id: "classic-bottom-left",
+            type: "leaf",
             size: 50,
-            groupId: 'code-editor',
-            groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+            groupId: "code-editor",
+            groupMetadata: { id: "code-editor", name: "Code Editor" },
           },
           {
-            id: 'classic-bottom-right',
-            type: 'leaf',
+            id: "classic-bottom-right",
+            type: "leaf",
             size: 50,
-            groupId: 'test-info',
-            groupMetadata: { id: 'test-info', name: 'Test Information' },
+            groupId: "test-info",
+            groupMetadata: { id: "test-info", name: "Test Information" },
           },
         ],
       },
     ],
-  }
-  return { groups, layout }
-}
+  };
+  return { groups, layout };
+};
 
 const getCompactLayoutConfig = () => {
-  const groups = createInitialHeaderGroups()
+  const groups = createInitialHeaderGroups();
   const layout: LayoutNode = {
-    id: 'compact-root',
-    type: 'container',
-    direction: 'horizontal',
+    id: "compact-root",
+    type: "container",
+    direction: "horizontal",
     children: [
       {
-        id: 'compact-left',
-        type: 'container',
-        direction: 'vertical',
+        id: "compact-left",
+        type: "container",
+        direction: "vertical",
         size: 30,
         children: [
           {
-            id: 'compact-left-top',
-            type: 'leaf',
+            id: "compact-left-top",
+            type: "leaf",
             size: 50,
-            groupId: 'problem-info',
-            groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+            groupId: "problem-info",
+            groupMetadata: { id: "problem-info", name: "Problem Information" },
           },
           {
-            id: 'compact-left-bottom',
-            type: 'leaf',
+            id: "compact-left-bottom",
+            type: "leaf",
             size: 50,
-            groupId: 'test-info',
-            groupMetadata: { id: 'test-info', name: 'Test Information' },
+            groupId: "test-info",
+            groupMetadata: { id: "test-info", name: "Test Information" },
           },
         ],
       },
       {
-        id: 'compact-right',
-        type: 'leaf',
+        id: "compact-right",
+        type: "leaf",
         size: 70,
-        groupId: 'code-editor',
-        groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+        groupId: "code-editor",
+        groupMetadata: { id: "code-editor", name: "Code Editor" },
       },
     ],
-  }
-  return { groups, layout }
-}
+  };
+  return { groups, layout };
+};
 
 const getWideLayoutConfig = () => {
-  const groups = createInitialHeaderGroups()
+  const groups = createInitialHeaderGroups();
   const layout: LayoutNode = {
-    id: 'wide-root',
-    type: 'container',
-    direction: 'horizontal',
+    id: "wide-root",
+    type: "container",
+    direction: "horizontal",
     children: [
       {
-        id: 'wide-left',
-        type: 'leaf',
+        id: "wide-left",
+        type: "leaf",
         size: 25,
-        groupId: 'problem-info',
-        groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+        groupId: "problem-info",
+        groupMetadata: { id: "problem-info", name: "Problem Information" },
       },
       {
-        id: 'wide-center',
-        type: 'leaf',
+        id: "wide-center",
+        type: "leaf",
         size: 50,
-        groupId: 'code-editor',
-        groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+        groupId: "code-editor",
+        groupMetadata: { id: "code-editor", name: "Code Editor" },
       },
       {
-        id: 'wide-right',
-        type: 'leaf',
+        id: "wide-right",
+        type: "leaf",
         size: 25,
-        groupId: 'test-info',
-        groupMetadata: { id: 'test-info', name: 'Test Information' },
+        groupId: "test-info",
+        groupMetadata: { id: "test-info", name: "Test Information" },
       },
     ],
-  }
-  return { groups, layout }
-}
+  };
+  return { groups, layout };
+};
 
-const handleLayoutChange = (newLayout: 'leet' | 'classic' | 'compact' | 'wide') => {
-  currentLayout.value = newLayout
-  let config
+const handleLayoutChange = (
+  newLayout: "leet" | "classic" | "compact" | "wide"
+) => {
+  currentLayout.value = newLayout;
+  let config;
   switch (newLayout) {
-    case 'leet': config = getLeetLayoutConfig(); break;
-    case 'classic': config = getClassicLayoutConfig(); break;
-    case 'compact': config = getCompactLayoutConfig(); break;
-    case 'wide': config = getWideLayoutConfig(); break;
+    case "leet":
+      config = getLeetLayoutConfig();
+      break;
+    case "classic":
+      config = getClassicLayoutConfig();
+      break;
+    case "compact":
+      config = getCompactLayoutConfig();
+      break;
+    case "wide":
+      config = getWideLayoutConfig();
+      break;
   }
-  headerStore.initData(config.groups, config.layout)
-}
+  headerStore.initData(config.groups, config.layout);
+};
 
 onMounted(() => {
-  const initialConfig = getLeetLayoutConfig()
-  headerStore.initData(initialConfig.groups, initialConfig.layout)
-})
+  const initialConfig = getLeetLayoutConfig();
+  headerStore.initData(initialConfig.groups, initialConfig.layout);
+});
 </script>
 
 <template>
@@ -361,38 +477,36 @@ onMounted(() => {
     <header
       class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 bg-[#f0f0f0] px-2.5"
     >
-      <div class="relative z-10 flex h-full min-w-[240px] flex-1 items-center overflow-hidden">
+      <div
+        class="relative z-10 flex h-full min-w-[240px] flex-1 items-center overflow-hidden"
+      >
         <LayoutHeaderLeft />
       </div>
-      <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div
+        class="pointer-events-none absolute inset-0 flex items-center justify-center"
+      >
         <div class="pointer-events-auto">
           <LayoutHeaderCenter />
         </div>
       </div>
-      <div class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2">
-        <!-- Likes / Dislikes / Save (Preserved from original DetailedView) -->
-        <div v-if="problem" class="hidden flex-none items-center gap-2 md:flex mr-2">
-          <Button variant="outline" size="sm" class="gap-1 h-8">
-            <ThumbsUp class="h-4 w-4" />
-            <span class="text-xs">{{ problem.likes }}</span>
-          </Button>
-          <Button variant="outline" size="sm" class="gap-1 h-8">
-            <ThumbsDown class="h-4 w-4" />
-            <span class="text-xs">{{ problem.dislikes }}</span>
-          </Button>
-          <Button variant="outline" size="sm" class="gap-1 h-8">
-            <Bookmark class="h-4 w-4" />
-            <span class="text-xs">Save</span>
-          </Button>
-        </div>
-
-        <LayoutHeaderControls :current-layout="currentLayout" @layout-change="handleLayoutChange" />
+      <div
+        class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2"
+      >
+        <LayoutHeaderControls
+          :current-layout="currentLayout"
+          :problem="problem"
+          @layout-change="handleLayoutChange"
+        />
       </div>
     </header>
 
     <!-- Dynamic layout area -->
     <main class="flex-1 min-h-0 overflow-hidden w-full p-4 pt-0">
-      <LayoutTree v-if="layoutConfig" :layout="layoutConfig" class="h-full w-full" />
+      <LayoutTree
+        v-if="layoutConfig"
+        :layout="layoutConfig"
+        class="h-full w-full"
+      />
     </main>
   </div>
 </template>
