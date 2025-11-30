@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart } from "@/components/ui/chart-line";
 import { BarChart } from "@/components/ui/chart-bar";
 import { DonutChart } from "@/components/ui/chart-donut";
-import { MoreHorizontal, Share2, GitFork } from "lucide-vue-next";
+import { GitFork, ListX, MoreHorizontal, Share2 } from "lucide-vue-next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +24,13 @@ import {
   fetchProblemListStats,
   fetchProblemsByListId,
 } from "@/api/problem-list";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+} from "@/components/ui/empty";
 
 const route = useRoute();
 const listId = computed(() => route.params.id as string);
@@ -347,17 +354,22 @@ const percentAxisFormatter = (value: number | Date) => {
 
     <!-- 问题列表将由 ProblemView 组件处理 -->
     <template v-if="problems.length === 0">
-      <div class="flex h-80 items-center justify-center">
-        <div class="text-center space-y-4">
-          <p class="text-xl font-medium text-muted-foreground">
-            No problems in this list
-          </p>
-          <p class="text-base text-muted-foreground">
-            Add problems to get started
-          </p>
-          <Button class="mt-6" variant="outline" size="lg">Add Problems</Button>
-        </div>
-      </div>
+      <Empty class="h-80 border border-border bg-muted/40">
+        <EmptyContent>
+          <EmptyMedia variant="icon">
+            <ListX class="h-7 w-7 text-muted-foreground" />
+          </EmptyMedia>
+          <EmptyHeader>
+            <p class="text-xl font-semibold text-foreground">
+              No problems in this list
+            </p>
+            <EmptyDescription>
+              Add problems to get started and track your progress.
+            </EmptyDescription>
+          </EmptyHeader>
+          <Button class="mt-1" variant="outline" size="lg">Add Problems</Button>
+        </EmptyContent>
+      </Empty>
     </template>
     </ProblemView>
   </div>

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { Badge } from "@/components/ui/badge";
-
 import type { SubmissionRecord } from "@/mocks/schema/submission";
-import { Loader2 } from "lucide-vue-next";
+import { Loader2, Inbox } from "lucide-vue-next";
 import {
   Table,
   TableBody,
@@ -12,6 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+} from "@/components/ui/empty";
 
 const props = defineProps<{
   submissions: SubmissionRecord[];
@@ -146,9 +152,22 @@ const handleSelect = (submission: SubmissionRecord) =>
           </template>
 
           <TableRow v-else>
-            <TableCell colspan="5" class="h-24 text-center">
-              No submissions yet. Run or submit your solution to populate this
-              list.
+            <TableCell colspan="5" class="p-0">
+              <Empty class="border-none bg-transparent px-6 py-8">
+                <EmptyContent>
+                  <EmptyMedia variant="icon">
+                    <Inbox class="h-6 w-6 text-muted-foreground" />
+                  </EmptyMedia>
+                  <EmptyHeader>
+                    <p class="text-base font-semibold text-foreground">
+                      No submissions yet
+                    </p>
+                    <EmptyDescription>
+                      Run or submit your solution to populate this list.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </EmptyContent>
+              </Empty>
             </TableCell>
           </TableRow>
         </TableBody>

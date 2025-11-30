@@ -13,7 +13,21 @@ import {
 import SolutionsCard from "./components/SolutionsCard.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import Badge from "@/components/ui/badge/Badge.vue";
-import { Search, Plus, PenLine, ArrowDownAZ, Check } from "lucide-vue-next";
+import {
+  Search,
+  Plus,
+  PenLine,
+  ArrowDownAZ,
+  Check,
+  Lightbulb,
+} from "lucide-vue-next";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+} from "@/components/ui/empty";
 
 const props = defineProps<{
   items: SolutionFeedItem[];
@@ -206,15 +220,21 @@ const handleCreateSolution = () => {
             <Separator v-if="index < sortedItems.length - 1" class="my-2" />
           </div>
         </div>
-        <div
-          v-else
-          class="mx-3 flex flex-col items-center gap-2 rounded-2xl bg-muted/30 px-6 py-10 text-center"
-        >
-          <p class="text-base font-medium text-foreground">No solutions yet</p>
-          <p class="text-sm text-muted-foreground">
-            Share your approach to help others understand this problem.
-          </p>
-        </div>
+        <Empty class="mx-3 bg-muted/30 px-6 py-8">
+          <EmptyContent>
+            <EmptyMedia variant="icon">
+              <Lightbulb class="h-6 w-6 text-muted-foreground" />
+            </EmptyMedia>
+            <EmptyHeader>
+              <p class="text-base font-semibold text-foreground">
+                No solutions yet
+              </p>
+              <EmptyDescription>
+                Share your approach to help others understand this problem.
+              </EmptyDescription>
+            </EmptyHeader>
+          </EmptyContent>
+        </Empty>
       </div>
     </div>
   </section>

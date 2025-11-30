@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { Problem } from "@/mocks/schema/problem";
+import { onMounted, onUnmounted, type Component, type PropType } from "vue";
+import { useRouter } from "vue-router";
+import { Lock, SearchX, Video } from "lucide-vue-next";
 import {
   Table,
   TableBody,
@@ -7,10 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Problem } from "@/mocks/schema/problem";
-import { onMounted, onUnmounted, type Component, type PropType } from "vue";
-import { useRouter } from "vue-router";
-import { Lock, Video } from "lucide-vue-next";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+} from "@/components/ui/empty";
 
 defineProps({
   displayedProblems: {
@@ -134,8 +141,22 @@ onUnmounted(() => {
       </template>
 
       <TableRow v-else>
-        <TableCell colspan="4" class="h-24 text-center">
-          No results found.
+        <TableCell colspan="4" class="p-0">
+          <Empty class="border-none bg-transparent px-6 py-8">
+            <EmptyContent>
+              <EmptyMedia variant="icon">
+                <SearchX class="h-6 w-6 text-muted-foreground" />
+              </EmptyMedia>
+              <EmptyHeader>
+                <p class="text-base font-semibold text-foreground">
+                  No results found
+                </p>
+                <EmptyDescription>
+                  Try adjusting filters or clearing search to see more problems.
+                </EmptyDescription>
+              </EmptyHeader>
+            </EmptyContent>
+          </Empty>
         </TableCell>
       </TableRow>
     </TableBody>
