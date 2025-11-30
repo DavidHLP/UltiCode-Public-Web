@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/hover-card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useBottomPanelStore } from "../right/bottom/bottom";
+import { useHeaderStore } from "@/stores/headerStore";
 
 const { requestRun } = useBottomPanelStore();
+const headerStore = useHeaderStore();
 
 const isRunning = ref(false);
 const runPulseKey = ref(0);
@@ -19,6 +21,8 @@ const runTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
 const handleRun = () => {
   requestRun();
+  headerStore.setActiveGroup("test-info");
+  headerStore.setActiveHeader("test-info", 6);
   runPulseKey.value = Date.now();
   isRunning.value = true;
   if (runTimer.value) {

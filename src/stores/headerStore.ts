@@ -33,12 +33,17 @@ export const useHeaderStore = defineStore('header', () => {
   const layoutConfig = ref<LayoutNode | null>(null)
   const activeGroupId = ref<string | null>(null)
   const headerGroups = ref<HeaderGroup[]>([])
+  const activeHeaderByGroup = ref<Record<string, number | null>>({})
 
   const visibleGroups = computed(() => headerGroups.value.filter((g) => g.headers.length > 0))
 
   const initData = (groups: HeaderGroup[], layout: LayoutNode) => {
     headerGroups.value = groups
     layoutConfig.value = layout
+    activeHeaderByGroup.value = groups.reduce<Record<string, number | null>>((acc, group) => {
+      acc[group.id] = group.headers[0]?.id ?? null
+      return acc
+    }, {})
     // 默认选中第一个有内容的组
     const firstVisible = groups.find((g) => g.headers.length > 0)
     if (firstVisible) {
@@ -53,6 +58,11 @@ export const useHeaderStore = defineStore('header', () => {
         ...header,
         index: idx,
       }))
+      const activeId = activeHeaderByGroup.value[groupId]
+      const stillExists = newHeaders.some((h) => h.id === activeId)
+      if (!stillExists) {
+        activeHeaderByGroup.value[groupId] = newHeaders[0]?.id ?? null
+      }
     }
   }
 
@@ -80,11 +90,21 @@ export const useHeaderStore = defineStore('header', () => {
         ...header,
         index: idx,
       }))
+
+      const sourceActive = activeHeaderByGroup.value[sourceGroupId]
+      if (!sourceGroup.headers.some((h) => h.id === sourceActive)) {
+        activeHeaderByGroup.value[sourceGroupId] = sourceGroup.headers[0]?.id ?? null
+      }
+      activeHeaderByGroup.value[targetGroupId] = movedItem.id
     }
   }
 
   const setActiveGroup = (groupId: string) => {
     activeGroupId.value = groupId
+  }
+
+  const setActiveHeader = (groupId: string, headerId: number | null) => {
+    activeHeaderByGroup.value[groupId] = headerId
   }
 
   const updateLayout = (layout: LayoutNode) => {
@@ -108,11 +128,16 @@ export const useHeaderStore = defineStore('header', () => {
 
     // Re-index source group
     sourceGroup.headers.forEach((h, i) => (h.index = i))
+    const sourceActive = activeHeaderByGroup.value[sourceGroupId]
+    if (!sourceGroup.headers.some((h) => h.id === sourceActive)) {
+      activeHeaderByGroup.value[sourceGroupId] = sourceGroup.headers[0]?.id ?? null
+    }
 
     if (direction === 'center') {
       // Move to target group (append)
       targetGroup.headers.push(movedItem)
       targetGroup.headers.forEach((h, i) => (h.index = i))
+      activeHeaderByGroup.value[targetGroupId] = movedItem.id
       return
     }
 
@@ -125,6 +150,7 @@ export const useHeaderStore = defineStore('header', () => {
     }
     newGroup.headers.forEach((h, i) => (h.index = i))
     headerGroups.value.push(newGroup)
+    activeHeaderByGroup.value[newGroupId] = movedItem.id
 
     // Helper to modify layout tree
     const modifyLayout = (node: LayoutNode): boolean => {
@@ -187,10 +213,12 @@ export const useHeaderStore = defineStore('header', () => {
     visibleGroups,
     layoutConfig,
     activeGroupId,
+    activeHeaderByGroup,
     initData,
     updateGroupHeaders,
     moveHeaderBetweenGroups,
     setActiveGroup,
+    setActiveHeader,
     updateLayout,
     splitGroup,
   }

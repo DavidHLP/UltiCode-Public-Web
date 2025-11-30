@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { inject, onMounted, ref, type Ref, watch } from 'vue'
+import { computed, inject, onMounted, ref, type Ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 
 import type { HeaderModel } from '@/stores/headerStore'
+import { useHeaderStore } from '@/stores/headerStore'
 
 import LayoutPanelContent from './LayoutPanelContent.vue'
 import LayoutPanelHeader from './LayoutPanelHeader.vue'
@@ -36,6 +38,11 @@ const splitGroup = inject<
   ) => void
 >('splitGroup')
 
+const headerStore = useHeaderStore()
+const { activeHeaderByGroup } = storeToRefs(headerStore)
+const { setActiveHeader } = headerStore
+const groupKey = computed(() => props.group || 'default')
+
 watch(
   () => props.headers,
   (newHeaders) => {
@@ -47,6 +54,9 @@ watch(
 onMounted(() => {
   if (localHeaders.value.length > 0 && !activeHeader.value) {
     activeHeader.value = localHeaders.value[0] || null
+    if (activeHeader.value) {
+      setActiveHeader(groupKey.value, activeHeader.value.id)
+    }
   }
 })
 
@@ -61,6 +71,26 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  () => activeHeaderByGroup.value[groupKey.value],
+  (targetId) => {
+    if (targetId === undefined) return
+    const next =
+      localHeaders.value.find((header) => header.id === targetId) ||
+      localHeaders.value[0] ||
+      null
+    activeHeader.value = next
+  },
+  { immediate: true }
+)
+
+watch(
+  () => activeHeader.value,
+  (header) => {
+    setActiveHeader(groupKey.value, header?.id ?? null)
+  }
 )
 
 const handleDragStart = (
@@ -92,6 +122,7 @@ const handleDragOver = (index: number, event: PointerEvent) => {
 
 const handleHeaderSelect = (header: HeaderModel) => {
   activeHeader.value = header
+  setActiveHeader(groupKey.value, header.id)
 }
 
 const handleDragEnd = () => {
