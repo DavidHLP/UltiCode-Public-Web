@@ -40,17 +40,19 @@ const theme = computed(() => (isDark.value ? "dark" : "light"));
 <style scoped>
 :deep(.md-editor-preview) {
   background: transparent;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 :deep(.md-editor-preview h1) {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
 
 :deep(.md-editor-preview h2) {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 600;
   margin-top: 0.875rem;
   margin-bottom: 0.5rem;
@@ -66,10 +68,12 @@ const theme = computed(() => (isDark.value ? "dark" : "light"));
 :deep(.md-editor-preview ul) {
   list-style: disc;
   margin-left: 1.5rem;
+  font-size: 0.95rem;
 }
 
 :deep(.md-editor-preview ol) {
   list-style: decimal;
   margin-left: 1.5rem;
+  font-size: 0.95rem;
 }
 </style>

@@ -72,7 +72,7 @@ watch(
 
 watch(activeCaseLabel, (label) => {
   if (!label || !localCases.value.length) return;
-  const matched = localCases.value.find((testCase) => testCase.label === label);
+  const matched = caseTabs.value.find((testCase) => testCase.displayLabel === label);
   if (matched && matched.id !== activeId.value) {
     activeId.value = matched.id;
   }
@@ -85,10 +85,18 @@ const activeCase = computed(() => {
   );
 });
 
+const caseTabs = computed(() =>
+  localCases.value.map((testCase, index) => ({
+    ...testCase,
+    displayLabel: `Case ${index + 1}`,
+  })),
+);
+
 watch(
   () => activeCase.value?.label,
   (label) => {
-    activeCaseLabel.value = label ?? null;
+    const tab = caseTabs.value.find((item) => item.id === activeCase.value?.id);
+    activeCaseLabel.value = tab?.displayLabel ?? null;
   },
   { immediate: true },
 );
@@ -99,11 +107,10 @@ const canRemoveCases = computed(() => localCases.value.length > 1);
 const addCase = () => {
   const template = activeCase.value ?? localCases.value[0];
   const newId = generateId("case");
-  const nextIndex = localCases.value.length + 1;
 
   const newCase: ProblemTestCase = {
     id: newId,
-    label: `Case ${nextIndex}`,
+    label: "",
     explanation: template?.explanation,
     inputs: createEmptyInputs(template),
   };
@@ -126,7 +133,7 @@ const removeCase = (id: string) => {
   <div class="flex h-full flex-col gap-4">
     <div class="flex flex-wrap items-center gap-3">
       <Button
-        v-for="testCase in localCases"
+        v-for="testCase in caseTabs"
         :key="testCase.id"
         :variant="testCase.id === activeId ? 'secondary' : 'ghost'"
         size="sm"
@@ -138,7 +145,7 @@ const removeCase = (id: string) => {
         "
         @click="selectCase(testCase.id)"
       >
-        <span>{{ testCase.label }}</span>
+        <span>{{ testCase.displayLabel }}</span>
         <button
           v-if="testCase.id === activeId && canRemoveCases"
           type="button"

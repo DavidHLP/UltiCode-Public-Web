@@ -90,7 +90,7 @@ const resetSelectedSolution = () => {
     <div v-if="selectedSolution" class="space-y-4 px-5 py-4">
       <button
         type="button"
-        class="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+        class="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
         @click="resetSelectedSolution"
       >
         &larr; Return solution list

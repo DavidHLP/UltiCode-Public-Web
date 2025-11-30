@@ -95,8 +95,49 @@ ${props.description.followUp}
 </template>
 
 <style scoped>
+.description-markdown :deep(.md-editor-preview) {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  background: transparent;
+}
+
+.description-markdown :deep(.md-editor-preview h1) {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.description-markdown :deep(.md-editor-preview h2) {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.description-markdown :deep(.md-editor-preview blockquote) {
+  border-left: 4px solid var(--color-border);
+  padding-left: 1rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+}
+
+.description-markdown :deep(.md-editor-preview ul),
+.description-markdown :deep(.md-editor-preview ol) {
+  margin-left: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.description-markdown :deep(.md-editor-preview ul) {
+  list-style: disc;
+}
+
+.description-markdown :deep(.md-editor-preview ol) {
+  list-style: decimal;
+}
+
 .description-markdown :deep(.katex) {
-  font-size: 1.05em;
+  font-size: 0.9em;
   color: hsl(var(--foreground));
 }
 
@@ -108,11 +149,11 @@ ${props.description.followUp}
 
 .description-markdown :deep(code) {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 
 .description-markdown :deep(pre code) {
-  font-size: 13px;
+  font-size: 0.85em;
   line-height: 1.5;
 }
 </style>

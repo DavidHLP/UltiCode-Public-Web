@@ -76,7 +76,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
   <section class="space-y-6">
     <section class="space-y-3">
       <!-- Title -->
-      <h1 class="text-lg font-semibold leading-tight">
+      <h1 class="text-base font-semibold leading-tight">
         {{ props.problem.title }}
       </h1>
 
@@ -84,7 +84,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
       <div class="flex flex-wrap gap-1">
         <!-- Difficulty Badge -->
         <div
-          class="relative inline-flex items-center justify-center px-2 py-1 gap-1 rounded-full bg-muted text-xs"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted text-[10px]"
           :class="difficultyClass"
         >
           {{ props.problem.difficulty }}
@@ -93,7 +93,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <!-- Tags Button -->
         <button
           v-if="props.problem.tags.length"
-          class="relative inline-flex items-center justify-center px-2 py-1 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-xs text-muted-foreground"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((tagsSection as any).$el)"
         >
           <svg
@@ -112,7 +112,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <!-- Companies Button -->
         <button
           v-if="props.problem.companies.length"
-          class="relative inline-flex items-center justify-center px-2 py-1 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-xs text-muted-foreground"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((companiesSection as any).$el)"
         >
           <span class="text-yellow-600 dark:text-yellow-500">Related Companies</span>
@@ -121,7 +121,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <!-- Hint Button -->
         <button
           v-if="props.problem.followUp || props.problem.starterNotes.length"
-          class="relative inline-flex items-center justify-center px-2 py-1 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-xs text-muted-foreground"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((hintsSection as any)?.$el)"
         >
           <svg
@@ -167,7 +167,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
       <DescriptionMarkdown :description="problemDescription" />
 
       <!-- Statistics and Accordion Section -->
-      <div ref="accordionSection" class="mt-6 flex flex-col gap-3">
+      <div ref="accordionSection" class="mt-4 flex flex-col gap-3">
         <Separator />
 
         <!-- Acceptance Stats -->
@@ -175,8 +175,8 @@ const problemDescription = computed<ProblemDescription>(() => ({
           <div class="flex items-center gap-2 whitespace-nowrap">
             <div class="text-xs text-muted-foreground">Accepted</div>
             <div>
-              <span class="text-sm text-foreground">{{ reactionCounts.likes.toLocaleString() }}</span>
-              <span class="ml-0.5 text-xs text-muted-foreground">
+              <span class="text-xs text-foreground">{{ reactionCounts.likes.toLocaleString() }}</span>
+              <span class="ml-0.5 text-[10px] text-muted-foreground">
                 / {{ (reactionCounts.likes + reactionCounts.dislikes).toLocaleString() }}
               </span>
             </div>
@@ -185,8 +185,8 @@ const problemDescription = computed<ProblemDescription>(() => ({
           <div class="flex items-center gap-2 whitespace-nowrap">
             <div class="text-xs text-muted-foreground">Acceptance Rate</div>
             <div>
-              <span class="text-sm text-foreground">{{ acceptanceRate }}</span>
-              <span class="ml-0.5 text-xs text-muted-foreground">%</span>
+              <span class="text-xs text-foreground">{{ acceptanceRate }}</span>
+              <span class="ml-0.5 text-[10px] text-muted-foreground">%</span>
             </div>
           </div>
         </div>

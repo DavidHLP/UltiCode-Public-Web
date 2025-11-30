@@ -14,9 +14,11 @@ interface TooltipCallbackDataParams {
   [key: string]: unknown;
 }
 
-const props = defineProps<{
-  submission: SubmissionRecord;
-}>();
+const props = defineProps({
+  submission: {
+    type: Object as () => SubmissionRecord,
+  } as const,
+});
 
 const parseMs = (value: string) => {
   const m = /([0-9]+)\s*ms/.exec(value);
@@ -24,9 +26,7 @@ const parseMs = (value: string) => {
 };
 
 const runtimeMs = computed(() => parseMs(props.submission.runtime));
-const distBins = computed<number[]>(
-  () => props.submission.runtimeDistBinsMs ?? [],
-);
+const distBins = computed<number[]>(() => props.submission.runtimeDistBinsMs ?? []);
 const distCounts = computed<number[]>(() => props.submission.runtimeDist ?? []);
 const distLength = computed(() =>
   Math.min(distCounts.value.length, distBins.value.length),
@@ -388,7 +388,7 @@ const toggleMemoryChart = () => {
 const codeMarkdown = computed(() => {
   const lang = props.submission.language.toLowerCase();
   const code = props.submission.code;
-  return `\`\`\`${lang}\n${code}\n\`\`\``;
+  return "```" + lang + "\n" + code + "\n" + "```";
 });
 </script>
 
