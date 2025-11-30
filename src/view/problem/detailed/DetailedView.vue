@@ -1,34 +1,21 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, provide, h, defineComponent, inject, type Component } from "vue";
 import { useRoute } from "vue-router";
+import { storeToRefs } from 'pinia'
 import { Button } from "@/components/ui/button";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import {
-  Bookmark,
-  ChevronLeft,
-  ChevronRight,
-  Shuffle,
-  ThumbsDown,
-  ThumbsUp,
-} from "lucide-vue-next";
-import logoIcon from "@/ico/favicon.ico";
+import { ThumbsUp, ThumbsDown, Bookmark } from "lucide-vue-next";
+
+import LayoutHeaderLeft from './headers/LayoutHeaderLeft.vue'
+import LayoutHeaderCenter from './headers/LayoutHeaderCenter.vue'
+import LayoutHeaderControls from './headers/LayoutHeaderControls.vue'
+import LayoutTree from '@/features/layout/tree/LayoutTree.vue'
+import { useHeaderStore, type HeaderGroup, type LayoutNode } from '@/stores/headerStore'
+
 import type { ProblemDetail } from "@/mocks/schema/problem-detail";
 import type { ProblemRunResult } from "@/mocks/schema/test-results";
 import { fetchProblemDetailById } from "@/api/problem-detail";
 import { fetchProblemRunResultByProblemId } from "@/api/test-results";
+
 import DescriptionView from "./Left/description/DescriptionView.vue";
 import SolutionsView from "./Left/solutions/SolutionsView.vue";
 import SubmissionsView from "./Left/submissions/SubmissionsView.vue";
@@ -36,8 +23,8 @@ import CodeView from "./right/top/CodeView.vue";
 import TestCaseView from "./right/bottom/TestCaseView.vue";
 import TestResultsView from "./right/bottom/TestResultsView.vue";
 
+// --- Data Fetching ---
 const route = useRoute();
-
 const problem = ref<ProblemDetail | null>(null);
 const runResult = ref<ProblemRunResult | null>(null);
 
@@ -71,190 +58,323 @@ onMounted(async () => {
     problem.value = null;
   }
 });
+
+// --- Context Provider ---
+// Provide problem and runResult to connector components
+provide('problemContext', { problem, runResult });
+
+// --- Connector Components ---
+// These wrappers adapt the injected context to the specific props required by the views
+
+const ConnectedDescriptionView = defineComponent({
+  setup() {
+    const { problem } = inject('problemContext') as any
+    return () => problem.value 
+      ? h('div', { class: 'px-1 py-2' }, h(DescriptionView, { problem: problem.value })) 
+      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
+  }
+})
+
+const ConnectedSolutionsView = defineComponent({
+  setup() {
+    const { problem } = inject('problemContext') as any
+    return () => problem.value 
+      ? h('div', { class: 'px-1 py-2' }, h(SolutionsView, { problemId: problem.value.id, followUp: problem.value.followUp ?? '' })) 
+      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
+  }
+})
+
+const ConnectedSubmissionsView = defineComponent({
+  setup() {
+    const { problem } = inject('problemContext') as any
+    return () => problem.value 
+      ? h('div', { class: 'px-1 py-2' }, h(SubmissionsView, { problemId: problem.value.id })) 
+      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
+  }
+})
+
+const ConnectedCodeView = defineComponent({
+  setup() {
+    const { problem } = inject('problemContext') as any
+    return () => problem.value && problem.value.languages.length
+      ? h(CodeView, { languages: problem.value.languages, starterNotes: problem.value.starterNotes }) 
+      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
+  }
+})
+
+const ConnectedTestCaseView = defineComponent({
+  setup() {
+    const { problem } = inject('problemContext') as any
+    return () => problem.value 
+      ? h('div', { class: 'px-1 py-2' }, h(TestCaseView, { testCases: problem.value.testCases })) 
+      : h('div', { class: 'flex items-center justify-center h-full' }, 'Loading...')
+  }
+})
+
+const ConnectedTestResultsView = defineComponent({
+  setup() {
+    const { runResult } = inject('problemContext') as any
+    return () => h('div', { class: 'px-1 py-2' }, h(TestResultsView, { runResult: runResult.value }))
+  }
+})
+
+// Map Header IDs to Components
+const panelComponentMap: Record<number, Component> = {
+  1: ConnectedDescriptionView,
+  2: ConnectedSolutionsView,
+  3: ConnectedSubmissionsView,
+  4: ConnectedCodeView,
+  5: ConnectedTestCaseView,
+  6: ConnectedTestResultsView
+}
+
+provide('panelComponentMap', panelComponentMap)
+
+// --- Layout Logic ---
+const headerStore = useHeaderStore()
+const { layoutConfig } = storeToRefs(headerStore)
+const currentLayout = ref<'leet' | 'classic' | 'compact' | 'wide'>('leet')
+
+const createInitialHeaderGroups = (): HeaderGroup[] => {
+  return [
+    {
+      id: 'problem-info',
+      name: 'Problem Information',
+      headers: [
+        { id: 1, index: 0, title: 'Problem Description', icon: 'FileText', color: '#1a1a1a', iconColor: '#007bff' },
+        { id: 2, index: 1, title: 'Solution', icon: 'FlaskConical', color: '#1a1a1a', iconColor: '#007bff' },
+        { id: 3, index: 2, title: 'Submission Records', icon: 'History', color: '#1a1a1a', iconColor: '#007bff' },
+      ],
+    },
+    {
+      id: 'code-editor',
+      name: 'Code Editor',
+      headers: [
+        { id: 4, index: 0, title: 'Code', icon: 'Code2', color: '#1a1a1a', iconColor: '#02b128' },
+      ],
+    },
+    {
+      id: 'test-info',
+      name: 'Test Information',
+      headers: [
+        { id: 5, index: 0, title: 'Test Cases', icon: 'SquareCheck', color: '#1a1a1a', iconColor: '#02b128' },
+        { id: 6, index: 1, title: 'Test Results', icon: 'Terminal', color: '#1a1a1a', iconColor: '#02b128' },
+      ],
+    },
+  ]
+}
+
+const getLeetLayoutConfig = () => {
+  const groups = createInitialHeaderGroups()
+  const layout: LayoutNode = {
+    id: 'programming-root',
+    type: 'container',
+    direction: 'horizontal',
+    children: [
+      {
+        id: 'programming-left',
+        type: 'leaf',
+        size: 50,
+        groupId: 'problem-info',
+        groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+      },
+      {
+        id: 'programming-right',
+        type: 'container',
+        direction: 'vertical',
+        size: 50,
+        children: [
+          {
+            id: 'programming-right-top',
+            type: 'leaf',
+            size: 50,
+            groupId: 'code-editor',
+            groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+          },
+          {
+            id: 'programming-right-bottom',
+            type: 'leaf',
+            size: 50,
+            groupId: 'test-info',
+            groupMetadata: { id: 'test-info', name: 'Test Information' },
+          },
+        ],
+      },
+    ],
+  }
+  return { groups, layout }
+}
+
+const getClassicLayoutConfig = () => {
+  const groups = createInitialHeaderGroups()
+  const layout: LayoutNode = {
+    id: 'classic-root',
+    type: 'container',
+    direction: 'vertical',
+    children: [
+      {
+        id: 'classic-top',
+        type: 'leaf',
+        size: 40,
+        groupId: 'problem-info',
+        groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+      },
+      {
+        id: 'classic-bottom',
+        type: 'container',
+        direction: 'horizontal',
+        size: 60,
+        children: [
+          {
+            id: 'classic-bottom-left',
+            type: 'leaf',
+            size: 50,
+            groupId: 'code-editor',
+            groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+          },
+          {
+            id: 'classic-bottom-right',
+            type: 'leaf',
+            size: 50,
+            groupId: 'test-info',
+            groupMetadata: { id: 'test-info', name: 'Test Information' },
+          },
+        ],
+      },
+    ],
+  }
+  return { groups, layout }
+}
+
+const getCompactLayoutConfig = () => {
+  const groups = createInitialHeaderGroups()
+  const layout: LayoutNode = {
+    id: 'compact-root',
+    type: 'container',
+    direction: 'horizontal',
+    children: [
+      {
+        id: 'compact-left',
+        type: 'container',
+        direction: 'vertical',
+        size: 30,
+        children: [
+          {
+            id: 'compact-left-top',
+            type: 'leaf',
+            size: 50,
+            groupId: 'problem-info',
+            groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+          },
+          {
+            id: 'compact-left-bottom',
+            type: 'leaf',
+            size: 50,
+            groupId: 'test-info',
+            groupMetadata: { id: 'test-info', name: 'Test Information' },
+          },
+        ],
+      },
+      {
+        id: 'compact-right',
+        type: 'leaf',
+        size: 70,
+        groupId: 'code-editor',
+        groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+      },
+    ],
+  }
+  return { groups, layout }
+}
+
+const getWideLayoutConfig = () => {
+  const groups = createInitialHeaderGroups()
+  const layout: LayoutNode = {
+    id: 'wide-root',
+    type: 'container',
+    direction: 'horizontal',
+    children: [
+      {
+        id: 'wide-left',
+        type: 'leaf',
+        size: 25,
+        groupId: 'problem-info',
+        groupMetadata: { id: 'problem-info', name: 'Problem Information' },
+      },
+      {
+        id: 'wide-center',
+        type: 'leaf',
+        size: 50,
+        groupId: 'code-editor',
+        groupMetadata: { id: 'code-editor', name: 'Code Editor' },
+      },
+      {
+        id: 'wide-right',
+        type: 'leaf',
+        size: 25,
+        groupId: 'test-info',
+        groupMetadata: { id: 'test-info', name: 'Test Information' },
+      },
+    ],
+  }
+  return { groups, layout }
+}
+
+const handleLayoutChange = (newLayout: 'leet' | 'classic' | 'compact' | 'wide') => {
+  currentLayout.value = newLayout
+  let config
+  switch (newLayout) {
+    case 'leet': config = getLeetLayoutConfig(); break;
+    case 'classic': config = getClassicLayoutConfig(); break;
+    case 'compact': config = getCompactLayoutConfig(); break;
+    case 'wide': config = getWideLayoutConfig(); break;
+  }
+  headerStore.initData(config.groups, config.layout)
+}
+
+onMounted(() => {
+  const initialConfig = getLeetLayoutConfig()
+  headerStore.initData(initialConfig.groups, initialConfig.layout)
+})
 </script>
 
 <template>
-  <div class="flex h-screen w-screen flex-col gap-4 overflow-hidden p-4">
-    <div v-if="problem" class="flex flex-1 min-h-0 flex-col gap-4">
-      <!-- Header -->
-      <nav
-        class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 border-b bg-[#f0f0f0] px-2.5"
-      >
-        <Menubar
-          class="flex h-8 min-w-[240px] flex-1 items-center gap-2 overflow-hidden border-none bg-transparent p-0 shadow-none"
-        >
-          <RouterLink to="/" class="mr-1 flex items-center gap-1">
-            <img :src="logoIcon" alt="Ulticode" class="h-5 w-5" />
-          </RouterLink>
-          <span class="h-4 w-px bg-border" />
-
-          <MenubarMenu>
-            <MenubarTrigger
-              class="flex h-8 items-center gap-2 px-2 py-1 text-xs text-muted-foreground hover:bg-accent/40"
-            >
-              <span>题库</span>
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem as-child>
-                <RouterLink :to="{ name: 'problemset' }" class="block w-full">
-                  题库首页
-                </RouterLink>
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <span class="h-7 w-px bg-border" />
-
-          <div class="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              class="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              <ChevronLeft class="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              class="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              <ChevronRight class="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              class="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              <Shuffle class="h-4 w-4" />
-            </Button>
-          </div>
-        </Menubar>
-
-        <div
-          class="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2"
-        >
-          <div
-            class="pointer-events-auto flex overflow-hidden rounded bg-muted/60 text-xs shadow-sm backdrop-blur-sm dark:bg-muted/40"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              class="h-8 rounded-none px-3 text-xs font-medium text-muted-foreground hover:bg-transparent"
-            >
-              Run
-            </Button>
-            <span class="my-1 h-6 w-px bg-border/60" />
-            <Button size="sm" class="h-8 rounded-none px-3 text-xs font-medium">
-              Submit
-            </Button>
-          </div>
+  <div class="h-screen flex flex-col bg-[#f0f0f0] antialiased">
+    <header
+      class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 bg-[#f0f0f0] px-2.5"
+    >
+      <div class="relative z-10 flex h-full min-w-[240px] flex-1 items-center overflow-hidden">
+        <LayoutHeaderLeft />
+      </div>
+      <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div class="pointer-events-auto">
+          <LayoutHeaderCenter />
         </div>
-
-        <div class="hidden flex-none items-center gap-2 md:flex">
-          <Button variant="outline" size="sm" class="gap-1">
+      </div>
+      <div class="relative z-10 ml-auto flex h-full flex-1 items-center justify-end gap-2">
+        <!-- Likes / Dislikes / Save (Preserved from original DetailedView) -->
+        <div v-if="problem" class="hidden flex-none items-center gap-2 md:flex mr-2">
+          <Button variant="outline" size="sm" class="gap-1 h-8">
             <ThumbsUp class="h-4 w-4" />
             <span class="text-xs">{{ problem.likes }}</span>
           </Button>
-          <Button variant="outline" size="sm" class="gap-1">
+          <Button variant="outline" size="sm" class="gap-1 h-8">
             <ThumbsDown class="h-4 w-4" />
             <span class="text-xs">{{ problem.dislikes }}</span>
           </Button>
-          <Button variant="outline" size="sm" class="gap-1">
+          <Button variant="outline" size="sm" class="gap-1 h-8">
             <Bookmark class="h-4 w-4" />
             <span class="text-xs">Save</span>
           </Button>
         </div>
-      </nav>
 
-      <ResizablePanelGroup direction="horizontal" class="flex-1 min-h-0 gap-4">
-        <ResizablePanel :defaultSize="45" class="min-w-[280px]">
-          <Tabs
-            default-value="description"
-            class="flex h-full flex-col gap-3 rounded-lg border bg-card shadow-sm"
-          >
-                <TabsList class="m-2">
-                  <TabsTrigger value="description"> Description </TabsTrigger>
-                  <TabsTrigger value="solutions"> Solutions </TabsTrigger>
-                  <TabsTrigger value="submissions"> Submissions </TabsTrigger>
-                </TabsList>
-                <TabsContent value="description" class="flex-1 min-h-0">
-                  <ScrollArea class="h-full pr-3">
-                    <div class="px-1 py-2">
-                      <DescriptionView :problem="problem" />
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-                <TabsContent value="solutions" class="flex-1 min-h-0">
-                  <ScrollArea class="h-full pr-3">
-                    <div class="px-1 py-2">
-                      <SolutionsView
-                        :problem-id="problem.id"
-                        :follow-up="problem.followUp ?? ''"
-                      />
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-                <TabsContent value="submissions" class="flex-1 min-h-0">
-                  <ScrollArea class="h-full pr-3">
-                    <div class="px-1 py-2">
-                      <SubmissionsView :problem-id="problem.id" />
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
-        </ResizablePanel>
+        <LayoutHeaderControls :current-layout="currentLayout" @layout-change="handleLayoutChange" />
+      </div>
+    </header>
 
-        <ResizableHandle with-handle />
-
-        <ResizablePanel :defaultSize="55" class="min-w-[320px]">
-          <ResizablePanelGroup
-            direction="vertical"
-            class="flex-1 min-h-0 gap-3"
-          >
-                <ResizablePanel :defaultSize="60" class="min-h-[160px]">
-                  <div class="flex h-full min-h-0 flex-col rounded-lg border bg-card shadow-sm">
-                    <CodeView
-                      v-if="problem.languages.length"
-                      :languages="problem.languages"
-                      :starter-notes="problem.starterNotes"
-                    />
-                  </div>
-                </ResizablePanel>
-
-                <ResizableHandle with-handle />
-
-                <ResizablePanel :defaultSize="40" class="min-h-[120px]">
-                  <Tabs
-                    default-value="cases"
-                    class="flex h-full flex-col gap-2 rounded-lg border bg-card shadow-sm"
-                  >
-                      <TabsList class="m-2">
-                        <TabsTrigger value="cases"> Testcases </TabsTrigger>
-                        <TabsTrigger value="results"> Results </TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="cases" class="flex-1 min-h-0">
-                        <ScrollArea class="h-full pr-3">
-                          <div class="px-1 py-2">
-                            <TestCaseView :test-cases="problem.testCases" />
-                          </div>
-                        </ScrollArea>
-                      </TabsContent>
-                      <TabsContent value="results" class="flex-1 min-h-0">
-                        <ScrollArea class="h-full pr-3">
-                          <div class="px-1 py-2">
-                            <TestResultsView :run-result="runResult" />
-                          </div>
-                        </ScrollArea>
-                      </TabsContent>
-                    </Tabs>
-                </ResizablePanel>
-              </ResizablePanelGroup>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
-
-    <div v-else class="flex flex-1 items-center justify-center">
-      <p class="text-sm text-muted-foreground">Loading problem...</p>
-    </div>
+    <!-- Dynamic layout area -->
+    <main class="flex-1 min-h-0 overflow-hidden w-full p-4 pt-0">
+      <LayoutTree v-if="layoutConfig" :layout="layoutConfig" class="h-full w-full" />
+    </main>
   </div>
 </template>

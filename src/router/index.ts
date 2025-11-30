@@ -73,11 +73,6 @@ const router = createRouter({
       path: "/problem/:id(\\d+)/solution/create",
       name: "solution-create",
       component: () => import("@/view/problem/detailed/Left/solutions/SolutionsEditView.vue"),
-    },
-    {
-      path: "/demo",
-      name: "demo",
-      component: () => import("@/view/demo/indexView.vue"),
     }
   ],
 });

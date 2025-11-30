@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import CodeEditor from "./components/CodeEditor.vue";
-import HeaderComponent from "../../components/HeaderComponent.vue";
 import type { ProblemLanguageOption } from "@/mocks/schema/problem-detail";
 import {
   AlignLeft,
@@ -58,6 +57,7 @@ watch(
 </script>
 
 <template>
+  <div class="h-full w-full flex flex-col">
     <!-- Tab Header -->
     <HeaderComponent title="代码" icon="Code2Icon" />
 
@@ -123,4 +123,5 @@ watch(
         class="flex-1 min-h-0"
       />
     </main>
+  </div>
 </template>
