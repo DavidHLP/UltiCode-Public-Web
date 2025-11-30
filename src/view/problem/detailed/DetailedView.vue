@@ -26,7 +26,6 @@ import {
 import type { ProblemDetail } from "@/mocks/schema/problem-detail";
 import type { ProblemRunResult } from "@/mocks/schema/test-results";
 import { fetchProblemDetailById } from "@/api/problem-detail";
-import { fetchProblemRunResultByProblemId } from "@/api/test-results";
 import { useBottomPanelStore } from "./right/bottom/bottom";
 import { fetchCurrentUserId } from "@/mocks/api/user";
 import type { ProblemTestCase } from "@/mocks/schema/problem-detail";
@@ -44,22 +43,6 @@ const problem = ref<ProblemDetail | null>(null);
 const runResult = ref<ProblemRunResult | null>(null);
 const bottomPanelStore = useBottomPanelStore();
 
-watch(
-  () => problem.value?.id,
-  async (id) => {
-    if (!id) {
-      runResult.value = null;
-      return;
-    }
-    try {
-      runResult.value = await fetchProblemRunResultByProblemId(id);
-    } catch (error) {
-      console.error("Failed to load run result", error);
-      runResult.value = null;
-    }
-  }
-);
-
 onMounted(async () => {
   const idParam = route.params.id;
   const numericId =
@@ -74,6 +57,13 @@ onMounted(async () => {
     problem.value = null;
   }
 });
+
+watch(
+  () => problem.value?.id,
+  () => {
+    runResult.value = null;
+  },
+);
 
 const buildRunResultFromCases = (
   cases: ProblemTestCase[],
