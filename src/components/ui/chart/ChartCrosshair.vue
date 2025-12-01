@@ -34,7 +34,10 @@ function template(d: Record<string, unknown>) {
     const TooltipComponent = props.customTooltip ?? ChartTooltip;
     const indexValue = d[props.index];
     createApp(TooltipComponent, {
-      title: typeof indexValue === 'string' || typeof indexValue === 'number' ? String(indexValue) : '',
+      title:
+        typeof indexValue === "string" || typeof indexValue === "number"
+          ? String(indexValue)
+          : "",
       data: omittedData,
     }).mount(componentDiv);
     wm.set(d, componentDiv.innerHTML);

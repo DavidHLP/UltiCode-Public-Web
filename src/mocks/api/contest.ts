@@ -16,11 +16,16 @@ import { fetchCurrentUserId, getUserById } from "@/mocks/api/user";
 import contestData from "@/mocks/db/contest";
 
 const contests = [...contestData.contests] as ContestRow[];
-const contestProblems = [...contestData.contest_problems] as ContestProblemRow[];
-const contestRankings = [...contestData.contest_rankings] as ContestRankingRow[];
+const contestProblems = [
+  ...contestData.contest_problems,
+] as ContestProblemRow[];
+const contestRankings = [
+  ...contestData.contest_rankings,
+] as ContestRankingRow[];
 const globalRankings = [...contestData.global_rankings] as GlobalRankingRow[];
-const contestParticipants = [...(contestData.contest_participants ??
-  [])] as ContestParticipantRow[];
+const contestParticipants = [
+  ...(contestData.contest_participants ?? []),
+] as ContestParticipantRow[];
 
 const contestProblemIds = Array.from(
   new Set(contestProblems.map((row) => row.problem_id)),

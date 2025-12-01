@@ -21,11 +21,17 @@ const submissionRows = [...submissionsData.submissions].map((row: unknown) => {
   const r = row as SubmissionRow;
   return {
     ...r,
-    runtime_dist: Array.isArray(r.runtime_dist) ? [...r.runtime_dist] : r.runtime_dist,
-    runtime_dist_bins: Array.isArray(r.runtime_dist_bins) ? [...r.runtime_dist_bins] : r.runtime_dist_bins,
+    runtime_dist: Array.isArray(r.runtime_dist)
+      ? [...r.runtime_dist]
+      : r.runtime_dist,
+    runtime_dist_bins: Array.isArray(r.runtime_dist_bins)
+      ? [...r.runtime_dist_bins]
+      : r.runtime_dist_bins,
   };
 }) as SubmissionRow[];
-const submissionTests = [...submissionsData.submission_tests].map(t => ({...t})) as SubmissionTestRow[];
+const submissionTests = [...submissionsData.submission_tests].map((t) => ({
+  ...t,
+})) as SubmissionTestRow[];
 
 // Build a map of submission tests by submission_id
 const testsBySubmissionId = submissionTests.reduce<

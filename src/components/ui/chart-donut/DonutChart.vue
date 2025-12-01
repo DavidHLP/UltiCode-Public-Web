@@ -71,17 +71,20 @@ const colors = computed(() =>
       ),
 );
 const legendItems = computed(() =>
-  props.data.map((item, i) => ({
-    name: String(item[props.index]),
-    color: colors.value[i] ?? '',
-    inactive: false,
-  } as BulletLegendItemInterface)),
+  props.data.map(
+    (item, i) =>
+      ({
+        name: String(item[props.index]),
+        color: colors.value[i] ?? "",
+        inactive: false,
+      }) as BulletLegendItemInterface,
+  ),
 );
 
 const totalValue = computed(() =>
   props.data.reduce((prev, curr) => {
     const value = curr[props.category];
-    return prev + (typeof value === 'number' ? value : Number(value) || 0);
+    return prev + (typeof value === "number" ? value : Number(value) || 0);
   }, 0),
 );
 </script>

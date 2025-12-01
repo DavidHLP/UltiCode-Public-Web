@@ -9,7 +9,9 @@ import rawProblemsData from "@/mocks/db/problems";
 const problemsData = {
   problems: [...rawProblemsData.problems] as ProblemRow[],
   problem_tags: [...rawProblemsData.problem_tags] as ProblemTagRow[],
-  problem_tag_relations: [...rawProblemsData.problem_tag_relations] as ProblemTagRelationRow[],
+  problem_tag_relations: [
+    ...rawProblemsData.problem_tag_relations,
+  ] as ProblemTagRelationRow[],
 };
 
 const tagLookup = new Map(

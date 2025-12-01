@@ -89,7 +89,10 @@ const recentResultsByProblemId = groupByProblemId(
 const normalizeInteractions = (
   snapshot: unknown,
 ): ProblemInteractionSnapshot => {
-  const snapshotData = (snapshot ?? {}) as Record<string, Record<string, unknown>>;
+  const snapshotData = (snapshot ?? {}) as Record<
+    string,
+    Record<string, unknown>
+  >;
   const counts = snapshotData.counts ?? {};
   const viewer = snapshotData.viewer ?? {};
   return {

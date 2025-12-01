@@ -35,7 +35,7 @@ function template(
       );
       const TooltipComponent = props.customTooltip ?? ChartTooltip;
       createApp(TooltipComponent, {
-        title: String(d[props.index] ?? ''),
+        title: String(d[props.index] ?? ""),
         data: omittedData,
       }).mount(componentDiv);
       wm.set(d, componentDiv.innerHTML);
@@ -43,17 +43,17 @@ function template(
     }
   } else {
     const data = d.data as Record<string, unknown> | undefined;
-    if (!data) return '';
+    if (!data) return "";
 
     if (wm.has(data)) {
       return wm.get(data);
     } else {
       const element = elements[i];
-      if (!element) return '';
+      if (!element) return "";
       const style = getComputedStyle(element);
       const omittedData = [
         {
-          name: String(data.name ?? ''),
+          name: String(data.name ?? ""),
           value: valueFormatter(Number(data[props.index])),
           color: style.fill,
         },
@@ -61,7 +61,7 @@ function template(
       const componentDiv = document.createElement("div");
       const TooltipComponent = props.customTooltip ?? ChartTooltip;
       createApp(TooltipComponent, {
-        title: String(d[props.index] ?? ''),
+        title: String(d[props.index] ?? ""),
         data: omittedData,
       }).mount(componentDiv);
       wm.set(d, componentDiv.innerHTML);
