@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import type { ForumFlairType, ForumThread } from "@/mocks/schema/forum";
+import type {
+  ForumFlairType,
+  ForumThread,
+  ForumPostMedia,
+} from "@/mocks/schema/forum";
 import {
   Card,
   CardContent,
@@ -54,9 +58,13 @@ const createdAgo = computed(() =>
   thread.value ? formatRelativeTime(thread.value.post.createdAt) : "",
 );
 const recommendationLabel = computed(
-  () => thread.value?.post.recommendation?.label ?? "",
+  () =>
+    (thread.value?.post.recommendation as unknown as { label?: string })
+      ?.label ?? "",
 );
-const media = computed(() => thread.value?.post.media);
+const media = computed(
+  () => thread.value?.post.media as unknown as ForumPostMedia | undefined,
+);
 const awards = computed(() => thread.value?.post.awards ?? []);
 const upvoteRatioDisplay = computed(() =>
   typeof thread.value?.post.stats.upvote_ratio === "number"

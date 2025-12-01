@@ -15,13 +15,15 @@ import type { SubmissionRow } from "@/mocks/schema/submission";
 import type { UserId } from "@/mocks/schema/user";
 import { fetchCurrentUserId } from "@/mocks/api/user";
 
-const runResults = testResultData.run_results as RunResultRow[];
-const runCases = testResultData.run_cases as RunCaseRow[];
-const runCaseInputs = testResultData.run_case_inputs as RunCaseInputRow[];
+const runResults = testResultData.run_results as unknown as RunResultRow[];
+const runCases = testResultData.run_cases as unknown as RunCaseRow[];
+const runCaseInputs =
+  testResultData.run_case_inputs as unknown as RunCaseInputRow[];
 
-const testCases = testCaseData.test_cases as TestCaseRow[];
-const testCaseInputs = testCaseData.test_case_inputs as TestCaseInputRow[];
-const submissions = submissionData.submissions as SubmissionRow[];
+const testCases = testCaseData.test_cases as unknown as TestCaseRow[];
+const testCaseInputs =
+  testCaseData.test_case_inputs as unknown as TestCaseInputRow[];
+const submissions = submissionData.submissions as unknown as SubmissionRow[];
 
 const submissionById = new Map(submissions.map((row) => [row.id, row]));
 const testCaseById = new Map(testCases.map((row) => [row.id, row]));

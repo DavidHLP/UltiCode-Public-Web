@@ -44,9 +44,36 @@ const userInitials = computed(() => {
 const communityIcon = computed(() => props.post.community.icon || "");
 const createdAgo = computed(() => formatRelativeTime(props.post.createdAt));
 const recommendationLabel = computed(
-  () => props.post.recommendation?.label ?? "",
+  () =>
+    (props.post.recommendation as unknown as { label?: string })?.label ?? "",
 );
-const media = computed(() => props.post.media);
+const media = computed(
+  () =>
+    props.post.media as unknown as
+      | {
+          kind?: string;
+          ratio?: number;
+          src?: string;
+          alt?: string;
+          caption?: string;
+          thumbnail?: string;
+          title?: string;
+          domain?: string;
+          description?: string;
+          url?: string;
+          body?: string;
+          markdown?: string;
+          controls?: boolean;
+          autoplay?: boolean;
+          poster?: string;
+          duration?: string;
+          question?: string;
+          options?: Array<{ id: string; label: string; votes: number }>;
+          totalVotes?: number;
+          closesAt?: string;
+        }
+      | undefined,
+);
 const awards = computed(() => props.post.awards ?? []);
 const hasAwards = computed(() => awards.value.length > 0);
 const commentPreview = computed(() => props.post.commentPreview ?? []);
@@ -369,14 +396,14 @@ function formatRelativeTime(value: string) {
               >
                 <span class="text-foreground">{{ option.label }}</span>
                 <span>{{
-                  formatPollPercentage(option.votes, media.totalVotes)
+                  formatPollPercentage(option.votes, media.totalVotes ?? 0)
                 }}</span>
               </div>
               <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   class="h-full rounded-full bg-primary"
                   :style="{
-                    width: formatPollWidth(option.votes, media.totalVotes),
+                    width: formatPollWidth(option.votes, media.totalVotes ?? 0),
                   }"
                 />
               </div>

@@ -111,7 +111,10 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
         <!-- Companies Button -->
         <button
-          v-if="props.problem.companies.length"
+          v-if="
+            Array.isArray(props.problem.companies) &&
+            props.problem.companies.length
+          "
           class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((companiesSection as any).$el)"
         >
@@ -156,7 +159,11 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
       <!-- Companies Section (Collapsible) -->
       <section
-        v-if="showCompanies && props.problem.companies.length"
+        v-if="
+          showCompanies &&
+          Array.isArray(props.problem.companies) &&
+          props.problem.companies.length
+        "
         class="flex flex-wrap gap-2"
       >
         <span
@@ -243,7 +250,10 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
           <!-- Related Companies -->
           <AccordionItem
-            v-if="props.problem.companies.length"
+            v-if="
+              Array.isArray(props.problem.companies) &&
+              props.problem.companies.length
+            "
             ref="companiesSection"
             value="companies"
           >

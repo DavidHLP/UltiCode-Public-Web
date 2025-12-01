@@ -25,11 +25,15 @@ const parseMs = (value: string) => {
   return m ? Number(m[1]) : null;
 };
 
-const runtimeMs = computed(() => parseMs(props.submission.runtime));
-const distBins = computed<number[]>(
-  () => props.submission.runtimeDistBinsMs ?? [],
+const runtimeMs = computed(() =>
+  props.submission ? parseMs(props.submission.runtime) : null,
 );
-const distCounts = computed<number[]>(() => props.submission.runtimeDist ?? []);
+const distBins = computed<number[]>(
+  () => props.submission?.runtimeDistBinsMs ?? [],
+);
+const distCounts = computed<number[]>(
+  () => props.submission?.runtimeDist ?? [],
+);
 const distLength = computed(() =>
   Math.min(distCounts.value.length, distBins.value.length),
 );
@@ -398,6 +402,7 @@ const toggleMemoryChart = () => {
 };
 
 const codeMarkdown = computed(() => {
+  if (!props.submission) return "";
   const lang = props.submission.language.toLowerCase();
   const code = props.submission.code;
   return "```" + lang + "\n" + code + "\n" + "```";
@@ -405,28 +410,31 @@ const codeMarkdown = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[700px] flex-col gap-3 px-3 py-2">
+  <div
+    v-if="props.submission"
+    class="mx-auto flex w-full max-w-[700px] flex-col gap-3 px-3 py-2"
+  >
     <!-- 顶部状态栏 -->
     <div class="flex w-full items-center justify-between gap-3">
       <div class="flex flex-1 flex-col items-start gap-0.5 overflow-hidden">
         <div
           class="flex flex-1 items-center gap-1.5 text-sm font-medium leading-5"
           :class="[
-            submission.status === 'Accepted'
+            props.submission.status === 'Accepted'
               ? 'text-green-600 dark:text-green-400'
               : 'text-red-600 dark:text-red-400',
           ]"
         >
           <span data-e2e-locator="submission-result">{{
-            submission.status
+            props.submission.status
           }}</span>
           <div class="text-[11px] font-normal text-muted-foreground">
             <span
               >{{
-                submission.tests?.filter((t) => t.status === "Accepted")
+                props.submission.tests?.filter((t) => t.status === "Accepted")
                   .length ?? 0
               }}
-              / {{ submission.tests?.length ?? 0 }} </span
+              / {{ props.submission.tests?.length ?? 0 }} </span
             >test cases passed
           </div>
         </div>
@@ -445,7 +453,7 @@ const codeMarkdown = computed(() => {
           </div>
           <span class="text-muted-foreground flex-none whitespace-nowrap">
             Submitted&nbsp;<span class="max-w-full truncate">{{
-              new Date(submission.submittedAt).toLocaleString("en-US", {
+              new Date(props.submission.submittedAt).toLocaleString("en-US", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -490,7 +498,7 @@ const codeMarkdown = computed(() => {
             </div>
             <div class="mt-1.5 flex items-center gap-1">
               <span class="text-foreground text-base font-semibold">{{
-                submission.runtime.replace(" ms", "")
+                props.submission.runtime.replace(" ms", "")
               }}</span>
               <span class="text-muted-foreground text-xs">ms</span>
               <div class="w-px h-2.5 bg-border mx-0.5"></div>
@@ -498,7 +506,7 @@ const codeMarkdown = computed(() => {
                 >Beats</span
               >
               <span class="text-foreground text-base font-semibold"
-                >{{ submission.runtimePercentile }}%</span
+                >{{ props.submission.runtimePercentile }}%</span
               >
             </div>
             <div
@@ -526,7 +534,7 @@ const codeMarkdown = computed(() => {
             </div>
             <div class="mt-1.5 flex items-center gap-1">
               <span class="text-foreground text-base font-semibold">{{
-                submission.memory.replace(" MB", "")
+                props.submission.memory.replace(" MB", "")
               }}</span>
               <span class="text-muted-foreground text-xs">MB</span>
               <div class="w-px h-2.5 bg-border mx-0.5"></div>
@@ -534,7 +542,7 @@ const codeMarkdown = computed(() => {
                 >Beats</span
               >
               <span class="text-foreground text-base font-semibold"
-                >{{ submission.memoryPercentile }}%</span
+                >{{ props.submission.memoryPercentile }}%</span
               >
             </div>
             <div

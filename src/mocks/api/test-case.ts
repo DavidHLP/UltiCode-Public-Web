@@ -5,8 +5,9 @@ import type {
 } from "@/mocks/schema/problem-detail";
 import testCaseData from "@/mocks/db/test-case";
 
-const testCases = testCaseData.test_cases as TestCaseRow[];
-const testCaseInputs = testCaseData.test_case_inputs as TestCaseInputRow[];
+const testCases = testCaseData.test_cases as unknown as TestCaseRow[];
+const testCaseInputs =
+  testCaseData.test_case_inputs as unknown as TestCaseInputRow[];
 
 const inputsByTestCaseId = testCaseInputs.reduce<
   Map<string, ProblemTestCase["inputs"]>
