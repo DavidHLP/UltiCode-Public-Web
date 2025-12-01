@@ -207,10 +207,12 @@ function loadMore() {
 <template>
   <section class="flex flex-col gap-6">
     <slot name="header" />
-    
+
     <div class="space-y-4">
       <!-- Controls Bar -->
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div
+        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
         <!-- Left: Search -->
         <div class="relative w-full max-w-md">
           <Search
@@ -230,12 +232,21 @@ function loadMore() {
               <Button variant="outline" class="h-10 gap-2 border-dashed">
                 <ListFilter class="h-4 w-4" />
                 Filters
-                <Badge 
-                  v-if="selectedStatus.length + selectedDifficulty.length + (showPremium !== null ? 1 : 0) > 0" 
-                  variant="secondary" 
+                <Badge
+                  v-if="
+                    selectedStatus.length +
+                      selectedDifficulty.length +
+                      (showPremium !== null ? 1 : 0) >
+                    0
+                  "
+                  variant="secondary"
                   class="ml-1 h-5 px-1 text-[10px]"
                 >
-                  {{ selectedStatus.length + selectedDifficulty.length + (showPremium !== null ? 1 : 0) }}
+                  {{
+                    selectedStatus.length +
+                    selectedDifficulty.length +
+                    (showPremium !== null ? 1 : 0)
+                  }}
                 </Badge>
               </Button>
             </DropdownMenuTrigger>
@@ -259,7 +270,8 @@ function loadMore() {
               <DropdownMenuCheckboxItem
                 :checked="selectedStatus.includes('attempted')"
                 @click="
-                  () => toggleStatusAttempted(!selectedStatus.includes('attempted'))
+                  () =>
+                    toggleStatusAttempted(!selectedStatus.includes('attempted'))
                 "
               >
                 <span class="flex items-center w-full">
@@ -272,7 +284,9 @@ function loadMore() {
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 :checked="selectedStatus.includes('todo')"
-                @click="() => toggleStatusTodo(!selectedStatus.includes('todo'))"
+                @click="
+                  () => toggleStatusTodo(!selectedStatus.includes('todo'))
+                "
               >
                 <span class="flex items-center w-full">
                   Todo
@@ -288,7 +302,8 @@ function loadMore() {
               <DropdownMenuCheckboxItem
                 :checked="selectedDifficulty.includes('Easy')"
                 @click="
-                  () => toggleDifficultyEasy(!selectedDifficulty.includes('Easy'))
+                  () =>
+                    toggleDifficultyEasy(!selectedDifficulty.includes('Easy'))
                 "
               >
                 <span class="flex items-center w-full">
@@ -303,7 +318,9 @@ function loadMore() {
                 :checked="selectedDifficulty.includes('Medium')"
                 @click="
                   () =>
-                    toggleDifficultyMedium(!selectedDifficulty.includes('Medium'))
+                    toggleDifficultyMedium(
+                      !selectedDifficulty.includes('Medium'),
+                    )
                 "
               >
                 <span class="flex items-center w-full">
@@ -317,7 +334,8 @@ function loadMore() {
               <DropdownMenuCheckboxItem
                 :checked="selectedDifficulty.includes('Hard')"
                 @click="
-                  () => toggleDifficultyHard(!selectedDifficulty.includes('Hard'))
+                  () =>
+                    toggleDifficultyHard(!selectedDifficulty.includes('Hard'))
                 "
               >
                 <span class="flex items-center w-full">
@@ -337,7 +355,10 @@ function loadMore() {
               >
                 <span class="flex items-center w-full">
                   Free
-                  <CheckIcon v-if="showPremium === false" class="ml-auto h-4 w-4" />
+                  <CheckIcon
+                    v-if="showPremium === false"
+                    class="ml-auto h-4 w-4"
+                  />
                 </span>
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
@@ -346,16 +367,19 @@ function loadMore() {
               >
                 <span class="flex items-center w-full">
                   Premium
-                  <CheckIcon v-if="showPremium === true" class="ml-auto h-4 w-4" />
+                  <CheckIcon
+                    v-if="showPremium === true"
+                    class="ml-auto h-4 w-4"
+                  />
                 </span>
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
+
           <Button variant="outline" class="h-10" @click="pickOne">
-             Pick One 
+            Pick One
           </Button>
-          
+
           <Button
             v-if="
               searchQuery ||
@@ -383,13 +407,20 @@ function loadMore() {
             :key="tag"
             :variant="isTagSelected(tag) ? 'default' : 'outline'"
             class="cursor-pointer px-3 py-1 hover:bg-primary/80 hover:text-primary-foreground transition-colors"
-            :class="{ 'bg-primary text-primary-foreground hover:bg-primary/90': isTagSelected(tag) }"
+            :class="{
+              'bg-primary text-primary-foreground hover:bg-primary/90':
+                isTagSelected(tag),
+            }"
             @click="toggleTag(tag)"
           >
             {{ tag }}
           </Badge>
           <CollapsibleTrigger as-child>
-            <Button variant="ghost" size="sm" class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground"
+            >
               Show more tags
               <ChevronDown class="h-3 w-3" />
             </Button>
@@ -402,7 +433,10 @@ function loadMore() {
               :key="tag"
               :variant="isTagSelected(tag) ? 'default' : 'outline'"
               class="cursor-pointer hover:bg-primary/80 hover:text-primary-foreground transition-colors"
-              :class="{ 'bg-primary text-primary-foreground hover:bg-primary/90': isTagSelected(tag) }"
+              :class="{
+                'bg-primary text-primary-foreground hover:bg-primary/90':
+                  isTagSelected(tag),
+              }"
               @click="toggleTag(tag)"
             >
               {{ tag }}

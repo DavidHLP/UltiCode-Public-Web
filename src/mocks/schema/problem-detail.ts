@@ -1,4 +1,4 @@
-import type { Problem, ProblemId } from "@/mocks/schema/problem";
+import type { Problem } from "@/mocks/schema/problem";
 
 export type ProblemDetailId = string;
 export type ProblemExampleId = string;
@@ -37,11 +37,11 @@ export interface ProblemDetailRow {
   problem_id: number; // BIGINT NOT NULL UNIQUE (FK to problems.id)
   slug: string; // VARCHAR(120) NOT NULL
   summary: string; // TEXT NOT NULL
-  companies?: any | null; // JSON
+  companies?: unknown | null; // JSON
   difficulty_rating: number; // DECIMAL(4,1) NOT NULL DEFAULT 1500
   updated_at: string; // DATETIME NOT NULL
   follow_up?: string | null; // TEXT
-  constraints_json: any; // JSON NOT NULL
+  constraints_json: unknown; // JSON NOT NULL
 }
 
 // Matches SQL: problem_examples table

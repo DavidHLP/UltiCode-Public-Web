@@ -87,10 +87,11 @@ const recentResultsByProblemId = groupByProblemId(
 );
 
 const normalizeInteractions = (
-  snapshot: any,
+  snapshot: unknown,
 ): ProblemInteractionSnapshot => {
-  const counts = snapshot?.counts ?? {};
-  const viewer = snapshot?.viewer ?? {};
+  const snapshotData = (snapshot ?? {}) as Record<string, Record<string, unknown>>;
+  const counts = snapshotData.counts ?? {};
+  const viewer = snapshotData.viewer ?? {};
   return {
     counts: {
       likes: Number(counts.likes ?? 0),
@@ -98,7 +99,8 @@ const normalizeInteractions = (
       favorites: Number(counts.favorites ?? 0),
     },
     viewer: {
-      reaction: (viewer.reaction ?? null) as ProblemInteractionSnapshot["viewer"]["reaction"],
+      reaction: (viewer.reaction ??
+        null) as ProblemInteractionSnapshot["viewer"]["reaction"],
       isFavorite: Boolean(viewer.isFavorite),
     },
   };

@@ -1,119 +1,134 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Layout, User, Check, ThumbsUp, ThumbsDown, Bookmark } from 'lucide-vue-next'
+import { computed, ref, watch } from "vue";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import {
+  Layout,
+  User,
+  Check,
+  ThumbsUp,
+  ThumbsDown,
+  Bookmark,
+} from "lucide-vue-next";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import type {
   ProblemDetail,
   ProblemInteractionCounts,
   ProblemInteractionSnapshot,
   ProblemReaction,
-} from '@/mocks/schema/problem-detail'
+} from "@/mocks/schema/problem-detail";
 
 interface Props {
-  currentLayout: 'leet' | 'classic' | 'compact' | 'wide'
-  problem?: ProblemDetail | null
+  currentLayout: "leet" | "classic" | "compact" | "wide";
+  problem?: ProblemDetail | null;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  'layout-change': [layout: 'leet' | 'classic' | 'compact' | 'wide']
-}>()
+  "layout-change": [layout: "leet" | "classic" | "compact" | "wide"];
+}>();
 
 const interactionCounts = ref<ProblemInteractionCounts>({
   likes: 0,
   dislikes: 0,
   favorites: 0,
-})
+});
 
-const viewerInteraction = ref<ProblemInteractionSnapshot['viewer']>({
+const viewerInteraction = ref<ProblemInteractionSnapshot["viewer"]>({
   reaction: null,
   isFavorite: false,
-})
+});
 
 watch(
   () => props.problem?.interactions,
   (interactions) => {
-    if (!interactions) return
-    interactionCounts.value = { ...interactions.counts }
-    viewerInteraction.value = { ...interactions.viewer }
+    if (!interactions) return;
+    interactionCounts.value = { ...interactions.counts };
+    viewerInteraction.value = { ...interactions.viewer };
   },
   { immediate: true, deep: true },
-)
+);
 
-const reactionCounts = computed(() => interactionCounts.value)
-const isLiked = computed(() => viewerInteraction.value.reaction === 'like')
-const isDisliked = computed(() => viewerInteraction.value.reaction === 'dislike')
-const isFavorited = computed(() => viewerInteraction.value.isFavorite)
+const reactionCounts = computed(() => interactionCounts.value);
+const isLiked = computed(() => viewerInteraction.value.reaction === "like");
+const isDisliked = computed(
+  () => viewerInteraction.value.reaction === "dislike",
+);
+const isFavorited = computed(() => viewerInteraction.value.isFavorite);
 
 const adjustReactionCount = (reaction: ProblemReaction, delta: number) => {
-  if (reaction === 'like') {
-    interactionCounts.value.likes = Math.max(0, interactionCounts.value.likes + delta)
-  } else if (reaction === 'dislike') {
-    interactionCounts.value.dislikes = Math.max(0, interactionCounts.value.dislikes + delta)
+  if (reaction === "like") {
+    interactionCounts.value.likes = Math.max(
+      0,
+      interactionCounts.value.likes + delta,
+    );
+  } else if (reaction === "dislike") {
+    interactionCounts.value.dislikes = Math.max(
+      0,
+      interactionCounts.value.dislikes + delta,
+    );
   }
-}
+};
 
 const toggleReaction = (reaction: ProblemReaction) => {
-  if (!reaction) return
-  const previous = viewerInteraction.value.reaction
+  if (!reaction) return;
+  const previous = viewerInteraction.value.reaction;
   if (previous === reaction) {
-    adjustReactionCount(reaction, -1)
-    viewerInteraction.value.reaction = null
-    return
+    adjustReactionCount(reaction, -1);
+    viewerInteraction.value.reaction = null;
+    return;
   }
 
-  if (previous) adjustReactionCount(previous, -1)
-  viewerInteraction.value.reaction = reaction
-  adjustReactionCount(reaction, 1)
-}
+  if (previous) adjustReactionCount(previous, -1);
+  viewerInteraction.value.reaction = reaction;
+  adjustReactionCount(reaction, 1);
+};
 
 const toggleFavorite = () => {
-  const next = !viewerInteraction.value.isFavorite
-  viewerInteraction.value.isFavorite = next
+  const next = !viewerInteraction.value.isFavorite;
+  viewerInteraction.value.isFavorite = next;
   interactionCounts.value.favorites = Math.max(
     0,
     interactionCounts.value.favorites + (next ? 1 : -1),
-  )
-}
+  );
+};
 
 // Layout options
 const layoutOptions = [
   {
-    id: 'leet',
-    label: 'Leet',
-    value: 'leet',
+    id: "leet",
+    label: "Leet",
+    value: "leet",
   },
   {
-    id: 'classic',
-    label: 'Classic',
-    value: 'classic',
+    id: "classic",
+    label: "Classic",
+    value: "classic",
   },
   {
-    id: 'compact',
-    label: 'Compact',
-    value: 'compact',
+    id: "compact",
+    label: "Compact",
+    value: "compact",
   },
   {
-    id: 'wide',
-    label: 'Wide',
-    value: 'wide',
+    id: "wide",
+    label: "Wide",
+    value: "wide",
   },
-]
+];
 
 const selectedLayout = computed({
   get: () => props.currentLayout,
   set: (value: string) => {
-    emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide')
+    emit("layout-change", value as "leet" | "classic" | "compact" | "wide");
   },
-})
+});
 </script>
 
 <template>
@@ -166,7 +181,10 @@ const selectedLayout = computed({
           <span class="text-xs">{{ reactionCounts.favorites }}</span>
         </Button>
 
-        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
+        <Separator
+          orientation="vertical"
+          class="h-7 w-px flex-none bg-gray-200"
+        />
       </div>
 
       <div class="relative group/nav-back flex items-center">
@@ -188,7 +206,11 @@ const selectedLayout = computed({
               <DropdownMenuRadioGroup
                 :model-value="selectedLayout"
                 @update:model-value="
-                  (value) => emit('layout-change', value as 'leet' | 'classic' | 'compact' | 'wide')
+                  (value) =>
+                    emit(
+                      'layout-change',
+                      value as 'leet' | 'classic' | 'compact' | 'wide',
+                    )
                 "
               >
                 <div class="grid grid-cols-2 gap-4">
@@ -213,20 +235,32 @@ const selectedLayout = computed({
                         v-if="option.value === 'leet'"
                         class="w-full h-full p-2 flex flex-row gap-1.5"
                       >
-                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        <div
+                          class="flex-1 bg-white rounded border border-gray-300"
+                        ></div>
                         <div class="flex flex-col gap-1.5 flex-1">
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                          <div
+                            class="flex-1 bg-white rounded border border-gray-300"
+                          ></div>
+                          <div
+                            class="flex-1 bg-white rounded border border-gray-300"
+                          ></div>
                         </div>
                       </div>
                       <div
                         v-else-if="option.value === 'classic'"
                         class="w-full h-full p-2 flex flex-col gap-1.5"
                       >
-                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        <div
+                          class="flex-1 bg-white rounded border border-gray-300"
+                        ></div>
                         <div class="flex gap-1.5 flex-1">
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                          <div
+                            class="flex-1 bg-white rounded border border-gray-300"
+                          ></div>
+                          <div
+                            class="flex-1 bg-white rounded border border-gray-300"
+                          ></div>
                         </div>
                       </div>
                       <div
@@ -234,15 +268,30 @@ const selectedLayout = computed({
                         class="w-full h-full p-2 flex flex-row gap-1.5"
                       >
                         <div class="flex flex-col gap-1.5 w-1/3">
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                          <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                          <div
+                            class="flex-1 bg-white rounded border border-gray-300"
+                          ></div>
+                          <div
+                            class="flex-1 bg-white rounded border border-gray-300"
+                          ></div>
                         </div>
-                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
+                        <div
+                          class="flex-1 bg-white rounded border border-gray-300"
+                        ></div>
                       </div>
-                      <div v-else class="w-full h-full p-2 flex flex-row gap-1.5">
-                        <div class="w-1/4 bg-white rounded border border-gray-300"></div>
-                        <div class="flex-1 bg-white rounded border border-gray-300"></div>
-                        <div class="w-1/4 bg-white rounded border border-gray-300"></div>
+                      <div
+                        v-else
+                        class="w-full h-full p-2 flex flex-row gap-1.5"
+                      >
+                        <div
+                          class="w-1/4 bg-white rounded border border-gray-300"
+                        ></div>
+                        <div
+                          class="flex-1 bg-white rounded border border-gray-300"
+                        ></div>
+                        <div
+                          class="w-1/4 bg-white rounded border border-gray-300"
+                        ></div>
                       </div>
 
                       <!-- Check mark indicator -->
@@ -255,7 +304,9 @@ const selectedLayout = computed({
                     </div>
 
                     <!-- Label -->
-                    <span class="text-xs font-medium text-gray-700 mt-1">{{ option.label }}</span>
+                    <span class="text-xs font-medium text-gray-700 mt-1">{{
+                      option.label
+                    }}</span>
                   </DropdownMenuRadioItem>
                 </div>
               </DropdownMenuRadioGroup>
@@ -263,7 +314,10 @@ const selectedLayout = computed({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
+        <Separator
+          orientation="vertical"
+          class="h-7 w-px flex-none bg-gray-200"
+        />
 
         <!-- User button -->
         <Button

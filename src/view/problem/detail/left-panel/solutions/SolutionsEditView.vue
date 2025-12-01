@@ -46,14 +46,24 @@
                     <h4 class="text-sm font-medium">Select Topics</h4>
                   </div>
 
-                  <div v-if="isLoadingTopics" class="flex items-center justify-center py-8">
-                    <span class="text-sm text-muted-foreground">Loading...</span>
+                  <div
+                    v-if="isLoadingTopics"
+                    class="flex items-center justify-center py-8"
+                  >
+                    <span class="text-sm text-muted-foreground"
+                      >Loading...</span
+                    >
                   </div>
                   <div v-else-if="topicLoadError" class="py-8 text-center">
                     <p class="text-sm text-destructive">{{ topicLoadError }}</p>
                   </div>
-                  <div v-else-if="!topicOptions.length" class="py-8 text-center">
-                    <p class="text-sm text-muted-foreground">No topics available</p>
+                  <div
+                    v-else-if="!topicOptions.length"
+                    class="py-8 text-center"
+                  >
+                    <p class="text-sm text-muted-foreground">
+                      No topics available
+                    </p>
                   </div>
                   <div v-else class="max-h-64 overflow-y-auto">
                     <div class="p-2">
@@ -65,7 +75,10 @@
                         @click="toggleTopic(topic.id)"
                       >
                         <span>{{ topic.name }}</span>
-                        <Check v-if="selectedTopicIds.includes(topic.id)" class="h-4 w-4" />
+                        <Check
+                          v-if="selectedTopicIds.includes(topic.id)"
+                          class="h-4 w-4"
+                        />
                       </button>
                     </div>
                   </div>
@@ -204,8 +217,8 @@ const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
   topicOptions.value.filter((topic) =>
-    selectedTopicIds.value.includes(topic.id)
-  )
+    selectedTopicIds.value.includes(topic.id),
+  ),
 );
 const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
@@ -233,7 +246,7 @@ onMounted(loadTopics);
 const isPreviewMode = ref(false);
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "Draft saved" : "Editing draft..."
+  isDraftSaved.value ? "Draft saved" : "Editing draft...",
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -248,7 +261,7 @@ watch([title, editorContent, selectedTopicIds], () => {
 const toggleTopic = (topicId: string) => {
   if (selectedTopicIds.value.includes(topicId)) {
     selectedTopicIds.value = selectedTopicIds.value.filter(
-      (item) => item !== topicId
+      (item) => item !== topicId,
     );
   } else {
     selectedTopicIds.value = [...selectedTopicIds.value, topicId];
@@ -257,7 +270,7 @@ const toggleTopic = (topicId: string) => {
 
 const removeTopic = (topicId: string) => {
   selectedTopicIds.value = selectedTopicIds.value.filter(
-    (item) => item !== topicId
+    (item) => item !== topicId,
   );
 };
 
@@ -284,7 +297,7 @@ const handleGoBack = () => {
 
 const handleUpload = async (
   files: File[],
-  callback: (urls: string[]) => void
+  callback: (urls: string[]) => void,
 ) => {
   const urls = files.map((file) => URL.createObjectURL(file));
   callback(urls);

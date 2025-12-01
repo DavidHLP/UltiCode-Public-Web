@@ -1,5 +1,3 @@
-
-
 const communityId = "community-ulticode";
 
 const data = {

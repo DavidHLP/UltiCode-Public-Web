@@ -18,8 +18,8 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronsUpDown } from "lucide-vue-next";
-import ForumPostCard from "@/view/forum/components/ForumPostCard.vue";
-import ForumSidebar from "@/view/forum/components/ForumSidebar.vue";
+import ForumPostCard from "@/view/forum/home/components/ForumPostCard.vue";
+import ForumSidebar from "@/view/forum/home/components/ForumSidebar.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,
@@ -83,7 +83,9 @@ const filteredPosts = computed(() => {
       !normalizedSearch ||
       post.title.toLowerCase().includes(normalizedSearch) ||
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
-      post.tags.some((tag: string) => tag.toLowerCase().includes(normalizedSearch));
+      post.tags.some((tag: string) =>
+        tag.toLowerCase().includes(normalizedSearch),
+      );
 
     const matchesCommunity =
       selectedCommunity.value === "all" ||
@@ -187,6 +189,7 @@ const sortedPosts = computed(() => {
           </CardContent>
         </Card>
         <ForumSidebar
+          class="self-start xl:sticky xl:top-6"
           :trendingTopics="trendingTopics"
           :communities="communities"
           :moderators="moderators"

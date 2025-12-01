@@ -6,10 +6,10 @@ import type {
 } from "@/mocks/schema/problem";
 import rawProblemsData from "@/mocks/db/problems";
 
-const problemsData = rawProblemsData as {
-  problems: ProblemRow[];
-  problem_tags: ProblemTagRow[];
-  problem_tag_relations: ProblemTagRelationRow[];
+const problemsData = {
+  problems: [...rawProblemsData.problems] as ProblemRow[],
+  problem_tags: [...rawProblemsData.problem_tags] as ProblemTagRow[],
+  problem_tag_relations: [...rawProblemsData.problem_tag_relations] as ProblemTagRelationRow[],
 };
 
 const tagLookup = new Map(
@@ -28,7 +28,8 @@ const problemTagsMap = problemsData.problem_tag_relations.reduce<
 }, new Map());
 
 const problems: Problem[] = problemsData.problems.map((problem) => {
-  const { acceptance_rate, is_premium, has_solution, completed_time, ...rest } = problem;
+  const { acceptance_rate, is_premium, has_solution, completed_time, ...rest } =
+    problem;
   return {
     ...rest,
     acceptanceRate: acceptance_rate,

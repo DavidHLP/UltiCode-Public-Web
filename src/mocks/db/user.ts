@@ -1,5 +1,3 @@
-
-
 const data = {
   currentUserId: "u-001",
   users: [

@@ -69,10 +69,10 @@ export interface ForumPostRow {
   title: string; // VARCHAR(255) NOT NULL
   flair_type?: ForumFlairType | null; // ENUM ('announcement','discussion','showcase','question','hiring') NULL
   flair_label?: string | null; // VARCHAR(60)
-  tags: any; // JSON NOT NULL
+  tags: unknown; // JSON NOT NULL
   excerpt?: string | null; // TEXT
-  media?: any | null; // JSON
-  recommendation?: any | null; // JSON
+  media?: unknown | null; // JSON
+  recommendation?: unknown | null; // JSON
   vote_state?: ForumVoteState; // ENUM ('upvoted','downvoted','neutral') DEFAULT 'neutral'
   is_saved: boolean; // TINYINT(1) NOT NULL DEFAULT 0
   impressions: number; // INT NOT NULL DEFAULT 0

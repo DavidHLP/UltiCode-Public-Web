@@ -1,5 +1,4 @@
 import type { ProblemId } from "@/mocks/schema/problem";
-import type { UserId } from "@/mocks/schema/user";
 
 export type ProblemListGroupId = string;
 export type ProblemListId = string;

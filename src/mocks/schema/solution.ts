@@ -72,7 +72,9 @@ export interface SolutionFeedMeta extends SolutionFeedMetaRow {
   topicTranslated?: string;
 }
 
-export interface SolutionFeedItem extends Omit<ProblemApproach, 'code' | 'steps' | 'complexity'>, SolutionFeedMeta {
+export interface SolutionFeedItem
+  extends Omit<ProblemApproach, "code" | "steps" | "complexity">,
+    SolutionFeedMeta {
   tags: string[];
   language: string; // From ProblemApproach
 }

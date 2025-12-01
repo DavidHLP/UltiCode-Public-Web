@@ -21,10 +21,10 @@ const props = defineProps<{
  */
 const difficultyClass = computed(() => {
   const difficulty = props.problem.difficulty.toLowerCase();
-  if (difficulty === 'easy') return 'text-green-600 dark:text-green-500';
-  if (difficulty === 'medium') return 'text-orange-600 dark:text-orange-500';
-  if (difficulty === 'hard') return 'text-red-600 dark:text-red-500';
-  return 'text-foreground';
+  if (difficulty === "easy") return "text-green-600 dark:text-green-500";
+  if (difficulty === "medium") return "text-orange-600 dark:text-orange-500";
+  if (difficulty === "hard") return "text-red-600 dark:text-red-500";
+  return "text-foreground";
 });
 
 const showTags = ref(false);
@@ -54,7 +54,7 @@ const scrollToSection = (element: HTMLElement | null) => {
 const acceptanceRate = computed(() => {
   const accepted = reactionCounts.value.likes;
   const total = reactionCounts.value.likes + reactionCounts.value.dislikes;
-  return total > 0 ? ((accepted / total) * 100).toFixed(1) : '0.0';
+  return total > 0 ? ((accepted / total) * 100).toFixed(1) : "0.0";
 });
 
 /**
@@ -115,7 +115,9 @@ const problemDescription = computed<ProblemDescription>(() => ({
           class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((companiesSection as any).$el)"
         >
-          <span class="text-yellow-600 dark:text-yellow-500">Related Companies</span>
+          <span class="text-yellow-600 dark:text-yellow-500"
+            >Related Companies</span
+          >
         </button>
 
         <!-- Hint Button -->
@@ -139,7 +141,10 @@ const problemDescription = computed<ProblemDescription>(() => ({
       </div>
 
       <!-- Tags Section (Collapsible) -->
-      <section v-if="showTags && props.problem.tags.length" class="flex flex-wrap gap-2">
+      <section
+        v-if="showTags && props.problem.tags.length"
+        class="flex flex-wrap gap-2"
+      >
         <span
           v-for="tag in props.problem.tags"
           :key="tag"
@@ -175,9 +180,16 @@ const problemDescription = computed<ProblemDescription>(() => ({
           <div class="flex items-center gap-2 whitespace-nowrap">
             <div class="text-xs text-muted-foreground">Accepted</div>
             <div>
-              <span class="text-xs text-foreground">{{ reactionCounts.likes.toLocaleString() }}</span>
+              <span class="text-xs text-foreground">{{
+                reactionCounts.likes.toLocaleString()
+              }}</span>
               <span class="ml-0.5 text-[10px] text-muted-foreground">
-                / {{ (reactionCounts.likes + reactionCounts.dislikes).toLocaleString() }}
+                /
+                {{
+                  (
+                    reactionCounts.likes + reactionCounts.dislikes
+                  ).toLocaleString()
+                }}
               </span>
             </div>
           </div>
@@ -196,7 +208,11 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <!-- Accordion for Tags, Companies, Hints -->
         <Accordion type="multiple" class="w-full">
           <!-- Related Tags -->
-          <AccordionItem v-if="props.problem.tags.length" ref="tagsSection" value="tags">
+          <AccordionItem
+            v-if="props.problem.tags.length"
+            ref="tagsSection"
+            value="tags"
+          >
             <AccordionTrigger class="text-xs hover:no-underline">
               <div class="flex items-center gap-2">
                 <svg
@@ -225,12 +241,17 @@ const problemDescription = computed<ProblemDescription>(() => ({
             </AccordionContent>
           </AccordionItem>
 
-
           <!-- Related Companies -->
-          <AccordionItem v-if="props.problem.companies.length" ref="companiesSection" value="companies">
+          <AccordionItem
+            v-if="props.problem.companies.length"
+            ref="companiesSection"
+            value="companies"
+          >
             <AccordionTrigger class="text-xs hover:no-underline">
               <div class="flex items-center gap-2">
-                <span class="text-yellow-600 dark:text-yellow-500">Related Companies</span>
+                <span class="text-yellow-600 dark:text-yellow-500"
+                  >Related Companies</span
+                >
               </div>
             </AccordionTrigger>
             <AccordionContent>
@@ -247,7 +268,11 @@ const problemDescription = computed<ProblemDescription>(() => ({
           </AccordionItem>
 
           <!-- Hints -->
-          <AccordionItem v-if="props.problem.starterNotes.length" ref="hintsSection" value="hints">
+          <AccordionItem
+            v-if="props.problem.starterNotes.length"
+            ref="hintsSection"
+            value="hints"
+          >
             <AccordionTrigger class="text-xs hover:no-underline">
               <div class="flex items-center gap-2">
                 <svg

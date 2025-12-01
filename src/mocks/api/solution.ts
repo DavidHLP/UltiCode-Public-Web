@@ -72,7 +72,9 @@ const badgesByMetaId = solutionData.solution_badge_relations.reduce<
   return acc;
 }, new Map());
 
-const topicsBySlug = new Map(solutionTopics.map((topic) => [topic.slug, topic]));
+const topicsBySlug = new Map(
+  solutionTopics.map((topic) => [topic.slug, topic]),
+);
 
 const buildMeta = (
   metaRow: (typeof solutionData.solution_metas)[number],
@@ -148,7 +150,10 @@ export function fetchSolutionFeedItems(
           ...approach.title.split(/\s+/).filter(Boolean),
           ...meta.badges,
         ]
-          .filter((tag): tag is string => typeof tag === "string" && tag.trim().length)
+          .filter(
+            (tag): tag is string =>
+              typeof tag === "string" && tag.trim().length > 0,
+          )
           .map((tag) => tag.trim()),
       ),
     );

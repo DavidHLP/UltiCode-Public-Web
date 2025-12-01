@@ -37,7 +37,7 @@ const topicLabel = computed(
           {{ authorInitial }}
         </AvatarFallback>
       </Avatar>
-      
+
       <div class="flex flex-1 flex-col gap-1.5 text-sm leading-tight">
         <div class="flex flex-wrap items-center gap-2">
           <span class="font-semibold text-foreground">
@@ -57,12 +57,18 @@ const topicLabel = computed(
             {{ props.item.flair }}
           </Badge>
         </div>
-        
+
         <div class="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" class="rounded-full px-2.5 py-0.5 text-[11px] capitalize">
+          <Badge
+            variant="secondary"
+            class="rounded-full px-2.5 py-0.5 text-[11px] capitalize"
+          >
             {{ props.item.language }}
           </Badge>
-          <Badge variant="secondary" class="rounded-full px-2.5 py-0.5 text-[11px] capitalize">
+          <Badge
+            variant="secondary"
+            class="rounded-full px-2.5 py-0.5 text-[11px] capitalize"
+          >
             {{ topicLabel }}
           </Badge>
           <Badge

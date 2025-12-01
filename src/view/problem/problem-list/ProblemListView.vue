@@ -197,162 +197,212 @@ const percentAxisFormatter = (value: number | Date) => {
 <template>
   <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     <ProblemExplorer :problems="problems">
-    <template #header>
-      <div class="space-y-8 pb-8 border-b border-border/40">
-        <!-- 标题和操作按钮 -->
-        <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div class="space-y-2">
-            <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
-              {{ currentList?.name || "Problem List" }}
-            </h1>
-             <!-- 描述 -->
-            <p
-              v-if="currentList?.description"
-              class="text-lg text-muted-foreground leading-relaxed max-w-3xl"
-            >
-              {{ currentList.description }}
-            </p>
-             <!-- 元数据 -->
-            <div class="flex items-center gap-4 text-sm text-muted-foreground pt-2">
-              <span v-if="currentList?.createdAt" class="flex items-center gap-1">
-                Created {{ formatDate(currentList.createdAt) }}
-              </span>
-              <span v-if="currentList?.updatedAt" class="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-muted-foreground/50">
-                Updated {{ formatDate(currentList.updatedAt) }}
-              </span>
-            </div>
-          </div>
-          
-          <div class="flex items-center gap-2 shrink-0">
-            <Button variant="outline" size="sm" class="h-9">
-              <Share2 class="mr-2 h-4 w-4" />
-              Share
-            </Button>
-            <Button variant="outline" size="sm" class="h-9">
-              <GitFork class="mr-2 h-4 w-4" />
-              Fork
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button variant="outline" size="icon" class="h-9 w-9">
-                  <MoreHorizontal class="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Edit List</DropdownMenuItem>
-                <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                <DropdownMenuItem class="text-destructive"
-                  >Delete</DropdownMenuItem
+      <template #header>
+        <div class="space-y-8 pb-8 border-b border-border/40">
+          <!-- 标题和操作按钮 -->
+          <div
+            class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between"
+          >
+            <div class="space-y-2">
+              <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
+                {{ currentList?.name || "Problem List" }}
+              </h1>
+              <!-- 描述 -->
+              <p
+                v-if="currentList?.description"
+                class="text-lg text-muted-foreground leading-relaxed max-w-3xl"
+              >
+                {{ currentList.description }}
+              </p>
+              <!-- 元数据 -->
+              <div
+                class="flex items-center gap-4 text-sm text-muted-foreground pt-2"
+              >
+                <span
+                  v-if="currentList?.createdAt"
+                  class="flex items-center gap-1"
                 >
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  Created {{ formatDate(currentList.createdAt) }}
+                </span>
+                <span
+                  v-if="currentList?.updatedAt"
+                  class="flex items-center gap-1 before:content-['•'] before:mr-4 before:text-muted-foreground/50"
+                >
+                  Updated {{ formatDate(currentList.updatedAt) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <Button variant="outline" size="sm" class="h-9">
+                <Share2 class="mr-2 h-4 w-4" />
+                Share
+              </Button>
+              <Button variant="outline" size="sm" class="h-9">
+                <GitFork class="mr-2 h-4 w-4" />
+                Fork
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button variant="outline" size="icon" class="h-9 w-9">
+                    <MoreHorizontal class="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Edit List</DropdownMenuItem>
+                  <DropdownMenuItem>Duplicate</DropdownMenuItem>
+                  <DropdownMenuItem class="text-destructive"
+                    >Delete</DropdownMenuItem
+                  >
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <!-- 统计信息 - 使用图表颜色系统 -->
+          <div
+            class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:w-fit"
+          >
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+              <span
+                class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >Total</span
+              >
+              <span class="text-2xl font-bold">{{ safeStats.totalCount }}</span>
+            </div>
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+              <span
+                class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >Solved</span
+              >
+              <span
+                class="text-2xl font-bold text-[hsl(var(--chart-status-solved))]"
+                >{{ safeStats.solvedCount }}</span
+              >
+            </div>
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+              <span
+                class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >Attempted</span
+              >
+              <span
+                class="text-2xl font-bold text-[hsl(var(--chart-status-attempted))]"
+                >{{ safeStats.attemptedCount }}</span
+              >
+            </div>
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+              <span
+                class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >Todo</span
+              >
+              <span
+                class="text-2xl font-bold text-[hsl(var(--chart-status-todo))]"
+                >{{ safeStats.todoCount }}</span
+              >
+            </div>
+            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
+              <span
+                class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >Progress</span
+              >
+              <span class="text-2xl font-bold"
+                >{{ safeStats.progress.toFixed(1) }}%</span
+              >
+            </div>
+          </div>
+
+          <!-- 图表区域 -->
+          <div
+            v-if="problems.length"
+            class="grid grid-cols-1 gap-6 lg:grid-cols-3 pt-4"
+          >
+            <!-- Status Overview Card -->
+            <Card class="chart-fade-in bg-card transition-all hover:shadow-md">
+              <CardHeader class="pb-2">
+                <CardTitle class="text-base font-medium"
+                  >Status Overview</CardTitle
+                >
+              </CardHeader>
+              <CardContent>
+                <DonutChart
+                  class="h-60"
+                  index="name"
+                  :category="'total'"
+                  :data="statusDonutData"
+                  :value-formatter="donutValueFormatter"
+                  :colors="statusColorScale"
+                />
+              </CardContent>
+            </Card>
+
+            <!-- Difficulty Insights Card -->
+            <Card
+              class="chart-fade-in lg:col-span-2 transition-all hover:shadow-md"
+            >
+              <CardHeader class="pb-2">
+                <CardTitle class="text-base font-medium"
+                  >Difficulty Insights</CardTitle
+                >
+              </CardHeader>
+              <CardContent>
+                <BarChart
+                  class="h-60"
+                  :data="difficultyInsights"
+                  index="difficulty"
+                  :categories="statusCategories"
+                  type="stacked"
+                  :rounded-corners="4"
+                  :y-formatter="countFormatter"
+                  :colors="statusColorScale"
+                />
+              </CardContent>
+            </Card>
+
+            <!-- Progress Momentum Card -->
+            <Card
+              class="chart-fade-in lg:col-span-3 transition-all hover:shadow-md"
+            >
+              <CardHeader class="pb-2">
+                <CardTitle class="text-base font-medium"
+                  >Progress Momentum</CardTitle
+                >
+              </CardHeader>
+              <CardContent>
+                <LineChart
+                  class="h-[300px]"
+                  :data="progressMomentum"
+                  index="label"
+                  :categories="momentumCategories"
+                  :colors="momentumColorScale"
+                  :y-formatter="percentAxisFormatter"
+                />
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </template>
 
-        <!-- 统计信息 - 使用图表颜色系统 -->
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:w-fit">
-            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
-                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</span>
-                <span class="text-2xl font-bold">{{ safeStats.totalCount }}</span>
-            </div>
-             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
-                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Solved</span>
-                <span class="text-2xl font-bold text-[hsl(var(--chart-status-solved))]">{{ safeStats.solvedCount }}</span>
-            </div>
-             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
-                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Attempted</span>
-                <span class="text-2xl font-bold text-[hsl(var(--chart-status-attempted))]">{{ safeStats.attemptedCount }}</span>
-            </div>
-             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
-                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Todo</span>
-                <span class="text-2xl font-bold text-[hsl(var(--chart-status-todo))]">{{ safeStats.todoCount }}</span>
-            </div>
-            <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
-                <span class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Progress</span>
-                <span class="text-2xl font-bold">{{ safeStats.progress.toFixed(1) }}%</span>
-            </div>
-        </div>
-
-        <!-- 图表区域 -->
-        <div
-          v-if="problems.length"
-          class="grid grid-cols-1 gap-6 lg:grid-cols-3 pt-4"
-        >
-          <!-- Status Overview Card -->
-          <Card class="chart-fade-in bg-card transition-all hover:shadow-md">
-            <CardHeader class="pb-2">
-              <CardTitle class="text-base font-medium">Status Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DonutChart
-                class="h-60"
-                index="name"
-                :category="'total'"
-                :data="statusDonutData"
-                :value-formatter="donutValueFormatter"
-                :colors="statusColorScale"
-              />
-            </CardContent>
-          </Card>
-
-          <!-- Difficulty Insights Card -->
-          <Card class="chart-fade-in lg:col-span-2 transition-all hover:shadow-md">
-            <CardHeader class="pb-2">
-              <CardTitle class="text-base font-medium">Difficulty Insights</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BarChart
-                class="h-60"
-                :data="difficultyInsights"
-                index="difficulty"
-                :categories="statusCategories"
-                type="stacked"
-                :rounded-corners="4"
-                :y-formatter="countFormatter"
-                :colors="statusColorScale"
-              />
-            </CardContent>
-          </Card>
-
-          <!-- Progress Momentum Card -->
-          <Card class="chart-fade-in lg:col-span-3 transition-all hover:shadow-md">
-            <CardHeader class="pb-2">
-              <CardTitle class="text-base font-medium">Progress Momentum</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <LineChart
-                class="h-[300px]"
-                :data="progressMomentum"
-                index="label"
-                :categories="momentumCategories"
-                :colors="momentumColorScale"
-                :y-formatter="percentAxisFormatter"
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </template>
-
-    <!-- 问题列表将由 ProblemExplorer 组件处理 -->
-    <template v-if="problems.length === 0">
-      <Empty class="h-80 border border-border bg-muted/40">
-        <EmptyContent>
-          <EmptyMedia variant="icon">
-            <ListX class="h-7 w-7 text-muted-foreground" />
-          </EmptyMedia>
-          <EmptyHeader>
-            <p class="text-xl font-semibold text-foreground">
-              No problems in this list
-            </p>
-            <EmptyDescription>
-              Add problems to get started and track your progress.
-            </EmptyDescription>
-          </EmptyHeader>
-          <Button class="mt-1" variant="outline" size="lg">Add Problems</Button>
-        </EmptyContent>
-      </Empty>
-    </template>
+      <!-- 问题列表将由 ProblemExplorer 组件处理 -->
+      <template v-if="problems.length === 0">
+        <Empty class="h-80 border border-border bg-muted/40">
+          <EmptyContent>
+            <EmptyMedia variant="icon">
+              <ListX class="h-7 w-7 text-muted-foreground" />
+            </EmptyMedia>
+            <EmptyHeader>
+              <p class="text-xl font-semibold text-foreground">
+                No problems in this list
+              </p>
+              <EmptyDescription>
+                Add problems to get started and track your progress.
+              </EmptyDescription>
+            </EmptyHeader>
+            <Button class="mt-1" variant="outline" size="lg"
+              >Add Problems</Button
+            >
+          </EmptyContent>
+        </Empty>
+      </template>
     </ProblemExplorer>
   </div>
 </template>

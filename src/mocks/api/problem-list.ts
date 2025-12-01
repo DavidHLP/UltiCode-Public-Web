@@ -1,5 +1,13 @@
 import type { Problem } from "@/mocks/schema/problem";
-import type { ProblemList, ProblemListItem, ProblemListRelationRow, ProblemListRow, ProblemListSavedRelationRow, ProblemListFavoriteRelationRow, ProblemListGroupRow } from "@/mocks/schema/problem-list";
+import type {
+  ProblemList,
+  ProblemListItem,
+  ProblemListRelationRow,
+  ProblemListRow,
+  ProblemListSavedRelationRow,
+  ProblemListFavoriteRelationRow,
+  ProblemListGroupRow,
+} from "@/mocks/schema/problem-list";
 import problemListData from "@/mocks/db/problem-lists";
 import { fetchProblems } from "@/mocks/api/problem";
 import { fetchCurrentUserId } from "@/mocks/api/user";
@@ -108,30 +116,32 @@ export function isProblemInList(problemId: number, listId: string): boolean {
 }
 
 export function getProblemListStats() {
-  return Array.from<[string, number[]]>(relationsByListId.entries()).map((entry) => {
-    const [listId, problemIds] = entry;
-    const problemSet = new Set(problemIds);
-    const listProblems = fetchProblems().filter((problem) =>
-      problemSet.has(problem.id),
-    );
-    const solvedCount = listProblems.filter(
-      (p) => p.status === "solved",
-    ).length;
-    const attemptedCount = listProblems.filter(
-      (p) => p.status === "attempted",
-    ).length;
-    const todoCount = listProblems.filter((p) => p.status === "todo").length;
+  return Array.from<[string, number[]]>(relationsByListId.entries()).map(
+    (entry) => {
+      const [listId, problemIds] = entry;
+      const problemSet = new Set(problemIds);
+      const listProblems = fetchProblems().filter((problem) =>
+        problemSet.has(problem.id),
+      );
+      const solvedCount = listProblems.filter(
+        (p) => p.status === "solved",
+      ).length;
+      const attemptedCount = listProblems.filter(
+        (p) => p.status === "attempted",
+      ).length;
+      const todoCount = listProblems.filter((p) => p.status === "todo").length;
 
-    return {
-      listId,
-      totalCount: problemIds.length,
-      solvedCount,
-      attemptedCount,
-      todoCount,
-      progress:
-        problemIds.length > 0 ? (solvedCount / problemIds.length) * 100 : 0,
-    };
-  });
+      return {
+        listId,
+        totalCount: problemIds.length,
+        solvedCount,
+        attemptedCount,
+        todoCount,
+        progress:
+          problemIds.length > 0 ? (solvedCount / problemIds.length) * 100 : 0,
+      };
+    },
+  );
 }
 
 export function getProblemsByListIdAndTag(

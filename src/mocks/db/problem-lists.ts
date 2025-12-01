@@ -1,5 +1,3 @@
-
-
 const data = {
   problem_list_groups: [
     { id: "group-created", name: "Created by me", sort_order: 0 },

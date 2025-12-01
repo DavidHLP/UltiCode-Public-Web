@@ -1,5 +1,3 @@
-import type { MockDatabase } from "../loader";
-
 /**
  * 竞赛模拟数据
  * 基于 LeetCode 竞赛业务设计
@@ -19,7 +17,8 @@ const data = {
       registered_count: 3245,
       participant_count: 0,
       is_rated: true,
-      description: "参加这场 1 小时 30 分的竞赛，提升你的编程能力和问题解决能力。",
+      description:
+        "参加这场 1 小时 30 分的竞赛，提升你的编程能力和问题解决能力。",
       cover_image:
         "https://assets.leetcode.cn/aliyun-lc-upload/contest-config/contest/wc_card_img.png",
     },

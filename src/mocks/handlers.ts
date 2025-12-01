@@ -5,11 +5,7 @@ import { mockRoutes } from "@/mocks/server.ts";
 
 function joinPath(base: string, routePath: string): string {
   const normalizedBase =
-    base === "/"
-      ? ""
-      : base.endsWith("/")
-        ? base.slice(0, -1)
-        : base;
+    base === "/" ? "" : base.endsWith("/") ? base.slice(0, -1) : base;
   const normalizedRoute = routePath.startsWith("/")
     ? routePath
     : `/${routePath}`;
@@ -31,10 +27,7 @@ async function readJson(request: Request) {
 }
 
 export const handlers: HttpHandler[] = mockRoutes.map((route) => {
-  const handlerFactory =
-    route.method === "POST"
-      ? http.post
-      : http.get;
+  const handlerFactory = route.method === "POST" ? http.post : http.get;
 
   return handlerFactory(
     joinPath(API_BASE_PATH, route.path),
@@ -42,8 +35,8 @@ export const handlers: HttpHandler[] = mockRoutes.map((route) => {
       const normalizedParams: Record<string, string> = {};
       for (const [key, value] of Object.entries(params)) {
         normalizedParams[key] = Array.isArray(value)
-          ? value[0] ?? ""
-          : value ?? "";
+          ? (value[0] ?? "")
+          : (value ?? "");
       }
 
       const result = await route.handler({
@@ -52,7 +45,9 @@ export const handlers: HttpHandler[] = mockRoutes.map((route) => {
         body: route.method === "POST" ? await readJson(request) : undefined,
       });
 
-      return HttpResponse.json(result.data as Record<string, unknown>, { status: result.status });
+      return HttpResponse.json(result.data as Record<string, unknown>, {
+        status: result.status,
+      });
     },
   );
 });

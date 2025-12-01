@@ -134,7 +134,7 @@ function formatRelativeTime(value: string) {
 
 <template>
   <Card
-    class="rounded-xl border border-border/50 bg-background/70 shadow-none transition hover:border-border"
+    class="rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm transition-all hover:shadow-md hover:border-border"
   >
     <CardContent class="space-y-4 p-4">
       <header class="flex items-start justify-between gap-4">
@@ -470,36 +470,36 @@ function formatRelativeTime(value: string) {
         <Share2 class="h-4 w-4" />
         {{ sharesDisplay }} shares
       </Button>
-              <Button
-          variant="ghost"
-          size="sm"
+      <Button
+        variant="ghost"
+        size="sm"
+        :class="[
+          'group gap-1.5 text-xs font-medium transition-all duration-200',
+          isSaved
+            ? 'text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400'
+            : 'text-muted-foreground hover:text-foreground',
+        ]"
+      >
+        <BookmarkCheck
+          v-if="isSaved"
           :class="[
-            'group gap-1.5 text-xs font-medium transition-all duration-200',
-            isSaved
-              ? 'text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400'
-              : 'text-muted-foreground hover:text-foreground',
+            'h-4 w-4 transition-transform duration-200 group-hover:scale-110',
+            'fill-amber-600 dark:fill-amber-500',
           ]"
+        />
+        <Bookmark
+          v-else
+          class="h-4 w-4 transition-transform duration-200 group-hover:scale-110"
+        />
+        <span class="transition-colors duration-200">{{ saveLabel }}</span>
+        <span
+          :class="[
+            'transition-colors duration-200',
+            isSaved ? 'text-amber-500/70' : 'text-muted-foreground',
+          ]"
+          >· {{ savesDisplay }}</span
         >
-          <BookmarkCheck
-            v-if="isSaved"
-            :class="[
-              'h-4 w-4 transition-transform duration-200 group-hover:scale-110',
-              'fill-amber-600 dark:fill-amber-500',
-            ]"
-          />
-          <Bookmark
-            v-else
-            class="h-4 w-4 transition-transform duration-200 group-hover:scale-110"
-          />
-          <span class="transition-colors duration-200">{{ saveLabel }}</span>
-          <span
-            :class="[
-              'transition-colors duration-200',
-              isSaved ? 'text-amber-500/70' : 'text-muted-foreground',
-            ]"
-            >· {{ savesDisplay }}</span
-          >
-        </Button>
+      </Button>
       <div class="ml-auto flex items-center gap-3">
         <span
           v-if="impressionsDisplay"

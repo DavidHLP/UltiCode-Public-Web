@@ -114,7 +114,7 @@ watch(
     const cases =
       bottomPanelStore.testCases.value.length > 0
         ? bottomPanelStore.testCases.value
-        : problem.value.testCases ?? [];
+        : (problem.value.testCases ?? []);
     runResult.value = buildRunResultFromCases(cases, problem.value.id);
   },
 );
@@ -142,12 +142,12 @@ const ConnectedDescriptionView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(DescriptionView, { problem: problem.value })
+            h(DescriptionView, { problem: problem.value }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -165,12 +165,12 @@ const ConnectedSolutionsView = defineComponent({
             h(SolutionsView, {
               problemId: problem.value.id,
               followUp: problem.value.followUp ?? "",
-            })
+            }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -185,12 +185,12 @@ const ConnectedSubmissionsView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(SubmissionsView, { problemId: problem.value.id })
+            h(SubmissionsView, { problemId: problem.value.id }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -209,7 +209,7 @@ const ConnectedCodeView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -224,12 +224,12 @@ const ConnectedTestCaseView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(TestCaseView, { testCases: problem.value.testCases })
+            h(TestCaseView, { testCases: problem.value.testCases }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -243,7 +243,7 @@ const ConnectedTestResultsView = defineComponent({
       h(
         "div",
         { class: "px-1 py-2" },
-        h(TestResultsView, { runResult: runResult.value })
+        h(TestResultsView, { runResult: runResult.value }),
       );
   },
 });
@@ -493,7 +493,7 @@ const getWideLayoutConfig = () => {
 };
 
 const handleLayoutChange = (
-  newLayout: "leet" | "classic" | "compact" | "wide"
+  newLayout: "leet" | "classic" | "compact" | "wide",
 ) => {
   currentLayout.value = newLayout;
   let config;

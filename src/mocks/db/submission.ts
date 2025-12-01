@@ -237,7 +237,7 @@ class LRUCache {
     {
       id: "st-lru-cache",
       submission_id: "sub-lru-cache-accepted",
-      label: "Primary", 
+      label: "Primary",
       status: "Accepted",
       runtime: "112 ms",
     },

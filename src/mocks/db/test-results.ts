@@ -1,5 +1,3 @@
-
-
 const data = {
   run_results: [
     {
@@ -105,7 +103,8 @@ const data = {
       status: "Accepted",
       runtime: "112 ms",
       memory: "14.2 MB",
-      detail: "Evicted key 2, then 1 after subsequent access reordered recency.",
+      detail:
+        "Evicted key 2, then 1 after subsequent access reordered recency.",
       output_text: "[null,null,null,1,null,-1,null,-1,3,4]",
       expected_output_text: "[null,null,null,1,null,-1,null,-1,3,4]",
     },

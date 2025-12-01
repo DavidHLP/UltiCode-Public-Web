@@ -17,8 +17,15 @@ export type SubmissionMetric = SubmissionMetricRow;
 export type SubmissionTestCaseSummary = SubmissionTestCaseRow;
 export type SubmissionRecord = SubmissionRecordRow;
 
-const submissionRows = submissionsData.submissions as SubmissionRow[];
-const submissionTests = submissionsData.submission_tests as SubmissionTestRow[];
+const submissionRows = [...submissionsData.submissions].map((row: unknown) => {
+  const r = row as SubmissionRow;
+  return {
+    ...r,
+    runtime_dist: Array.isArray(r.runtime_dist) ? [...r.runtime_dist] : r.runtime_dist,
+    runtime_dist_bins: Array.isArray(r.runtime_dist_bins) ? [...r.runtime_dist_bins] : r.runtime_dist_bins,
+  };
+}) as SubmissionRow[];
+const submissionTests = [...submissionsData.submission_tests].map(t => ({...t})) as SubmissionTestRow[];
 
 // Build a map of submission tests by submission_id
 const testsBySubmissionId = submissionTests.reduce<
@@ -50,7 +57,7 @@ function transformSubmission(row: SubmissionRow): SubmissionRecordRow {
     runtimePercentile: row.runtime_percentile,
     memoryPercentile: row.memory_percentile,
     code: row.code,
-    tags: Array.isArray(row.tags_json) ? row.tags_json : [],
+    tags: Array.isArray(row.tags) ? row.tags : [],
     notes: row.notes || undefined,
     metrics: [], // Metrics are computed elsewhere or not stored in DB
     tests: testsBySubmissionId.get(row.id) ?? [],

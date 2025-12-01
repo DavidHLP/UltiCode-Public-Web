@@ -1,50 +1,54 @@
 <script setup lang="ts">
-import { computed, toRefs } from 'vue'
-import { storeToRefs } from 'pinia'
+import { computed, toRefs } from "vue";
+import { storeToRefs } from "pinia";
 
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-import { useHeaderStore, type LayoutNode } from '@/stores/headerStore'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { useHeaderStore, type LayoutNode } from "@/stores/headerStore";
 
-import LayoutPanel from '../panels/LayoutPanel.vue'
+import LayoutPanel from "../panels/LayoutPanel.vue";
 
-defineOptions({ name: 'LayoutTreeNode' })
+defineOptions({ name: "LayoutTreeNode" });
 
 const props = defineProps<{
-  node: LayoutNode
-  isRoot?: boolean
-}>()
+  node: LayoutNode;
+  isRoot?: boolean;
+}>();
 
-const { node, isRoot } = toRefs(props)
+const { node, isRoot } = toRefs(props);
 
-const headerStore = useHeaderStore()
-const { headerGroups, activeGroupId } = storeToRefs(headerStore)
-const { updateGroupHeaders, setActiveGroup } = headerStore
+const headerStore = useHeaderStore();
+const { headerGroups, activeGroupId } = storeToRefs(headerStore);
+const { updateGroupHeaders, setActiveGroup } = headerStore;
 
 const handleGroupClick = (groupId: string) => {
-  setActiveGroup(groupId)
-}
+  setActiveGroup(groupId);
+};
 
 const getGroupHeaders = (groupId: string) => {
-  return headerGroups.value.find((g) => g.id === groupId)?.headers || []
-}
+  return headerGroups.value.find((g) => g.id === groupId)?.headers || [];
+};
 
 const shouldShowNode = (layoutNode: LayoutNode): boolean => {
-  if (layoutNode.type === 'leaf' && layoutNode.groupId) {
-    return getGroupHeaders(layoutNode.groupId).length > 0
+  if (layoutNode.type === "leaf" && layoutNode.groupId) {
+    return getGroupHeaders(layoutNode.groupId).length > 0;
   }
-  if (layoutNode.type === 'container' && layoutNode.children) {
-    return layoutNode.children.some((child) => shouldShowNode(child))
+  if (layoutNode.type === "container" && layoutNode.children) {
+    return layoutNode.children.some((child) => shouldShowNode(child));
   }
-  return false
-}
+  return false;
+};
 
 const visibleChildren = computed(() => {
-  const currentNode = node.value
-  if (currentNode.type !== 'container' || !currentNode.children) {
-    return []
+  const currentNode = node.value;
+  if (currentNode.type !== "container" || !currentNode.children) {
+    return [];
   }
-  return currentNode.children.filter((child) => shouldShowNode(child))
-})
+  return currentNode.children.filter((child) => shouldShowNode(child));
+});
 </script>
 
 <template>
@@ -68,13 +72,20 @@ const visibleChildren = computed(() => {
           <LayoutTreeNode :node="child" />
         </ResizablePanel>
 
-        <ResizableHandle v-if="index < visibleChildren.length - 1" with-handle />
+        <ResizableHandle
+          v-if="index < visibleChildren.length - 1"
+          with-handle
+        />
       </template>
     </ResizablePanelGroup>
 
     <!-- Leaf Node -->
     <div
-      v-else-if="node.type === 'leaf' && node.groupId && getGroupHeaders(node.groupId).length > 0"
+      v-else-if="
+        node.type === 'leaf' &&
+        node.groupId &&
+        getGroupHeaders(node.groupId).length > 0
+      "
       class="h-full cursor-pointer rounded-xl border border-transparent overflow-hidden bg-white"
       :class="{ 'border-[#dedede] shadow-sm': activeGroupId === node.groupId }"
       @click="handleGroupClick(node.groupId)"
@@ -82,7 +93,9 @@ const visibleChildren = computed(() => {
       <LayoutPanel
         :headers="getGroupHeaders(node.groupId)"
         :group="node.groupId"
-        :on-update="(newHeaders) => updateGroupHeaders(node.groupId!, newHeaders)"
+        :on-update="
+          (newHeaders) => updateGroupHeaders(node.groupId!, newHeaders)
+        "
         :is-active="activeGroupId === node.groupId"
         class="h-full"
       />

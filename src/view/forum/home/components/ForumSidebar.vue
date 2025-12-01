@@ -61,7 +61,7 @@ const getCommunityOnline = (slug: string) => {
 
 <template>
   <aside class="flex flex-col gap-3">
-    <Card class="border-border/60 bg-card/60">
+    <Card class="border-border/60 bg-card shadow-sm">
       <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
         <CardTitle class="flex items-center gap-2 text-sm font-semibold">
           <TrendingUp class="h-4 w-4 text-orange-500" />
@@ -99,7 +99,7 @@ const getCommunityOnline = (slug: string) => {
       </CardContent>
     </Card>
 
-    <Card class="border-border/60 bg-card/60">
+    <Card class="border-border/60 bg-card shadow-sm">
       <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
         <CardTitle class="flex items-center gap-2 text-sm font-semibold">
           <Users class="h-4 w-4 text-blue-500" />
@@ -110,7 +110,7 @@ const getCommunityOnline = (slug: string) => {
         <ul class="space-y-3 text-xs">
           <li v-for="community in communities" :key="community.name">
             <article
-              class="space-y-3 overflow-hidden rounded-lg border border-border/50 bg-background/60"
+              class="space-y-3 overflow-hidden rounded-lg border border-border/50 bg-background"
             >
               <div
                 v-if="community.banner"
@@ -218,7 +218,7 @@ const getCommunityOnline = (slug: string) => {
       </CardContent>
     </Card>
 
-    <Card class="border-border/60 bg-card/60">
+    <Card class="border-border/60 bg-card shadow-sm">
       <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
         <CardTitle class="flex items-center gap-2 text-sm font-semibold">
           <ShieldCheck class="h-4 w-4 text-emerald-500" />

@@ -28,13 +28,13 @@ export type MockDatabase = Record<string, any[]>;
  */
 export interface ValidationResult {
   valid: boolean;
-   
+
   errors: Array<{
     entity: string;
     field: string;
     message: string;
     severity: string;
-    value?: any;
+    value?: unknown;
   }>;
   warnings: Array<{
     entity: string;

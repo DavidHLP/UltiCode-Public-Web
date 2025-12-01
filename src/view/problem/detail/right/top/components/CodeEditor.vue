@@ -25,7 +25,10 @@ interface GlobalScope {
 }
 
 interface RequireFunction {
-  (modules: string[], callback: (monaco: typeof import("monaco-editor")) => void): void;
+  (
+    modules: string[],
+    callback: (monaco: typeof import("monaco-editor")) => void,
+  ): void;
   defined?: (module: string) => boolean;
 }
 
@@ -34,8 +37,12 @@ const getMonaco = async () => {
     typeof window !== "undefined" ? (window as unknown as GlobalScope) : null;
   if (monacoInstance) return monacoInstance;
   const cached =
-    globalScope?.[globalMonacoKey] as typeof import("monaco-editor") | undefined ??
-    (globalScope?.monaco && globalScope.monaco.editor ? globalScope.monaco : null);
+    (globalScope?.[globalMonacoKey] as
+      | typeof import("monaco-editor")
+      | undefined) ??
+    (globalScope?.monaco && globalScope.monaco.editor
+      ? globalScope.monaco
+      : null);
   if (cached) {
     monacoInstance = cached;
     return monacoInstance;
@@ -43,14 +50,17 @@ const getMonaco = async () => {
   const globalRequire = globalScope?.require as RequireFunction | undefined;
   if (globalRequire?.defined?.("vs/editor/editor.main")) {
     return new Promise<typeof import("monaco-editor")>((resolve) => {
-      globalRequire(["vs/editor/editor.main"], (monaco: typeof import("monaco-editor")) => {
-        monacoInstance = monaco;
-        if (globalScope) {
-          globalScope[globalMonacoKey] = monaco;
-          globalScope.monaco = monaco;
-        }
-        resolve(monaco);
-      });
+      globalRequire(
+        ["vs/editor/editor.main"],
+        (monaco: typeof import("monaco-editor")) => {
+          monacoInstance = monaco;
+          if (globalScope) {
+            globalScope[globalMonacoKey] = monaco;
+            globalScope.monaco = monaco;
+          }
+          resolve(monaco);
+        },
+      );
     });
   }
   if (!monacoPromise) {
@@ -135,8 +145,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    ref="container"
-    class="h-full w-full"
-  />
+  <div ref="container" class="h-full w-full" />
 </template>

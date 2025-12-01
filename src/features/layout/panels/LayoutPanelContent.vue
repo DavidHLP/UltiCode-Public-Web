@@ -1,28 +1,29 @@
 <script setup lang="ts">
-import { computed, inject, type Component } from 'vue'
+import { computed, inject, type Component } from "vue";
 
-import type { HeaderModel } from '@/stores/headerStore'
+import type { HeaderModel } from "@/stores/headerStore";
 
 // Receive active header as property
 const props = defineProps<{
-  activeHeader: HeaderModel | null
-  isActive?: boolean // Whether the current group is active
-}>()
+  activeHeader: HeaderModel | null;
+  isActive?: boolean; // Whether the current group is active
+}>();
 
 // Inject the component map from the parent view (DetailedView)
-const panelComponentMap = inject<Record<number, Component>>('panelComponentMap')
+const panelComponentMap =
+  inject<Record<number, Component>>("panelComponentMap");
 
 const contentComponent = computed(() => {
-  if (!props.activeHeader || !panelComponentMap) return null
-  return panelComponentMap[props.activeHeader.id]
-})
+  if (!props.activeHeader || !panelComponentMap) return null;
+  return panelComponentMap[props.activeHeader.id];
+});
 
 const content = computed(() => {
   if (!props.activeHeader) {
-    return 'Please select an option'
+    return "Please select an option";
   }
-  return props.activeHeader.title
-})
+  return props.activeHeader.title;
+});
 </script>
 
 <template>

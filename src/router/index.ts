@@ -1,4 +1,8 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from "vue-router";
 
 const forumRoutes: RouteRecordRaw = {
   path: "/forum",
@@ -7,12 +11,12 @@ const forumRoutes: RouteRecordRaw = {
     {
       path: "",
       name: "forum-home",
-      component: () => import("@/view/forum/ForumView.vue"),
+      component: () => import("@/view/forum/home/ForumHomeView.vue"),
     },
     {
       path: "detailed/:postId",
       name: "forum-thread",
-      component: () => import("@/view/forum/detailed/ForumDetailedView.vue"),
+      component: () => import("@/view/forum/thread/ForumThreadView.vue"),
     },
   ],
 };

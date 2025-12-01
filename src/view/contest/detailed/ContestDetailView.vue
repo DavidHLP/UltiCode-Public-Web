@@ -113,13 +113,21 @@ function getCountryFlag(countryCode: string): string {
             <ArrowLeft class="h-4 w-4" />
             返回竞赛列表
           </Button>
-          
+
           <div class="flex items-start justify-between gap-4">
             <div class="flex-1 space-y-3">
               <div class="flex items-center gap-3">
-                <h1 class="text-3xl font-bold tracking-tight">{{ contest.title }}</h1>
+                <h1 class="text-3xl font-bold tracking-tight">
+                  {{ contest.title }}
+                </h1>
                 <Badge
-                  :variant="contest.status === 'running' ? 'destructive' : contest.status === 'upcoming' ? 'default' : 'secondary'"
+                  :variant="
+                    contest.status === 'running'
+                      ? 'destructive'
+                      : contest.status === 'upcoming'
+                        ? 'default'
+                        : 'secondary'
+                  "
                   class="text-xs"
                 >
                   {{
@@ -131,7 +139,10 @@ function getCountryFlag(countryCode: string): string {
                   }}
                 </Badge>
               </div>
-              <p v-if="contest.description" class="text-base text-muted-foreground">
+              <p
+                v-if="contest.description"
+                class="text-base text-muted-foreground"
+              >
                 {{ contest.description }}
               </p>
             </div>
@@ -159,39 +170,63 @@ function getCountryFlag(countryCode: string): string {
           <CardContent class="p-0">
             <div class="grid divide-x md:grid-cols-4">
               <div class="flex items-center gap-3 p-6">
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
+                >
                   <Calendar class="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-muted-foreground">开始时间</p>
-                  <p class="text-base font-semibold">{{ formatDateTime(contest.startTime) }}</p>
+                  <p class="text-sm font-medium text-muted-foreground">
+                    开始时间
+                  </p>
+                  <p class="text-base font-semibold">
+                    {{ formatDateTime(contest.startTime) }}
+                  </p>
                 </div>
               </div>
               <div class="flex items-center gap-3 p-6">
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
+                >
                   <Clock class="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-muted-foreground">比赛时长</p>
-                  <p class="text-base font-semibold">{{ contest.durationMinutes }} 分钟</p>
+                  <p class="text-sm font-medium text-muted-foreground">
+                    比赛时长
+                  </p>
+                  <p class="text-base font-semibold">
+                    {{ contest.durationMinutes }} 分钟
+                  </p>
                 </div>
               </div>
               <div class="flex items-center gap-3 p-6">
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
+                >
                   <Users class="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-muted-foreground">参赛人数</p>
-                  <p class="text-base font-semibold">{{ contest.participantCount }} 人</p>
+                  <p class="text-sm font-medium text-muted-foreground">
+                    参赛人数
+                  </p>
+                  <p class="text-base font-semibold">
+                    {{ contest.participantCount }} 人
+                  </p>
                 </div>
               </div>
               <div class="flex items-center gap-3 p-6">
-                <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <div
+                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
+                >
                   <Trophy class="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-muted-foreground">竞赛类型</p>
-                  <p class="text-base font-semibold">{{ contest.isRated ? "计分赛" : "非计分" }}</p>
+                  <p class="text-sm font-medium text-muted-foreground">
+                    竞赛类型
+                  </p>
+                  <p class="text-base font-semibold">
+                    {{ contest.isRated ? "计分赛" : "非计分" }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -226,21 +261,32 @@ function getCountryFlag(countryCode: string): string {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow v-for="problem in contest.problems" :key="problem.id" class="group cursor-pointer hover:bg-muted/50">
+                    <TableRow
+                      v-for="problem in contest.problems"
+                      :key="problem.id"
+                      class="group cursor-pointer hover:bg-muted/50"
+                    >
                       <TableCell class="pl-6">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-mono text-sm font-bold">
+                        <div
+                          class="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-mono text-sm font-bold"
+                        >
                           {{ problem.problemIndex }}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div class="space-y-1">
                           <router-link
-                            :to="{ name: 'problem-detail', params: { id: problem.problemId } }"
+                            :to="{
+                              name: 'problem-detail',
+                              params: { id: problem.problemId },
+                            }"
                             class="font-semibold hover:text-primary"
                           >
                             {{ problem.title }}
                           </router-link>
-                          <div class="flex items-center gap-3 text-sm text-muted-foreground">
+                          <div
+                            class="flex items-center gap-3 text-sm text-muted-foreground"
+                          >
                             <span class="flex items-center gap-1">
                               <Target class="h-3 w-3" />
                               {{ problem.solvedCount }} 通过
@@ -254,27 +300,36 @@ function getCountryFlag(countryCode: string): string {
                           variant="outline"
                           :class="[
                             getDifficultyColor(problem.difficulty),
-                            'font-medium'
+                            'font-medium',
                           ]"
                         >
                           {{ problem.difficulty }}
                         </Badge>
                       </TableCell>
                       <TableCell class="text-center">
-                        <span class="inline-flex items-center gap-1 font-semibold">
+                        <span
+                          class="inline-flex items-center gap-1 font-semibold"
+                        >
                           <Award class="h-4 w-4 text-yellow-600" />
                           {{ problem.score }}
                         </span>
                       </TableCell>
                       <TableCell class="text-center">
-                        <span class="font-medium">{{ problem.acceptanceRate }}</span>
+                        <span class="font-medium">{{
+                          problem.acceptanceRate
+                        }}</span>
                       </TableCell>
                       <TableCell class="pr-6">
                         <Button
                           size="sm"
                           variant="ghost"
                           class="opacity-0 group-hover:opacity-100"
-                          @click="$router.push({ name: 'problem-detail', params: { id: problem.problemId } })"
+                          @click="
+                            $router.push({
+                              name: 'problem-detail',
+                              params: { id: problem.problemId },
+                            })
+                          "
                         >
                           <ChevronRight class="h-4 w-4" />
                         </Button>
@@ -289,7 +344,9 @@ function getCountryFlag(countryCode: string): string {
           <!-- 排行榜 -->
           <TabsContent value="ranking" class="space-y-4">
             <Card>
-              <CardHeader class="flex flex-row items-center justify-between pb-3">
+              <CardHeader
+                class="flex flex-row items-center justify-between pb-3"
+              >
                 <CardTitle class="text-xl">排行榜</CardTitle>
                 <Button variant="outline" size="sm">查看完整排名</Button>
               </CardHeader>
@@ -302,18 +359,27 @@ function getCountryFlag(countryCode: string): string {
                       <TableHead class="w-24 text-center">得分</TableHead>
                       <TableHead class="w-32 text-center">完成时间</TableHead>
                       <TableHead class="w-48">题目结果</TableHead>
-                      <TableHead class="w-32 pr-6 text-right">积分变化</TableHead>
+                      <TableHead class="w-32 pr-6 text-right"
+                        >积分变化</TableHead
+                      >
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow v-for="entry in rankings.slice(0, 20)" :key="entry.id" class="group">
+                    <TableRow
+                      v-for="entry in rankings.slice(0, 20)"
+                      :key="entry.id"
+                      class="group"
+                    >
                       <TableCell class="pl-6">
                         <div
                           class="inline-flex h-10 w-10 items-center justify-center rounded-full font-bold"
                           :class="{
-                            'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-md': entry.rank === 1,
-                            'bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md': entry.rank === 2,
-                            'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-md': entry.rank === 3,
+                            'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-md':
+                              entry.rank === 1,
+                            'bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md':
+                              entry.rank === 2,
+                            'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-md':
+                              entry.rank === 3,
                             'bg-muted text-muted-foreground': entry.rank > 3,
                           }"
                         >
@@ -323,8 +389,12 @@ function getCountryFlag(countryCode: string): string {
                       <TableCell>
                         <div class="space-y-1">
                           <div class="flex items-center gap-2">
-                            <span class="text-lg">{{ getCountryFlag(entry.country) }}</span>
-                            <span class="font-semibold">{{ entry.username }}</span>
+                            <span class="text-lg">{{
+                              getCountryFlag(entry.country)
+                            }}</span>
+                            <span class="font-semibold">{{
+                              entry.username
+                            }}</span>
                           </div>
                           <p class="text-sm text-muted-foreground">
                             {{ entry.ratingBefore }} → {{ entry.ratingAfter }}
@@ -335,7 +405,9 @@ function getCountryFlag(countryCode: string): string {
                         <span class="text-lg font-bold">{{ entry.score }}</span>
                       </TableCell>
                       <TableCell class="text-center">
-                        <span class="font-mono text-sm">{{ entry.finishTime }}</span>
+                        <span class="font-mono text-sm">{{
+                          entry.finishTime
+                        }}</span>
                       </TableCell>
                       <TableCell>
                         <div class="flex flex-wrap gap-1">
@@ -356,14 +428,23 @@ function getCountryFlag(countryCode: string): string {
                         <div
                           class="inline-flex items-center gap-1 rounded-md px-2 py-1 font-semibold"
                           :class="{
-                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': entry.ratingChange > 0,
-                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': entry.ratingChange < 0,
+                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400':
+                              entry.ratingChange > 0,
+                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400':
+                              entry.ratingChange < 0,
                             'text-muted-foreground': entry.ratingChange === 0,
                           }"
                         >
-                          <TrendingUp v-if="entry.ratingChange > 0" class="h-4 w-4" />
-                          <TrendingDown v-else-if="entry.ratingChange < 0" class="h-4 w-4" />
-                          {{ entry.ratingChange > 0 ? "+" : "" }}{{ entry.ratingChange }}
+                          <TrendingUp
+                            v-if="entry.ratingChange > 0"
+                            class="h-4 w-4"
+                          />
+                          <TrendingDown
+                            v-else-if="entry.ratingChange < 0"
+                            class="h-4 w-4"
+                          />
+                          {{ entry.ratingChange > 0 ? "+" : ""
+                          }}{{ entry.ratingChange }}
                         </div>
                       </TableCell>
                     </TableRow>

@@ -1,5 +1,3 @@
-
-
 const data = {
   test_cases: [
     {
@@ -12,7 +10,8 @@ const data = {
       id: "tc-two-sum-negatives",
       problem_id: 1,
       label: "Case 2",
-      explanation: "Includes negatives to ensure complement lookup still works.",
+      explanation:
+        "Includes negatives to ensure complement lookup still works.",
     },
     {
       id: "tc-two-sum-duplicates",

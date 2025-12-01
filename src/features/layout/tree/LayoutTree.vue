@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { provide, ref } from 'vue'
+import { provide, ref } from "vue";
 
-import { useHeaderStore, type LayoutNode } from '@/stores/headerStore'
+import { useHeaderStore, type LayoutNode } from "@/stores/headerStore";
 
-import LayoutTreeNode from './LayoutTreeNode.vue'
+import LayoutTreeNode from "./LayoutTreeNode.vue";
 
 defineProps<{
-  layout: LayoutNode
-}>()
+  layout: LayoutNode;
+}>();
 
-const headerStore = useHeaderStore()
-const { moveHeaderBetweenGroups, splitGroup } = headerStore
+const headerStore = useHeaderStore();
+const { moveHeaderBetweenGroups, splitGroup } = headerStore;
 
 const dragState = ref<{
-  sourceGroupId: string | null
-  sourceIndex: number | null
-}>({ sourceGroupId: null, sourceIndex: null })
+  sourceGroupId: string | null;
+  sourceIndex: number | null;
+}>({ sourceGroupId: null, sourceIndex: null });
 
-provide('dragState', dragState)
-provide('moveHeaderBetweenGroups', moveHeaderBetweenGroups)
-provide('splitGroup', splitGroup)
+provide("dragState", dragState);
+provide("moveHeaderBetweenGroups", moveHeaderBetweenGroups);
+provide("splitGroup", splitGroup);
 </script>
 
 <template>

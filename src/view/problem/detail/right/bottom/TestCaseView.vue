@@ -74,7 +74,9 @@ watch(
 
 watch(activeCaseLabel, (newLabel) => {
   if (!newLabel || !localCases.value.length) return;
-  const matched = caseTabs.value.find((testCase) => testCase.displayLabel === newLabel);
+  const matched = caseTabs.value.find(
+    (testCase) => testCase.displayLabel === newLabel,
+  );
   if (matched && matched.id !== activeId.value) {
     activeId.value = matched.id;
   }

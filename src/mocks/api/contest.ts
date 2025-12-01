@@ -15,12 +15,12 @@ import { fetchProblemsByIds } from "@/mocks/api/problem";
 import { fetchCurrentUserId, getUserById } from "@/mocks/api/user";
 import contestData from "@/mocks/db/contest";
 
-const contests = contestData.contests as ContestRow[];
-const contestProblems = contestData.contest_problems as ContestProblemRow[];
-const contestRankings = contestData.contest_rankings as ContestRankingRow[];
-const globalRankings = contestData.global_rankings as GlobalRankingRow[];
-const contestParticipants =
-  (contestData.contest_participants ?? []) as ContestParticipantRow[];
+const contests = [...contestData.contests] as ContestRow[];
+const contestProblems = [...contestData.contest_problems] as ContestProblemRow[];
+const contestRankings = [...contestData.contest_rankings] as ContestRankingRow[];
+const globalRankings = [...contestData.global_rankings] as GlobalRankingRow[];
+const contestParticipants = [...(contestData.contest_participants ??
+  [])] as ContestParticipantRow[];
 
 const contestProblemIds = Array.from(
   new Set(contestProblems.map((row) => row.problem_id)),
@@ -185,7 +185,7 @@ export function fetchUpcomingContests(): ContestListItem[] {
     .map(mapContestToListItem)
     .sort(
       (a, b) =>
-        new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
     );
 }
 
@@ -207,7 +207,7 @@ export function fetchPastContests(): ContestListItem[] {
     .map(mapContestToListItem)
     .sort(
       (a, b) =>
-        new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+        new Date(b.startTime).getTime() - new Date(a.startTime).getTime(),
     );
 }
 
@@ -226,7 +226,7 @@ export function fetchContestDetail(contestId: string): ContestDetail | null {
   const now = new Date();
   const startTime = new Date(contest.start_time);
   const endTime = new Date(
-    startTime.getTime() + contest.duration_minutes * 60 * 1000
+    startTime.getTime() + contest.duration_minutes * 60 * 1000,
   );
   const participant = getCurrentUserParticipation(contestId);
 
@@ -273,7 +273,7 @@ export function fetchGlobalRankings(): GlobalRankingEntry[] {
 export function fetchContestStats(): ContestStats {
   const totalParticipants = contests.reduce(
     (sum, c) => sum + c.participant_count,
-    0
+    0,
   );
   const totalRating = globalRankings.reduce((sum, r) => sum + r.rating, 0);
   const averageRating =

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {MdPreview} from "md-editor-v3";
+import { MdPreview } from "md-editor-v3";
 import "md-editor-v3/lib/preview.css";
 import "katex/dist/katex.min.css";
-import {computed} from "vue";
+import { computed } from "vue";
 import katex from "katex";
 
 /**
@@ -41,18 +41,18 @@ const markdownContent = computed(() => {
 
     props.description.examples.forEach((example, index) => {
       parts.push(
-          `\n#### Example ${index + 1}\n\n`,
-          `**Input**
+        `\n#### Example ${index + 1}\n\n`,
+        `**Input**
 \`\`\`
 ${example.input}
 \`\`\`
 
 `,
-          `**Output**
+        `**Output**
 \`\`\`
 ${example.output}
 \`\`\`
-`
+`,
       );
 
       if (example.explanation) {
@@ -64,8 +64,8 @@ ${example.output}
   // Add constraints
   if (props.description.constraints?.length) {
     parts.push(
-        "\n\n#### Constraints\n\n",
-        ...props.description.constraints.map(c => `- ${c}\n`)
+      "\n\n#### Constraints\n\n",
+      ...props.description.constraints.map((c) => `- ${c}\n`),
     );
   }
 
@@ -86,10 +86,10 @@ ${props.description.followUp}
 <template>
   <div class="description-markdown">
     <MdPreview
-        :model-value="markdownContent"
-        preview-theme="default"
-        :show-code-row-number="false"
-        :katex="katex"
+      :model-value="markdownContent"
+      preview-theme="default"
+      :show-code-row-number="false"
+      :katex="katex"
     />
   </div>
 </template>

@@ -31,17 +31,17 @@ const code = ref("");
 const prefersDark = usePreferredDark();
 
 const languageMeta = computed(() =>
-  props.languages.find((lang) => lang.value === activeLanguageValue.value)
+  props.languages.find((lang) => lang.value === activeLanguageValue.value),
 );
 
 const editorLanguage = computed(
-  () => languageMeta.value?.value ?? "typescript"
+  () => languageMeta.value?.value ?? "typescript",
 );
 const editorTheme = computed(() =>
-  prefersDark.value ? "vs-dark" : "vs-light"
+  prefersDark.value ? "vs-dark" : "vs-light",
 );
 const activeLanguageLabel = computed(
-  () => languageMeta.value?.label ?? "Select language"
+  () => languageMeta.value?.label ?? "Select language",
 );
 
 watch(
@@ -52,7 +52,7 @@ watch(
       code.value = target.starterCode;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

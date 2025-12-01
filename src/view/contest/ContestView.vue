@@ -158,7 +158,12 @@ function getCountryFlag(countryCode: string): string {
           <h2 class="text-2xl font-semibold">即将开始</h2>
           <Card
             class="cursor-pointer overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-background transition-all hover:border-primary/40 hover:shadow-lg"
-            @click="$router.push({ name: 'contest-detail', params: { contestId: nextContest.id } })"
+            @click="
+              $router.push({
+                name: 'contest-detail',
+                params: { contestId: nextContest.id },
+              })
+            "
           >
             <CardContent class="p-6">
               <div class="space-y-4">
@@ -206,17 +211,17 @@ function getCountryFlag(countryCode: string): string {
                   <Button
                     size="lg"
                     class="gap-2"
-                    @click.stop="$router.push({ name: 'contest-detail', params: { contestId: nextContest.id } })"
+                    @click.stop="
+                      $router.push({
+                        name: 'contest-detail',
+                        params: { contestId: nextContest.id },
+                      })
+                    "
                   >
                     <Users class="h-4 w-4" />
                     立即报名
                   </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    class="gap-2"
-                    @click.stop
-                  >
+                  <Button size="lg" variant="outline" class="gap-2" @click.stop>
                     <Calendar class="h-4 w-4" />
                     添加到日历
                   </Button>
@@ -248,7 +253,12 @@ function getCountryFlag(countryCode: string): string {
                   v-for="contest in pastContests.slice(0, 10)"
                   :key="contest.id"
                   class="cursor-pointer transition-colors hover:bg-muted/50"
-                  @click="$router.push({ name: 'contest-detail', params: { contestId: contest.id } })"
+                  @click="
+                    $router.push({
+                      name: 'contest-detail',
+                      params: { contestId: contest.id },
+                    })
+                  "
                 >
                   <TableCell>
                     <div class="flex items-center gap-2">

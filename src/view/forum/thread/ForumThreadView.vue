@@ -11,11 +11,11 @@ import { fetchForumThread, createForumComment } from "@/api/forum";
 import { MessageSquare } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
-import ThreadHeader from "@/view/forum/detailed/components/ThreadHeader.vue";
-import ThreadMedia from "@/view/forum/detailed/components/ThreadMedia.vue";
-import ThreadAwards from "@/view/forum/detailed/components/ThreadAwards.vue";
-import ThreadActions from "@/view/forum/detailed/components/ThreadActions.vue";
-import ThreadComments from "@/view/forum/detailed/components/ThreadComments.vue";
+import ThreadHeader from "@/view/forum/thread/components/ThreadHeader.vue";
+import ThreadMedia from "@/view/forum/thread/components/ThreadMedia.vue";
+import ThreadAwards from "@/view/forum/thread/components/ThreadAwards.vue";
+import ThreadActions from "@/view/forum/thread/components/ThreadActions.vue";
+import ThreadComments from "@/view/forum/thread/components/ThreadComments.vue";
 
 const route = useRoute();
 const thread = ref<ForumThread | null>(null);
@@ -146,7 +146,7 @@ async function onSubmitComment(body: string) {
 
     <template v-else-if="thread">
       <Card
-        class="rounded-xl border border-border/50 bg-background/70 shadow-none"
+        class="rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm"
       >
         <CardHeader class="pb-2">
           <CardTitle class="text-xl">{{ thread.post.title }}</CardTitle>
@@ -189,7 +189,7 @@ async function onSubmitComment(body: string) {
         </CardFooter>
       </Card>
 
-      <Card class="border-border/60 bg-card/60">
+      <Card class="border-border/60 bg-card shadow-sm">
         <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
           <CardTitle class="flex items-center gap-2 text-sm font-semibold">
             <MessageSquare class="h-4 w-4 text-blue-500" />

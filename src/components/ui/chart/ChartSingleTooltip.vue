@@ -16,7 +16,11 @@ const props = defineProps<{
 
 // Use weakmap to store reference to each datapoint for Tooltip
 const wm = new WeakMap();
-function template(d: any, i: number, elements: (HTMLElement | SVGElement)[]) {
+function template(
+  d: Record<string, unknown>,
+  i: number,
+  elements: (HTMLElement | SVGElement)[],
+) {
   const valueFormatter = props.valueFormatter ?? ((tick: number) => `${tick}`);
   if (props.index in d) {
     if (wm.has(d)) {
@@ -26,35 +30,38 @@ function template(d: any, i: number, elements: (HTMLElement | SVGElement)[]) {
       const omittedData = Object.entries(omit(d, [props.index])).map(
         ([key, value]) => {
           const legendReference = props.items?.find((i) => i.name === key);
-          return { ...legendReference, value: valueFormatter(value) };
+          return { ...legendReference, value: valueFormatter(Number(value)) };
         },
       );
       const TooltipComponent = props.customTooltip ?? ChartTooltip;
       createApp(TooltipComponent, {
-        title: d[props.index],
+        title: String(d[props.index] ?? ''),
         data: omittedData,
       }).mount(componentDiv);
       wm.set(d, componentDiv.innerHTML);
       return componentDiv.innerHTML;
     }
   } else {
-    const data = d.data;
+    const data = d.data as Record<string, unknown> | undefined;
+    if (!data) return '';
 
     if (wm.has(data)) {
       return wm.get(data);
     } else {
-      const style = getComputedStyle(elements[i]);
+      const element = elements[i];
+      if (!element) return '';
+      const style = getComputedStyle(element);
       const omittedData = [
         {
-          name: data.name,
-          value: valueFormatter(data[props.index]),
+          name: String(data.name ?? ''),
+          value: valueFormatter(Number(data[props.index])),
           color: style.fill,
         },
       ];
       const componentDiv = document.createElement("div");
       const TooltipComponent = props.customTooltip ?? ChartTooltip;
       createApp(TooltipComponent, {
-        title: d[props.index],
+        title: String(d[props.index] ?? ''),
         data: omittedData,
       }).mount(componentDiv);
       wm.set(d, componentDiv.innerHTML);

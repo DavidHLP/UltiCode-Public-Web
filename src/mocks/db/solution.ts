@@ -181,7 +181,8 @@ def maxArea(height: List[int]) -> int:
     },
     {
       id: "sol-level-order",
-      highlight: "Binary Tree Level Order Traversal: queue-first BFS with diagrams",
+      highlight:
+        "Binary Tree Level Order Traversal: queue-first BFS with diagrams",
       flair: "Editorial",
       author_id: "author-lee",
       views_text: "7.8K",
@@ -345,7 +346,8 @@ public:
     },
     {
       id: "sol-climbing-stairs",
-      highlight: "Climbing Stairs: Dynamic Programming approach with optimization",
+      highlight:
+        "Climbing Stairs: Dynamic Programming approach with optimization",
       flair: "Tutorial",
       author_id: "author-alex",
       views_text: "18.5K",

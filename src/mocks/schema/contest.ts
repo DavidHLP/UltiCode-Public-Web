@@ -65,7 +65,7 @@ export interface ContestParticipantRow {
 }
 
 /**
- * 竞赛排行榜 - contest_rankings  
+ * 竞赛排行榜 - contest_rankings
  * 存储用户在竞赛中的排名和成绩
  */
 export interface ContestRankingRow {
@@ -78,7 +78,7 @@ export interface ContestRankingRow {
   finish_time_seconds: number; // INT NOT NULL - 完赛用时(秒)
   q1_time_seconds?: number | null; // INT - Q1 用时
   q2_time_seconds?: number | null; // INT - Q2 用时
-  q3_time_seconds?: number | null; // INT - Q3 用时  
+  q3_time_seconds?: number | null; // INT - Q3 用时
   q4_time_seconds?: number | null; // INT - Q4 用时
   rating_before: number; // INT NOT NULL - 竞赛前积分
   rating_after: number; // INT NOT NULL - 竞赛后积分

@@ -1,5 +1,3 @@
-
-
 const now = "2024-11-01T00:00:00.000Z";
 
 const data = {
@@ -18,7 +16,10 @@ const data = {
       difficulty_rating: 1197,
       updated_at: now,
       follow_up: "How would you handle a sorted array without extra space?",
-      constraints_json: ["$2 \\leq n \\leq 10^4$", "$-10^9 \\leq nums[i], target \\leq 10^9$"],
+      constraints_json: [
+        "$2 \\leq n \\leq 10^4$",
+        "$-10^9 \\leq nums[i], target \\leq 10^9$",
+      ],
     },
     {
       id: "pd-add-two-numbers",
@@ -34,7 +35,10 @@ const data = {
       difficulty_rating: 1420,
       updated_at: now,
       follow_up: "Try writing a recursive variant and discuss its stack cost.",
-      constraints_json: ["$1 \\leq len(l1), len(l2) \\leq 100$", "Nodes store a single digit"],
+      constraints_json: [
+        "$1 \\leq len(l1), len(l2) \\leq 100$",
+        "Nodes store a single digit",
+      ],
     },
     {
       id: "pd-container",
@@ -50,7 +54,10 @@ const data = {
       difficulty_rating: 1360,
       updated_at: now,
       follow_up: "Discuss why a greedy inward two-pointer scan is optimal.",
-      constraints_json: ["$2 \\leq n \\leq 10^5$", "$0 \\leq height[i] \\leq 10^4$"],
+      constraints_json: [
+        "$2 \\leq n \\leq 10^5$",
+        "$0 \\leq height[i] \\leq 10^4$",
+      ],
     },
     {
       id: "pd-min-cost",
@@ -106,7 +113,8 @@ const data = {
       },
       difficulty_rating: 1910,
       updated_at: now,
-      follow_up: "Discuss how you would make the cache thread-safe or add TTL eviction.",
+      follow_up:
+        "Discuss how you would make the cache thread-safe or add TTL eviction.",
       constraints_json: [
         "$1 \\leq capacity \\leq 3000$",
         "$0 \\leq key, value \\leq 10^4$",
@@ -154,8 +162,7 @@ const data = {
       example_order: 1,
       input_text: "points = [[3,12],[-2,5],[-4,1]]",
       output_text: "18",
-      explanation:
-        "Connecting [-4,1] → [-2,5] → [3,12] yields total cost 18.",
+      explanation: "Connecting [-4,1] → [-2,5] → [3,12] yields total cost 18.",
     },
     {
       id: "ex-level-order-1",
@@ -392,13 +399,15 @@ const data = {
       id: "step-min-cost-1",
       approach_id: "ap-min-cost-kruskal",
       step_order: 0,
-      content: "Generate all pairwise Manhattan edge weights from the points list.",
+      content:
+        "Generate all pairwise Manhattan edge weights from the points list.",
     },
     {
       id: "step-min-cost-2",
       approach_id: "ap-min-cost-kruskal",
       step_order: 1,
-      content: "Sort edges ascending so the smallest bridge is always considered first.",
+      content:
+        "Sort edges ascending so the smallest bridge is always considered first.",
     },
     {
       id: "step-min-cost-3",
@@ -417,7 +426,8 @@ const data = {
       id: "step-level-order-2",
       approach_id: "ap-level-order-bfs",
       step_order: 1,
-      content: "Push the root into a queue and iterate while the queue has nodes.",
+      content:
+        "Push the root into a queue and iterate while the queue has nodes.",
     },
     {
       id: "step-level-order-3",
@@ -436,7 +446,8 @@ const data = {
       id: "step-lru-1",
       approach_id: "ap-lru-dll",
       step_order: 0,
-      content: "Use dummy head/tail nodes so inserts and removals never need null checks.",
+      content:
+        "Use dummy head/tail nodes so inserts and removals never need null checks.",
     },
     {
       id: "step-lru-2",
@@ -529,12 +540,14 @@ const data = {
     {
       id: "note-level-order",
       problem_id: 5,
-      content: "Read the queue length up front for each layer so new children do not leak into the current level.",
+      content:
+        "Read the queue length up front for each layer so new children do not leak into the current level.",
     },
     {
       id: "note-lru-cache",
       problem_id: 6,
-      content: "The node right before the tail sentinel is always the eviction target; move nodes to the head when touched.",
+      content:
+        "The node right before the tail sentinel is always the eviction target; move nodes to the head when touched.",
     },
   ],
   problem_recent_results: [

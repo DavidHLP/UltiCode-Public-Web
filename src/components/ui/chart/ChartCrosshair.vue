@@ -20,7 +20,7 @@ const props = withDefaults(
 
 // Use weakmap to store reference to each datapoint for Tooltip
 const wm = new WeakMap();
-function template(d: any) {
+function template(d: Record<string, unknown>) {
   if (wm.has(d)) {
     return wm.get(d);
   } else {
@@ -32,8 +32,9 @@ function template(d: any) {
       },
     );
     const TooltipComponent = props.customTooltip ?? ChartTooltip;
+    const indexValue = d[props.index];
     createApp(TooltipComponent, {
-      title: d[props.index].toString(),
+      title: typeof indexValue === 'string' || typeof indexValue === 'number' ? String(indexValue) : '',
       data: omittedData,
     }).mount(componentDiv);
     wm.set(d, componentDiv.innerHTML);

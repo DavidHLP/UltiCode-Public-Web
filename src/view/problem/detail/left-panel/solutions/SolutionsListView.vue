@@ -65,7 +65,7 @@ const languageOptions = computed(() => {
       languages.add(item.language);
     }
   });
-  
+
   return Array.from(languages)
     .sort()
     .map((lang) => ({
@@ -131,7 +131,9 @@ const handleCreateSolution = () => {
       <div class="flex items-center gap-2 px-3 py-2">
         <!-- 搜索框 -->
         <div class="relative flex-1">
-          <Search class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search
+            class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
           <Input
             v-model="search"
             placeholder="Search solutions"
@@ -161,23 +163,37 @@ const handleCreateSolution = () => {
       </div>
 
       <!-- 语言标签过滤栏 -->
-      <div class="relative w-full overflow-hidden px-3 py-1.5 lc-md:px-2 lc-md:py-1">
-        <div class="flex w-full items-center gap-1.5 overflow-x-auto scrollbar-hide">
+      <div
+        class="relative w-full overflow-hidden px-3 py-1.5 lc-md:px-2 lc-md:py-1"
+      >
+        <div
+          class="flex w-full items-center gap-1.5 overflow-x-auto scrollbar-hide"
+        >
           <Badge
             variant="secondary"
             class="lc-md:px-1.5 lc-md:py-0.5 inline-flex cursor-pointer items-center flex-shrink-0 gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors"
-            :class="languageFilter === 'all' ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
+            :class="
+              languageFilter === 'all'
+                ? 'bg-gray-100 dark:bg-gray-100 text-foreground dark:text-foreground'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            "
             @click="languageFilter = 'all'"
           >
             All
           </Badge>
           <Badge
-            v-for="option in languageOptions.filter(opt => opt.value !== 'all')"
+            v-for="option in languageOptions.filter(
+              (opt) => opt.value !== 'all',
+            )"
             :key="option.value"
             translate="no"
             variant="secondary"
             class="lc-md:px-1.5 lc-md:py-0.5 inline-flex cursor-pointer items-center flex-shrink-0 gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors"
-            :class="languageFilter === option.value ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'"
+            :class="
+              languageFilter === option.value
+                ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            "
             @click="languageFilter = option.value"
           >
             {{ option.label }}
@@ -187,18 +203,26 @@ const handleCreateSolution = () => {
 
       <!-- 提交统计和操作栏 -->
       <div class="mx-3 mb-1.5 lc-md:mx-2 lc-md:mb-1">
-        <div class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1">
+        <div
+          class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1"
+        >
           <div class="flex items-center gap-1.5 flex-1 min-w-0">
-            <div class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0">
-              <Plus class="h-2.5 w-2.5 text-text-primary dark:text-text-primary" />
+            <div
+              class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0"
+            >
+              <Plus
+                class="h-2.5 w-2.5 text-text-primary dark:text-text-primary"
+              />
             </div>
             <span class="text-[11px] leading-tight">
-              Your last submission beats 
-              <span class="font-semibold text-green-600 dark:text-green-400">17%</span> 
+              Your last submission beats
+              <span class="font-semibold text-green-600 dark:text-green-400"
+                >17%</span
+              >
               of users
             </span>
           </div>
-          <button 
+          <button
             class="flex h-5 flex-shrink-0 items-center gap-0.5 rounded bg-green-600 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm transition-all hover:bg-green-600/90 hover:shadow active:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50"
             @click="handleCreateSolution"
           >
@@ -213,7 +237,11 @@ const handleCreateSolution = () => {
     <div class="flex-1 overflow-y-auto">
       <div class="py-3">
         <div v-if="sortedItems.length" class="flex flex-col">
-          <div v-for="(item, index) in sortedItems" :key="item.id" class="flex flex-col">
+          <div
+            v-for="(item, index) in sortedItems"
+            :key="item.id"
+            class="flex flex-col"
+          >
             <div class="px-3">
               <SolutionsCard :item="item" @select="handleSelect" />
             </div>
