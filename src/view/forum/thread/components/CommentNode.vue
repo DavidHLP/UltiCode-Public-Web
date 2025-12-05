@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ForumComment } from "@/mocks/schema/forum.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowBigUp, Pin, Lock, MessageSquare } from "lucide-vue-next";
-import { computed } from "vue";
+import { ArrowBigUp, Pin, Lock, MessageSquare, MinusSquare, PlusSquare } from "lucide-vue-next";
+import { computed, ref } from "vue";
 
 defineOptions({
   name: "CommentNode",
@@ -36,6 +36,7 @@ function formatRelativeTime(value: string) {
 }
 
 const createdAgo = computed(() => formatRelativeTime(props.comment.createdAt));
+const isCollapsed = ref(false);
 </script>
 
 <template>
@@ -73,31 +74,46 @@ const createdAgo = computed(() => formatRelativeTime(props.comment.createdAt));
           >
             <Lock class="h-3 w-3" /> Locked
           </span>
+          <button
+            @click="isCollapsed = !isCollapsed"
+            class="ml-1 opacity-0 transition-opacity group-hover:opacity-100"
+            :title="isCollapsed ? 'Expand' : 'Collapse'"
+          >
+            <component
+              :is="isCollapsed ? PlusSquare : MinusSquare"
+              class="h-3 w-3"
+            />
+          </button>
         </div>
 
-        <div class="text-sm leading-relaxed text-foreground/90">
-          {{ comment.body }}
-        </div>
+        <template v-if="!isCollapsed">
+          <div class="text-sm leading-relaxed text-foreground/90">
+            {{ comment.body }}
+          </div>
 
-        <div class="flex items-center gap-4">
-          <button
-            class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowBigUp class="h-4 w-4" />
-            {{ comment.upvotes }}
-          </button>
-          <button
-            class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <MessageSquare class="h-3.5 w-3.5" />
-            Reply
-          </button>
+          <div class="flex items-center gap-4">
+            <button
+              class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowBigUp class="h-4 w-4" />
+              {{ comment.upvotes }}
+            </button>
+            <button
+              class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <MessageSquare class="h-3.5 w-3.5" />
+              Reply
+            </button>
+          </div>
+        </template>
+        <div v-else class="text-[11px] italic text-muted-foreground">
+          Comment collapsed
         </div>
       </div>
     </div>
 
     <ul
-      v-if="comment.replies && comment.replies.length"
+      v-if="!isCollapsed && comment.replies && comment.replies.length"
       class="relative ml-3.5 space-y-4 border-l border-border/40 pl-4 pt-2"
     >
       <CommentNode

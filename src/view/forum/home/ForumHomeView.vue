@@ -20,6 +20,7 @@ import {
 import { ChevronsUpDown } from "lucide-vue-next";
 import ForumPostCard from "@/view/forum/home/components/ForumPostCard.vue";
 import ForumSidebar from "@/view/forum/home/components/ForumSidebar.vue";
+import ForumPostSkeleton from "@/view/forum/components/ForumPostSkeleton.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,
@@ -34,8 +35,10 @@ const trendingTopics = ref<ForumTrendingTopic[]>([]);
 const communities = ref<ForumCommunity[]>([]);
 const moderators = ref<ForumModerator[]>([]);
 const quickFilters = ref<Array<{ label: string; value: string }>>([]);
+const isLoading = ref(true);
 
 onMounted(async () => {
+  isLoading.value = true;
   try {
     const [postRows, topicRows, communityRows, moderatorRows, filters] =
       await Promise.all([
@@ -57,6 +60,8 @@ onMounted(async () => {
     communities.value = [];
     moderators.value = [];
     quickFilters.value = [];
+  } finally {
+    isLoading.value = false;
   }
 });
 
@@ -182,11 +187,16 @@ const sortedPosts = computed(() => {
             </div>
           </CardHeader>
           <CardContent class="space-y-6 px-0">
-            <ForumPostCard
-              v-for="post in sortedPosts"
-              :key="post.id"
-              :post="post"
-            />
+            <div v-if="isLoading" class="space-y-6">
+              <ForumPostSkeleton v-for="i in 3" :key="i" />
+            </div>
+            <div v-else class="space-y-6">
+              <ForumPostCard
+                v-for="post in sortedPosts"
+                :key="post.id"
+                :post="post"
+              />
+            </div>
           </CardContent>
         </Card>
         <ForumSidebar
@@ -194,6 +204,7 @@ const sortedPosts = computed(() => {
           :trendingTopics="trendingTopics"
           :communities="communities"
           :moderators="moderators"
+          :isLoading="isLoading"
         />
       </div>
     </div>

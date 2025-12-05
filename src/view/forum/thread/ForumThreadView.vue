@@ -11,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import ForumPostSkeleton from "@/view/forum/components/ForumPostSkeleton.vue";
 import { fetchForumThread, createForumComment } from "@/api/forum";
 import { MessageSquare } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
@@ -145,11 +147,17 @@ async function onSubmitComment(body: string) {
       </RouterLink>
     </div>
 
-    <div
-      v-if="isLoading"
-      class="rounded-xl border border-dashed border-muted p-6 text-sm text-muted-foreground"
-    >
-      Loading thread…
+    <div v-if="isLoading" class="space-y-6">
+      <ForumPostSkeleton />
+      <div class="space-y-4 pl-4 border-l border-border/40">
+        <div class="flex gap-3" v-for="i in 3" :key="i">
+          <Skeleton class="h-8 w-8 rounded-full" />
+          <div class="space-y-2 flex-1">
+            <Skeleton class="h-4 w-32" />
+            <Skeleton class="h-4 w-full" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <template v-else-if="thread">

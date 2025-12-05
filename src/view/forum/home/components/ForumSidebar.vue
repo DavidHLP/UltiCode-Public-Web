@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   CalendarDays,
   ClipboardList,
@@ -24,10 +25,11 @@ import {
 } from "lucide-vue-next";
 import { computed } from "vue";
 
-const { trendingTopics, communities, moderators } = defineProps<{
+const { trendingTopics, communities, moderators, isLoading } = defineProps<{
   trendingTopics: ForumTrendingTopic[];
   communities: ForumCommunity[];
   moderators: ForumModerator[];
+  isLoading?: boolean;
 }>();
 
 const checklist = [
@@ -72,7 +74,13 @@ const getCommunityOnline = (slug: string) => {
         </CardDescription>
       </CardHeader>
       <CardContent class="p-0">
-        <ul class="divide-y divide-border/40 text-xs">
+        <div v-if="isLoading" class="space-y-4 p-4">
+          <div v-for="i in 3" :key="i" class="space-y-2">
+            <Skeleton class="h-4 w-3/4" />
+            <Skeleton class="h-3 w-1/2" />
+          </div>
+        </div>
+        <ul v-else class="divide-y divide-border/40 text-xs">
           <li
             v-for="topic in trendingTopics"
             :key="topic.id"
@@ -107,7 +115,16 @@ const getCommunityOnline = (slug: string) => {
         </CardTitle>
       </CardHeader>
       <CardContent class="p-4">
-        <ul class="space-y-3 text-xs">
+        <div v-if="isLoading" class="space-y-4">
+          <div v-for="i in 2" :key="i" class="flex gap-3">
+            <Skeleton class="h-8 w-8 rounded-full" />
+            <div class="space-y-2 flex-1">
+              <Skeleton class="h-4 w-1/2" />
+              <Skeleton class="h-3 w-3/4" />
+            </div>
+          </div>
+        </div>
+        <ul v-else class="space-y-3 text-xs">
           <li v-for="community in communities" :key="community.name">
             <article
               class="space-y-3 overflow-hidden rounded-lg border border-border/50 bg-background"
@@ -226,7 +243,16 @@ const getCommunityOnline = (slug: string) => {
         </CardTitle>
       </CardHeader>
       <CardContent class="p-0">
-        <ul class="divide-y divide-border/60 text-xs">
+        <div v-if="isLoading" class="space-y-4 p-4">
+          <div v-for="i in 2" :key="i" class="flex gap-3">
+            <Skeleton class="h-8 w-8 rounded-full" />
+            <div class="space-y-2 flex-1">
+              <Skeleton class="h-4 w-1/2" />
+              <Skeleton class="h-3 w-1/3" />
+            </div>
+          </div>
+        </div>
+        <ul v-else class="divide-y divide-border/60 text-xs">
           <li
             v-for="moderator in moderators"
             :key="moderator.username"
