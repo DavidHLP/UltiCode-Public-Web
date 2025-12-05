@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = "/api";
+const DEFAULT_API_BASE = "http://localhost:3000";
 
 const normalizedBaseUrl = (() => {
   const base = import.meta.env.VITE_API_BASE_URL?.trim() || DEFAULT_API_BASE;
@@ -19,8 +19,7 @@ const normalizedBasePath = (() => {
 
 export const API_BASE_URL = normalizedBaseUrl;
 export const API_BASE_PATH = normalizedBasePath;
-export const USE_MOCK_API =
-  (import.meta.env.VITE_API_USE_MOCK ?? "true") === "true";
+export const USE_MOCK_API = false;
 
 async function parseJson<T>(response: Response): Promise<T> {
   if (!response.ok) {
