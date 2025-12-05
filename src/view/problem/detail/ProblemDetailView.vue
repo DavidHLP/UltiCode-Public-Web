@@ -44,13 +44,12 @@ const bottomPanelStore = useBottomPanelStore();
 
 onMounted(async () => {
   const idParam = route.params.id;
-  const numericId =
-    typeof idParam === "string"
-      ? Number.parseInt(idParam, 10)
-      : Number(idParam);
-  const safeId = Number.isFinite(numericId) ? numericId : 1;
+  const id = Array.isArray(idParam) ? idParam[0] : idParam;
+
+  if (!id) return;
+
   try {
-    problem.value = await fetchProblemDetailById(safeId);
+    problem.value = await fetchProblemDetailById(id);
   } catch (error) {
     console.error("Failed to load problem detail", error);
     problem.value = null;
