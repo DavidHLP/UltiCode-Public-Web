@@ -62,7 +62,7 @@ const acceptanceRate = computed(() => {
  */
 const problemDescription = computed<ProblemDescription>(() => ({
   content: props.problem.summary || "",
-  examples: props.problem.examples.map((example) => {
+  examples: (props.problem.examples || []).map((example) => {
     const ex = example as { input: string; output: string; explanation?: string };
     return {
       input: ex.input,
@@ -96,7 +96,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
         <!-- Tags Button -->
         <button
-          v-if="props.problem.tags.length"
+          v-if="props.problem.tags?.length"
           class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((tagsSection as any).$el)"
         >
@@ -149,11 +149,11 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
       <!-- Tags Section (Collapsible) -->
       <section
-        v-if="showTags && props.problem.tags.length"
+        v-if="showTags && props.problem.tags?.length"
         class="flex flex-wrap gap-2"
       >
         <span
-          v-for="tag in props.problem.tags"
+          v-for="tag in (props.problem.tags || [])"
           :key="tag"
           class="rounded-full border border-border bg-background px-3 py-1 text-[11px] text-muted-foreground"
         >
@@ -220,7 +220,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <Accordion type="multiple" class="w-full">
           <!-- Related Tags -->
           <AccordionItem
-            v-if="props.problem.tags.length"
+            v-if="props.problem.tags?.length"
             ref="tagsSection"
             value="tags"
           >
@@ -242,7 +242,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
             <AccordionContent>
               <div class="mt-2 flex flex-wrap gap-1 pl-7">
                 <span
-                  v-for="tag in props.problem.tags"
+                  v-for="tag in (props.problem.tags || [])"
                   :key="tag"
                   class="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground"
                 >
