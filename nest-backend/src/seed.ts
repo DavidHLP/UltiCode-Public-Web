@@ -75,6 +75,14 @@ async function bootstrap() {
       ? [...pd.constraints_json]
       : [],
     updated_at: new Date(pd.updated_at),
+    hints:
+      pd.id === 'pd-two-sum'
+        ? [
+            'A brute force approach is simple. Loop through each element x and find if there is another value that equals to target – x.',
+            'So, if we fix one of the numbers, say x, we have to scan the entire array to find the next number y which is value - x where value is the input parameter. Can we change our array somehow so that this search becomes faster?',
+            'The second train of thought is, without changing the array, can we use additional space to somehow make the search faster? This is where a hash map comes in handy.',
+          ]
+        : [],
   }));
   await problemDetailRepository.save(details);
   console.log('Problem Details seeded');

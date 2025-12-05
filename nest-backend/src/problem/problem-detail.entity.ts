@@ -45,4 +45,7 @@ export class ProblemDetail {
 
   @Column({ type: 'json' })
   constraints_json: string[];
+
+  @Column({ type: 'json', nullable: true })
+  hints: string[] | null;
 }

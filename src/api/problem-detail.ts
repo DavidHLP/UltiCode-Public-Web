@@ -14,15 +14,33 @@ interface BackendExample {
   outputText?: string;
 }
 
+interface BackendProblemDetail {
+  summary: string;
+  companies: { id: string; name: string; logo?: string }[] | null;
+  constraints_json: string[];
+  follow_up: string;
+  hints: string[] | null;
+}
+
+interface BackendProblemResponse extends ProblemDetail {
+  detail: BackendProblemDetail;
+  examples: BackendExample[];
+}
+
 export async function fetchProblemDetailById(
   id: number | string,
 ): Promise<ProblemDetail> {
-  const response = await apiGet<ProblemDetail & { examples: BackendExample[]; constraints_json: string[]; summary: string; follow_up: string }>(`/problems/${id}`);
+  const response = await apiGet<BackendProblemResponse>(`/problems/${id}`);
   
   // Map backend naming to frontend interface
-  response.content = response.summary || '';
-  response.constraints = response.constraints_json || [];
-  response.followUp = response.follow_up;
+  // The backend returns a nested 'detail' object containing much of this info
+  const detail = response.detail;
+
+  response.content = detail.summary || '';
+  response.constraints = detail.constraints_json || [];
+  response.followUp = detail.follow_up;
+  response.companies = detail.companies || [];
+  response.starterNotes = detail.hints || [];
   
   if (response.examples && response.examples.length > 0) {
     const originalExamples = response.examples;
