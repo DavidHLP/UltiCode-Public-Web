@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ForumFlairType, ForumPost } from "@/mocks/schema/forum.ts";
+import type { ForumFlairType, ForumPost } from "@/types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Pin, Lock, ArrowBigUp, Eye } from "lucide-vue-next";
@@ -13,15 +13,15 @@ const props = defineProps<{
   viewsDisplay?: string;
 }>();
 
-const avatarSrc = computed(() => props.post.user.avatar || undefined);
+const avatarSrc = computed(() => props.post.author.avatar || undefined);
 const userInitials = computed(() => {
-  const parts = props.post.user.username.split(/[^A-Za-z0-9]+/);
+  const parts = props.post.author.username.split(/[^A-Za-z0-9]+/);
   return parts
     .map((p) => p.charAt(0).toUpperCase())
     .join("")
     .slice(0, 2);
 });
-const communityIcon = computed(() => props.post.community.icon || "");
+const communityIcon = computed(() => props.post.community?.icon || "");
 </script>
 
 <template>
@@ -31,7 +31,7 @@ const communityIcon = computed(() => props.post.community.icon || "");
         <AvatarImage
           v-if="avatarSrc"
           :src="avatarSrc"
-          :alt="post.user.username"
+          :alt="post.author.username"
         />
         <AvatarFallback class="text-xs font-semibold uppercase">{{
           userInitials
@@ -43,10 +43,11 @@ const communityIcon = computed(() => props.post.community.icon || "");
         >
           <span class="flex items-center gap-2">
             <span
+              v-if="communityIcon"
               class="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-base"
               >{{ communityIcon }}</span
             >
-            <span class="truncate">{{ post.community.name }}</span>
+            <span class="truncate">{{ post.community?.name }}</span>
           </span>
           <Badge
             v-if="post.flair"
@@ -56,7 +57,7 @@ const communityIcon = computed(() => props.post.community.icon || "");
               flairClasses[post.flair.type],
             ]"
           >
-            {{ post.flair.label }}
+            {{ post.flair.text }}
           </Badge>
           <Badge
             v-if="post.isPinned"
@@ -75,11 +76,11 @@ const communityIcon = computed(() => props.post.community.icon || "");
         <div
           class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
         >
-          <span>u/{{ post.user.username }}</span>
+          <span>u/{{ post.author.username }}</span>
           <span>•</span>
           <span>{{ createdAgo }}</span>
           <span>•</span>
-          <span>{{ post.user.karma.toLocaleString() }} karma</span>
+          <span>{{ post.stats?.likes?.toLocaleString() ?? 0 }} likes</span>
         </div>
         <div
           v-if="upvoteRatioDisplay || viewsDisplay"

@@ -14,7 +14,7 @@ import { useBottomPanelStore } from "./bottom";
 import type {
   ProblemCaseResultDetail,
   ProblemRunResult,
-} from "@/mocks/schema/test-results";
+} from "@/types/test-results";
 
 const props = defineProps<{
   runResult: ProblemRunResult | null;
@@ -177,7 +177,7 @@ const selectCase = (label: string) => {
         <div v-if="activeResult" class="space-y-4 text-xs md:text-sm">
           <div class="space-y-3">
             <div class="space-y-2">
-              <template v-if="activeResult.inputs.length">
+              <template v-if="activeResult.inputs?.length">
                 <div
                   v-for="field in activeResult.inputs"
                   :key="field.id"

@@ -7,7 +7,7 @@ import { useBottomPanelStore } from "./bottom";
 import type {
   ProblemTestCase,
   ProblemTestCaseInput,
-} from "@/mocks/schema/problem-detail";
+} from "@/types/problem-detail";
 
 const props = defineProps<{
   testCases: ProblemTestCase[];
@@ -34,6 +34,7 @@ const createEmptyInputs = (
   return [
     {
       id: generateId("input"),
+      name: "input",
       fieldName: "input",
       label: "input",
       value: "",

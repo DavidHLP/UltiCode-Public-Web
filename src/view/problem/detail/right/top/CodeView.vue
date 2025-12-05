@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import CodeEditor from "./components/CodeEditor.vue";
-import type { ProblemLanguageOption } from "@/mocks/schema/problem-detail";
+import type { ProblemLanguageOption } from "@/types/problem-detail";
 import {
   AlignLeft,
   Bookmark,

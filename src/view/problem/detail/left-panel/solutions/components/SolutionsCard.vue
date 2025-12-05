@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { SolutionFeedItem } from "@/mocks/schema/solution.ts";
+import type { SolutionFeedItem } from "@/types/solution";
 import { Eye, MessageCircle, Triangle } from "lucide-vue-next";
 
 const props = defineProps<{
@@ -54,7 +54,7 @@ const handleSelect = () => emit("select", props.item);
             props.item.author.role
           }}</span>
           <span class="text-xs text-muted-foreground"
-            >· {{ props.item.createdAt }}</span
+            >· {{ props.item.created_at }}</span
           >
           <span
             v-if="props.item.flair"

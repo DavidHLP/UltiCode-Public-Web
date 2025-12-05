@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Problem } from "@/mocks/schema/problem";
+import type { Problem } from "@/types/problem";
 import { computed, onMounted, ref, watch, type Ref } from "vue";
 import {
   CheckCircle2,
@@ -69,7 +69,7 @@ const filteredProblems = computed(() => {
       selectedTags.value.some((tag) => p.tags.includes(tag));
     const statusMatch =
       selectedStatus.value.length === 0 ||
-      selectedStatus.value.includes(p.status);
+      (p.status && selectedStatus.value.includes(p.status));
     const difficultyMatch =
       selectedDifficulty.value.length === 0 ||
       selectedDifficulty.value.includes(p.difficulty);

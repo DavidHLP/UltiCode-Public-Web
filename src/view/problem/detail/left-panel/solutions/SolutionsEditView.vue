@@ -137,7 +137,7 @@ import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fetchSolutionTopics } from "@/api/topic";
-import type { SolutionTopic } from "@/mocks/schema/topic";
+import type { SolutionTopic } from "@/types/topic";
 
 config({
   editorExtensions: {

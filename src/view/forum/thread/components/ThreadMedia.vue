@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ForumPostMedia } from "@/mocks/schema/forum.ts";
+import type { ForumPostMedia } from "@/types/forum";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 defineProps<{
@@ -26,7 +26,7 @@ function formatPollWidth(votes: number, totalVotes: number) {
     class="overflow-hidden rounded-lg border border-border/60"
   >
     <AspectRatio
-      v-if="media.kind === 'image'"
+      v-if="media.type === 'image'"
       :ratio="media.ratio ?? 16 / 9"
       class="bg-muted"
     >
@@ -37,14 +37,14 @@ function formatPollWidth(votes: number, totalVotes: number) {
       />
     </AspectRatio>
     <p
-      v-if="media.kind === 'image' && media.caption"
+      v-if="media.type === 'image' && media.caption"
       class="border-t border-border/50 bg-background/80 px-4 py-2 text-xs text-muted-foreground"
     >
       {{ media.caption }}
     </p>
 
     <div
-      v-else-if="media.kind === 'link'"
+      v-else-if="media.type === 'link'"
       class="flex flex-col gap-3 bg-background/80 p-4 sm:flex-row sm:items-center"
     >
       <div
@@ -74,7 +74,7 @@ function formatPollWidth(votes: number, totalVotes: number) {
     </div>
 
     <div
-      v-else-if="media.kind === 'text'"
+      v-else-if="media.type === 'text'"
       class="space-y-2 bg-muted/20 p-4 text-sm leading-relaxed text-muted-foreground"
     >
       {{ media.body }}
@@ -85,7 +85,7 @@ function formatPollWidth(votes: number, totalVotes: number) {
       >
     </div>
 
-    <div v-else-if="media.kind === 'video'" class="bg-muted">
+    <div v-else-if="media.type === 'video'" class="bg-muted">
       <AspectRatio :ratio="16 / 9" class="bg-black">
         <video
           :src="media.src"
@@ -105,7 +105,7 @@ function formatPollWidth(votes: number, totalVotes: number) {
     </div>
 
     <div
-      v-else-if="media.kind === 'poll'"
+      v-else-if="media.type === 'poll'"
       class="space-y-3 bg-background/80 p-4 text-sm text-foreground"
     >
       <header class="space-y-1">

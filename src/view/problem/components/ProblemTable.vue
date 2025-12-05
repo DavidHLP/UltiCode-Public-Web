@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Problem } from "@/mocks/schema/problem";
+import type { Problem } from "@/types/problem";
 import { onMounted, onUnmounted, type Component, type PropType } from "vue";
 import { useRouter } from "vue-router";
 import { Lock, SearchX, Video } from "lucide-vue-next";
@@ -128,7 +128,7 @@ onUnmounted(() => {
           </TableCell>
 
           <TableCell class="text-center">
-            {{ formatAcceptance(problem.acceptanceRate) }}
+            {{ formatAcceptance(problem.acceptanceRate ?? problem.acceptance_rate) }}
           </TableCell>
 
           <TableCell

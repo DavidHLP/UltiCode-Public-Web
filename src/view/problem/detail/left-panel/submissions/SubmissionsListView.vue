@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { SubmissionRecord } from "@/mocks/schema/submission";
+import type { SubmissionRecord } from "@/types/submission";
 import { Loader2, Inbox } from "lucide-vue-next";
 import {
   Table,
@@ -79,15 +79,15 @@ const formatRelativeTime = (timestamp: number | null) => {
 
 const sortedSubmissions = computed(() =>
   [...props.submissions].sort((a, b) => {
-    const tsA = normalizeTimestamp(a.submittedAt) ?? 0;
-    const tsB = normalizeTimestamp(b.submittedAt) ?? 0;
+    const tsA = normalizeTimestamp(a.submittedAt ?? a.created_at) ?? 0;
+    const tsB = normalizeTimestamp(b.submittedAt ?? b.created_at) ?? 0;
     return tsB - tsA;
   }),
 );
 
 const decoratedSubmissions = computed(() =>
   sortedSubmissions.value.map((submission) => {
-    const timestamp = normalizeTimestamp(submission.submittedAt);
+    const timestamp = normalizeTimestamp(submission.submittedAt ?? submission.created_at);
     return {
       ...submission,
       formattedSubmitted: timestamp

@@ -3,7 +3,7 @@ import type {
   ForumFlairType,
   ForumThread,
   ForumPostMedia,
-} from "@/mocks/schema/forum";
+} from "@/types/forum";
 import {
   Card,
   CardContent,
@@ -57,28 +57,28 @@ const flairClasses: Record<ForumFlairType, string> = {
 };
 
 const createdAgo = computed(() =>
-  thread.value ? formatRelativeTime(thread.value.post.createdAt) : "",
+  thread.value ? formatRelativeTime(thread.value.createdAt) : "",
 );
 const recommendationLabel = computed(
   () =>
-    (thread.value?.post.recommendation as unknown as { label?: string })
+    (thread.value?.recommendation as unknown as { label?: string })
       ?.label ?? "",
 );
 const media = computed(
-  () => thread.value?.post.media as unknown as ForumPostMedia | undefined,
+  () => thread.value?.media as unknown as ForumPostMedia | undefined,
 );
-const awards = computed(() => thread.value?.post.awards ?? []);
+const awards = computed(() => thread.value?.awards ?? []);
 const upvoteRatioDisplay = computed(() =>
-  typeof thread.value?.post.stats.upvote_ratio === "number"
-    ? `${Math.round(thread.value.post.stats.upvote_ratio * 100)}%`
+  typeof thread.value?.stats?.upvote_ratio === "number"
+    ? `${Math.round(thread.value.stats.upvote_ratio * 100)}%`
     : undefined,
 );
 const viewsDisplay = computed(() =>
-  typeof thread.value?.post.stats.views === "number"
-    ? formatCount(thread.value.post.stats.views)
+  typeof thread.value?.stats?.views === "number"
+    ? formatCount(thread.value.stats.views)
     : undefined,
 );
-const voteState = computed(() => thread.value?.post.voteState ?? "neutral");
+const voteState = computed(() => thread.value?.voteState ?? "neutral");
 const voteLabel = computed(() =>
   voteState.value === "upvoted"
     ? "Upvoted"
@@ -87,19 +87,19 @@ const voteLabel = computed(() =>
       : "Upvote",
 );
 const scoreDisplay = computed(() =>
-  thread.value ? formatCount(thread.value.post.stats.score) : "0",
+  thread.value?.stats?.score ? formatCount(thread.value.stats.score) : "0",
 );
 const commentsDisplay = computed(() =>
-  thread.value ? formatCount(thread.value.post.stats.comments) : "0",
+  thread.value?.stats?.comments ? formatCount(thread.value.stats.comments) : "0",
 );
 const awardsDisplay = computed(() =>
-  thread.value ? formatCount(thread.value.post.stats.awards) : "0",
+  thread.value?.stats?.awards ? formatCount(thread.value.stats.awards) : "0",
 );
 const savesDisplay = computed(() =>
-  thread.value ? formatCount(thread.value.post.stats.saves) : "0",
+  thread.value?.stats?.saves ? formatCount(thread.value.stats.saves) : "0",
 );
 const sharesDisplay = computed(() =>
-  thread.value ? formatCount(thread.value.post.stats.shares) : "0",
+  thread.value?.stats?.shares ? formatCount(thread.value.stats.shares) : "0",
 );
 
 function formatCount(value: number) {
@@ -165,11 +165,11 @@ async function onSubmitComment(body: string) {
         class="rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm"
       >
         <CardHeader class="pb-2">
-          <CardTitle class="text-xl">{{ thread.post.title }}</CardTitle>
+          <CardTitle class="text-xl">{{ thread.title }}</CardTitle>
         </CardHeader>
         <CardContent class="space-y-4">
           <ThreadHeader
-            :post="thread.post"
+            :post="thread"
             :created-ago="createdAgo"
             :flair-classes="flairClasses"
             :upvote-ratio-display="upvoteRatioDisplay"
@@ -180,13 +180,13 @@ async function onSubmitComment(body: string) {
           </p>
 
           <section
-            v-if="thread.post.excerpt"
+            v-if="thread.excerpt"
             class="text-sm text-muted-foreground"
           >
-            {{ thread.post.excerpt }}
+            {{ thread.excerpt }}
           </section>
 
-          <ThreadMedia :media="media" :title="thread.post.title" />
+          <ThreadMedia :media="media" :title="thread.title" />
 
           <ThreadAwards v-if="awards.length" :awards="awards" />
         </CardContent>
@@ -215,7 +215,7 @@ async function onSubmitComment(body: string) {
         <CardContent class="p-4">
           <ThreadComments
             :comments="thread.comments"
-            :is-locked="thread.post.isLocked"
+            :is-locked="thread.isLocked"
             @submit="onSubmitComment"
           />
         </CardContent>

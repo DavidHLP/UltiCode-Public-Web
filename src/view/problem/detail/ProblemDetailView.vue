@@ -23,12 +23,11 @@ import {
   type LayoutNode,
 } from "@/stores/headerStore";
 
-import type { ProblemDetail } from "@/mocks/schema/problem-detail";
-import type { ProblemRunResult } from "@/mocks/schema/test-results";
+import type { ProblemDetail, ProblemTestCase } from "@/types/problem-detail";
+import type { ProblemRunResult } from "@/types/test-results";
 import { fetchProblemDetailById } from "@/api/problem-detail";
 import { useBottomPanelStore } from "./right/bottom/bottom";
-import { fetchCurrentUserId } from "@/mocks/api/user";
-import type { ProblemTestCase } from "@/mocks/schema/problem-detail";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 import DescriptionView from "./left-panel/description/DescriptionView.vue";
 import SolutionsView from "./left-panel/solutions/SolutionsView.vue";
@@ -204,7 +203,7 @@ const ConnectedCodeView = defineComponent({
       problem.value && problem.value.languages.length
         ? h(CodeView, {
             languages: problem.value.languages,
-            starterNotes: problem.value.starterNotes,
+            starterNotes: problem.value.starterNotes ?? [],
           })
         : h(
             "div",
@@ -224,7 +223,7 @@ const ConnectedTestCaseView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(TestCaseView, { testCases: problem.value.testCases }),
+            h(TestCaseView, { testCases: problem.value.testCases ?? [] }),
           )
         : h(
             "div",

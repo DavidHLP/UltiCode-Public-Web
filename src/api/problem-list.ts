@@ -2,13 +2,14 @@ import { apiGet } from "@/utils/request";
 import type { Problem } from "@/types/problem";
 import type {
   ProblemList,
+  ProblemListGroup,
   ProblemListStats,
   ProblemListId,
   ProblemListItem,
 } from "@/types/problem-list";
 
-export async function fetchProblemLists(): Promise<ProblemList[]> {
-  return apiGet<ProblemList[]>("/problem-lists");
+export async function fetchProblemLists(): Promise<ProblemListGroup[]> {
+  return apiGet<ProblemListGroup[]>("/problem-lists");
 }
 
 export async function fetchProblemListItem(

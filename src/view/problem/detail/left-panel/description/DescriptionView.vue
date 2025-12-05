@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { ProblemDetail } from "@/mocks/schema/problem-detail.ts";
+import type { ProblemDetail } from "@/types/problem-detail";
 import DescriptionMarkdown, {
   type ProblemDescription,
 } from "./DescriptionMarkdown.vue";
@@ -62,13 +62,17 @@ const acceptanceRate = computed(() => {
  */
 const problemDescription = computed<ProblemDescription>(() => ({
   content: props.problem.summary || "",
-  examples: props.problem.examples.map((example) => ({
-    input: example.input,
-    output: example.output,
-    explanation: example.explanation,
-  })),
+  examples: props.problem.examples.map((example) => {
+    const ex = example as { input: string; output: string; explanation?: string };
+    return {
+      input: ex.input,
+      output: ex.output,
+      explanation: ex.explanation,
+    };
+  }),
   constraints: props.problem.constraints || [],
   followUp: props.problem.followUp,
+  starterNotes: props.problem.starterNotes ?? "",
 }));
 </script>
 

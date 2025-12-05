@@ -3,7 +3,7 @@ import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
-import type { SubmissionRecord } from "@/mocks/schema/submission";
+import type { SubmissionRecord } from "@/types/submission";
 import { Clock, Microchip, Sparkles } from "lucide-vue-next";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
@@ -20,7 +20,8 @@ const props = defineProps({
   } as const,
 });
 
-const parseMs = (value: string) => {
+const parseMs = (value: string | number) => {
+  if (typeof value === 'number') return value;
   const m = /([0-9]+)\s*ms/.exec(value);
   return m ? Number(m[1]) : null;
 };
@@ -28,11 +29,12 @@ const parseMs = (value: string) => {
 const runtimeMs = computed(() =>
   props.submission ? parseMs(props.submission.runtime) : null,
 );
+
 const distBins = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs ?? [],
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? [],
 );
 const distCounts = computed<number[]>(
-  () => props.submission?.runtimeDist ?? [],
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? [],
 );
 const distLength = computed(() =>
   Math.min(distCounts.value.length, distBins.value.length),
@@ -453,7 +455,7 @@ const codeMarkdown = computed(() => {
           </div>
           <span class="text-muted-foreground flex-none whitespace-nowrap">
             Submitted&nbsp;<span class="max-w-full truncate">{{
-              new Date(props.submission.submittedAt).toLocaleString("en-US", {
+              new Date(props.submission.submittedAt ?? props.submission.created_at).toLocaleString("en-US", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -497,17 +499,12 @@ const codeMarkdown = computed(() => {
               </div>
             </div>
             <div class="mt-1.5 flex items-center gap-1">
-              <span class="text-foreground text-base font-semibold">{{
-                props.submission.runtime.replace(" ms", "")
-              }}</span>
-              <span class="text-muted-foreground text-xs">ms</span>
-              <div class="w-px h-2.5 bg-border mx-0.5"></div>
-              <span class="text-muted-foreground text-[11px] capitalize"
-                >Beats</span
-              >
-              <span class="text-foreground text-base font-semibold"
-                >{{ props.submission.runtimePercentile }}%</span
-              >
+              <span class="font-medium text-foreground">
+        {{ props.submission.runtime.toString().replace("ms", "") }} ms
+      </span>
+      <span class="text-muted-foreground">
+        Beats {{ (props.submission.runtimePercentile ?? 0).toFixed(1) }}%
+      </span>
             </div>
             <div
               class="mt-0.5 flex w-fit cursor-pointer gap-0.5 text-[11px] opacity-0 group-hover:opacity-100"
@@ -533,17 +530,12 @@ const codeMarkdown = computed(() => {
               </div>
             </div>
             <div class="mt-1.5 flex items-center gap-1">
-              <span class="text-foreground text-base font-semibold">{{
-                props.submission.memory.replace(" MB", "")
-              }}</span>
-              <span class="text-muted-foreground text-xs">MB</span>
-              <div class="w-px h-2.5 bg-border mx-0.5"></div>
-              <span class="text-muted-foreground text-[11px] capitalize"
-                >Beats</span
-              >
-              <span class="text-foreground text-base font-semibold"
-                >{{ props.submission.memoryPercentile }}%</span
-              >
+      <span class="font-medium text-foreground">
+        {{ props.submission.memory.toString().replace("MB", "") }} MB
+      </span>
+      <span class="text-muted-foreground">
+        Beats {{ (props.submission.memoryPercentile ?? 0).toFixed(1) }}%
+      </span>
             </div>
             <div
               class="mt-0.5 flex w-fit cursor-pointer gap-0.5 text-[11px] opacity-0 group-hover:opacity-100"

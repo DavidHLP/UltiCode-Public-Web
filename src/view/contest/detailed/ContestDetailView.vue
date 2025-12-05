@@ -5,7 +5,7 @@ import { fetchContestDetail, fetchContestRanking } from "@/api/contest";
 import type {
   ContestDetail,
   ContestRankingEntry,
-} from "@/mocks/schema/contest";
+} from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,13 @@ function formatDateTime(isoString: string): string {
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+// 计算时长
+function getDurationMinutes(startTime: string, endTime: string): number {
+  const start = new Date(startTime).getTime();
+  const end = new Date(endTime).getTime();
+  return Math.floor((end - start) / (1000 * 60));
 }
 
 // 获取难度颜色
@@ -180,7 +187,7 @@ function getCountryFlag(countryCode: string): string {
                     开始时间
                   </p>
                   <p class="text-base font-semibold">
-                    {{ formatDateTime(contest.startTime) }}
+                    {{ formatDateTime(contest.start_time) }}
                   </p>
                 </div>
               </div>
@@ -195,7 +202,7 @@ function getCountryFlag(countryCode: string): string {
                     比赛时长
                   </p>
                   <p class="text-base font-semibold">
-                    {{ contest.durationMinutes }} 分钟
+                    {{ getDurationMinutes(contest.start_time, contest.end_time) }} 分钟
                   </p>
                 </div>
               </div>
@@ -210,7 +217,7 @@ function getCountryFlag(countryCode: string): string {
                     参赛人数
                   </p>
                   <p class="text-base font-semibold">
-                    {{ contest.participantCount }} 人
+                    {{ contest.participant_count }} 人
                   </p>
                 </div>
               </div>
@@ -270,7 +277,7 @@ function getCountryFlag(countryCode: string): string {
                         <div
                           class="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-mono text-sm font-bold"
                         >
-                          {{ problem.problemIndex }}
+                          {{ problem.problemIndex || '#' }}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -278,7 +285,7 @@ function getCountryFlag(countryCode: string): string {
                           <router-link
                             :to="{
                               name: 'problem-detail',
-                              params: { id: problem.problemId },
+                              params: { id: problem.problemId || problem.id },
                             }"
                             class="font-semibold hover:text-primary"
                           >
@@ -289,9 +296,9 @@ function getCountryFlag(countryCode: string): string {
                           >
                             <span class="flex items-center gap-1">
                               <Target class="h-3 w-3" />
-                              {{ problem.solvedCount }} 通过
+                              {{ problem.solvedCount || 0 }} 通过
                             </span>
-                            <span>{{ problem.submissionCount }} 提交</span>
+                            <span>{{ problem.submissionCount || 0 }} 提交</span>
                           </div>
                         </div>
                       </TableCell>
@@ -311,12 +318,12 @@ function getCountryFlag(countryCode: string): string {
                           class="inline-flex items-center gap-1 font-semibold"
                         >
                           <Award class="h-4 w-4 text-yellow-600" />
-                          {{ problem.score }}
+                          {{ problem.score || 0 }}
                         </span>
                       </TableCell>
                       <TableCell class="text-center">
                         <span class="font-medium">{{
-                          problem.acceptanceRate
+                          problem.acceptanceRate || '0%'
                         }}</span>
                       </TableCell>
                       <TableCell class="pr-6">
@@ -327,7 +334,7 @@ function getCountryFlag(countryCode: string): string {
                           @click="
                             $router.push({
                               name: 'problem-detail',
-                              params: { id: problem.problemId },
+                              params: { id: problem.problemId || problem.id },
                             })
                           "
                         >
@@ -367,7 +374,7 @@ function getCountryFlag(countryCode: string): string {
                   <TableBody>
                     <TableRow
                       v-for="entry in rankings.slice(0, 20)"
-                      :key="entry.id"
+                      :key="entry.username"
                       class="group"
                     >
                       <TableCell class="pl-6">
@@ -390,14 +397,14 @@ function getCountryFlag(countryCode: string): string {
                         <div class="space-y-1">
                           <div class="flex items-center gap-2">
                             <span class="text-lg">{{
-                              getCountryFlag(entry.country)
+                              getCountryFlag(entry.country || 'CN')
                             }}</span>
                             <span class="font-semibold">{{
                               entry.username
                             }}</span>
                           </div>
                           <p class="text-sm text-muted-foreground">
-                            {{ entry.ratingBefore }} → {{ entry.ratingAfter }}
+                            {{ entry.ratingBefore || 1500 }} → {{ entry.ratingAfter || 1500 }}
                           </p>
                         </div>
                       </TableCell>
@@ -406,13 +413,13 @@ function getCountryFlag(countryCode: string): string {
                       </TableCell>
                       <TableCell class="text-center">
                         <span class="font-mono text-sm">{{
-                          entry.finishTime
+                          entry.finish_time
                         }}</span>
                       </TableCell>
                       <TableCell>
                         <div class="flex flex-wrap gap-1">
                           <Badge
-                            v-for="result in entry.problemResults"
+                            v-for="result in entry.problemResults || []"
                             :key="result.index"
                             :variant="result.solved ? 'default' : 'secondary'"
                             class="min-w-[2rem] justify-center font-mono text-xs"
@@ -429,22 +436,22 @@ function getCountryFlag(countryCode: string): string {
                           class="inline-flex items-center gap-1 rounded-md px-2 py-1 font-semibold"
                           :class="{
                             'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400':
-                              entry.ratingChange > 0,
+                              (entry.ratingChange || 0) > 0,
                             'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400':
-                              entry.ratingChange < 0,
-                            'text-muted-foreground': entry.ratingChange === 0,
+                              (entry.ratingChange || 0) < 0,
+                            'text-muted-foreground': (entry.ratingChange || 0) === 0,
                           }"
                         >
                           <TrendingUp
-                            v-if="entry.ratingChange > 0"
+                            v-if="(entry.ratingChange || 0) > 0"
                             class="h-4 w-4"
                           />
                           <TrendingDown
-                            v-else-if="entry.ratingChange < 0"
+                            v-else-if="(entry.ratingChange || 0) < 0"
                             class="h-4 w-4"
                           />
-                          {{ entry.ratingChange > 0 ? "+" : ""
-                          }}{{ entry.ratingChange }}
+                          {{ (entry.ratingChange || 0) > 0 ? "+" : ""
+                          }}{{ entry.ratingChange || 0 }}
                         </div>
                       </TableCell>
                     </TableRow>

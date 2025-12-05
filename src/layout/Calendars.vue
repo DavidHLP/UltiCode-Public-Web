@@ -6,11 +6,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-vue-next";
-import type { ProblemList } from "@/mocks/schema/problem-list";
+import type { ProblemListGroup } from "@/types/problem-list";
 import { RouterLink } from "vue-router";
 
 defineProps<{
-  problemLists: ProblemList[];
+  problemLists: ProblemListGroup[];
 }>();
 </script>
 
@@ -25,14 +25,14 @@ defineProps<{
       </CollapsibleTrigger>
       <CollapsibleContent class="py-2">
         <ul class="space-y-1">
-          <li v-for="item in list.items" :key="item.id">
+          <li v-for="item in list.lists" :key="item.id">
             <RouterLink
               :to="`/problem/problem-list/${item.id}`"
               class="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               <span class="flex-1 truncate">{{ item.name }}</span>
               <span class="text-xs text-muted-foreground">{{
-                item.problemCount
+                item.problem_count
               }}</span>
             </RouterLink>
           </li>

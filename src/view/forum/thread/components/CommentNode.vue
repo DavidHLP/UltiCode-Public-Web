@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ForumComment } from "@/mocks/schema/forum.ts";
+import type { ForumComment } from "@/types/forum.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowBigUp, Pin, Lock, MessageSquare, MinusSquare, PlusSquare } from "lucide-vue-next";
 import { computed, ref } from "vue";

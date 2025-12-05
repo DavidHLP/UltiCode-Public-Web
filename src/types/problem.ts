@@ -4,6 +4,9 @@ export interface Problem {
   slug: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   acceptance_rate: number;
+  acceptanceRate?: number; // alias or computed
   tags: string[];
   status?: 'solved' | 'attempted' | 'todo';
+  isPremium?: boolean;
+  hasSolution?: boolean;
 }

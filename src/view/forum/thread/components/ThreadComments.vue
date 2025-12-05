@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ForumComment } from "@/mocks/schema/forum.ts";
+import type { ForumComment } from "@/types/forum.ts";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-vue-next";

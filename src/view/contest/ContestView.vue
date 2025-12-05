@@ -8,7 +8,7 @@ import {
 import type {
   ContestListItem,
   GlobalRankingEntry,
-} from "@/mocks/schema/contest";
+} from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,13 @@ function getCountdown(startTime: string): string {
     return `${days} 天 ${hours} 小时 ${minutes} 分 ${seconds} 秒`;
   }
   return `${hours} 小时 ${minutes} 分 ${seconds} 秒`;
+}
+
+// 计算时长
+function getDurationMinutes(startTime: string, endTime: string): number {
+  const start = new Date(startTime).getTime();
+  const end = new Date(endTime).getTime();
+  return Math.floor((end - start) / (1000 * 60));
 }
 
 // 获取竞赛类型标签
@@ -171,7 +178,7 @@ function getCountryFlag(countryCode: string): string {
                   <div class="space-y-2">
                     <div class="flex items-center gap-2">
                       <Badge variant="outline">
-                        {{ getContestTypeLabel(nextContest.type) }}
+                        {{ getContestTypeLabel(nextContest.type || 'weekly') }}
                       </Badge>
                       <Badge v-if="nextContest.isRated" variant="default">
                         计分
@@ -188,22 +195,22 @@ function getCountryFlag(countryCode: string): string {
                 <div class="grid gap-4 md:grid-cols-3">
                   <div class="flex items-center gap-2 text-sm">
                     <Calendar class="h-4 w-4 text-muted-foreground" />
-                    <span>{{ formatDateTime(nextContest.startTime) }}</span>
+                    <span>{{ formatDateTime(nextContest.start_time) }}</span>
                   </div>
                   <div class="flex items-center gap-2 text-sm">
                     <Clock class="h-4 w-4 text-muted-foreground" />
-                    <span>{{ nextContest.durationMinutes }} 分钟</span>
+                    <span>{{ getDurationMinutes(nextContest.start_time, nextContest.end_time) }} 分钟</span>
                   </div>
                   <div class="flex items-center gap-2 text-sm">
                     <Users class="h-4 w-4 text-muted-foreground" />
-                    <span>{{ nextContest.registeredCount }} 人已报名</span>
+                    <span>{{ nextContest.participant_count }} 人已报名</span>
                   </div>
                 </div>
 
                 <div class="rounded-lg bg-primary/10 p-4">
                   <p class="mb-2 text-sm font-medium">距离开始还有:</p>
                   <p class="text-2xl font-bold text-primary">
-                    {{ getCountdown(nextContest.startTime) }}
+                    {{ getCountdown(nextContest.start_time) }}
                   </p>
                 </div>
 
@@ -263,16 +270,16 @@ function getCountryFlag(countryCode: string): string {
                   <TableCell>
                     <div class="flex items-center gap-2">
                       <Badge variant="outline" class="text-xs">
-                        {{ getContestTypeLabel(contest.type) }}
+                        {{ getContestTypeLabel(contest.type || 'weekly') }}
                       </Badge>
                       <span class="font-semibold">{{ contest.title }}</span>
                     </div>
                   </TableCell>
                   <TableCell class="text-sm text-muted-foreground">
-                    {{ formatDateTime(contest.startTime) }}
+                    {{ formatDateTime(contest.start_time) }}
                   </TableCell>
                   <TableCell class="text-right text-sm">
-                    {{ contest.durationMinutes }} 分钟
+                    {{ getDurationMinutes(contest.start_time, contest.end_time) }} 分钟
                   </TableCell>
                   <TableCell class="text-right">
                     <Button
@@ -307,7 +314,7 @@ function getCountryFlag(countryCode: string): string {
             <CardContent class="space-y-3">
               <div
                 v-for="(user, index) in globalRankings.slice(0, 10)"
-                :key="user.id"
+                :key="user.username"
                 class="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50"
               >
                 <div
@@ -342,8 +349,8 @@ function getCountryFlag(countryCode: string): string {
                     </Badge>
                   </div>
                   <p class="text-xs text-muted-foreground">
-                    {{ getCountryFlag(user.country) }}
-                    {{ user.rating }} 分 · {{ user.contestsAttended }} 场
+                    {{ getCountryFlag(user.country || 'CN') }}
+                    {{ user.rating }} 分 · {{ user.contestsAttended || 0 }} 场
                   </p>
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import type { ProblemTestCase } from "@/mocks/schema/problem-detail";
+import type { ProblemTestCase } from "@/types/problem-detail";
 
 const activeCaseLabel = ref<string | null>(null);
 const testCases = ref<ProblemTestCase[]>([]);

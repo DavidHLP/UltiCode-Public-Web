@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ForumAward } from "@/mocks/schema/forum.ts";
+import type { ForumAward } from "@/types/forum";
 
 defineProps<{
   awards: ForumAward[];

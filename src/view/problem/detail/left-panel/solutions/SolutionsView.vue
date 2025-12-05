@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import type { SolutionFeedItem } from "@/mocks/schema/solution";
+import type { SolutionFeedItem } from "@/types/solution";
 import SolutionsListView from "./SolutionsListView.vue";
 import SolutionsDetail from "./components/SolutionsDetail.vue";
 import { fetchSolutionFeed } from "@/api/solution";

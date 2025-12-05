@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import SubmissionsListView from "./SubmissionsListView.vue";
 import SubmissionsDetail from "./SubmissionsDetail.vue";
-import type { SubmissionRecord } from "@/mocks/schema/submission";
+import type { SubmissionRecord } from "@/types/submission";
 import { fetchProblemSubmissions } from "@/api/submission";
 
 const props = defineProps<{

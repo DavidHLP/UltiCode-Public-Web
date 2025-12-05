@@ -21,8 +21,8 @@ import type {
   ProblemDetail,
   ProblemInteractionCounts,
   ProblemInteractionSnapshot,
-  ProblemReaction,
-} from "@/mocks/schema/problem-detail";
+  ProblemReactionType,
+} from "@/types/problem-detail";
 
 interface Props {
   currentLayout: "leet" | "classic" | "compact" | "wide";
@@ -40,8 +40,8 @@ const interactionCounts = ref<ProblemInteractionCounts>({
   favorites: 0,
 });
 
-const viewerInteraction = ref<ProblemInteractionSnapshot["viewer"]>({
-  reaction: null,
+const viewerInteraction = ref<NonNullable<ProblemInteractionSnapshot["viewer"]>>({
+  reaction: undefined,
   isFavorite: false,
 });
 
@@ -50,7 +50,9 @@ watch(
   (interactions) => {
     if (!interactions) return;
     interactionCounts.value = { ...interactions.counts };
-    viewerInteraction.value = { ...interactions.viewer };
+    viewerInteraction.value = interactions.viewer
+      ? { ...interactions.viewer }
+      : { reaction: undefined, isFavorite: false };
   },
   { immediate: true, deep: true },
 );
@@ -62,7 +64,7 @@ const isDisliked = computed(
 );
 const isFavorited = computed(() => viewerInteraction.value.isFavorite);
 
-const adjustReactionCount = (reaction: ProblemReaction, delta: number) => {
+const adjustReactionCount = (reaction: ProblemReactionType, delta: number) => {
   if (reaction === "like") {
     interactionCounts.value.likes = Math.max(
       0,
@@ -76,12 +78,12 @@ const adjustReactionCount = (reaction: ProblemReaction, delta: number) => {
   }
 };
 
-const toggleReaction = (reaction: ProblemReaction) => {
+const toggleReaction = (reaction: ProblemReactionType) => {
   if (!reaction) return;
   const previous = viewerInteraction.value.reaction;
   if (previous === reaction) {
     adjustReactionCount(reaction, -1);
-    viewerInteraction.value.reaction = null;
+    viewerInteraction.value.reaction = undefined;
     return;
   }
 

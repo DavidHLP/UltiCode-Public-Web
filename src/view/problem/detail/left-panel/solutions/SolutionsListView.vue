@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import type { SolutionFeedItem } from "@/mocks/schema/solution";
+import type { SolutionFeedItem } from "@/types/solution";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {

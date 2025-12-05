@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SolutionFeedItem } from "@/mocks/schema/solution.ts";
+import type { SolutionFeedItem } from "@/types/solution";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Badge from "../../../../../../components/ui/badge/Badge.vue";
@@ -47,7 +47,7 @@ const topicLabel = computed(
             {{ props.item.author.role }}
           </span>
           <span class="text-xs text-muted-foreground">
-            · {{ props.item.createdAt }}
+            · {{ props.item.created_at }}
           </span>
           <Badge
             v-if="props.item.flair"

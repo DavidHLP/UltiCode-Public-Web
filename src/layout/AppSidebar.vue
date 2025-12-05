@@ -5,7 +5,7 @@ import { fetchProblemLists } from "@/api/problem-list";
 import DatePicker from "@/layout/DatePicker.vue";
 import NavUser from "@/layout/NavUser.vue";
 import { onMounted, ref } from "vue";
-import type { ProblemList } from "@/mocks/schema/problem-list";
+import type { ProblemListGroup } from "@/types/problem-list";
 import {
   Sidebar,
   SidebarContent,
@@ -25,7 +25,7 @@ const data = {
   },
 };
 
-const problemLists = ref<ProblemList[]>([]);
+const problemLists = ref<ProblemListGroup[]>([]);
 
 onMounted(async () => {
   try {
