@@ -59,7 +59,11 @@ const difficultyClass = (difficulty: Problem["difficulty"]) => {
   }
 };
 
-const formatAcceptance = (value: number) => `${value.toFixed(1)}%`;
+const formatAcceptance = (value: number | string | undefined | null) => {
+  if (value === undefined || value === null) return "-";
+  const num = Number(value);
+  return isNaN(num) ? "-" : `${num.toFixed(1)}%`;
+};
 
 const handleScroll = () => {
   const buffer = 200; // Number of pixels from the bottom to trigger load more
