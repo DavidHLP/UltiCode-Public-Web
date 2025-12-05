@@ -2,10 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { fetchContestDetail, fetchContestRanking } from "@/api/contest";
-import type {
-  ContestDetail,
-  ContestRankingEntry,
-} from "@/types/contest";
+import type { ContestDetail, ContestRankingEntry } from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -202,7 +199,10 @@ function getCountryFlag(countryCode: string): string {
                     比赛时长
                   </p>
                   <p class="text-base font-semibold">
-                    {{ getDurationMinutes(contest.start_time, contest.end_time) }} 分钟
+                    {{
+                      getDurationMinutes(contest.start_time, contest.end_time)
+                    }}
+                    分钟
                   </p>
                 </div>
               </div>
@@ -277,7 +277,7 @@ function getCountryFlag(countryCode: string): string {
                         <div
                           class="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-mono text-sm font-bold"
                         >
-                          {{ problem.problemIndex || '#' }}
+                          {{ problem.problemIndex || "#" }}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -306,7 +306,7 @@ function getCountryFlag(countryCode: string): string {
                         <Badge
                           variant="outline"
                           :class="[
-                            getDifficultyColor(problem.difficulty),
+                            getDifficultyColor(problem.difficulty || 'Medium'),
                             'font-medium',
                           ]"
                         >
@@ -323,7 +323,7 @@ function getCountryFlag(countryCode: string): string {
                       </TableCell>
                       <TableCell class="text-center">
                         <span class="font-medium">{{
-                          problem.acceptanceRate || '0%'
+                          problem.acceptanceRate || "0%"
                         }}</span>
                       </TableCell>
                       <TableCell class="pr-6">
@@ -397,14 +397,15 @@ function getCountryFlag(countryCode: string): string {
                         <div class="space-y-1">
                           <div class="flex items-center gap-2">
                             <span class="text-lg">{{
-                              getCountryFlag(entry.country || 'CN')
+                              getCountryFlag(entry.country || "CN")
                             }}</span>
                             <span class="font-semibold">{{
                               entry.username
                             }}</span>
                           </div>
                           <p class="text-sm text-muted-foreground">
-                            {{ entry.ratingBefore || 1500 }} → {{ entry.ratingAfter || 1500 }}
+                            {{ entry.ratingBefore || 1500 }} →
+                            {{ entry.ratingAfter || 1500 }}
                           </p>
                         </div>
                       </TableCell>
@@ -439,7 +440,8 @@ function getCountryFlag(countryCode: string): string {
                               (entry.ratingChange || 0) > 0,
                             'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400':
                               (entry.ratingChange || 0) < 0,
-                            'text-muted-foreground': (entry.ratingChange || 0) === 0,
+                            'text-muted-foreground':
+                              (entry.ratingChange || 0) === 0,
                           }"
                         >
                           <TrendingUp
