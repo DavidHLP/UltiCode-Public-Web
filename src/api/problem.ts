@@ -1,5 +1,5 @@
-import type { Problem } from "@/mocks/schema/problem";
-import { apiGet } from "@/api/client";
+import type { Problem } from "@/types/problem";
+import { apiGet } from "@/utils/request";
 
 export async function fetchProblems(): Promise<Problem[]> {
   return apiGet<Problem[]>("/problems");

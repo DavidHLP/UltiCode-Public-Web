@@ -1,5 +1,5 @@
-import { apiGet } from "@/api/client";
-import type { ProblemRunResult } from "@/mocks/schema/test-results";
+import { apiGet } from "@/utils/request";
+import type { ProblemRunResult } from "@/types/test-results";
 
 export async function fetchProblemRunResultByProblemId(
   problemId: number,

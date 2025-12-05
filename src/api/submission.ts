@@ -1,5 +1,5 @@
-import { apiGet } from "@/api/client";
-import type { SubmissionRecord } from "@/mocks/schema/submission";
+import { apiGet } from "@/utils/request";
+import type { SubmissionRecord } from "@/types/submission";
 
 export async function fetchProblemSubmissions(
   problemId: number,

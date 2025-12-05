@@ -17,8 +17,8 @@ import {
 import type {
   ProblemListItem,
   ProblemListStats,
-} from "@/mocks/schema/problem-list";
-import type { Problem } from "@/mocks/schema/problem";
+} from "@/types/problem-list";
+import type { Problem } from "@/types/problem";
 import {
   fetchProblemListItem,
   fetchProblemListStats,
@@ -88,13 +88,14 @@ watch(
 );
 
 // 格式化日期
-const formatDate = (date?: Date) => {
+const formatDate = (date?: Date | string) => {
   if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  }).format(date);
+  }).format(d);
 };
 
 const statusCategories: Array<"Solved" | "Attempted" | "Todo"> = [
@@ -173,7 +174,7 @@ const progressMomentum = computed(() => {
       "Solved Share": Number(((solved / total) * 100).toFixed(1)),
       "Attempted Share": Number(((attempted / total) * 100).toFixed(1)),
       "Todo Share": Number(((todo / total) * 100).toFixed(1)),
-      "Acceptance Rate": Number(problem.acceptanceRate.toFixed(1)),
+      "Acceptance Rate": Number(problem.acceptance_rate.toFixed(1)),
     };
   });
 });

@@ -1,11 +1,11 @@
-import { apiGet } from "@/api/client";
-import type { Problem } from "@/mocks/schema/problem";
+import { apiGet } from "@/utils/request";
+import type { Problem } from "@/types/problem";
 import type {
   ProblemList,
+  ProblemListStats,
   ProblemListId,
   ProblemListItem,
-  ProblemListStats,
-} from "@/mocks/schema/problem-list";
+} from "@/types/problem-list";
 
 export async function fetchProblemLists(): Promise<ProblemList[]> {
   return apiGet<ProblemList[]>("/problem-lists");

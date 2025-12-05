@@ -1,5 +1,5 @@
-import type { ProblemDetail } from "@/mocks/schema/problem-detail";
-import { apiGet } from "@/api/client";
+import type { ProblemDetail } from "@/types/problem-detail";
+import { apiGet } from "@/utils/request";
 
 export async function fetchProblemDetailById(
   id: number,

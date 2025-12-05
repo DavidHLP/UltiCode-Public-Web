@@ -1,11 +1,11 @@
-import { apiGet } from "@/api/client";
+import { apiGet } from "@/utils/request";
 import type {
   ContestListItem,
   ContestDetail,
   ContestRankingEntry,
   GlobalRankingEntry,
   ContestStats,
-} from "@/mocks/schema/contest";
+} from "@/types/contest";
 
 /**
  * 获取所有竞赛列表

@@ -1,5 +1,5 @@
-import { apiGet } from "@/api/client";
-import type { SolutionTopicsResponse } from "@/mocks/schema/topic";
+import { apiGet } from "@/utils/request";
+import type { SolutionTopicsResponse } from "@/types/topic";
 
 export async function fetchSolutionTopics(): Promise<SolutionTopicsResponse> {
   return apiGet<SolutionTopicsResponse>("/solution-topics");

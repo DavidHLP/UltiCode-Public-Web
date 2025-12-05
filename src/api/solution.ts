@@ -1,5 +1,5 @@
-import { apiGet } from "@/api/client";
-import type { SolutionFeedResponse } from "@/mocks/schema/solution";
+import { apiGet } from "@/utils/request";
+import type { SolutionFeedResponse } from "@/types/solution";
 
 export async function fetchSolutionFeed(
   problemId: number,

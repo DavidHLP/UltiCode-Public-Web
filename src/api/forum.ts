@@ -1,11 +1,11 @@
-import { apiGet, apiPost } from "@/api/client";
+import { apiGet, apiPost } from "@/utils/request";
 import type {
   ForumCommunity,
   ForumModerator,
   ForumPost,
   ForumThread,
   ForumTrendingTopic,
-} from "@/mocks/schema/forum";
+} from "@/types/forum";
 
 export async function fetchForumPosts(): Promise<ForumPost[]> {
   return apiGet<ForumPost[]>("/forum/posts");
