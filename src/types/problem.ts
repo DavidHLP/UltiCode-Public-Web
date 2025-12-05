@@ -9,4 +9,5 @@ export interface Problem {
   status?: 'solved' | 'attempted' | 'todo';
   isPremium?: boolean;
   hasSolution?: boolean;
+  completedTime?: string; // Frontend specific
 }

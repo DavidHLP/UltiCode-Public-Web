@@ -30,7 +30,7 @@ const difficultyClass = computed(() => {
 const showTags = ref(false);
 const showCompanies = ref(false);
 
-const reactionCounts = computed(() => props.problem.interactions.counts);
+const reactionCounts = computed(() => props.problem.interactions?.counts ?? { likes: 0, dislikes: 0, favorites: 0 });
 
 // Refs for accordion sections
 const tagsSection = ref<HTMLElement | null>(null);
@@ -72,7 +72,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
   }),
   constraints: props.problem.constraints || [],
   followUp: props.problem.followUp,
-  starterNotes: props.problem.starterNotes ?? "",
+  starterNotes: props.problem.starterNotes ?? [],
 }));
 </script>
 
@@ -129,7 +129,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
         <!-- Hint Button -->
         <button
-          v-if="props.problem.followUp || props.problem.starterNotes.length"
+          v-if="props.problem.followUp || props.problem.starterNotes?.length"
           class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
           @click="scrollToSection((hintsSection as any)?.$el)"
         >
@@ -172,10 +172,10 @@ const problemDescription = computed<ProblemDescription>(() => ({
       >
         <span
           v-for="company in props.problem.companies"
-          :key="company"
+          :key="company.id"
           class="rounded-full bg-muted px-3 py-1 text-[11px] font-medium text-foreground"
         >
-          {{ company }}
+          {{ company.name }}
         </span>
       </section>
 
@@ -272,10 +272,10 @@ const problemDescription = computed<ProblemDescription>(() => ({
               <div class="mt-2 flex flex-wrap gap-1 pl-7">
                 <span
                   v-for="company in props.problem.companies"
-                  :key="company"
+                  :key="company.id"
                   class="rounded-full bg-muted px-2 py-1 text-xs text-foreground"
                 >
-                  {{ company }}
+                  {{ company.name }}
                 </span>
               </div>
             </AccordionContent>
@@ -283,7 +283,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
 
           <!-- Hints -->
           <AccordionItem
-            v-if="props.problem.starterNotes.length"
+            v-if="props.problem.starterNotes?.length"
             ref="hintsSection"
             value="hints"
           >

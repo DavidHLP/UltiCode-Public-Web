@@ -48,30 +48,29 @@ const fallbackSolution = computed<SolutionFeedItem>(() => ({
   author: {
     id: "author-fallback",
     name: "Editorial",
+    username: "editorial",
     role: "System Note",
     avatarColor: "#94a3b8",
   },
   tags: [],
   stats: {
     likes: 0,
-    views: "0",
+    views: 0,
     comments: 0,
   },
-  views: "0",
+  views: 0,
+  votes: 0,
   likes: 0,
   comments: 0,
-  createdAt: "—",
+  created_at: "—",
   publishedAt: new Date().toISOString(),
-  topic: "general",
-  languageFilter: "all",
-  score: 0,
-  steps: [],
-  code: "",
-  language: "text",
-  complexity: {
-    time: "-",
-    space: "-",
+  topic: {
+    id: "general",
+    name: "General",
   },
+  languageFilter: "all",
+  language: "markdown",
+  score: 0,
   content: props.followUp, // Markdown 内容
 }));
 

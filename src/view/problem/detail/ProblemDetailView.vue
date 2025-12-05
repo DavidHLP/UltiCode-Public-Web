@@ -90,7 +90,12 @@ const buildRunResultFromCases = (
       detail: "Sample run using provided inputs.",
       output,
       expectedOutput: output,
-      inputs: testCase.inputs ?? [],
+      inputs: testCase.inputs?.map(input => ({
+        id: input.id ?? `input-${index}-${input.name}`,
+        label: input.label ?? input.name,
+        name: input.name,
+        value: input.value
+      })) ?? [],
     };
   });
 

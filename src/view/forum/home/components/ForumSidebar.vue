@@ -3,7 +3,7 @@ import type {
   ForumCommunity,
   ForumModerator,
   ForumTrendingTopic,
-} from "@/mocks/schema/forum";
+} from "@/types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,9 @@ const formatter = new Intl.NumberFormat("en", { notation: "compact" });
 const communityLookup = computed(() => {
   return communities.reduce<Record<string, ForumCommunity>>(
     (lookup, community) => {
+      if (community.slug) {
       lookup[community.slug] = community;
+    }
       return lookup;
     },
     {},
@@ -57,7 +59,7 @@ const getCommunityName = (slug: string) =>
 const getCommunityOnline = (slug: string) => {
   const community = communityLookup.value[slug];
   if (!community) return "";
-  return `${formatter.format(community.online)} online`;
+  return `${formatter.format(community.online ?? 0)} online`;
 };
 </script>
 
@@ -89,8 +91,8 @@ const getCommunityOnline = (slug: string) => {
             <article class="space-y-1">
               <p class="font-medium text-foreground">{{ topic.title }}</p>
               <p class="text-[11px] text-muted-foreground">
-                {{ getCommunityName(topic.communityId) }} ·
-                {{ getCommunityOnline(topic.communityId) }}
+                {{ getCommunityName(topic.communityId ?? '') }} ·
+                {{ getCommunityOnline(topic.communityId ?? '') }}
               </p>
             </article>
             <Badge
@@ -158,8 +160,8 @@ const getCommunityOnline = (slug: string) => {
                       </span>
                     </div>
                     <p class="text-[11px] text-muted-foreground">
-                      {{ formatter.format(community.members) }} members ·
-                      {{ formatter.format(community.online) }} online
+                      {{ formatter.format(community.members ?? 0) }} members ·
+                      {{ formatter.format(community.online ?? 0) }} online
                     </p>
                     <p
                       v-if="community.foundedAt"

@@ -2,7 +2,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { SidebarGroup, SidebarGroupContent } from "@/components/ui/sidebar";
 import { fetchProblems } from "@/api/problem";
-import type { Problem } from "@/mocks/schema/problem";
+import type { Problem } from "@/types/problem";
 import { computed, onMounted, ref } from "vue";
 import { getLocalTimeZone, today } from "@internationalized/date";
 

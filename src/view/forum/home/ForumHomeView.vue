@@ -95,7 +95,7 @@ const filteredPosts = computed(() => {
 
     const matchesCommunity =
       selectedCommunity.value === "all" ||
-      post.community.slug === selectedCommunity.value;
+      post.community?.slug === selectedCommunity.value;
 
     const matchesFlair =
       selectedFlair.value === "all" || post.flair?.type === selectedFlair.value;
@@ -107,11 +107,11 @@ const filteredPosts = computed(() => {
 const sortedPosts = computed(() => {
   const posts = [...filteredPosts.value];
   const sorters: Record<string, (a: ForumPost, b: ForumPost) => number> = {
-    hot: (a, b) => b.stats.score - a.stats.score,
+    hot: (a, b) => (b.stats?.score ?? 0) - (a.stats?.score ?? 0),
     new: (a, b) =>
-      new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
-    top: (a, b) => b.stats.saves - a.stats.saves,
-    rising: (a, b) => b.stats.shares - a.stats.shares,
+      new Date(b.created_at).valueOf() - new Date(a.created_at).valueOf(),
+    top: (a, b) => (b.stats?.saves ?? 0) - (a.stats?.saves ?? 0),
+    rising: (a, b) => (b.stats?.shares ?? 0) - (a.stats?.shares ?? 0),
   };
 
   const sorter = sorters[quickFilter.value] ?? sorters.hot;

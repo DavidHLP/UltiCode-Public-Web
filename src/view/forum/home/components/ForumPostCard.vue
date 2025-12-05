@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ForumFlairType, ForumPost } from "@/mocks/schema/forum";
+import type { ForumFlairType, ForumPost } from "@/types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,18 +31,18 @@ const flairClasses: Record<ForumFlairType, string> = {
   hiring: "bg-orange-100 text-orange-700",
 };
 
-const avatarSrc = computed(() => props.post.user.avatar || undefined);
+const avatarSrc = computed(() => props.post.author.avatar || undefined);
 
 const userInitials = computed(() => {
-  const parts = props.post.user.username.split(/[\s_-]/);
+  const parts = props.post.author.username.split(/[\s_-]/);
   return parts
-    .map((part) => part.charAt(0).toUpperCase())
+    .map((part: string) => part.charAt(0).toUpperCase())
     .join("")
     .slice(0, 2);
 });
 
-const communityIcon = computed(() => props.post.community.icon || "");
-const createdAgo = computed(() => formatRelativeTime(props.post.createdAt));
+const communityIcon = computed(() => props.post.community?.icon || "");
+const createdAgo = computed(() => formatRelativeTime(props.post.createdAt ?? props.post.created_at));
 const recommendationLabel = computed(
   () =>
     (props.post.recommendation as unknown as { label?: string })?.label ?? "",
@@ -79,12 +79,12 @@ const hasAwards = computed(() => awards.value.length > 0);
 const commentPreview = computed(() => props.post.commentPreview ?? []);
 const hasCommentPreview = computed(() => commentPreview.value.length > 0);
 const upvoteRatioDisplay = computed(() => {
-  const ratio = props.post.stats.upvote_ratio;
+  const ratio = props.post.stats?.upvote_ratio;
   if (typeof ratio !== "number") return undefined;
   return `${Math.round(ratio * 100)}%`;
 });
 const viewsDisplay = computed(() => {
-  const views = props.post.stats.views;
+  const views = props.post.stats?.views;
   if (typeof views !== "number") return undefined;
   return formatCount(views);
 });
@@ -102,12 +102,12 @@ const impressionsDisplay = computed(() => {
   return formatCount(impressions);
 });
 
-const karmaDisplay = computed(() => formatCount(props.post.user.karma));
-const scoreDisplay = computed(() => formatCount(props.post.stats.score));
-const commentsDisplay = computed(() => formatCount(props.post.stats.comments));
-const awardsDisplay = computed(() => formatCount(props.post.stats.awards));
-const savesDisplay = computed(() => formatCount(props.post.stats.saves));
-const sharesDisplay = computed(() => formatCount(props.post.stats.shares));
+const karmaDisplay = computed(() => formatCount(props.post.author.karma ?? 0));
+const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
+const commentsDisplay = computed(() => formatCount(props.post.stats?.comments ?? 0));
+const awardsDisplay = computed(() => formatCount(props.post.stats?.awards ?? 0));
+const savesDisplay = computed(() => formatCount(props.post.stats?.saves ?? 0));
+const sharesDisplay = computed(() => formatCount(props.post.stats?.shares ?? 0));
 
 function formatCount(value: number) {
   if (value >= 1000) {
@@ -170,7 +170,7 @@ function formatRelativeTime(value: string) {
             <AvatarImage
               v-if="avatarSrc"
               :src="avatarSrc"
-              :alt="post.user.username"
+              :alt="post.author.username"
             />
             <AvatarFallback class="text-xs font-semibold uppercase">
               {{ userInitials }}
@@ -186,7 +186,7 @@ function formatRelativeTime(value: string) {
                 >
                   {{ communityIcon }}
                 </span>
-                <span class="truncate">{{ post.community.name }}</span>
+                <span class="truncate">{{ post.community?.name }}</span>
               </span>
               <Badge
                 v-if="post.flair"
@@ -196,7 +196,7 @@ function formatRelativeTime(value: string) {
                   flairClasses[post.flair.type],
                 ]"
               >
-                {{ post.flair.label }}
+                {{ props.post.flair?.text ?? '' }}
               </Badge>
               <Badge
                 v-if="post.isPinned"
@@ -215,9 +215,40 @@ function formatRelativeTime(value: string) {
               </span>
             </div>
             <div
+              v-if="props.post.community"
+              class="flex items-center gap-1.5"
+            >
+              <Avatar class="h-4 w-4 rounded-sm">
+                <AvatarImage
+                  v-if="props.post.community.icon"
+                  :src="props.post.community.icon"
+                />
+                <AvatarFallback class="rounded-sm text-[9px]">{{
+                  props.post.community.name.charAt(0)
+                }}</AvatarFallback>
+              </Avatar>
+              <span class="text-xs font-medium text-foreground">{{
+                props.post.community.name
+              }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <Avatar class="h-5 w-5 border border-border">
+
+                <AvatarImage
+                v-if="props.post.author.avatar"
+                v-if="props.post.author?.avatar"
+                :src="props.post.author.avatar"
+              />
+                <AvatarFallback>{{ userInitials }}</AvatarFallback>
+              </Avatar>
+              <span class="font-medium text-foreground hover:underline">{{
+               props.post.author?.username || "U"
+            }}</span>
+            </div>
+            <div
               class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
             >
-              <span>u/{{ post.user.username }}</span>
+              <span>u/{{ post.author?.username }}</span>
               <span>•</span>
               <span>{{ createdAgo }}</span>
               <span>•</span>

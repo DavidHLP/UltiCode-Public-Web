@@ -2,6 +2,7 @@ export interface ForumUser {
   id: string;
   username: string;
   avatar?: string;
+  karma?: number;
 }
 
 export interface ForumCommunity {
@@ -11,6 +12,16 @@ export interface ForumCommunity {
   member_count: number;
   slug?: string;
   icon?: string;
+  banner?: string;
+  isNew?: boolean;
+  isOfficial?: boolean;
+  members?: number;
+  online?: number;
+  foundedAt?: string;
+  tags?: string[];
+  accentColor?: string;
+  rules?: { id: string; title: string; summary: string }[];
+  links?: { label: string; url: string; description?: string }[];
 }
 
 export type ForumFlairType = 'discussion' | 'question' | 'announcement' | 'showcase' | 'hiring';
@@ -18,6 +29,13 @@ export type ForumFlairType = 'discussion' | 'question' | 'announcement' | 'showc
 export interface ForumFlair {
   type: ForumFlairType;
   text?: string;
+}
+
+export interface ForumAward {
+  id: string;
+  icon: string;
+  label: string;
+  count: number;
 }
 
 export interface ForumMediaBase {
@@ -101,12 +119,28 @@ export interface ForumPost {
     score?: number;
     saves?: number;
     shares?: number;
+    upvote_ratio?: number;
+    awards?: number;
   };
   isPinned?: boolean;
   isLocked?: boolean;
   createdAt?: string;
   views?: number;
   media?: ForumPostMedia[];
+  commentPreview?: {
+    id: string;
+    author: string; // Changed to string based on usage in ForumPostCard (u/{{ comment.author }})
+    avatar?: string;
+    content?: string;
+    body?: string; // Component uses body
+    createdAt: string;
+    upvotes: number;
+  }[];
+  isSaved?: boolean;
+  impressions?: number;
+  voteState?: 'upvoted' | 'downvoted' | 'neutral';
+  recommendation?: { label?: string };
+  awards?: any[];
 }
 
 export interface ForumComment {
@@ -125,14 +159,26 @@ export interface ForumComment {
 
 export interface ForumThread extends ForumPost {
   comments: ForumComment[];
+  recommendation?: { label?: string };
+  awards?: any[]; // Using any[] for now as ForumAward is not defined
+  voteState?: 'upvoted' | 'downvoted' | 'neutral';
 }
+
+
 
 export interface ForumModerator extends ForumUser {
   role: 'moderator' | 'admin';
+  timezone?: string;
+  availability?: string;
+  focus?: string[];
 }
 
 export interface ForumTrendingTopic {
   id: string;
   name: string;
   posts_count: number;
+  title?: string; // alias for name
+  communityId?: string;
+  trend?: 'up' | 'down' | 'stable';
+  delta?: string;
 }

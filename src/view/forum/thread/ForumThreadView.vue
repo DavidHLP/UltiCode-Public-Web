@@ -57,7 +57,7 @@ const flairClasses: Record<ForumFlairType, string> = {
 };
 
 const createdAgo = computed(() =>
-  thread.value ? formatRelativeTime(thread.value.createdAt) : "",
+  thread.value ? formatRelativeTime(thread.value.createdAt ?? thread.value.created_at) : "",
 );
 const recommendationLabel = computed(
   () =>
