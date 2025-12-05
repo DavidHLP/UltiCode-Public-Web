@@ -42,7 +42,9 @@ const userInitials = computed(() => {
 });
 
 const communityIcon = computed(() => props.post.community?.icon || "");
-const createdAgo = computed(() => formatRelativeTime(props.post.createdAt ?? props.post.created_at));
+const createdAgo = computed(() =>
+  formatRelativeTime(props.post.createdAt ?? props.post.created_at),
+);
 const recommendationLabel = computed(
   () =>
     (props.post.recommendation as unknown as { label?: string })?.label ?? "",
@@ -104,10 +106,16 @@ const impressionsDisplay = computed(() => {
 
 const karmaDisplay = computed(() => formatCount(props.post.author.karma ?? 0));
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
-const commentsDisplay = computed(() => formatCount(props.post.stats?.comments ?? 0));
-const awardsDisplay = computed(() => formatCount(props.post.stats?.awards ?? 0));
+const commentsDisplay = computed(() =>
+  formatCount(props.post.stats?.comments ?? 0),
+);
+const awardsDisplay = computed(() =>
+  formatCount(props.post.stats?.awards ?? 0),
+);
 const savesDisplay = computed(() => formatCount(props.post.stats?.saves ?? 0));
-const sharesDisplay = computed(() => formatCount(props.post.stats?.shares ?? 0));
+const sharesDisplay = computed(() =>
+  formatCount(props.post.stats?.shares ?? 0),
+);
 
 function formatCount(value: number) {
   if (value >= 1000) {
@@ -196,7 +204,7 @@ function formatRelativeTime(value: string) {
                   flairClasses[post.flair.type],
                 ]"
               >
-                {{ props.post.flair?.text ?? '' }}
+                {{ props.post.flair?.text ?? "" }}
               </Badge>
               <Badge
                 v-if="post.isPinned"
@@ -214,10 +222,7 @@ function formatRelativeTime(value: string) {
                 Locked
               </span>
             </div>
-            <div
-              v-if="props.post.community"
-              class="flex items-center gap-1.5"
-            >
+            <div v-if="props.post.community" class="flex items-center gap-1.5">
               <Avatar class="h-4 w-4 rounded-sm">
                 <AvatarImage
                   v-if="props.post.community.icon"
@@ -233,17 +238,15 @@ function formatRelativeTime(value: string) {
             </div>
             <div class="flex items-center gap-2">
               <Avatar class="h-5 w-5 border border-border">
-
                 <AvatarImage
-                v-if="props.post.author.avatar"
-                v-if="props.post.author?.avatar"
-                :src="props.post.author.avatar"
-              />
+                  v-if="props.post.author?.avatar"
+                  :src="props.post.author.avatar"
+                />
                 <AvatarFallback>{{ userInitials }}</AvatarFallback>
               </Avatar>
-              <span class="font-medium text-foreground hover:underline">{{
-               props.post.author?.username || "U"
-            }}</span>
+              <span class="font-medium text-foreground hover:underline">
+                {{ props.post.author?.username || "U" }}
+              </span>
             </div>
             <div
               class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground"

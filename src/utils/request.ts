@@ -1,7 +1,12 @@
-import axios, { type InternalAxiosRequestConfig, type AxiosResponse, type AxiosError, type AxiosRequestConfig } from 'axios';
+import axios, {
+  type InternalAxiosRequestConfig,
+  type AxiosResponse,
+  type AxiosError,
+  type AxiosRequestConfig,
+} from "axios";
 
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
   timeout: 10000,
 });
 
@@ -17,7 +22,7 @@ service.interceptors.request.use(
   },
   (error: AxiosError) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor
@@ -26,15 +31,19 @@ service.interceptors.response.use(
     return response.data;
   },
   (error: AxiosError) => {
-    console.error('Request error:', error);
+    console.error("Request error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
-export async function apiGet<T>(path: string, init?: AxiosRequestConfig): Promise<T> {
-  return service.get<any, T>(path, { ...init });
+export async function apiGet<T>(
+  path: string,
+  init?: AxiosRequestConfig,
+): Promise<T> {
+  return service.get<T, T>(path, { ...init });
 }
 
 export async function apiPost<T>(
@@ -42,7 +51,7 @@ export async function apiPost<T>(
   body?: unknown,
   init?: AxiosRequestConfig,
 ): Promise<T> {
-  return service.post<any, T>(path, body, { ...init });
+  return service.post<T, T, unknown>(path, body, { ...init });
 }
 
 export default service;

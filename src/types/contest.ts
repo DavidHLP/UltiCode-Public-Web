@@ -3,7 +3,7 @@ export interface ContestListItem {
   title: string;
   start_time: string;
   end_time: string;
-  status: 'upcoming' | 'running' | 'finished';
+  status: "upcoming" | "running" | "finished";
   participant_count: number;
   // Frontend specific or camelCase aliases
   startTime?: string;
@@ -16,9 +16,33 @@ export interface ContestListItem {
   canStart?: boolean;
 }
 
+export interface ContestProblemSummary {
+  id: string;
+  contest_id: string;
+  problem_id: number;
+  problem_index: string;
+  score: number;
+  solved_count: number;
+  submission_count: number;
+  // Optional aliases used in UI
+  problemIndex?: string;
+  problemId?: number;
+  title?: string;
+  difficulty?: string;
+  acceptanceRate?: string | number;
+  solvedCount?: number;
+  submissionCount?: number;
+}
+
 export interface ContestDetail extends ContestListItem {
   description: string;
-  problems: any[];
+  problems: ContestProblemSummary[];
+}
+
+export interface ContestProblemResult {
+  index: string;
+  solved: boolean;
+  time?: string;
 }
 
 export interface ContestRankingEntry {
@@ -28,7 +52,7 @@ export interface ContestRankingEntry {
   finish_time: string;
   // Aliases
   finishTime?: string;
-  problemResults?: any[];
+  problemResults?: ContestProblemResult[];
   ratingChange?: number;
   ratingBefore?: number;
   ratingAfter?: number;

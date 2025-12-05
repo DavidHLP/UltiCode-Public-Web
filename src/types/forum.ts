@@ -24,7 +24,12 @@ export interface ForumCommunity {
   links?: { label: string; url: string; description?: string }[];
 }
 
-export type ForumFlairType = 'discussion' | 'question' | 'announcement' | 'showcase' | 'hiring';
+export type ForumFlairType =
+  | "discussion"
+  | "question"
+  | "announcement"
+  | "showcase"
+  | "hiring";
 
 export interface ForumFlair {
   type: ForumFlairType;
@@ -43,8 +48,8 @@ export interface ForumMediaBase {
 }
 
 export interface ForumMediaImage extends ForumMediaBase {
-  type: 'image';
-  kind?: 'image';
+  type: "image";
+  kind?: "image";
   url: string;
   src?: string; // alias for url
   alt?: string;
@@ -54,8 +59,8 @@ export interface ForumMediaImage extends ForumMediaBase {
 }
 
 export interface ForumMediaVideo extends ForumMediaBase {
-  type: 'video';
-  kind?: 'video';
+  type: "video";
+  kind?: "video";
   url: string;
   src?: string;
   thumbnail?: string;
@@ -66,8 +71,8 @@ export interface ForumMediaVideo extends ForumMediaBase {
 }
 
 export interface ForumMediaLink extends ForumMediaBase {
-  type: 'link';
-  kind?: 'link';
+  type: "link";
+  kind?: "link";
   url: string;
   title?: string;
   domain?: string;
@@ -82,8 +87,8 @@ export interface ForumMediaPollOption {
 }
 
 export interface ForumMediaPoll extends ForumMediaBase {
-  type: 'poll';
-  kind?: 'poll';
+  type: "poll";
+  kind?: "poll";
   question: string;
   options: ForumMediaPollOption[];
   totalVotes: number;
@@ -91,13 +96,18 @@ export interface ForumMediaPoll extends ForumMediaBase {
 }
 
 export interface ForumMediaText extends ForumMediaBase {
-  type: 'text';
-  kind?: 'text';
+  type: "text";
+  kind?: "text";
   markdown: string;
   body?: string;
 }
 
-export type ForumPostMedia = ForumMediaImage | ForumMediaVideo | ForumMediaLink | ForumMediaPoll | ForumMediaText;
+export type ForumPostMedia =
+  | ForumMediaImage
+  | ForumMediaVideo
+  | ForumMediaLink
+  | ForumMediaPoll
+  | ForumMediaText;
 
 export interface ForumPost {
   id: string;
@@ -138,9 +148,9 @@ export interface ForumPost {
   }[];
   isSaved?: boolean;
   impressions?: number;
-  voteState?: 'upvoted' | 'downvoted' | 'neutral';
+  voteState?: "upvoted" | "downvoted" | "neutral";
   recommendation?: { label?: string };
-  awards?: any[];
+  awards?: ForumAward[];
 }
 
 export interface ForumComment {
@@ -160,14 +170,12 @@ export interface ForumComment {
 export interface ForumThread extends ForumPost {
   comments: ForumComment[];
   recommendation?: { label?: string };
-  awards?: any[]; // Using any[] for now as ForumAward is not defined
-  voteState?: 'upvoted' | 'downvoted' | 'neutral';
+  awards?: ForumAward[];
+  voteState?: "upvoted" | "downvoted" | "neutral";
 }
 
-
-
 export interface ForumModerator extends ForumUser {
-  role: 'moderator' | 'admin';
+  role: "moderator" | "admin";
   timezone?: string;
   availability?: string;
   focus?: string[];
@@ -179,6 +187,6 @@ export interface ForumTrendingTopic {
   posts_count: number;
   title?: string; // alias for name
   communityId?: string;
-  trend?: 'up' | 'down' | 'stable';
+  trend?: "up" | "down" | "stable";
   delta?: string;
 }

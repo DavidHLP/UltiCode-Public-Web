@@ -1,7 +1,6 @@
 import { apiGet } from "@/utils/request";
 import type { Problem } from "@/types/problem";
 import type {
-  ProblemList,
   ProblemListGroup,
   ProblemListStats,
   ProblemListId,
