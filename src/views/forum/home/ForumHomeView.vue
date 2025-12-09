@@ -18,9 +18,9 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronsUpDown } from "lucide-vue-next";
-import ForumPostCard from "@/view/forum/home/components/ForumPostCard.vue";
-import ForumSidebar from "@/view/forum/home/components/ForumSidebar.vue";
-import ForumPostSkeleton from "@/view/forum/components/ForumPostSkeleton.vue";
+import ForumPostCard from "@/views/forum/home/components/ForumPostCard.vue";
+import ForumSidebar from "@/views/forum/home/components/ForumSidebar.vue";
+import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,

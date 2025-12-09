@@ -11,12 +11,12 @@ const forumRoutes: RouteRecordRaw = {
     {
       path: "",
       name: "forum-home",
-      component: () => import("@/view/forum/home/ForumHomeView.vue"),
+      component: () => import("@/views/forum/home/ForumHomeView.vue"),
     },
     {
       path: "detailed/:postId",
       name: "forum-thread",
-      component: () => import("@/view/forum/thread/ForumThreadView.vue"),
+      component: () => import("@/views/forum/thread/ForumThreadView.vue"),
     },
   ],
 };
@@ -28,12 +28,12 @@ const contestRoutes: RouteRecordRaw = {
     {
       path: "",
       name: "contest-home",
-      component: () => import("@/view/contest/ContestView.vue"),
+      component: () => import("@/views/contest/ContestView.vue"),
     },
     {
       path: ":contestId",
       name: "contest-detail",
-      component: () => import("@/view/contest/detailed/ContestDetailView.vue"),
+      component: () => import("@/views/contest/detailed/ContestDetailView.vue"),
     },
   ],
 };
@@ -44,20 +44,20 @@ const problemRoutes: RouteRecordRaw = {
   children: [
     {
       path: "",
-      component: () => import("@/view/problem/ProblemLayout.vue"),
+      component: () => import("@/views/problem/ProblemLayout.vue"),
       children: [
         { path: "", redirect: { name: "problem-set" } },
         {
           path: "problem-set",
           name: "problem-set",
           component: () =>
-            import("@/view/problem/problem-set/ProblemSetView.vue"),
+            import("@/views/problem/problem-set/ProblemSetView.vue"),
         },
         {
           path: "problem-list/:id",
           name: "problem-list",
           component: () =>
-            import("@/view/problem/problem-list/ProblemListView.vue"),
+            import("@/views/problem/problem-list/ProblemListView.vue"),
         },
       ],
     },
@@ -67,14 +67,14 @@ const problemRoutes: RouteRecordRaw = {
 const problemDetailRoute: RouteRecordRaw = {
   path: "/problems/:id",
   name: "problem-detail",
-  component: () => import("@/view/problem/detail/ProblemDetailView.vue"),
+  component: () => import("@/views/problem/detail/ProblemDetailView.vue"),
 };
 
 const solutionCreateRoute: RouteRecordRaw = {
   path: "/problem/:id(\\d+)/solution/create",
   name: "solution-create",
   component: () =>
-    import("@/view/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
+    import("@/views/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
 };
 
 const router = createRouter({

@@ -3,7 +3,7 @@ import type { ForumComment } from "@/types/forum.ts";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-vue-next";
-import CommentNode from "@/view/forum/thread/components/CommentNode.vue";
+import CommentNode from "@/views/forum/thread/components/CommentNode.vue";
 import { ref } from "vue";
 
 const props = defineProps<{

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import ProblemExplorer from "@/view/problem/components/ProblemExplorer.vue";
+import ProblemExplorer from "@/views/problem/components/ProblemExplorer.vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart } from "@/components/ui/chart-line";

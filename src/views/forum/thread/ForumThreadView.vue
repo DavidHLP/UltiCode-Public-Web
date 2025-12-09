@@ -12,16 +12,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import ForumPostSkeleton from "@/view/forum/components/ForumPostSkeleton.vue";
+import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import { fetchForumThread, createForumComment } from "@/api/forum";
 import { MessageSquare } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
-import ThreadHeader from "@/view/forum/thread/components/ThreadHeader.vue";
-import ThreadMedia from "@/view/forum/thread/components/ThreadMedia.vue";
-import ThreadAwards from "@/view/forum/thread/components/ThreadAwards.vue";
-import ThreadActions from "@/view/forum/thread/components/ThreadActions.vue";
-import ThreadComments from "@/view/forum/thread/components/ThreadComments.vue";
+import ThreadHeader from "@/views/forum/thread/components/ThreadHeader.vue";
+import ThreadMedia from "@/views/forum/thread/components/ThreadMedia.vue";
+import ThreadAwards from "@/views/forum/thread/components/ThreadAwards.vue";
+import ThreadActions from "@/views/forum/thread/components/ThreadActions.vue";
+import ThreadComments from "@/views/forum/thread/components/ThreadComments.vue";
 
 const route = useRoute();
 const thread = ref<ForumThread | null>(null);
