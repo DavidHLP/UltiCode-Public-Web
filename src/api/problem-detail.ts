@@ -31,44 +31,50 @@ export async function fetchProblemDetailById(
   id: number | string,
 ): Promise<ProblemDetail> {
   const response = await apiGet<BackendProblemResponse>(`/problems/${id}`);
-  
+
   // Map backend naming to frontend interface
   // The backend returns a nested 'detail' object containing much of this info
   const detail = response.detail;
-  
+
   // Ensure ID is a number (backend may return string for BigInt)
   response.id = Number(response.id);
 
-  response.content = detail.summary || '';
+  response.content = detail.summary || "";
   response.constraints = detail.constraints_json || [];
   response.followUp = detail.follow_up;
   response.companies = detail.companies || [];
   response.starterNotes = detail.hints || [];
-  
+
   if (response.examples && response.examples.length > 0) {
     const originalExamples = response.examples;
 
     // Map for TestCaseView (expecting inputs array)
-    response.testCases = originalExamples.map((ex: BackendExample, index: number) => ({
-      id: ex.id || `case-${index}`,
-      label: `Case ${index + 1}`,
-      explanation: ex.explanation,
-      inputs: ex.inputs ? ex.inputs.map((input: BackendExampleInput) => ({
-        name: input.name,
-        value: input.value,
-        label: input.name,
-      })) : [],
-      // Use outputText as the expected output for reference if needed
-      output: ex.outputText, 
-    }));
+    response.testCases = originalExamples.map(
+      (ex: BackendExample, index: number) => ({
+        id: ex.id || `case-${index}`,
+        label: `Case ${index + 1}`,
+        explanation: ex.explanation,
+        inputs: ex.inputs
+          ? ex.inputs.map((input: BackendExampleInput) => ({
+              name: input.name,
+              value: input.value,
+              label: input.name,
+            }))
+          : [],
+        // Use outputText as the expected output for reference if needed
+        output: ex.outputText,
+      }),
+    );
 
     // Map for DescriptionView (expecting input/output/explanation)
-    (response as ProblemDetail).examples = originalExamples.map((ex: BackendExample) => ({
-      input: ex.inputText || '', 
-      output: ex.outputText || '',
-      explanation: ex.explanation,
-    }));
+    (response as ProblemDetail).examples = originalExamples.map(
+      (ex: BackendExample) => ({
+        input: ex.inputText || "",
+        output: ex.outputText || "",
+        explanation: ex.explanation,
+      }),
+    );
   }
-  
+
   return response;
 }

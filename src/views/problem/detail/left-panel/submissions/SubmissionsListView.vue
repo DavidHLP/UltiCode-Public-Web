@@ -87,7 +87,9 @@ const sortedSubmissions = computed(() =>
 
 const decoratedSubmissions = computed(() =>
   sortedSubmissions.value.map((submission) => {
-    const timestamp = normalizeTimestamp(submission.submittedAt ?? submission.created_at);
+    const timestamp = normalizeTimestamp(
+      submission.submittedAt ?? submission.created_at,
+    );
     return {
       ...submission,
       formattedSubmitted: timestamp

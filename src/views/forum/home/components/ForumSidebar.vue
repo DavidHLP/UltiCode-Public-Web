@@ -45,8 +45,8 @@ const communityLookup = computed(() => {
   return communities.reduce<Record<string, ForumCommunity>>(
     (lookup, community) => {
       if (community.slug) {
-      lookup[community.slug] = community;
-    }
+        lookup[community.slug] = community;
+      }
       return lookup;
     },
     {},
@@ -91,8 +91,8 @@ const getCommunityOnline = (slug: string) => {
             <article class="space-y-1">
               <p class="font-medium text-foreground">{{ topic.title }}</p>
               <p class="text-[11px] text-muted-foreground">
-                {{ getCommunityName(topic.communityId ?? '') }} ·
-                {{ getCommunityOnline(topic.communityId ?? '') }}
+                {{ getCommunityName(topic.communityId ?? "") }} ·
+                {{ getCommunityOnline(topic.communityId ?? "") }}
               </p>
             </article>
             <Badge

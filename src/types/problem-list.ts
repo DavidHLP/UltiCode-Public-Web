@@ -1,4 +1,4 @@
-import type { Problem } from './problem';
+import type { Problem } from "./problem";
 
 export interface ProblemList {
   id: string;
@@ -34,5 +34,5 @@ export interface ProblemListItem {
   createdAt?: string;
   updatedAt?: string;
   title?: string; // Keep title if used elsewhere, but component uses name
-  difficulty?: 'Easy' | 'Medium' | 'Hard';
+  difficulty?: "Easy" | "Medium" | "Hard";
 }

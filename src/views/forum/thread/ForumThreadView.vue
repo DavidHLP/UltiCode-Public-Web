@@ -57,12 +57,14 @@ const flairClasses: Record<ForumFlairType, string> = {
 };
 
 const createdAgo = computed(() =>
-  thread.value ? formatRelativeTime(thread.value.createdAt ?? thread.value.created_at) : "",
+  thread.value
+    ? formatRelativeTime(thread.value.createdAt ?? thread.value.created_at)
+    : "",
 );
 const recommendationLabel = computed(
   () =>
-    (thread.value?.recommendation as unknown as { label?: string })
-      ?.label ?? "",
+    (thread.value?.recommendation as unknown as { label?: string })?.label ??
+    "",
 );
 const media = computed(
   () => thread.value?.media as unknown as ForumPostMedia | undefined,
@@ -90,7 +92,9 @@ const scoreDisplay = computed(() =>
   thread.value?.stats?.score ? formatCount(thread.value.stats.score) : "0",
 );
 const commentsDisplay = computed(() =>
-  thread.value?.stats?.comments ? formatCount(thread.value.stats.comments) : "0",
+  thread.value?.stats?.comments
+    ? formatCount(thread.value.stats.comments)
+    : "0",
 );
 const awardsDisplay = computed(() =>
   thread.value?.stats?.awards ? formatCount(thread.value.stats.awards) : "0",
@@ -179,10 +183,7 @@ async function onSubmitComment(body: string) {
             {{ recommendationLabel }}
           </p>
 
-          <section
-            v-if="thread.excerpt"
-            class="text-sm text-muted-foreground"
-          >
+          <section v-if="thread.excerpt" class="text-sm text-muted-foreground">
             {{ thread.excerpt }}
           </section>
 

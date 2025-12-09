@@ -14,10 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type {
-  ProblemListItem,
-  ProblemListStats,
-} from "@/types/problem-list";
+import type { ProblemListItem, ProblemListStats } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
 import {
   fetchProblemListItem,

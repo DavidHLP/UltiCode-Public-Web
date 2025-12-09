@@ -1,4 +1,4 @@
-import type { Problem } from './problem';
+import type { Problem } from "./problem";
 
 export interface ProblemTestCaseInput {
   id?: string;
@@ -24,7 +24,7 @@ export interface ProblemLanguageOption {
   starterCode: string;
 }
 
-export type ProblemReactionType = 'like' | 'dislike';
+export type ProblemReactionType = "like" | "dislike";
 
 export interface ProblemReaction {
   id: string;

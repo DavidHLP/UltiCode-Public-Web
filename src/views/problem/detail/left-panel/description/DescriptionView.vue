@@ -30,7 +30,14 @@ const difficultyClass = computed(() => {
 const showTags = ref(false);
 const showCompanies = ref(false);
 
-const reactionCounts = computed(() => props.problem.interactions?.counts ?? { likes: 0, dislikes: 0, favorites: 0 });
+const reactionCounts = computed(
+  () =>
+    props.problem.interactions?.counts ?? {
+      likes: 0,
+      dislikes: 0,
+      favorites: 0,
+    },
+);
 
 // Refs for accordion sections
 const tagsSection = ref<HTMLElement | null>(null);
@@ -63,7 +70,11 @@ const acceptanceRate = computed(() => {
 const problemDescription = computed<ProblemDescription>(() => ({
   content: props.problem.summary || "",
   examples: (props.problem.examples || []).map((example) => {
-    const ex = example as { input: string; output: string; explanation?: string };
+    const ex = example as {
+      input: string;
+      output: string;
+      explanation?: string;
+    };
     return {
       input: ex.input,
       output: ex.output,
@@ -153,7 +164,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         class="flex flex-wrap gap-2"
       >
         <span
-          v-for="tag in (props.problem.tags || [])"
+          v-for="tag in props.problem.tags || []"
           :key="tag"
           class="rounded-full border border-border bg-background px-3 py-1 text-[11px] text-muted-foreground"
         >
@@ -242,7 +253,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
             <AccordionContent>
               <div class="mt-2 flex flex-wrap gap-1 pl-7">
                 <span
-                  v-for="tag in (props.problem.tags || [])"
+                  v-for="tag in props.problem.tags || []"
                   :key="tag"
                   class="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground"
                 >

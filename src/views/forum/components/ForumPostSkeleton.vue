@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Skeleton } from '@/components/ui/skeleton'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 </script>
 
 <template>

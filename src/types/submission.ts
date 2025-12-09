@@ -1,6 +1,6 @@
 export interface SubmissionTestRecord {
   id: string;
-  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error';
+  status: "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error";
   runtime: number;
   memory: number;
 }
@@ -8,7 +8,7 @@ export interface SubmissionTestRecord {
 export interface SubmissionRecord {
   id: string;
   problem_id: number;
-  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error';
+  status: "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error";
   language: string;
   runtime: number;
   memory: number;

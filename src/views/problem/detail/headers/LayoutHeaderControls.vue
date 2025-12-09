@@ -40,7 +40,9 @@ const interactionCounts = ref<ProblemInteractionCounts>({
   favorites: 0,
 });
 
-const viewerInteraction = ref<NonNullable<ProblemInteractionSnapshot["viewer"]>>({
+const viewerInteraction = ref<
+  NonNullable<ProblemInteractionSnapshot["viewer"]>
+>({
   reaction: undefined,
   isFavorite: false,
 });

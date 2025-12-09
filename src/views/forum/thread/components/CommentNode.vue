@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import type { ForumComment } from "@/types/forum.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowBigUp, Pin, Lock, MessageSquare, MinusSquare, PlusSquare } from "lucide-vue-next";
+import {
+  ArrowBigUp,
+  Pin,
+  Lock,
+  MessageSquare,
+  MinusSquare,
+  PlusSquare,
+} from "lucide-vue-next";
 import { computed, ref } from "vue";
 
 defineOptions({
@@ -35,7 +42,9 @@ function formatRelativeTime(value: string) {
   return "just now";
 }
 
-const createdAgo = computed(() => formatRelativeTime(props.comment.createdAt ?? props.comment.created_at));
+const createdAgo = computed(() =>
+  formatRelativeTime(props.comment.createdAt ?? props.comment.created_at),
+);
 const isCollapsed = ref(false);
 </script>
 

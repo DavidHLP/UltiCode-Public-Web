@@ -180,7 +180,7 @@ function getCountryFlag(countryCode: string): string {
                   <div class="space-y-2">
                     <div class="flex items-center gap-2">
                       <Badge variant="outline">
-                        {{ getContestTypeLabel(nextContest.type || 'weekly') }}
+                        {{ getContestTypeLabel(nextContest.type || "weekly") }}
                       </Badge>
                       <Badge v-if="nextContest.isRated" variant="default">
                         计分
@@ -201,7 +201,15 @@ function getCountryFlag(countryCode: string): string {
                   </div>
                   <div class="flex items-center gap-2 text-sm">
                     <Clock class="h-4 w-4 text-muted-foreground" />
-                    <span>{{ getDurationMinutes(nextContest.start_time, nextContest.end_time) }} 分钟</span>
+                    <span
+                      >{{
+                        getDurationMinutes(
+                          nextContest.start_time,
+                          nextContest.end_time,
+                        )
+                      }}
+                      分钟</span
+                    >
                   </div>
                   <div class="flex items-center gap-2 text-sm">
                     <Users class="h-4 w-4 text-muted-foreground" />
@@ -272,7 +280,7 @@ function getCountryFlag(countryCode: string): string {
                   <TableCell>
                     <div class="flex items-center gap-2">
                       <Badge variant="outline" class="text-xs">
-                        {{ getContestTypeLabel(contest.type || 'weekly') }}
+                        {{ getContestTypeLabel(contest.type || "weekly") }}
                       </Badge>
                       <span class="font-semibold">{{ contest.title }}</span>
                     </div>
@@ -281,7 +289,10 @@ function getCountryFlag(countryCode: string): string {
                     {{ formatDateTime(contest.start_time) }}
                   </TableCell>
                   <TableCell class="text-right text-sm">
-                    {{ getDurationMinutes(contest.start_time, contest.end_time) }} 分钟
+                    {{
+                      getDurationMinutes(contest.start_time, contest.end_time)
+                    }}
+                    分钟
                   </TableCell>
                   <TableCell class="text-right">
                     <Button
@@ -351,7 +362,7 @@ function getCountryFlag(countryCode: string): string {
                     </Badge>
                   </div>
                   <p class="text-xs text-muted-foreground">
-                    {{ getCountryFlag(user.country || 'CN') }}
+                    {{ getCountryFlag(user.country || "CN") }}
                     {{ user.rating }} 分 · {{ user.contestsAttended || 0 }} 场
                   </p>
                 </div>

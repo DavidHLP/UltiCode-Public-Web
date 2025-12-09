@@ -4,7 +4,12 @@ export interface ProblemRunCase {
   submissionTestId: string;
   testCaseId: string;
   caseLabel: string;
-  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error' | 'Pending';
+  status:
+    | "Accepted"
+    | "Wrong Answer"
+    | "Time Limit Exceeded"
+    | "Runtime Error"
+    | "Pending";
   runtime: string;
   memory: string;
   detail?: string;
@@ -20,7 +25,12 @@ export interface ProblemRunResult {
   submissionId: string;
   problemId: number;
   userId: string;
-  verdict: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error' | 'Pending';
+  verdict:
+    | "Accepted"
+    | "Wrong Answer"
+    | "Time Limit Exceeded"
+    | "Runtime Error"
+    | "Pending";
   runtime: string;
   memory: string;
   cases: ProblemRunCase[];
