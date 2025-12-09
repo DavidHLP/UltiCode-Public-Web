@@ -6,7 +6,7 @@ import {
 
 const forumRoutes: RouteRecordRaw = {
   path: "/forum",
-  component: () => import("@/layout/AppLayout.vue"),
+  component: () => import("@/features/sider/AppLayout.vue"),
   children: [
     {
       path: "",
@@ -23,7 +23,7 @@ const forumRoutes: RouteRecordRaw = {
 
 const contestRoutes: RouteRecordRaw = {
   path: "/contest",
-  component: () => import("@/layout/AppLayout.vue"),
+  component: () => import("@/features/sider/AppLayout.vue"),
   children: [
     {
       path: "",
@@ -40,7 +40,7 @@ const contestRoutes: RouteRecordRaw = {
 
 const problemRoutes: RouteRecordRaw = {
   path: "/problem",
-  component: () => import("@/layout/AppLayout.vue"),
+  component: () => import("@/features/sider/AppLayout.vue"),
   children: [
     {
       path: "",

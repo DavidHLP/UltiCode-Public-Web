@@ -1,33 +1,9 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import type { HeaderModel, HeaderGroup, LayoutNode } from "@/types/header";
 
-export interface HeaderModel {
-  id: number;
-  index: number;
-  title: string;
-  icon: string;
-  color?: string;
-  iconColor?: string;
-}
-
-export interface HeaderGroup {
-  id: string;
-  name: string;
-  headers: HeaderModel[];
-}
-
-export interface LayoutNode {
-  id: string;
-  type: "container" | "leaf";
-  direction?: "horizontal" | "vertical";
-  size?: number;
-  children?: LayoutNode[];
-  groupId?: string;
-  groupMetadata?: {
-    id: string;
-    name: string;
-  };
-}
+// Re-export types for backward compatibility
+export type { HeaderModel, HeaderGroup, LayoutNode } from "@/types/header";
 
 export const useHeaderStore = defineStore("header", () => {
   const layoutConfig = ref<LayoutNode | null>(null);

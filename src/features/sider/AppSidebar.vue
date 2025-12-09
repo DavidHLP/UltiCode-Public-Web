@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { SidebarProps } from "@/components/ui/sidebar";
-import Calendars from "@/layout/Calendars.vue";
+import Calendars from "@/features/sider/Calendars.vue";
 import { fetchProblemLists } from "@/api/problem-list";
-import DatePicker from "@/layout/DatePicker.vue";
-import NavUser from "@/layout/NavUser.vue";
+import DatePicker from "@/features/sider/DatePicker.vue";
+import NavUser from "@/features/sider/NavUser.vue";
 import { onMounted, ref } from "vue";
 import type { ProblemListGroup } from "@/types/problem-list";
 import {

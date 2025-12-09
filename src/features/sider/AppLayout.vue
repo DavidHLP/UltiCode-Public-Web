@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppSidebar from "@/layout/AppSidebar.vue";
+import AppSidebar from "@/features/sider/AppSidebar.vue";
 import {
   NavigationMenu,
   NavigationMenuIndicator,
