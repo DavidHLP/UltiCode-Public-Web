@@ -8,6 +8,8 @@ import {
 import type {
   ContestListItem,
   GlobalRankingEntry,
+  ContestStatus,
+  ContestType,
 } from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -94,7 +96,7 @@ function getDurationMinutes(startTime: string, endTime: string): number {
 }
 
 // 获取竞赛类型标签
-function getContestTypeLabel(type: string): string {
+function getContestTypeLabel(type: ContestType | string): string {
   const labels: Record<string, string> = {
     weekly: "周赛",
     biweekly: "双周赛",
@@ -105,7 +107,7 @@ function getContestTypeLabel(type: string): string {
 
 // 获取竞赛状态颜色
 function getStatusVariant(
-  status: string,
+  status: ContestStatus | string,
 ): "default" | "secondary" | "destructive" | "outline" {
   const variants: Record<string, "default" | "secondary" | "destructive"> = {
     upcoming: "default",

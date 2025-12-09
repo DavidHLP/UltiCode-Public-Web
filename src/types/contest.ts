@@ -1,14 +1,17 @@
+export type ContestStatus = "upcoming" | "running" | "finished";
+export type ContestType = "weekly" | "biweekly" | "special";
+
 export interface ContestListItem {
   id: string;
   title: string;
   start_time: string;
   end_time: string;
-  status: "upcoming" | "running" | "finished";
+  status: ContestStatus;
   participant_count: number;
   // Frontend specific or camelCase aliases
   startTime?: string;
   endTime?: string;
-  type?: string;
+  type?: ContestType;
   isRated?: boolean;
   durationMinutes?: number;
   registeredCount?: number;

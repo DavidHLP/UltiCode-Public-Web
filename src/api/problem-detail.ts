@@ -35,6 +35,9 @@ export async function fetchProblemDetailById(
   // Map backend naming to frontend interface
   // The backend returns a nested 'detail' object containing much of this info
   const detail = response.detail;
+  
+  // Ensure ID is a number (backend may return string for BigInt)
+  response.id = Number(response.id);
 
   response.content = detail.summary || '';
   response.constraints = detail.constraints_json || [];
