@@ -3,7 +3,7 @@ import type { ForumFlairType, ForumPost } from "@/types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   ArrowBigUp,
@@ -168,10 +168,10 @@ function formatRelativeTime(value: string) {
 </script>
 
 <template>
-  <Card
+  <div
     class="rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm transition-all hover:shadow-md hover:border-border"
   >
-    <CardContent class="space-y-4 p-4">
+    <div class="space-y-4 p-4">
       <header class="flex items-start justify-between gap-4">
         <div class="flex items-start gap-3 min-w-0">
           <Avatar class="h-9 w-9 border border-border/60">
@@ -499,9 +499,9 @@ function formatRelativeTime(value: string) {
           </li>
         </ul>
       </section>
-    </CardContent>
+    </div>
 
-    <CardFooter
+    <div
       class="flex flex-wrap items-center gap-2 border-t border-border/50 px-4 py-3"
     >
       <Button
@@ -569,6 +569,6 @@ function formatRelativeTime(value: string) {
           {{ impressionsDisplay }} impressions
         </span>
       </div>
-    </CardFooter>
-  </Card>
+    </div>
+  </div>
 </template>

@@ -7,13 +7,6 @@ import type {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   CalendarDays,
@@ -65,17 +58,17 @@ const getCommunityOnline = (slug: string) => {
 
 <template>
   <aside class="flex flex-col gap-3">
-    <Card class="border-border/60 bg-card shadow-sm">
-      <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
-        <CardTitle class="flex items-center gap-2 text-sm font-semibold">
+    <div class="border rounded-xl border-border/60 bg-card shadow-sm">
+      <div class="space-y-1 border-b border-border/60 px-4 py-3">
+        <div class="flex items-center gap-2 text-sm font-semibold">
           <TrendingUp class="h-4 w-4 text-orange-500" />
           Trending threads
-        </CardTitle>
-        <CardDescription class="text-xs text-muted-foreground">
+        </div>
+        <div class="text-xs text-muted-foreground">
           Highlights the community is bookmarking right now.
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="p-0">
+        </div>
+      </div>
+      <div class="p-0">
         <div v-if="isLoading" class="space-y-4 p-4">
           <div v-for="i in 3" :key="i" class="space-y-2">
             <Skeleton class="h-4 w-3/4" />
@@ -106,17 +99,17 @@ const getCommunityOnline = (slug: string) => {
             </Badge>
           </li>
         </ul>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
 
-    <Card class="border-border/60 bg-card shadow-sm">
-      <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
-        <CardTitle class="flex items-center gap-2 text-sm font-semibold">
+    <div class="border rounded-xl border-border/60 bg-card shadow-sm">
+      <div class="space-y-1 border-b border-border/60 px-4 py-3">
+        <div class="flex items-center gap-2 text-sm font-semibold">
           <Users class="h-4 w-4 text-blue-500" />
           Communities to join
-        </CardTitle>
-      </CardHeader>
-      <CardContent class="p-4">
+        </div>
+      </div>
+      <div class="p-4">
         <div v-if="isLoading" class="space-y-4">
           <div v-for="i in 2" :key="i" class="flex gap-3">
             <Skeleton class="h-8 w-8 rounded-full" />
@@ -234,17 +227,17 @@ const getCommunityOnline = (slug: string) => {
             </article>
           </li>
         </ul>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
 
-    <Card class="border-border/60 bg-card shadow-sm">
-      <CardHeader class="space-y-1 border-b border-border/60 px-4 py-3">
-        <CardTitle class="flex items-center gap-2 text-sm font-semibold">
+    <div class="border rounded-xl border-border/60 bg-card shadow-sm">
+      <div class="space-y-1 border-b border-border/60 px-4 py-3">
+        <div class="flex items-center gap-2 text-sm font-semibold">
           <ShieldCheck class="h-4 w-4 text-emerald-500" />
           Moderator desk
-        </CardTitle>
-      </CardHeader>
-      <CardContent class="p-0">
+        </div>
+      </div>
+      <div class="p-0">
         <div v-if="isLoading" class="space-y-4 p-4">
           <div v-for="i in 2" :key="i" class="flex gap-3">
             <Skeleton class="h-8 w-8 rounded-full" />
@@ -289,11 +282,11 @@ const getCommunityOnline = (slug: string) => {
             </ul>
           </li>
         </ul>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
 
-    <Card class="border border-dashed border-border/60 bg-card/40">
-      <CardContent class="space-y-3 p-4">
+    <div class="border rounded-xl border-dashed border-border/60 bg-card/40">
+      <div class="space-y-3 p-4">
         <header
           class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"
         >
@@ -309,7 +302,7 @@ const getCommunityOnline = (slug: string) => {
         <Button class="w-full" size="sm" variant="secondary"
           >Review subreddit wiki</Button
         >
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   </aside>
 </template>

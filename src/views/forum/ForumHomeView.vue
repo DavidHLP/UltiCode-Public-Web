@@ -8,7 +8,7 @@ import type {
 } from "@/types/forum";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
@@ -18,8 +18,8 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronsUpDown } from "lucide-vue-next";
-import ForumPostCard from "@/views/forum/home/components/ForumPostCard.vue";
-import ForumSidebar from "@/views/forum/home/components/ForumSidebar.vue";
+import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
+import ForumSidebar from "@/views/forum/components/ForumSidebar.vue";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import { computed, onMounted, ref } from "vue";
 import {
@@ -128,8 +128,8 @@ const sortedPosts = computed(() => {
   <ScrollArea class="h-full">
     <div class="mx-auto w-full max-w-6xl space-y-8 px-4 lg:px-10">
       <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <Card class="border-none bg-transparent p-0 shadow-none">
-          <CardHeader class="space-y-3 border-none px-0 pb-0">
+        <div class="border-none bg-transparent p-0 shadow-none">
+          <div class="space-y-3 border-none px-0 pb-0">
             <div
               class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
             >
@@ -185,8 +185,8 @@ const sortedPosts = computed(() => {
                 Subscribe RSS
               </Button>
             </div>
-          </CardHeader>
-          <CardContent class="space-y-6 px-0">
+          </div>
+          <div class="space-y-6 px-0 mt-6">
             <div v-if="isLoading" class="space-y-6">
               <ForumPostSkeleton v-for="i in 3" :key="i" />
             </div>
@@ -197,8 +197,8 @@ const sortedPosts = computed(() => {
                 :post="post"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
         <ForumSidebar
           class="self-start xl:sticky xl:top-6"
           :trendingTopics="trendingTopics"
