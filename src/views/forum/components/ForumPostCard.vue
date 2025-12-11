@@ -15,6 +15,17 @@ import {
 } from "lucide-vue-next";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
+import MarkdownIt from "markdown-it";
+
+const md = new MarkdownIt({
+  html: false,
+  linkify: true,
+  breaks: true,
+});
+
+function renderMarkdown(text: string) {
+  return md.render(text);
+}
 
 const props = defineProps<{
   post: ForumPost;
@@ -62,12 +73,12 @@ const media = computed(
           totalVotes?: number;
           closesAt?: string;
         }
-      | undefined,
+      | undefined
 );
 
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0),
+  formatCount(props.post.stats?.comments ?? 0)
 );
 
 function formatCount(value: number) {
@@ -176,12 +187,11 @@ function formatRelativeTime(value: string) {
           </RouterLink>
 
           <!-- Text Content / Excerpt -->
-          <p
+          <div
             v-if="post.excerpt"
-            class="text-sm text-muted-foreground line-clamp-3"
-          >
-            {{ post.excerpt }}
-          </p>
+            class="text-sm text-muted-foreground line-clamp-[20] prose prose-sm dark:prose-invert prose-p:my-0 prose-headings:my-0 prose-ul:my-0 prose-ol:my-0 max-w-none"
+            v-html="renderMarkdown(post.excerpt)"
+          ></div>
 
           <!-- Media -->
           <div
@@ -237,6 +247,15 @@ function formatRelativeTime(value: string) {
                 />
               </AspectRatio>
             </div>
+
+            <div
+              v-else-if="
+                media.kind === 'text' ||
+                (media.markdown && media.markdown.length)
+              "
+              class="prose prose-sm dark:prose-invert max-w-none p-3"
+              v-html="renderMarkdown(media.markdown || media.body || '')"
+            ></div>
           </div>
         </section>
 
