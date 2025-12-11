@@ -157,20 +157,3 @@ export interface ForumThread extends ForumPost {
   // Thread specific body/content if main post has it (backend uses excerpt/media, but if body exists add here)
   body?: string;
 }
-
-export interface ForumModerator extends ForumUser {
-  role: "moderator" | "admin";
-  timezone?: string;
-  availability?: string;
-  focus?: string[];
-}
-
-export interface ForumTrendingTopic {
-  id: string;
-  name: string;
-  posts_count: number;
-  title?: string; // alias for name
-  communityId?: string;
-  trend?: "up" | "down" | "stable";
-  delta?: string;
-}

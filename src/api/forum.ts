@@ -1,28 +1,12 @@
 import { apiGet, apiPost } from "@/utils/request";
-import type {
-  ForumCommunity,
-  ForumModerator,
-  ForumPost,
-  ForumThread,
-  ForumTrendingTopic,
-} from "@/types/forum";
+import type { ForumCommunity, ForumPost, ForumThread } from "@/types/forum";
 
 export async function fetchForumPosts(): Promise<ForumPost[]> {
   return apiGet<ForumPost[]>("/forum/posts");
 }
 
-export async function fetchForumTrendingTopics(): Promise<
-  ForumTrendingTopic[]
-> {
-  return apiGet<ForumTrendingTopic[]>("/forum/trending");
-}
-
 export async function fetchForumCommunities(): Promise<ForumCommunity[]> {
   return apiGet<ForumCommunity[]>("/forum/communities");
-}
-
-export async function fetchForumModerators(): Promise<ForumModerator[]> {
-  return apiGet<ForumModerator[]>("/forum/moderators");
 }
 
 export async function fetchForumQuickFilters(): Promise<

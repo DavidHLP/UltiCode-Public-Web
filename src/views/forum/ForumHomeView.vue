@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import type {
-  ForumFlairType,
-  ForumPost,
-  ForumCommunity,
-  ForumModerator,
-  ForumTrendingTopic,
-} from "@/types/forum";
+import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -19,46 +13,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronsUpDown } from "lucide-vue-next";
 import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
-import ForumSidebar from "@/views/forum/components/ForumSidebar.vue";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,
-  fetchForumModerators,
   fetchForumPosts,
   fetchForumQuickFilters,
-  fetchForumTrendingTopics,
 } from "@/api/forum";
 
 const posts = ref<ForumPost[]>([]);
-const trendingTopics = ref<ForumTrendingTopic[]>([]);
 const communities = ref<ForumCommunity[]>([]);
-const moderators = ref<ForumModerator[]>([]);
 const quickFilters = ref<Array<{ label: string; value: string }>>([]);
 const isLoading = ref(true);
 
 onMounted(async () => {
   isLoading.value = true;
   try {
-    const [postRows, topicRows, communityRows, moderatorRows, filters] =
-      await Promise.all([
-        fetchForumPosts(),
-        fetchForumTrendingTopics(),
-        fetchForumCommunities(),
-        fetchForumModerators(),
-        fetchForumQuickFilters(),
-      ]);
+    const [postRows, communityRows, filters] = await Promise.all([
+      fetchForumPosts(),
+      fetchForumCommunities(),
+      fetchForumQuickFilters(),
+    ]);
     posts.value = postRows;
-    trendingTopics.value = topicRows;
     communities.value = communityRows;
-    moderators.value = moderatorRows;
     quickFilters.value = filters;
   } catch (error) {
     console.error("Failed to load forum data", error);
     posts.value = [];
-    trendingTopics.value = [];
     communities.value = [];
-    moderators.value = [];
     quickFilters.value = [];
   } finally {
     isLoading.value = false;
@@ -127,7 +109,7 @@ const sortedPosts = computed(() => {
 <template>
   <ScrollArea class="h-full">
     <div class="mx-auto w-full max-w-6xl space-y-8 px-4 lg:px-10">
-      <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
+      <div class="grid gap-8 xl:grid-cols-1">
         <div class="border-none bg-transparent p-0 shadow-none">
           <div class="space-y-3 border-none px-0 pb-0">
             <div
@@ -199,13 +181,6 @@ const sortedPosts = computed(() => {
             </div>
           </div>
         </div>
-        <ForumSidebar
-          class="self-start xl:sticky xl:top-6"
-          :trendingTopics="trendingTopics"
-          :communities="communities"
-          :moderators="moderators"
-          :isLoading="isLoading"
-        />
       </div>
     </div>
   </ScrollArea>
