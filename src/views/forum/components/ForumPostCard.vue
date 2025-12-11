@@ -48,33 +48,40 @@ const userInitials = computed(() => {
 });
 const createdAgo = computed(() => formatRelativeTime(props.post.createdAt));
 
-const media = computed(
-  () =>
-    props.post.media as unknown as
-      | {
-          kind?: string;
-          ratio?: number;
-          src?: string;
-          alt?: string;
-          caption?: string;
-          thumbnail?: string;
-          title?: string;
-          domain?: string;
-          description?: string;
-          url?: string;
-          body?: string;
-          markdown?: string;
-          controls?: boolean;
-          autoplay?: boolean;
-          poster?: string;
-          duration?: string;
-          question?: string;
-          options?: Array<{ id: string; label: string; votes: number }>;
-          totalVotes?: number;
-          closesAt?: string;
-        }
-      | undefined
-);
+type PostMediaItem = {
+  kind?: string;
+  ratio?: number;
+  src?: string;
+  alt?: string;
+  caption?: string;
+  thumbnail?: string;
+  title?: string;
+  domain?: string;
+  description?: string;
+  url?: string;
+  body?: string;
+  markdown?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  poster?: string;
+  duration?: string;
+  question?: string;
+  options?: Array<{ id: string; label: string; votes: number }>;
+  totalVotes?: number;
+  closesAt?: string;
+};
+
+const media = computed(() => {
+  const m = props.post.media as unknown as
+    | PostMediaItem
+    | Array<PostMediaItem>
+    | undefined;
+
+  if (Array.isArray(m)) {
+    return m.find((item) => item.kind === "image" || item.kind === "video");
+  }
+  return m;
+});
 
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
@@ -188,7 +195,10 @@ function formatRelativeTime(value: string) {
 
           <!-- Text Content / Excerpt -->
           <div
-            v-if="post.excerpt"
+            v-if="
+              post.excerpt &&
+              !(media?.kind === 'image' || media?.kind === 'video')
+            "
             class="text-sm text-muted-foreground line-clamp-[20] prose prose-sm dark:prose-invert prose-p:my-0 prose-headings:my-0 prose-ul:my-0 prose-ol:my-0 max-w-none"
             v-html="renderMarkdown(post.excerpt)"
           ></div>
