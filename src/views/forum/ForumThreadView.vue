@@ -30,7 +30,7 @@ watch(
   (postId) => {
     void loadThread(postId);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 async function onSubmitComment(body: string) {
@@ -41,13 +41,13 @@ async function onSubmitComment(body: string) {
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-4xl space-y-6 px-4 lg:px-10">
-    <div class="py-4">
+  <div class="mx-auto w-full max-w-4xl px-0 sm:px-4 lg:px-6 py-4">
+    <div class="mb-4 px-4 sm:px-0">
       <RouterLink
         to="/forum"
-        class="text-sm font-medium text-primary underline-offset-2 hover:underline"
+        class="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        ← Back to forum
+        <span class="text-xs">←</span> Back to feed
       </RouterLink>
     </div>
 
@@ -65,12 +65,15 @@ async function onSubmitComment(body: string) {
     </div>
 
     <template v-else-if="thread">
-      <ForumThreadContent :thread="thread" />
-      <ForumThreadComments
-        :comments="thread.comments"
-        :is-locked="thread.isLocked"
-        @submit="onSubmitComment"
-      />
+      <div class="bg-card sm:rounded-xl overflow-hidden">
+        <ForumThreadContent :thread="thread" />
+        <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
+        <ForumThreadComments
+          :comments="thread.comments"
+          :is-locked="thread.isLocked"
+          @submit="onSubmitComment"
+        />
+      </div>
     </template>
 
     <div

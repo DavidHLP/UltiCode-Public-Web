@@ -6,8 +6,7 @@ import {
   Pin,
   Lock,
   MessageSquare,
-  MinusSquare,
-  PlusSquare,
+  MoreHorizontal,
 } from "lucide-vue-next";
 import { computed, ref } from "vue";
 
@@ -44,12 +43,20 @@ function formatRelativeTime(value: string) {
 
 const createdAgo = computed(() => formatRelativeTime(props.comment.createdAt));
 const isCollapsed = ref(false);
+
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value;
+}
 </script>
 
 <template>
-  <li class="group relative space-y-2">
-    <div class="flex items-start gap-3">
-      <Avatar class="h-7 w-7 border border-border/50">
+  <div class="relative flex gap-2">
+    <!-- Left Column: Avatar + Thread Line -->
+    <div class="flex flex-col items-center shrink-0">
+      <Avatar
+        class="h-6 w-6 border border-border/40 cursor-pointer sm:h-7 sm:w-7"
+        @click="toggleCollapse"
+      >
         <AvatarImage
           v-if="comment.author.avatar"
           :src="comment.author.avatar"
@@ -60,74 +67,91 @@ const isCollapsed = ref(false);
         </AvatarFallback>
       </Avatar>
 
-      <div class="min-w-0 flex-1 space-y-1.5">
-        <div
-          class="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground"
+      <!-- Thread Line -->
+      <div
+        v-if="!isCollapsed && comment.replies && comment.replies.length > 0"
+        class="w-[2px] flex-1 mt-2 rounded-full bg-border/40 hover:bg-primary/50 cursor-pointer transition-colors"
+        @click="toggleCollapse"
+      ></div>
+    </div>
+
+    <!-- Right Column: Content -->
+    <div class="flex-1 min-w-0 pb-1">
+      <div
+        class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mb-1 h-6 sm:h-7"
+      >
+        <span
+          class="font-semibold text-foreground hover:underline cursor-pointer"
+          @click="toggleCollapse"
+          >u/{{ comment.author.username }}</span
         >
-          <span class="font-semibold text-foreground"
-            >u/{{ comment.author.username }}</span
-          >
-          <span>•</span>
-          <span class="hover:underline cursor-pointer">{{ createdAgo }}</span>
-          <span
-            v-if="comment.isPinned"
-            class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-          >
-            <Pin class="h-3 w-3" /> Pinned
-          </span>
-          <span
-            v-if="comment.isLocked"
-            class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-          >
-            <Lock class="h-3 w-3" /> Locked
-          </span>
+        <span>•</span>
+        <span>{{ createdAgo }}</span>
+
+        <span
+          v-if="comment.isPinned"
+          class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+        >
+          <Pin class="h-3 w-3" /> Pinned
+        </span>
+        <span
+          v-if="comment.isLocked"
+          class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+        >
+          <Lock class="h-3 w-3" /> Locked
+        </span>
+
+        <button
+          v-if="isCollapsed"
+          @click="toggleCollapse"
+          class="ml-auto text-xs font-medium text-muted-foreground hover:text-foreground"
+        >
+          <MoreHorizontal class="h-4 w-4" />
+        </button>
+      </div>
+
+      <div v-show="!isCollapsed" class="space-y-2">
+        <div class="text-sm leading-relaxed text-foreground/90 break-words">
+          {{ comment.body }}
+        </div>
+
+        <div class="flex items-center gap-3">
           <button
-            @click="isCollapsed = !isCollapsed"
-            class="ml-1 opacity-0 transition-opacity group-hover:opacity-100"
-            :title="isCollapsed ? 'Expand' : 'Collapse'"
+            class="group flex items-center gap-1.5 text-muted-foreground hover:bg-muted/50 p-1 -ml-1 rounded transition-colors"
           >
-            <component
-              :is="isCollapsed ? PlusSquare : MinusSquare"
-              class="h-3 w-3"
+            <ArrowBigUp
+              class="h-5 w-5 group-hover:text-orange-600 transition-colors"
             />
+            <span class="text-xs font-bold">{{ comment.upvotes }}</span>
+          </button>
+          <button
+            class="group flex items-center gap-1.5 text-muted-foreground hover:bg-muted/50 p-1 rounded transition-colors"
+          >
+            <MessageSquare
+              class="h-4 w-4 group-hover:text-blue-500 transition-colors"
+            />
+            <span class="text-xs font-bold">Reply</span>
+          </button>
+          <button
+            class="group flex items-center gap-1.5 text-muted-foreground hover:bg-muted/50 p-1 rounded transition-colors"
+          >
+            <MoreHorizontal class="h-4 w-4" />
+            <span class="sr-only">More</span>
           </button>
         </div>
 
-        <template v-if="!isCollapsed">
-          <div class="text-sm leading-relaxed text-foreground/90">
-            {{ comment.body }}
-          </div>
-
-          <div class="flex items-center gap-4">
-            <button
-              class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ArrowBigUp class="h-4 w-4" />
-              {{ comment.upvotes }}
-            </button>
-            <button
-              class="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <MessageSquare class="h-3.5 w-3.5" />
-              Reply
-            </button>
-          </div>
-        </template>
-        <div v-else class="text-[11px] italic text-muted-foreground">
-          Comment collapsed
+        <!-- Nested Replies -->
+        <div
+          v-if="comment.replies && comment.replies.length"
+          class="space-y-4 pt-2"
+        >
+          <CommentNode
+            v-for="reply in comment.replies"
+            :key="reply.id"
+            :comment="reply"
+          />
         </div>
       </div>
     </div>
-
-    <ul
-      v-if="!isCollapsed && comment.replies && comment.replies.length"
-      class="relative ml-3.5 space-y-4 border-l border-border/40 pl-4 pt-2"
-    >
-      <CommentNode
-        v-for="child in comment.replies"
-        :key="child.id"
-        :comment="child"
-      />
-    </ul>
-  </li>
+  </div>
 </template>

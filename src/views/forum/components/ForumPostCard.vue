@@ -85,7 +85,7 @@ const media = computed(() => {
 
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0)
+  formatCount(props.post.stats?.comments ?? 0),
 );
 
 function formatCount(value: number) {

@@ -11,12 +11,12 @@ import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   ArrowBigUp,
-  Eye,
-  Gift,
   Lock,
   MessageSquare,
   Pin,
   Share2,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-vue-next";
 import { computed } from "vue";
 
@@ -32,57 +32,21 @@ const flairClasses: Record<ForumFlairType, string> = {
   hiring: "bg-orange-100 text-orange-700",
 };
 
-const avatarSrc = computed(() => props.thread.author.avatar || undefined);
-const userInitials = computed(() => {
-  const parts = props.thread.author.username.split(/[^A-Za-z0-9]+/);
-  return parts
-    .map((p) => p.charAt(0).toUpperCase())
-    .join("")
-    .slice(0, 2);
-});
 const communityIcon = computed(() => props.thread.community?.icon || "");
 
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
-const recommendationLabel = computed(
-  () =>
-    (props.thread.recommendation as unknown as { label?: string })?.label ?? "",
-);
+
 const media = computed(
   () => props.thread.media as unknown as ForumPostMedia | undefined,
 );
-const awards = computed(() => props.thread.awards ?? []);
-const upvoteRatioDisplay = computed(() =>
-  typeof props.thread.stats?.upvote_ratio === "number"
-    ? `${Math.round(props.thread.stats.upvote_ratio * 100)}%`
-    : undefined,
-);
-const viewsDisplay = computed(() =>
-  typeof props.thread.stats?.views === "number"
-    ? formatCount(props.thread.stats.views)
-    : undefined,
-);
+
 const voteState = computed(() => props.thread.voteState ?? "neutral");
-const voteLabel = computed(() =>
-  voteState.value === "upvoted"
-    ? "Upvoted"
-    : voteState.value === "downvoted"
-      ? "Downvoted"
-      : "Upvote",
-);
+
 const scoreDisplay = computed(() =>
   props.thread.stats?.score ? formatCount(props.thread.stats.score) : "0",
 );
 const commentsDisplay = computed(() =>
   props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
-);
-const awardsDisplay = computed(() =>
-  props.thread.stats?.awards ? formatCount(props.thread.stats.awards) : "0",
-);
-const savesDisplay = computed(() =>
-  props.thread.stats?.saves ? formatCount(props.thread.stats.saves) : "0",
-);
-const sharesDisplay = computed(() =>
-  props.thread.stats?.shares ? formatCount(props.thread.stats.shares) : "0",
 );
 
 function formatCount(value: number) {
@@ -126,284 +90,264 @@ function formatPollWidth(votes: number, totalVotes: number) {
 </script>
 
 <template>
-  <div
-    class="rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm"
-  >
-    <div class="pb-2 p-6">
-      <h3 class="text-xl font-semibold leading-none tracking-tight">
-        {{ thread.title }}
-      </h3>
-    </div>
-    <div class="space-y-4 p-6 pt-0">
-      <header class="flex items-start justify-between gap-4">
-        <div class="flex items-start gap-3 min-w-0">
-          <Avatar class="h-9 w-9 border border-border/60">
+  <div class="bg-card text-card-foreground">
+    <!-- Header -->
+    <div class="px-4 pt-4 sm:px-6 sm:pt-6">
+      <div class="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+        <template v-if="thread.community">
+          <Avatar class="h-5 w-5 border border-border/40">
             <AvatarImage
-              v-if="avatarSrc"
-              :src="avatarSrc"
-              :alt="thread.author.username"
+              v-if="communityIcon"
+              :src="communityIcon"
+              :alt="thread.community.name"
             />
-            <AvatarFallback class="text-xs font-semibold uppercase">
-              {{ userInitials }}
-            </AvatarFallback>
+            <AvatarFallback class="text-[10px]">{{
+              thread.community.name.charAt(0).toUpperCase()
+            }}</AvatarFallback>
           </Avatar>
-          <div class="min-w-0 space-y-2">
-            <div
-              class="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground"
-            >
-              <span class="flex items-center gap-2">
-                <span
-                  v-if="communityIcon"
-                  class="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-base"
-                >
-                  {{ communityIcon }}
-                </span>
-                <span class="truncate">{{ thread.community?.name }}</span>
-              </span>
-              <Badge
-                v-if="thread.flair"
-                variant="secondary"
-                :class="[
-                  'gap-1 rounded-full px-2.5 py-0.5 text-[10px]',
-                  flairClasses[thread.flair.type],
-                ]"
-              >
-                {{ thread.flair.text }}
-              </Badge>
-              <Badge
-                v-if="thread.isPinned"
-                variant="outline"
-                class="flex items-center gap-1 rounded-full border-dashed px-2 py-0.5 text-[10px] uppercase"
-              >
-                <Pin class="h-3 w-3" /> Pinned
-              </Badge>
-              <span
-                v-if="thread.isLocked"
-                class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600"
-              >
-                <Lock class="h-3 w-3" /> Locked
-              </span>
-            </div>
-            <div
-              class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
-            >
-              <span>u/{{ thread.author.username }}</span>
-              <span>•</span>
-              <span>{{ createdAgo }}</span>
-              <span>•</span>
-              <span
-                >{{ thread.stats?.likes?.toLocaleString() ?? 0 }} likes</span
-              >
-            </div>
-            <div
-              v-if="upvoteRatioDisplay || viewsDisplay"
-              class="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground"
-            >
-              <span
-                v-if="upvoteRatioDisplay"
-                class="inline-flex items-center gap-1"
-              >
-                <ArrowBigUp class="h-3 w-3 opacity-60" />
-                {{ upvoteRatioDisplay }} upvoted
-              </span>
-              <span v-if="viewsDisplay" class="inline-flex items-center gap-1">
-                <Eye class="h-3 w-3 opacity-60" /> {{ viewsDisplay }} views
-              </span>
-            </div>
-          </div>
-        </div>
-      </header>
+          <span
+            class="font-bold text-foreground hover:underline cursor-pointer"
+          >
+            r/{{ thread.community.name }}
+          </span>
+          <span>•</span>
+        </template>
+        <span class="hover:underline cursor-pointer"
+          >Posted by u/{{ thread.author.username }}</span
+        >
+        <span>{{ createdAgo }}</span>
 
-      <p v-if="recommendationLabel" class="text-xs text-muted-foreground">
-        {{ recommendationLabel }}
-      </p>
+        <Badge
+          v-if="thread.flair"
+          variant="secondary"
+          :class="[
+            'ml-auto sm:ml-2 rounded-full px-2 py-0 text-[10px] h-5',
+            flairClasses[thread.flair.type],
+          ]"
+        >
+          {{ thread.flair.text }}
+        </Badge>
+      </div>
 
-      <section v-if="thread.excerpt" class="text-sm text-muted-foreground">
+      <h1
+        class="text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-foreground mb-2"
+      >
+        {{ thread.title }}
+      </h1>
+
+      <div class="flex flex-wrap gap-2 mb-4">
+        <Badge
+          v-if="thread.isPinned"
+          variant="outline"
+          class="flex items-center gap-1 rounded-full border-dashed px-2 py-0.5 text-[10px] uppercase"
+        >
+          <Pin class="h-3 w-3" /> Pinned
+        </Badge>
+        <span
+          v-if="thread.isLocked"
+          class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600"
+        >
+          <Lock class="h-3 w-3" /> Locked
+        </span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="px-4 sm:px-6 pb-2 space-y-4">
+      <section
+        v-if="thread.excerpt"
+        class="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap"
+      >
         {{ thread.excerpt }}
       </section>
 
-      <section
-        v-if="media"
-        class="overflow-hidden rounded-lg border border-border/60"
-      >
-        <AspectRatio
-          v-if="media.type === 'image'"
-          :ratio="media.ratio ?? 16 / 9"
-          class="bg-muted"
-        >
-          <img
-            :src="media.src"
-            :alt="media.alt ?? thread.title"
-            class="h-full w-full object-cover"
-          />
-        </AspectRatio>
-        <p
-          v-if="media.type === 'image' && media.caption"
-          class="border-t border-border/50 bg-background/80 px-4 py-2 text-xs text-muted-foreground"
-        >
-          {{ media.caption }}
-        </p>
-
+      <section v-if="media" class="mt-4">
         <div
-          v-else-if="media.type === 'link'"
-          class="flex flex-col gap-3 bg-background/80 p-4 sm:flex-row sm:items-center"
+          class="overflow-hidden rounded-lg border border-border/40 bg-muted/20"
         >
-          <div
-            v-if="media.thumbnail"
-            class="h-24 w-full overflow-hidden rounded-md border bg-muted sm:h-20 sm:w-20"
+          <AspectRatio
+            v-if="media.type === 'image'"
+            :ratio="media.ratio ?? 16 / 9"
+            class="bg-muted"
           >
             <img
-              :src="media.thumbnail"
-              :alt="media.title ?? media.domain"
-              class="h-full w-full object-cover"
-            />
-          </div>
-          <div class="min-w-0 space-y-1 text-sm">
-            <p class="text-xs uppercase tracking-wide text-muted-foreground">
-              {{ media.domain }}
-            </p>
-            <p class="truncate font-medium text-foreground">
-              {{ media.title ?? media.url }}
-            </p>
-            <p
-              v-if="media.description"
-              class="line-clamp-2 text-xs text-muted-foreground"
-            >
-              {{ media.description }}
-            </p>
-          </div>
-        </div>
-
-        <div
-          v-else-if="media.type === 'text'"
-          class="space-y-2 bg-muted/20 p-4 text-sm leading-relaxed text-muted-foreground"
-        >
-          {{ media.body }}
-          <pre
-            v-if="media.markdown"
-            class="whitespace-pre-wrap text-xs text-muted-foreground"
-            >{{ media.markdown }}</pre
-          >
-        </div>
-
-        <div v-else-if="media.type === 'video'" class="bg-muted">
-          <AspectRatio :ratio="16 / 9" class="bg-black">
-            <video
               :src="media.src"
-              class="h-full w-full object-cover"
-              :poster="media.thumbnail"
-              :controls="media.controls ?? true"
-              :autoplay="media.autoplay ?? false"
-              playsinline
+              :alt="media.alt ?? thread.title"
+              class="h-full w-full object-contain bg-black/5"
             />
           </AspectRatio>
-          <p
-            v-if="media.duration"
-            class="border-t border-border/50 px-4 py-2 text-xs text-muted-foreground"
+          <div
+            v-if="media.type === 'image' && media.caption"
+            class="p-2 text-xs text-muted-foreground text-center bg-background/50"
           >
-            Duration {{ media.duration }}
-          </p>
-        </div>
+            {{ media.caption }}
+          </div>
 
-        <div
-          v-else-if="media.type === 'poll'"
-          class="space-y-3 bg-background/80 p-4 text-sm text-foreground"
-        >
-          <header class="space-y-1">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
-            >
-              Community poll
-            </p>
-            <p class="font-medium text-foreground">{{ media.question }}</p>
-          </header>
-          <ul class="space-y-2">
-            <li
-              v-for="option in media.options"
-              :key="option.id"
-              class="space-y-1"
-            >
+          <div
+            v-else-if="media.type === 'link'"
+            class="flex flex-col sm:flex-row bg-background"
+          >
+            <div class="flex-1 p-4 flex flex-col justify-center min-w-0">
               <div
-                class="flex items-center justify-between text-[11px] text-muted-foreground"
+                class="text-xs text-muted-foreground mb-1 uppercase tracking-wide"
               >
-                <span class="text-foreground">{{ option.label }}</span>
-                <span>{{
-                  formatPollPercentage(option.votes, media.totalVotes)
-                }}</span>
+                {{ media.domain }}
               </div>
-              <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  class="h-full rounded-full bg-primary"
-                  :style="{
-                    width: formatPollWidth(option.votes, media.totalVotes),
-                  }"
-                />
+              <div class="font-medium text-foreground truncate mb-1">
+                {{ media.title ?? media.url }}
               </div>
-            </li>
-          </ul>
-          <p class="text-[11px] text-muted-foreground">
-            {{ media.totalVotes }} votes
-            <span v-if="media.closesAt"> · closes {{ media.closesAt }}</span>
-          </p>
-        </div>
-      </section>
+              <div class="text-sm text-muted-foreground line-clamp-2">
+                {{ media.description }}
+              </div>
+              <a
+                :href="media.url"
+                target="_blank"
+                class="mt-2 text-blue-500 hover:underline text-xs inline-flex items-center gap-1"
+              >
+                Open Link <Share2 class="w-3 h-3" />
+              </a>
+            </div>
+            <div
+              v-if="media.thumbnail"
+              class="h-32 sm:h-auto sm:w-32 bg-muted relative"
+            >
+              <img :src="media.thumbnail" class="w-full h-full object-cover" />
+            </div>
+          </div>
 
-      <section
-        v-if="awards.length"
-        class="space-y-2 rounded-lg border border-border/60 bg-background/60 p-3"
-      >
-        <header
-          class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
-        >
-          Awards
-        </header>
-        <ul class="flex flex-wrap gap-2">
-          <li
-            v-for="award in awards"
-            :key="award.id"
-            class="inline-flex items-center gap-2 rounded-full bg-muted/50 px-3 py-1 text-xs font-medium"
+          <div
+            v-else-if="media.type === 'text'"
+            class="p-4 text-sm leading-relaxed"
           >
-            <span class="text-sm">{{ award.icon }}</span>
-            <span class="text-foreground">{{ award.label }}</span>
-            <span class="text-muted-foreground">×{{ award.count }}</span>
-          </li>
-        </ul>
+            <div
+              v-if="media.markdown"
+              class="prose prose-sm dark:prose-invert max-w-none"
+            >
+              {{ media.markdown }}
+            </div>
+            <div v-else>{{ media.body }}</div>
+          </div>
+
+          <div v-else-if="media.type === 'video'" class="bg-black">
+            <AspectRatio :ratio="16 / 9">
+              <video
+                :src="media.src"
+                class="w-full h-full"
+                controls
+                :poster="media.thumbnail"
+              ></video>
+            </AspectRatio>
+          </div>
+
+          <div
+            v-else-if="media.type === 'poll'"
+            class="space-y-3 bg-background/80 p-4 text-sm text-foreground"
+          >
+            <header class="space-y-1">
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+              >
+                Community poll
+              </p>
+              <p class="font-medium text-foreground">{{ media.question }}</p>
+            </header>
+            <ul class="space-y-2">
+              <li
+                v-for="option in media.options"
+                :key="option.id"
+                class="space-y-1"
+              >
+                <div
+                  class="flex items-center justify-between text-[11px] text-muted-foreground"
+                >
+                  <span class="text-foreground">{{ option.label }}</span>
+                  <span>{{
+                    formatPollPercentage(option.votes, media.totalVotes)
+                  }}</span>
+                </div>
+                <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    class="h-full rounded-full bg-primary"
+                    :style="{
+                      width: formatPollWidth(option.votes, media.totalVotes),
+                    }"
+                  />
+                </div>
+              </li>
+            </ul>
+            <p class="text-[11px] text-muted-foreground">
+              {{ media.totalVotes }} votes
+              <span v-if="media.closesAt"> · closes {{ media.closesAt }}</span>
+            </p>
+          </div>
+        </div>
       </section>
     </div>
 
+    <!-- Actions -->
     <div
-      class="flex flex-wrap items-center gap-2 border-t border-border/50 px-4 py-3"
+      class="px-2 py-2 sm:px-6 flex items-center gap-1 text-muted-foreground border-t border-transparent"
     >
+      <div
+        class="flex items-center bg-muted/30 rounded-full hover:bg-muted/50 p-0.5"
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          class="h-8 w-8 rounded-full hover:text-orange-600"
+          :class="{
+            'text-orange-600 bg-orange-100/50': voteState === 'upvoted',
+          }"
+        >
+          <ArrowBigUp
+            class="h-5 w-5"
+            :class="{ 'fill-current': voteState === 'upvoted' }"
+          />
+        </Button>
+        <span class="text-sm font-bold min-w-[1.5rem] text-center px-1">{{
+          scoreDisplay
+        }}</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="h-8 w-8 rounded-full hover:text-blue-600"
+          :class="{ 'text-blue-600 bg-blue-100/50': voteState === 'downvoted' }"
+        >
+          <ArrowBigUp
+            class="h-5 w-5 rotate-180"
+            :class="{ 'fill-current': voteState === 'downvoted' }"
+          />
+        </Button>
+      </div>
+
       <Button
         variant="ghost"
         size="sm"
-        :class="[
-          'gap-2 text-xs font-medium',
-          voteState === 'upvoted' ? 'text-primary' : 'text-foreground',
-        ]"
+        class="gap-2 rounded-full h-9 hover:bg-muted/50"
       >
-        <ArrowBigUp
-          class="h-4 w-4"
-          :class="voteState === 'upvoted' ? 'text-primary' : ''"
-        />
-        <span>{{ voteLabel }}</span>
-        <span class="text-muted-foreground">· {{ scoreDisplay }}</span>
-      </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
         <MessageSquare class="h-4 w-4" />
-        {{ commentsDisplay }} comments
+        <span class="text-xs font-semibold"
+          >{{ commentsDisplay }} Comments</span
+        >
       </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
-        <Gift class="h-4 w-4" />
-        {{ awardsDisplay }} awards
-      </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
+      <Button
+        variant="ghost"
+        size="sm"
+        class="gap-2 rounded-full h-9 hover:bg-muted/50"
+      >
         <Share2 class="h-4 w-4" />
-        {{ sharesDisplay }} shares
+        <span class="text-xs font-semibold">Share</span>
       </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
-        <Share2 class="h-4 w-4 rotate-90" />
-        {{ savesDisplay }} saves
+      <Button
+        variant="ghost"
+        size="sm"
+        class="gap-2 rounded-full h-9 hover:bg-muted/50"
+      >
+        <component
+          :is="thread.isSaved ? BookmarkCheck : Bookmark"
+          class="h-4 w-4"
+        />
+        <span class="text-xs font-semibold">Save</span>
       </Button>
     </div>
   </div>
