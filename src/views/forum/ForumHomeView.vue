@@ -1,17 +1,5 @@
 <script setup lang="ts">
 import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from "@/components/ui/dropdown-menu";
-import { ChevronsUpDown } from "lucide-vue-next";
 import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import { computed, onMounted, ref } from "vue";
@@ -51,18 +39,6 @@ const searchQuery = ref("");
 const quickFilter = ref("hot");
 const selectedCommunity = ref("all");
 const selectedFlair = ref<"all" | ForumFlairType>("all");
-const quickFilterLabel = computed(() => {
-  return (
-    (
-      {
-        hot: "Hot",
-        new: "New",
-        top: "Top",
-        rising: "Rising",
-      } as Record<string, string>
-    )[quickFilter.value] ?? "Hot"
-  );
-});
 const filteredPosts = computed(() => {
   const normalizedSearch = searchQuery.value.trim().toLowerCase();
   return posts.value.filter((post) => {
@@ -72,7 +48,7 @@ const filteredPosts = computed(() => {
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
       (Array.isArray(post.tags) &&
         post.tags.some((tag: string) =>
-          tag.toLowerCase().includes(normalizedSearch),
+          tag.toLowerCase().includes(normalizedSearch)
         ));
 
     const matchesCommunity =
@@ -107,81 +83,41 @@ const sortedPosts = computed(() => {
 </script>
 
 <template>
-  <ScrollArea class="h-full">
-    <div class="mx-auto w-full max-w-6xl space-y-8 px-4 lg:px-10">
-      <div class="grid gap-8 xl:grid-cols-1">
-        <div class="border-none bg-transparent p-0 shadow-none">
-          <div class="space-y-3 border-none px-0 pb-0">
-            <div
-              class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <Button variant="outline" class="gap-2">
-                    Sort: {{ quickFilterLabel }}
-                    <ChevronsUpDown class="h-4 w-4 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-40">
-                  <DropdownMenuRadioGroup v-model:value="quickFilter">
-                    <DropdownMenuRadioItem value="hot"
-                      >Hot</DropdownMenuRadioItem
-                    >
-                    <DropdownMenuRadioItem value="new"
-                      >New</DropdownMenuRadioItem
-                    >
-                    <DropdownMenuRadioItem value="top"
-                      >Top</DropdownMenuRadioItem
-                    >
-                    <DropdownMenuRadioItem value="rising"
-                      >Rising</DropdownMenuRadioItem
-                    >
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <form
-                class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"
-              >
-                <Input
-                  v-model="searchQuery"
-                  placeholder="Search threads"
-                  class="w-full sm:w-64"
-                />
-              </form>
-            </div>
-            <div
-              class="flex items-center justify-between text-sm text-muted-foreground"
-            >
-              <p class="flex items-center gap-1">
-                Showing
-                <span class="font-semibold text-foreground">{{
-                  sortedPosts.length
-                }}</span>
-                threads
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                class="h-auto px-2 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-primary"
-              >
-                Subscribe RSS
-              </Button>
-            </div>
-          </div>
-          <div class="space-y-6 px-0 mt-6">
-            <div v-if="isLoading" class="space-y-6">
-              <ForumPostSkeleton v-for="i in 3" :key="i" />
-            </div>
-            <div v-else class="space-y-6">
-              <ForumPostCard
-                v-for="post in sortedPosts"
-                :key="post.id"
-                :post="post"
-              />
+  <div class="mx-auto flex w-full max-w-5xl items-start gap-6 px-4 py-8">
+    <!-- Main Feed -->
+    <main class="w-full min-w-0 flex-1 space-y-4">
+      <div v-if="isLoading" class="space-y-4">
+        <ForumPostSkeleton v-for="i in 3" :key="i" />
+      </div>
+      <div v-else class="space-y-4">
+        <ForumPostCard
+          v-for="post in sortedPosts"
+          :key="post.id"
+          :post="post"
+        />
+      </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <sider class="hidden w-[312px] flex-none space-y-4 lg:block">
+      <!-- Community sidebar placeholder -->
+      <div
+        class="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
+      >
+        <div class="bg-muted/50 p-4 font-medium">About Community</div>
+        <div class="p-4 text-sm text-muted-foreground">
+          <p>
+            Welcome to the forum! Discuss related topics and share your
+            thoughts.
+          </p>
+          <div class="mt-4 flex flex-col gap-2">
+            <div class="flex justify-between text-xs">
+              <span>Created</span>
+              <span class="font-medium">Dec 11, 2025</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </ScrollArea>
+    </sider>
+  </div>
 </template>
