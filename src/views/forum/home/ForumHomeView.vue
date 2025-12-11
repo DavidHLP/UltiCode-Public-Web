@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
-import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
-import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
+import PostCard from "@/views/forum/comments/components/PostCard.vue";
+import PostSkeleton from "@/views/forum/comments/components/PostSkeleton.vue";
+import ForumSidebar from "@/views/forum/home/components/ForumHomeSidebar.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,
@@ -87,10 +88,10 @@ const sortedPosts = computed(() => {
     <!-- Main Feed -->
     <main class="w-full min-w-0 flex-1 space-y-4">
       <div v-if="isLoading" class="space-y-4">
-        <ForumPostSkeleton v-for="i in 3" :key="i" />
+        <PostSkeleton v-for="i in 3" :key="i" />
       </div>
       <div v-else class="space-y-4">
-        <ForumPostCard
+        <PostCard
           v-for="post in sortedPosts"
           :key="post.id"
           :post="post"
@@ -99,25 +100,6 @@ const sortedPosts = computed(() => {
     </main>
 
     <!-- Right Sidebar -->
-    <sider class="hidden w-[312px] flex-none space-y-4 lg:block">
-      <!-- Community sidebar placeholder -->
-      <div
-        class="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
-      >
-        <div class="bg-muted/50 p-4 font-medium">About Community</div>
-        <div class="p-4 text-sm text-muted-foreground">
-          <p>
-            Welcome to the forum! Discuss related topics and share your
-            thoughts.
-          </p>
-          <div class="mt-4 flex flex-col gap-2">
-            <div class="flex justify-between text-xs">
-              <span>Created</span>
-              <span class="font-medium">Dec 11, 2025</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </sider>
+    <ForumSidebar />
   </div>
 </template>
