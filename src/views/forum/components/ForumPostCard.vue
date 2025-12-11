@@ -6,14 +6,11 @@ import { Button } from "@/components/ui/button";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
+  ArrowBigDown,
   ArrowBigUp,
   Bookmark,
-  BookmarkCheck,
-  Eye,
-  Gift,
-  Lock,
+  Link as LinkIcon,
   MessageSquare,
-  Pin,
   Share2,
 } from "lucide-vue-next";
 import { computed } from "vue";
@@ -31,8 +28,6 @@ const flairClasses: Record<ForumFlairType, string> = {
   hiring: "bg-orange-100 text-orange-700",
 };
 
-const avatarSrc = computed(() => props.post.author.avatar || undefined);
-
 const userInitials = computed(() => {
   const parts = props.post.author.username.split(/[\s_-]/);
   return parts
@@ -40,13 +35,8 @@ const userInitials = computed(() => {
     .join("")
     .slice(0, 2);
 });
-const createdAgo = computed(() =>
-  formatRelativeTime(props.post.createdAt ?? props.post.created_at),
-);
-const recommendationLabel = computed(
-  () =>
-    (props.post.recommendation as unknown as { label?: string })?.label ?? "",
-);
+const createdAgo = computed(() => formatRelativeTime(props.post.createdAt));
+
 const media = computed(
   () =>
     props.post.media as unknown as
@@ -74,45 +64,10 @@ const media = computed(
         }
       | undefined,
 );
-const awards = computed(() => props.post.awards ?? []);
-const hasAwards = computed(() => awards.value.length > 0);
-const commentPreview = computed(() => props.post.commentPreview ?? []);
-const hasCommentPreview = computed(() => commentPreview.value.length > 0);
-const upvoteRatioDisplay = computed(() => {
-  const ratio = props.post.stats?.upvote_ratio;
-  if (typeof ratio !== "number") return undefined;
-  return `${Math.round(ratio * 100)}%`;
-});
-const viewsDisplay = computed(() => {
-  const views = props.post.stats?.views;
-  if (typeof views !== "number") return undefined;
-  return formatCount(views);
-});
-const voteState = computed(() => props.post.voteState ?? "neutral");
-const voteLabel = computed(() => {
-  if (voteState.value === "upvoted") return "Upvoted";
-  if (voteState.value === "downvoted") return "Downvoted";
-  return "Upvote";
-});
-const isSaved = computed(() => props.post.isSaved ?? false);
-const saveLabel = computed(() => (isSaved.value ? "Saved" : "Save"));
-const impressionsDisplay = computed(() => {
-  const impressions = props.post.impressions;
-  if (typeof impressions !== "number") return undefined;
-  return formatCount(impressions);
-});
 
-const karmaDisplay = computed(() => formatCount(props.post.author.karma ?? 0));
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
   formatCount(props.post.stats?.comments ?? 0),
-);
-const awardsDisplay = computed(() =>
-  formatCount(props.post.stats?.awards ?? 0),
-);
-const savesDisplay = computed(() => formatCount(props.post.stats?.saves ?? 0));
-const sharesDisplay = computed(() =>
-  formatCount(props.post.stats?.shares ?? 0),
 );
 
 function formatCount(value: number) {
@@ -120,22 +75,6 @@ function formatCount(value: number) {
     return `${(value / 1000).toFixed(1).replace(/\.0$/, "")}k`;
   }
   return value.toString();
-}
-
-function formatPollPercentage(votes: number, totalVotes: number) {
-  if (totalVotes <= 0) {
-    return "0%";
-  }
-  return `${Math.round((votes / totalVotes) * 100)}%`;
-}
-
-function formatPollWidth(votes: number, totalVotes: number) {
-  if (totalVotes <= 0) {
-    return "0%";
-  }
-  const percentage = (votes / totalVotes) * 100;
-  const minimum = votes > 0 && percentage < 4 ? 4 : percentage;
-  return `${Math.min(100, Math.max(minimum, 0)).toFixed(0)}%`;
 }
 
 const relativeTimeFormatter = new Intl.RelativeTimeFormat("en", {
@@ -167,375 +106,190 @@ function formatRelativeTime(value: string) {
 
 <template>
   <div
-    class="rounded-xl border border-border/50 bg-card text-card-foreground shadow-sm transition-all hover:shadow-md hover:border-border"
+    class="bg-card text-card-foreground hover:bg-muted/30 transition-colors border-b border-border/40 last:border-0"
   >
-    <div class="space-y-4 p-4">
-      <header class="flex items-start justify-between gap-4">
-        <div class="flex items-start gap-3 min-w-0">
-          <Avatar class="h-9 w-9 border border-border/60">
+    <div class="flex gap-3 px-4 py-3 sm:gap-4 sm:px-6">
+      <div class="min-w-0 flex-1 space-y-2">
+        <!-- Header -->
+        <header class="flex items-center gap-2 text-xs text-muted-foreground">
+          <Avatar class="h-5 w-5 rounded-full" v-if="post.community?.icon">
             <AvatarImage
-              v-if="avatarSrc"
-              :src="avatarSrc"
+              :src="post.community.icon"
+              :alt="post.community.name"
+            />
+            <AvatarFallback>{{
+              post.community.name.charAt(0).toUpperCase()
+            }}</AvatarFallback>
+          </Avatar>
+          <Avatar class="h-5 w-5 rounded-full" v-else-if="post.author.avatar">
+            <AvatarImage
+              :src="post.author.avatar"
               :alt="post.author.username"
             />
-            <AvatarFallback class="text-xs font-semibold uppercase">
-              {{ userInitials }}
-            </AvatarFallback>
+            <AvatarFallback>{{ userInitials }}</AvatarFallback>
           </Avatar>
-          <div class="min-w-0 space-y-2">
-            <div
-              class="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground"
+          <span class="flex items-center gap-1">
+            <span
+              v-if="post.community"
+              class="font-bold text-foreground hover:underline cursor-pointer"
             >
-              <span class="flex items-center gap-2">
-                <span class="truncate">{{ post.community?.name }}</span>
-              </span>
-              <Badge
-                v-if="post.flair"
-                variant="secondary"
-                :class="[
-                  'gap-1 rounded-full px-2.5 py-0.5 text-[10px]',
-                  flairClasses[post.flair.type],
-                ]"
-              >
-                {{ props.post.flair?.text ?? "" }}
-              </Badge>
-              <Badge
-                v-if="post.isPinned"
-                variant="outline"
-                class="flex items-center gap-1 rounded-full border-dashed px-2 py-0.5 text-[10px] uppercase"
-              >
-                <Pin class="h-3 w-3" />
-                Pinned
-              </Badge>
-              <span
-                v-if="post.isLocked"
-                class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600"
-              >
-                <Lock class="h-3 w-3" />
-                Locked
-              </span>
-            </div>
-
-            <div
-              class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
+              r/{{ post.community.name }}
+            </span>
+            <span
+              v-else
+              class="font-bold text-foreground hover:underline cursor-pointer"
             >
-              <span>u/{{ post.author?.username }}</span>
-              <span>•</span>
-              <span>{{ createdAgo }}</span>
-              <span>•</span>
-              <span>{{ karmaDisplay }} karma</span>
-            </div>
-            <p v-if="recommendationLabel" class="text-xs text-muted-foreground">
-              {{ recommendationLabel }}
-            </p>
-            <div
-              v-if="upvoteRatioDisplay || viewsDisplay"
-              class="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground"
+              u/{{ post.author.username }}
+            </span>
+            <span class="text-muted-foreground/60">•</span>
+            <span>{{ createdAgo }}</span>
+            <span v-if="post.community" class="text-muted-foreground/60"
+              >•</span
             >
-              <span
-                v-if="upvoteRatioDisplay"
-                class="inline-flex items-center gap-1"
-              >
-                <ArrowBigUp class="h-3 w-3 opacity-60" />
-                {{ upvoteRatioDisplay }} upvoted
-              </span>
-              <span v-if="viewsDisplay" class="inline-flex items-center gap-1">
-                <Eye class="h-3 w-3 opacity-60" />
-                {{ viewsDisplay }} views
-              </span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <section class="space-y-2">
-        <RouterLink
-          :to="{ name: 'forum-thread', params: { postId: post.id } }"
-          class="block text-lg font-semibold tracking-tight text-foreground hover:underline"
-        >
-          {{ post.title }}
-        </RouterLink>
-        <p v-if="post.excerpt" class="text-sm text-muted-foreground">
-          {{ post.excerpt }}
-        </p>
-        <ul class="flex flex-wrap gap-2">
-          <li v-for="tag in post.tags" :key="tag" class="list-none">
-            <Badge
-              variant="outline"
-              class="rounded-full border-dashed border-border/60 px-2.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground"
+            <span v-if="post.community"
+              >Posted by u/{{ post.author.username }}</span
             >
-              #{{ tag }}
-            </Badge>
-          </li>
-        </ul>
-      </section>
-
-      <section
-        v-if="hasAwards"
-        class="space-y-2 rounded-lg border border-border/60 bg-background/60 p-3"
-      >
-        <header
-          class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
-        >
-          Awards
+          </span>
+          <Badge
+            v-if="post.flair"
+            variant="secondary"
+            :class="[
+              'ml-auto sm:ml-2 rounded-full px-2 py-0 text-[10px] h-5',
+              flairClasses[post.flair.type],
+            ]"
+          >
+            {{ props.post.flair?.text }}
+          </Badge>
         </header>
-        <ul class="flex flex-wrap gap-2">
-          <li
-            v-for="award in awards"
-            :key="award.id"
-            class="inline-flex items-center gap-2 rounded-full bg-muted/50 px-3 py-1 text-xs font-medium"
-          >
-            <span class="text-sm">{{ award.icon }}</span>
-            <span class="text-foreground">{{ award.label }}</span>
-            <span class="text-muted-foreground">×{{ award.count }}</span>
-          </li>
-        </ul>
-      </section>
 
-      <section
-        v-if="media"
-        class="overflow-hidden rounded-lg border border-border/60"
-      >
-        <AspectRatio
-          v-if="media.kind === 'image'"
-          :ratio="media.ratio ?? 16 / 9"
-          class="bg-muted"
-        >
-          <img
-            :src="media.src"
-            :alt="media.alt ?? post.title"
-            class="h-full w-full object-cover"
-          />
-        </AspectRatio>
-        <p
-          v-if="media.kind === 'image' && media.caption"
-          class="border-t border-border/50 bg-background/80 px-4 py-2 text-xs text-muted-foreground"
-        >
-          {{ media.caption }}
-        </p>
-
-        <div
-          v-else-if="media.kind === 'link'"
-          class="flex flex-col gap-3 bg-background/80 p-4 sm:flex-row sm:items-center"
-        >
-          <div
-            v-if="media.thumbnail"
-            class="h-24 w-full overflow-hidden rounded-md border bg-muted sm:h-20 sm:w-20"
+        <!-- Body -->
+        <section class="space-y-2">
+          <RouterLink
+            :to="{ name: 'forum-thread', params: { postId: post.id } }"
+            class="block"
           >
-            <img
-              :src="media.thumbnail"
-              :alt="media.title ?? media.domain"
-              class="h-full w-full object-cover"
-            />
-          </div>
-          <div class="min-w-0 space-y-1 text-sm">
-            <p class="text-xs uppercase tracking-wide text-muted-foreground">
-              {{ media.domain }}
-            </p>
-            <p class="truncate font-medium text-foreground">
-              {{ media.title ?? media.url }}
-            </p>
-            <p
-              v-if="media.description"
-              class="line-clamp-2 text-xs text-muted-foreground"
+            <h3
+              class="text-base sm:text-lg font-medium leading-snug text-foreground hover:underline decoration-2 decoration-transparent hover:decoration-current transition-all"
             >
-              {{ media.description }}
-            </p>
-          </div>
-        </div>
+              {{ post.title }}
+            </h3>
+          </RouterLink>
 
-        <div
-          v-else-if="media.kind === 'text'"
-          class="space-y-2 bg-muted/20 p-4 text-sm leading-relaxed text-muted-foreground"
-        >
-          {{ media.body }}
-          <pre
-            v-if="media.markdown"
-            class="whitespace-pre-wrap text-xs text-muted-foreground"
-            >{{ media.markdown }}
-          </pre>
-        </div>
-
-        <div v-else-if="media.kind === 'video'" class="bg-muted">
-          <AspectRatio :ratio="16 / 9" class="bg-black">
-            <video
-              :src="media.src"
-              class="h-full w-full object-cover"
-              :poster="media.thumbnail"
-              :controls="media.controls ?? true"
-              :autoplay="media.autoplay ?? false"
-              playsinline
-            />
-          </AspectRatio>
+          <!-- Text Content / Excerpt -->
           <p
-            v-if="media.duration"
-            class="border-t border-border/50 px-4 py-2 text-xs text-muted-foreground"
+            v-if="post.excerpt"
+            class="text-sm text-muted-foreground line-clamp-3"
           >
-            Duration {{ media.duration }}
+            {{ post.excerpt }}
           </p>
-        </div>
 
-        <div
-          v-else-if="media.kind === 'poll'"
-          class="space-y-3 bg-background/80 p-4 text-sm text-foreground"
-        >
-          <header class="space-y-1">
-            <p
-              class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+          <!-- Media -->
+          <div
+            v-if="media"
+            class="mt-2 overflow-hidden rounded-xl border border-border/40 bg-muted/40"
+          >
+            <AspectRatio
+              v-if="media.kind === 'image'"
+              :ratio="media.ratio ?? 16 / 9"
+              class="w-full"
             >
-              Community poll
-            </p>
-            <p class="font-medium text-foreground">{{ media.question }}</p>
-          </header>
-          <ul class="space-y-2">
-            <li
-              v-for="option in media.options"
-              :key="option.id"
-              class="space-y-1"
+              <img
+                :src="media.src"
+                :alt="media.alt ?? post.title"
+                class="h-full w-full object-contain bg-black/5"
+              />
+            </AspectRatio>
+
+            <div
+              v-else-if="media.kind === 'link'"
+              class="flex h-24 w-full overflow-hidden bg-background"
             >
               <div
-                class="flex items-center justify-between text-[11px] text-muted-foreground"
+                class="flex-1 p-3 flex flex-col justify-between overflow-hidden"
               >
-                <span class="text-foreground">{{ option.label }}</span>
-                <span>{{
-                  formatPollPercentage(option.votes, media.totalVotes ?? 0)
-                }}</span>
-              </div>
-              <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  class="h-full rounded-full bg-primary"
-                  :style="{
-                    width: formatPollWidth(option.votes, media.totalVotes ?? 0),
-                  }"
-                />
-              </div>
-            </li>
-          </ul>
-          <p class="text-[11px] text-muted-foreground">
-            {{ media.totalVotes }} votes
-            <span v-if="media.closesAt">
-              · closes {{ formatRelativeTime(media.closesAt) }}</span
-            >
-          </p>
-        </div>
-      </section>
-
-      <section
-        v-if="hasCommentPreview"
-        class="space-y-4 rounded-lg border border-border/60 bg-background/60 p-3"
-      >
-        <header
-          class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
-        >
-          Top comments
-        </header>
-        <ul class="space-y-3">
-          <li
-            v-for="comment in commentPreview"
-            :key="comment.id"
-            class="space-y-2"
-          >
-            <div class="flex items-start gap-3">
-              <Avatar class="h-7 w-7 border border-border/50">
-                <AvatarImage
-                  v-if="comment.avatar"
-                  :src="comment.avatar"
-                  :alt="comment.author"
-                />
-                <AvatarFallback class="text-[10px] font-semibold uppercase">
-                  {{ comment.author.slice(0, 2).toUpperCase() }}
-                </AvatarFallback>
-              </Avatar>
-              <div class="min-w-0 space-y-1">
-                <div
-                  class="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground"
-                >
-                  <span class="font-semibold text-foreground"
-                    >u/{{ comment.author }}</span
-                  >
-                  <span>•</span>
-                  <span>{{ formatRelativeTime(comment.createdAt) }}</span>
+                <div class="text-sm font-medium truncate">
+                  {{ media.title ?? media.url }}
                 </div>
-                <p class="text-sm text-foreground">
-                  {{ comment.body }}
-                </p>
-                <span class="text-[11px] text-muted-foreground">
-                  {{ formatCount(comment.upvotes) }} upvotes
-                </span>
+                <div class="text-xs text-muted-foreground truncate">
+                  {{ media.description }}
+                </div>
+                <div class="flex items-center gap-1 text-xs text-blue-500">
+                  <LinkIcon class="w-3 h-3" />
+                  {{ media.domain }}
+                </div>
+              </div>
+              <div v-if="media.thumbnail" class="w-32 h-full bg-muted">
+                <img
+                  :src="media.thumbnail"
+                  class="w-full h-full object-cover"
+                />
               </div>
             </div>
-          </li>
-        </ul>
-      </section>
-    </div>
 
-    <div
-      class="flex flex-wrap items-center gap-2 border-t border-border/50 px-4 py-3"
-    >
-      <Button
-        variant="ghost"
-        size="sm"
-        :class="[
-          'gap-2 text-xs font-medium',
-          voteState === 'upvoted' ? 'text-primary' : 'text-foreground',
-        ]"
-      >
-        <ArrowBigUp
-          class="h-4 w-4"
-          :class="voteState === 'upvoted' ? 'text-primary' : ''"
-        />
-        <span>{{ voteLabel }}</span>
-        <span class="text-muted-foreground">· {{ scoreDisplay }}</span>
-      </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
-        <MessageSquare class="h-4 w-4" />
-        {{ commentsDisplay }} comments
-      </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
-        <Gift class="h-4 w-4" />
-        {{ awardsDisplay }} awards
-      </Button>
-      <Button variant="ghost" size="sm" class="gap-2 text-xs font-medium">
-        <Share2 class="h-4 w-4" />
-        {{ sharesDisplay }} shares
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        :class="[
-          'group gap-1.5 text-xs font-medium transition-all duration-200',
-          isSaved
-            ? 'text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400'
-            : 'text-muted-foreground hover:text-foreground',
-        ]"
-      >
-        <BookmarkCheck
-          v-if="isSaved"
-          :class="[
-            'h-4 w-4 transition-transform duration-200 group-hover:scale-110',
-            'fill-amber-600 dark:fill-amber-500',
-          ]"
-        />
-        <Bookmark
-          v-else
-          class="h-4 w-4 transition-transform duration-200 group-hover:scale-110"
-        />
-        <span class="transition-colors duration-200">{{ saveLabel }}</span>
-        <span
-          :class="[
-            'transition-colors duration-200',
-            isSaved ? 'text-amber-500/70' : 'text-muted-foreground',
-          ]"
-          >· {{ savesDisplay }}</span
-        >
-      </Button>
-      <div class="ml-auto flex items-center gap-3">
-        <span
-          v-if="impressionsDisplay"
-          class="text-[11px] text-muted-foreground"
-        >
-          {{ impressionsDisplay }} impressions
-        </span>
+            <div v-else-if="media.kind === 'video'" class="bg-black">
+              <AspectRatio :ratio="16 / 9">
+                <video
+                  :src="media.src"
+                  class="h-full w-full"
+                  :poster="media.thumbnail"
+                  controls
+                  playsinline
+                />
+              </AspectRatio>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer (Buttons) -->
+        <div class="flex items-center gap-2 pt-1">
+          <!-- Vote (Horizontal Pill) -->
+          <div
+            class="flex items-center bg-muted/50 rounded-full border border-transparent hover:border-border/50 text-muted-foreground"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 hover:bg-transparent hover:text-orange-600 rounded-l-full"
+            >
+              <ArrowBigUp class="h-5 w-5" />
+            </Button>
+            <span class="text-xs font-bold">{{ scoreDisplay }}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 hover:bg-transparent hover:text-blue-600 rounded-r-full"
+            >
+              <ArrowBigDown class="h-5 w-5" />
+            </Button>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
+          >
+            <MessageSquare class="h-4 w-4" />
+            {{ commentsDisplay }}
+            <span class="hidden sm:inline">comments</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
+          >
+            <Share2 class="h-4 w-4" />
+            <span class="hidden sm:inline">Share</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
+          >
+            <Bookmark class="h-4 w-4" />
+            <span class="hidden sm:inline">Save</span>
+          </Button>
+        </div>
       </div>
     </div>
   </div>

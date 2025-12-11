@@ -42,9 +42,7 @@ const userInitials = computed(() => {
 });
 const communityIcon = computed(() => props.thread.community?.icon || "");
 
-const createdAgo = computed(() =>
-  formatRelativeTime(props.thread.createdAt ?? props.thread.created_at),
-);
+const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 const recommendationLabel = computed(
   () =>
     (props.thread.recommendation as unknown as { label?: string })?.label ?? "",

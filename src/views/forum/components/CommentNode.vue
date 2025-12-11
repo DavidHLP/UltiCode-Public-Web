@@ -42,9 +42,7 @@ function formatRelativeTime(value: string) {
   return "just now";
 }
 
-const createdAgo = computed(() =>
-  formatRelativeTime(props.comment.createdAt ?? props.comment.created_at),
-);
+const createdAgo = computed(() => formatRelativeTime(props.comment.createdAt));
 const isCollapsed = ref(false);
 </script>
 

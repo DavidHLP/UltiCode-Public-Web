@@ -109,7 +109,7 @@ const sortedPosts = computed(() => {
   const sorters: Record<string, (a: ForumPost, b: ForumPost) => number> = {
     hot: (a, b) => (b.stats?.score ?? 0) - (a.stats?.score ?? 0),
     new: (a, b) =>
-      new Date(b.created_at).valueOf() - new Date(a.created_at).valueOf(),
+      new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
     top: (a, b) => (b.stats?.saves ?? 0) - (a.stats?.saves ?? 0),
     rising: (a, b) => (b.stats?.shares ?? 0) - (a.stats?.shares ?? 0),
   };

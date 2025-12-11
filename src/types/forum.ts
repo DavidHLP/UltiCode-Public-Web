@@ -112,40 +112,27 @@ export type ForumPostMedia =
 export interface ForumPost {
   id: string;
   title: string;
-  content: string;
   author: ForumUser;
-  created_at: string;
-  likes: number;
-  comments_count: number;
-  // Frontend specific or extended properties
-  excerpt?: string;
-  tags?: string[];
-  community?: ForumCommunity;
-  flair?: ForumFlair;
+  createdAt: string;
+  // Stats object from backend
   stats?: {
-    views: number;
-    likes: number;
-    comments: number;
+    views?: number;
+    likes?: number;
+    comments?: number;
     score?: number;
     saves?: number;
     shares?: number;
     upvote_ratio?: number;
     awards?: number;
   };
+  // Frontend specific or extended properties
+  excerpt?: string;
+  tags?: string[];
+  community?: ForumCommunity;
+  flair?: ForumFlair;
   isPinned?: boolean;
   isLocked?: boolean;
-  createdAt?: string;
-  views?: number;
   media?: ForumPostMedia[];
-  commentPreview?: {
-    id: string;
-    author: string; // Changed to string based on usage in ForumPostCard (u/{{ comment.author }})
-    avatar?: string;
-    content?: string;
-    body?: string; // Component uses body
-    createdAt: string;
-    upvotes: number;
-  }[];
   isSaved?: boolean;
   impressions?: number;
   voteState?: "upvoted" | "downvoted" | "neutral";
@@ -155,23 +142,20 @@ export interface ForumPost {
 
 export interface ForumComment {
   id: string;
-  content: string;
+  body: string;
   author: ForumUser;
-  created_at: string;
-  // Frontend specific
-  body?: string;
-  upvotes?: number;
+  createdAt: string;
+  upvotes: number;
   replies?: ForumComment[];
   isPinned?: boolean;
   isLocked?: boolean;
-  createdAt?: string;
+  parentId?: string;
 }
 
 export interface ForumThread extends ForumPost {
   comments: ForumComment[];
-  recommendation?: { label?: string };
-  awards?: ForumAward[];
-  voteState?: "upvoted" | "downvoted" | "neutral";
+  // Thread specific body/content if main post has it (backend uses excerpt/media, but if body exists add here)
+  body?: string;
 }
 
 export interface ForumModerator extends ForumUser {
