@@ -15,17 +15,7 @@ import {
 } from "lucide-vue-next";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
-import MarkdownIt from "markdown-it";
-
-const md = new MarkdownIt({
-  html: false,
-  linkify: true,
-  breaks: true,
-});
-
-function renderMarkdown(text: string) {
-  return md.render(text);
-}
+import { renderMarkdown } from "@/utils/markdown";
 
 const props = defineProps<{
   post: ForumPost;
@@ -85,7 +75,7 @@ const media = computed(() => {
 
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0)
+  formatCount(props.post.stats?.comments ?? 0),
 );
 
 function formatCount(value: number) {

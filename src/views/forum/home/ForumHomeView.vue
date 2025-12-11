@@ -49,7 +49,7 @@ const filteredPosts = computed(() => {
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
       (Array.isArray(post.tags) &&
         post.tags.some((tag: string) =>
-          tag.toLowerCase().includes(normalizedSearch)
+          tag.toLowerCase().includes(normalizedSearch),
         ));
 
     const matchesCommunity =
@@ -91,11 +91,7 @@ const sortedPosts = computed(() => {
         <PostSkeleton v-for="i in 3" :key="i" />
       </div>
       <div v-else class="space-y-4">
-        <PostCard
-          v-for="post in sortedPosts"
-          :key="post.id"
-          :post="post"
-        />
+        <PostCard v-for="post in sortedPosts" :key="post.id" :post="post" />
       </div>
     </main>
 

@@ -19,6 +19,7 @@ import {
   BookmarkCheck,
 } from "lucide-vue-next";
 import { computed } from "vue";
+import { renderMarkdown } from "@/utils/markdown";
 
 const props = defineProps<{
   thread: ForumThread;
@@ -45,16 +46,16 @@ const userInitials = computed(() => {
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
-  () => props.thread.media as unknown as ForumPostMedia | undefined
+  () => props.thread.media as unknown as ForumPostMedia | undefined,
 );
 
 const voteState = computed(() => props.thread.voteState ?? "neutral");
 
 const scoreDisplay = computed(() =>
-  props.thread.stats?.score ? formatCount(props.thread.stats.score) : "0"
+  props.thread.stats?.score ? formatCount(props.thread.stats.score) : "0",
 );
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0"
+  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
 );
 
 function formatCount(value: number) {
@@ -187,10 +188,9 @@ function formatPollWidth(votes: number, totalVotes: number) {
     <div class="px-4 sm:px-6 pb-2 space-y-4">
       <section
         v-if="thread.excerpt"
-        class="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap"
-      >
-        {{ thread.excerpt }}
-      </section>
+        class="text-sm leading-relaxed text-foreground/90 prose prose-sm dark:prose-invert max-w-none"
+        v-html="renderMarkdown(thread.excerpt)"
+      ></section>
 
       <section v-if="media" class="mt-4">
         <div
@@ -248,16 +248,9 @@ function formatPollWidth(votes: number, totalVotes: number) {
 
           <div
             v-else-if="media.type === 'text'"
-            class="p-4 text-sm leading-relaxed"
-          >
-            <div
-              v-if="media.markdown"
-              class="prose prose-sm dark:prose-invert max-w-none"
-            >
-              {{ media.markdown }}
-            </div>
-            <div v-else>{{ media.body }}</div>
-          </div>
+            class="p-4 text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none"
+            v-html="renderMarkdown(media.markdown || media.body || '')"
+          ></div>
 
           <div v-else-if="media.type === 'video'" class="bg-black">
             <AspectRatio :ratio="16 / 9">
