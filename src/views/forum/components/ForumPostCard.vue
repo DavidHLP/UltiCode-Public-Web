@@ -40,8 +40,6 @@ const userInitials = computed(() => {
     .join("")
     .slice(0, 2);
 });
-
-const communityIcon = computed(() => props.post.community?.icon || "");
 const createdAgo = computed(() =>
   formatRelativeTime(props.post.createdAt ?? props.post.created_at),
 );
@@ -189,11 +187,6 @@ function formatRelativeTime(value: string) {
               class="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground"
             >
               <span class="flex items-center gap-2">
-                <span
-                  class="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-base"
-                >
-                  {{ communityIcon }}
-                </span>
                 <span class="truncate">{{ post.community?.name }}</span>
               </span>
               <Badge
@@ -222,32 +215,7 @@ function formatRelativeTime(value: string) {
                 Locked
               </span>
             </div>
-            <div v-if="props.post.community" class="flex items-center gap-1.5">
-              <Avatar class="h-4 w-4 rounded-sm">
-                <AvatarImage
-                  v-if="props.post.community.icon"
-                  :src="props.post.community.icon"
-                />
-                <AvatarFallback class="rounded-sm text-[9px]">{{
-                  props.post.community.name.charAt(0)
-                }}</AvatarFallback>
-              </Avatar>
-              <span class="text-xs font-medium text-foreground">{{
-                props.post.community.name
-              }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <Avatar class="h-5 w-5 border border-border">
-                <AvatarImage
-                  v-if="props.post.author?.avatar"
-                  :src="props.post.author.avatar"
-                />
-                <AvatarFallback>{{ userInitials }}</AvatarFallback>
-              </Avatar>
-              <span class="font-medium text-foreground hover:underline">
-                {{ props.post.author?.username || "U" }}
-              </span>
-            </div>
+
             <div
               class="flex flex-wrap items-center gap-1 text-xs text-muted-foreground"
             >

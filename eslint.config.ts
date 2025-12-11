@@ -10,7 +10,6 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
 export default defineConfigWithVueTs(
   {
-    // @ts-expect-error - valid eslint config property but types are strict
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
