@@ -7,6 +7,7 @@ import ForumThreadComments from "@/views/forum/components/ForumThreadComments.vu
 import { fetchForumThread, createForumComment } from "@/api/forum";
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
+import { ArrowLeft } from "lucide-vue-next";
 
 const route = useRoute();
 const thread = ref<ForumThread | null>(null);
@@ -42,15 +43,6 @@ async function onSubmitComment(body: string) {
 
 <template>
   <div class="mx-auto w-full max-w-4xl px-0 sm:px-4 lg:px-6 py-4">
-    <div class="mb-4 px-4 sm:px-0">
-      <RouterLink
-        to="/forum"
-        class="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <span class="text-xs">←</span> Back to feed
-      </RouterLink>
-    </div>
-
     <div v-if="isLoading" class="space-y-6">
       <ForumPostSkeleton />
       <div class="space-y-4 pl-4 border-l border-border/40">
@@ -65,14 +57,23 @@ async function onSubmitComment(body: string) {
     </div>
 
     <template v-else-if="thread">
-      <div class="bg-card sm:rounded-xl overflow-hidden">
-        <ForumThreadContent :thread="thread" />
-        <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
-        <ForumThreadComments
-          :comments="thread.comments"
-          :is-locked="thread.isLocked"
-          @submit="onSubmitComment"
-        />
+      <div class="flex items-start gap-0.25 sm:gap-0.5">
+        <RouterLink
+          to="/forum"
+          class="shrink-0 inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted/50 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground mt-4 sm:mt-6"
+        >
+          <ArrowLeft class="h-5 w-5" />
+        </RouterLink>
+
+        <div class="flex-1 min-w-0 bg-card sm:rounded-xl overflow-hidden">
+          <ForumThreadContent :thread="thread" />
+          <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
+          <ForumThreadComments
+            :comments="thread.comments"
+            :is-locked="thread.isLocked"
+            @submit="onSubmitComment"
+          />
+        </div>
       </div>
     </template>
 

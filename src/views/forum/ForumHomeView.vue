@@ -48,7 +48,7 @@ const filteredPosts = computed(() => {
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
       (Array.isArray(post.tags) &&
         post.tags.some((tag: string) =>
-          tag.toLowerCase().includes(normalizedSearch),
+          tag.toLowerCase().includes(normalizedSearch)
         ));
 
     const matchesCommunity =

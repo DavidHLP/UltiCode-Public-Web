@@ -34,6 +34,14 @@ const flairClasses: Record<ForumFlairType, string> = {
 
 const communityIcon = computed(() => props.thread.community?.icon || "");
 
+const userInitials = computed(() => {
+  const parts = props.thread.author.username.split(/[\s_-]/);
+  return parts
+    .map((part: string) => part.charAt(0).toUpperCase())
+    .join("")
+    .slice(0, 2);
+});
+
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
@@ -92,30 +100,53 @@ function formatPollWidth(votes: number, totalVotes: number) {
 <template>
   <div class="bg-card text-card-foreground">
     <!-- Header -->
-    <div class="px-4 pt-4 sm:px-6 sm:pt-6">
+    <div class="px-3 pt-4 sm:px-4 sm:pt-6">
       <div class="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-        <template v-if="thread.community">
-          <Avatar class="h-8 w-8 sm:h-9 sm:w-9 border border-border/40">
+        <template v-if="communityIcon">
+          <Avatar class="h-9 w-9 rounded-full border border-border/40">
             <AvatarImage
               v-if="communityIcon"
               :src="communityIcon"
-              :alt="thread.community.name"
+              :alt="thread.community?.name"
             />
             <AvatarFallback class="text-xs">{{
-              thread.community.name.charAt(0).toUpperCase()
+              thread.community?.name?.charAt(0).toUpperCase()
             }}</AvatarFallback>
           </Avatar>
-          <span
-            class="font-bold text-foreground hover:underline cursor-pointer"
-          >
-            r/{{ thread.community.name }}
-          </span>
-          <span>•</span>
         </template>
-        <span class="hover:underline cursor-pointer"
-          >Posted by u/{{ thread.author.username }}</span
-        >
-        <span>{{ createdAgo }}</span>
+        <template v-else>
+          <Avatar class="h-9 w-9 rounded-full border border-border/40">
+            <AvatarImage
+              v-if="thread.author.avatar"
+              :src="thread.author.avatar"
+              :alt="thread.author.username"
+            />
+            <AvatarFallback class="text-xs">{{ userInitials }}</AvatarFallback>
+          </Avatar>
+        </template>
+
+        <div class="flex items-center gap-1 flex-wrap">
+          <template v-if="thread.community">
+            <span
+              class="font-bold text-foreground hover:underline cursor-pointer"
+            >
+              r/{{ thread.community.name }}
+            </span>
+            <span class="text-muted-foreground/60">•</span>
+            <span class="hover:underline cursor-pointer"
+              >Posted by u/{{ thread.author.username }}</span
+            >
+          </template>
+          <template v-else>
+            <span
+              class="font-bold text-foreground hover:underline cursor-pointer"
+            >
+              u/{{ thread.author.username }}
+            </span>
+          </template>
+          <span class="text-muted-foreground/60">•</span>
+          <span>{{ createdAgo }}</span>
+        </div>
 
         <Badge
           v-if="thread.flair"
