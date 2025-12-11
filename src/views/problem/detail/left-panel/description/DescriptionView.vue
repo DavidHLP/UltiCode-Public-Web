@@ -91,7 +91,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
   <section class="space-y-6">
     <section class="space-y-3">
       <!-- Title -->
-      <h1 class="text-base font-semibold leading-tight">
+      <h1 class="text-2xl font-semibold leading-tight">
         {{ props.problem.title }}
       </h1>
 
@@ -99,7 +99,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
       <div class="flex flex-wrap gap-1">
         <!-- Difficulty Badge -->
         <div
-          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted text-[10px]"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted text-xs"
           :class="difficultyClass"
         >
           {{ props.problem.difficulty }}
@@ -108,7 +108,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <!-- Tags Button -->
         <button
           v-if="props.problem.tags?.length"
-          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-xs text-muted-foreground"
           @click="scrollToSection((tagsSection as any).$el)"
         >
           <svg
@@ -130,7 +130,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
             Array.isArray(props.problem.companies) &&
             props.problem.companies.length
           "
-          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-xs text-muted-foreground"
           @click="scrollToSection((companiesSection as any).$el)"
         >
           <span class="text-yellow-600 dark:text-yellow-500"
@@ -141,7 +141,7 @@ const problemDescription = computed<ProblemDescription>(() => ({
         <!-- Hint Button -->
         <button
           v-if="props.problem.followUp || props.problem.starterNotes?.length"
-          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-[10px] text-muted-foreground"
+          class="relative inline-flex items-center justify-center px-1.5 py-0.5 gap-1 rounded-full bg-muted cursor-pointer transition-colors hover:bg-muted/80 hover:opacity-80 text-xs text-muted-foreground"
           @click="scrollToSection((hintsSection as any)?.$el)"
         >
           <svg

@@ -103,20 +103,33 @@
           </div>
         </div>
 
-        <div class="flex-1 overflow-hidden px-4">
-          <div class="h-full overflow-x-hidden overflow-y-auto">
-            <MdEditor
-              v-model="editorContent"
-              :theme="editorTheme"
-              :toolbars="toolbarItems"
-              :footers="footerItems"
-              :preview-only="isPreviewMode"
-              class="w-full bg-transparent"
-              style="height: 100%"
-              editor-id="solution-editor"
-              @on-upload-img="handleUpload"
-              @on-save="handleManualSave"
-            />
+        <div class="flex-1 px-4 pb-4 overflow-hidden">
+          <div class="grid h-full grid-cols-2 gap-4">
+            <!-- Monaco Editor Container -->
+            <div
+              class="flex flex-col rounded-lg border bg-card overflow-hidden"
+            >
+              <div
+                class="flex items-center border-b bg-muted/30 px-3 py-2 text-xs font-medium text-muted-foreground"
+              >
+                Markdown Editor
+              </div>
+              <div ref="editorContainer" class="flex-1 w-full h-full"></div>
+            </div>
+
+            <!-- Markdown Preview -->
+            <div
+              class="flex flex-col rounded-lg border bg-card overflow-hidden"
+            >
+              <div
+                class="flex items-center border-b bg-muted/30 px-3 py-2 text-xs font-medium text-muted-foreground"
+              >
+                Preview
+              </div>
+              <div class="flex-1 overflow-y-auto p-4">
+                <div class="markdown-content" v-html="previewHtml"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -125,27 +138,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, onBeforeUnmount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useDebounceFn, usePreferredDark } from "@vueuse/core";
-import { MdEditor, config } from "md-editor-v3";
-import type { ToolbarNames, Footers } from "md-editor-v3";
-import "md-editor-v3/lib/style.css";
-import katex from "katex";
-import "katex/dist/katex.css";
 import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fetchSolutionTopics } from "@/api/topic";
 import type { SolutionTopic } from "@/types/topic";
-
-config({
-  editorExtensions: {
-    katex: {
-      instance: katex,
-    },
-  },
-});
+import loader from "@monaco-editor/loader";
+import * as monaco from "monaco-editor";
+import { renderMarkdown } from "@/utils/markdown";
+import "highlight.js/styles/atom-one-dark.css";
 
 const router = useRouter();
 const route = useRoute();
@@ -183,36 +187,49 @@ class Solution {
 `);
 
 const isDark = usePreferredDark();
-const editorTheme = computed(() => (isDark.value ? "dark" : "light"));
 
-const toolbarItems: ToolbarNames[] = [
-  "bold",
-  "underline",
-  "italic",
-  "strikeThrough",
-  "title",
-  "-",
-  "quote",
-  "unorderedList",
-  "orderedList",
-  "task",
-  "codeRow",
-  "code",
-  "link",
-  "image",
-  "table",
-  "katex",
-  "=",
-  "revoke",
-  "next",
-  "save",
-  "preview",
-  "previewOnly",
-  "fullscreen",
-];
+// Monaco Editor setup
+const editorContainer = ref<HTMLElement | null>(null);
+let editorInstance: monaco.editor.IStandaloneCodeEditor | null = null;
 
-const footerItems: Footers[] = ["markdownTotal", "="];
+onMounted(async () => {
+  loadTopics();
 
+  if (editorContainer.value) {
+    loader.config({ monaco });
+    const monacoInstance = await loader.init();
+
+    editorInstance = monacoInstance.editor.create(editorContainer.value, {
+      value: editorContent.value,
+      language: "markdown",
+      theme: isDark.value ? "vs-dark" : "vs",
+      automaticLayout: true,
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+      fontSize: 14,
+      fontFamily: "Menlo, Monaco, 'Courier New', monospace",
+      padding: { top: 16, bottom: 16 },
+    });
+
+    editorInstance.onDidChangeModelContent(() => {
+      editorContent.value = editorInstance?.getValue() || "";
+    });
+  }
+});
+
+onBeforeUnmount(() => {
+  if (editorInstance) {
+    editorInstance.dispose();
+  }
+});
+
+watch(isDark, (newVal) => {
+  if (editorInstance) {
+    monaco.editor.setTheme(newVal ? "vs-dark" : "vs");
+  }
+});
+
+// Topic Logic
 const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
@@ -241,9 +258,6 @@ const loadTopics = async () => {
   }
 };
 
-onMounted(loadTopics);
-
-const isPreviewMode = ref(false);
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
   isDraftSaved.value ? "Draft saved" : "Editing draft...",
@@ -274,10 +288,6 @@ const removeTopic = (topicId: string) => {
   );
 };
 
-const handleManualSave = () => {
-  isDraftSaved.value = true;
-};
-
 const handlePublish = () => {
   isDraftSaved.value = true;
   console.log("Publishing solution", {
@@ -295,71 +305,78 @@ const handleGoBack = () => {
   router.back();
 };
 
-const handleUpload = async (
-  files: File[],
-  callback: (urls: string[]) => void,
-) => {
-  const urls = files.map((file) => URL.createObjectURL(file));
-  callback(urls);
-};
+const previewHtml = computed(() => renderMarkdown(editorContent.value));
 </script>
 
 <style>
-:deep(.md-editor) {
-  border: none;
-  background: transparent;
-}
-
-:deep(.md-editor-container) {
-  background: transparent;
-}
-
-:deep(.md-editor--preview-only) {
-  background: transparent;
-}
-
-:deep(.md-editor-text-input) {
-  background: transparent;
-  font-family: inherit;
-}
-
-:deep(.md-editor-toolbar) {
-  border-bottom: 1px solid var(--color-border);
-  background: transparent;
-}
-
-:deep(.md-editor-preview) {
-  background: transparent;
-}
-
-:deep(.md-editor-preview h1) {
+.markdown-content h1 {
   font-size: 1.5rem;
   font-weight: 700;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
 
-:deep(.md-editor-preview h2) {
+.markdown-content h2 {
   font-size: 1.25rem;
   font-weight: 600;
   margin-top: 0.875rem;
   margin-bottom: 0.5rem;
 }
 
-:deep(.md-editor-preview blockquote) {
+.markdown-content blockquote {
   border-left: 4px solid var(--color-border);
   padding-left: 1rem;
   color: var(--text-secondary);
   margin: 0.5rem 0;
 }
 
-:deep(.md-editor-preview ul) {
+.markdown-content ul {
   list-style: disc;
   margin-left: 1.5rem;
 }
 
-:deep(.md-editor-preview ol) {
+.markdown-content ol {
   list-style: decimal;
   margin-left: 1.5rem;
+}
+
+.markdown-content pre {
+  background-color: var(--color-secondary);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown-content code {
+  font-family: "Fira Code", monospace;
+  font-size: 0.875rem;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: var(--color-muted);
+}
+
+.markdown-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 </style>

@@ -4,6 +4,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 import "./style.css";
+import "./assets/markdown.css";
 import VueDnDKitPlugin from "@vue-dnd-kit/core";
 
 async function bootstrap() {
