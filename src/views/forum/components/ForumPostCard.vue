@@ -85,7 +85,7 @@ const media = computed(() => {
 
 const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0),
+  formatCount(props.post.stats?.comments ?? 0)
 );
 
 function formatCount(value: number) {
@@ -130,21 +130,27 @@ function formatRelativeTime(value: string) {
       <div class="min-w-0 flex-1 space-y-2">
         <!-- Header -->
         <header class="flex items-center gap-2 text-xs text-muted-foreground">
-          <Avatar class="h-5 w-5 rounded-full" v-if="post.community?.icon">
+          <Avatar
+            class="h-9 w-9 rounded-full border border-border/40"
+            v-if="post.community?.icon"
+          >
             <AvatarImage
               :src="post.community.icon"
               :alt="post.community.name"
             />
-            <AvatarFallback>{{
+            <AvatarFallback class="text-xs">{{
               post.community.name.charAt(0).toUpperCase()
             }}</AvatarFallback>
           </Avatar>
-          <Avatar class="h-5 w-5 rounded-full" v-else-if="post.author.avatar">
+          <Avatar
+            class="h-9 w-9 rounded-full border border-border/40"
+            v-else-if="post.author.avatar"
+          >
             <AvatarImage
               :src="post.author.avatar"
               :alt="post.author.username"
             />
-            <AvatarFallback>{{ userInitials }}</AvatarFallback>
+            <AvatarFallback class="text-xs">{{ userInitials }}</AvatarFallback>
           </Avatar>
           <span class="flex items-center gap-1">
             <span

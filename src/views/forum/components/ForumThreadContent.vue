@@ -37,16 +37,16 @@ const communityIcon = computed(() => props.thread.community?.icon || "");
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
-  () => props.thread.media as unknown as ForumPostMedia | undefined,
+  () => props.thread.media as unknown as ForumPostMedia | undefined
 );
 
 const voteState = computed(() => props.thread.voteState ?? "neutral");
 
 const scoreDisplay = computed(() =>
-  props.thread.stats?.score ? formatCount(props.thread.stats.score) : "0",
+  props.thread.stats?.score ? formatCount(props.thread.stats.score) : "0"
 );
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
+  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0"
 );
 
 function formatCount(value: number) {
@@ -95,13 +95,13 @@ function formatPollWidth(votes: number, totalVotes: number) {
     <div class="px-4 pt-4 sm:px-6 sm:pt-6">
       <div class="flex items-center gap-2 text-xs text-muted-foreground mb-2">
         <template v-if="thread.community">
-          <Avatar class="h-5 w-5 border border-border/40">
+          <Avatar class="h-8 w-8 sm:h-9 sm:w-9 border border-border/40">
             <AvatarImage
               v-if="communityIcon"
               :src="communityIcon"
               :alt="thread.community.name"
             />
-            <AvatarFallback class="text-[10px]">{{
+            <AvatarFallback class="text-xs">{{
               thread.community.name.charAt(0).toUpperCase()
             }}</AvatarFallback>
           </Avatar>
