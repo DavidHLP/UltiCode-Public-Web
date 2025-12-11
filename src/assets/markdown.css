@@ -101,7 +101,8 @@
 .lc-code-body pre {
   margin: 0 !important;
   padding: 1rem;
-  font-family: "Menlo", "Monaco", "Consolas", "Courier New", monospace !important;
+  font-family:
+    "Menlo", "Monaco", "Consolas", "Courier New", monospace !important;
   font-size: 0.875em !important;
   line-height: 1.6 !important;
   background-color: transparent !important;
