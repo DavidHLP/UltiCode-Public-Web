@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Problem } from "@/types/problem";
-import { onMounted, onUnmounted, type Component, type PropType } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Lock, SearchX, Video } from "lucide-vue-next";
 import {
@@ -19,24 +19,9 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty";
 
-defineProps({
-  displayedProblems: {
-    type: Array as PropType<
-      (Problem & {
-        statusIcon?: Component;
-      })[]
-    >,
-    required: true,
-  },
-  numProblemsToShow: {
-    type: Number,
-    required: true,
-  },
-  totalFilteredProblems: {
-    type: Number,
-    required: true,
-  },
-});
+import type { ProblemTableProps } from "./type";
+
+defineProps<ProblemTableProps>();
 
 const router = useRouter();
 
@@ -134,7 +119,7 @@ onUnmounted(() => {
           <TableCell class="text-center">
             {{
               formatAcceptance(
-                problem.acceptanceRate ?? problem.acceptance_rate,
+                problem.acceptanceRate ?? problem.acceptance_rate
               )
             }}
           </TableCell>

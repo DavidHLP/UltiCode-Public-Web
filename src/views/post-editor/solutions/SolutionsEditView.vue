@@ -106,16 +106,10 @@
         <div class="flex-1 px-4 pb-4 overflow-hidden">
           <div class="grid h-full grid-cols-2 gap-4">
             <!-- Monaco Editor Container -->
-            <div
-              class="flex flex-col rounded-lg border bg-card overflow-hidden"
-            >
-              <div
-                class="flex items-center border-b bg-muted/30 px-3 py-2 text-xs font-medium text-muted-foreground"
-              >
-                Markdown Editor
-              </div>
-              <div ref="editorContainer" class="flex-1 w-full h-full"></div>
-            </div>
+            <MarkdownEdit
+              v-model="editorContent"
+              :default-value="dynamicTemplate"
+            />
 
             <!-- Markdown Preview -->
             <div
@@ -138,28 +132,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, onBeforeUnmount } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useDebounceFn, usePreferredDark } from "@vueuse/core";
+import { useDebounceFn } from "@vueuse/core";
 import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fetchSolutionTopics } from "@/api/topic";
 import { fetchSubmission } from "@/api/submission";
 import type { SolutionTopic } from "@/types/topic";
-import loader from "@monaco-editor/loader";
-import * as monaco from "monaco-editor";
 import { renderMarkdown } from "@/utils/markdown";
-import { configureMonacoWorkers } from "@/utils/monaco-workers";
 import "highlight.js/styles/atom-one-dark.css";
 
-configureMonacoWorkers();
+import { MarkdownEdit } from "@/components/markdown";
 
 const router = useRouter();
 const route = useRoute();
 
 const title = ref("");
-const editorContent = ref<string>(`# Approach
+
+// Default template content
+const defaultTemplate = `# Approach
 
 > What method do you use to solve this problem?
 
@@ -188,13 +181,10 @@ class Solution {
    }
 }
 \`\`\`
-`);
+`;
 
-const isDark = usePreferredDark();
-
-// Monaco Editor setup
-const editorContainer = ref<HTMLElement | null>(null);
-let editorInstance: monaco.editor.IStandaloneCodeEditor | null = null;
+const editorContent = ref<string>("");
+const dynamicTemplate = ref<string>(defaultTemplate);
 
 const resolvedProblemId = ref<string>(route.params.id as string);
 
@@ -213,8 +203,29 @@ onMounted(async () => {
       }
       resolvedProblemId.value = submission.problem_id.toString();
 
-      // Optionally pre-fill code? User didn't ask for it, but might be nice.
-      // For now, sticking to requirements: check ACC status.
+      // Update dynamic template with submission code
+      const lang = submission.language.toLowerCase();
+      const code = submission.code;
+      dynamicTemplate.value = `# Approach
+
+> What method do you use to solve this problem?
+
+# Solution
+
+> How do you apply these methods?
+
+# Complexity
+
+- Time complexity: $O(*)$
+- Space complexity: $O(*)$
+
+# Code
+
+\`\`\`${lang}
+${code}
+\`\`\`
+`;
+      // If editor content is empty, it will pick up this new template via the component watcher
     } catch (error) {
       console.error("Failed to validate submission", error);
       alert("Failed to validate submission.");
@@ -224,40 +235,10 @@ onMounted(async () => {
   }
 
   loadTopics();
-
-  if (editorContainer.value) {
-    loader.config({ monaco });
-    const monacoInstance = await loader.init();
-
-    editorInstance = monacoInstance.editor.create(editorContainer.value, {
-      value: editorContent.value,
-      language: "markdown",
-      theme: isDark.value ? "vs-dark" : "vs",
-      automaticLayout: true,
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      fontSize: 14,
-      fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-      padding: { top: 16, bottom: 16 },
-    });
-
-    editorInstance.onDidChangeModelContent(() => {
-      editorContent.value = editorInstance?.getValue() || "";
-    });
-  }
 });
 
-onBeforeUnmount(() => {
-  if (editorInstance) {
-    editorInstance.dispose();
-  }
-});
-
-watch(isDark, (newVal) => {
-  if (editorInstance) {
-    monaco.editor.setTheme(newVal ? "vs-dark" : "vs");
-  }
-});
+// Watch logic for isDark is handled inside MarkdownEdit now
+// Editor instance management is also inside MarkdownEdit
 
 // Topic Logic
 const topicOptions = ref<SolutionTopic[]>([]);

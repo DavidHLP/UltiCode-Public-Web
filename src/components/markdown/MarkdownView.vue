@@ -2,12 +2,9 @@
 import { renderMarkdown } from "@/utils/markdown";
 import { toast } from "vue-sonner";
 
-const props = defineProps<{
-  /** Markdown 内容 */
-  content: string;
-  /** 编辑器 ID，用于区分多个实例 */
-  editorId?: string;
-}>();
+import type { MarkdownViewProps } from "./type";
+
+const props = defineProps<MarkdownViewProps>();
 
 const handleClick = (e: MouseEvent) => {
   const target = e.target as HTMLElement;

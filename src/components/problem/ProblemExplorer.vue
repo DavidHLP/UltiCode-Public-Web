@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Problem } from "@/types/problem";
+
 import { computed, onMounted, ref, watch, type Ref } from "vue";
 import {
   CheckCircle2,
@@ -29,9 +30,9 @@ import {
 import ProblemTable from "./ProblemTable.vue";
 import { fetchProblems } from "@/api/problem";
 
-const props = defineProps<{
-  problems?: Problem[];
-}>();
+import type { ProblemExplorerProps } from "./type";
+
+const props = defineProps<ProblemExplorerProps>();
 
 const searchQuery = ref("");
 const selectedTags = ref<string[]>([]);
@@ -111,7 +112,7 @@ const popularTags = ref([
   "Sorting",
 ]);
 const otherTags = computed(() =>
-  allTags.value.filter((t) => !popularTags.value.includes(t)),
+  allTags.value.filter((t) => !popularTags.value.includes(t))
 );
 
 function toggleStatusSolved(checked: boolean) {
@@ -142,7 +143,7 @@ function togglePremiumPremium(checked: boolean) {
 function toggleFilter(
   targetArray: Ref<string[]>,
   item: string,
-  checked: boolean,
+  checked: boolean
 ) {
   const currentItems = targetArray.value;
   const isPresent = currentItems.includes(item);
@@ -319,7 +320,7 @@ function loadMore() {
                 @click="
                   () =>
                     toggleDifficultyMedium(
-                      !selectedDifficulty.includes('Medium'),
+                      !selectedDifficulty.includes('Medium')
                     )
                 "
               >
