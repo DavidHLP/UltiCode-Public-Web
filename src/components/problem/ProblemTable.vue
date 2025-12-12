@@ -119,7 +119,7 @@ onUnmounted(() => {
           <TableCell class="text-center">
             {{
               formatAcceptance(
-                problem.acceptanceRate ?? problem.acceptance_rate
+                problem.acceptanceRate ?? problem.acceptance_rate,
               )
             }}
           </TableCell>

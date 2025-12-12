@@ -121,7 +121,7 @@
                 Preview
               </div>
               <div class="flex-1 overflow-y-auto p-4">
-                <div class="markdown-content" v-html="previewHtml"></div>
+                <MarkdownView :content="editorContent" />
               </div>
             </div>
           </div>
@@ -141,10 +141,9 @@ import { Button } from "@/components/ui/button";
 import { fetchSolutionTopics } from "@/api/topic";
 import { fetchSubmission } from "@/api/submission";
 import type { SolutionTopic } from "@/types/topic";
-import { renderMarkdown } from "@/utils/markdown";
 import "highlight.js/styles/atom-one-dark.css";
 
-import { MarkdownEdit } from "@/components/markdown";
+import { MarkdownEdit, MarkdownView } from "@/components/markdown";
 
 const router = useRouter();
 const route = useRoute();
@@ -320,8 +319,6 @@ const handlePublish = () => {
 const handleGoBack = () => {
   router.back();
 };
-
-const previewHtml = computed(() => renderMarkdown(editorContent.value));
 </script>
 
 <style>

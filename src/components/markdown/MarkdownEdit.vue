@@ -88,7 +88,7 @@ watch(
       emit("update:modelValue", newVal);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // 监听 modelValue 变化（外部更新）
@@ -98,7 +98,7 @@ watch(
     if (editorInstance && editorInstance.getValue() !== newVal) {
       editorInstance.setValue(newVal);
     }
-  }
+  },
 );
 
 // 监听主题变化

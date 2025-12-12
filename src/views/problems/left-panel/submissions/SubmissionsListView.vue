@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+
 import {
   Empty,
   EmptyContent,
@@ -28,18 +28,17 @@ const emit = defineEmits<{
   select: [submission: SubmissionRecord];
 }>();
 
-const statusVariant = (status: SubmissionRecord["status"]) => {
+const statusClass = (status: SubmissionRecord["status"]) => {
   switch (status) {
     case "Accepted":
-      return "text-emerald-600 dark:text-emerald-300 bg-emerald-100/50 dark:bg-emerald-900/40";
+      return "text-green-600 dark:text-green-400 font-medium";
     case "Wrong Answer":
-      return "text-red-600 dark:text-red-300 bg-red-100/60 dark:bg-red-900/40";
     case "Runtime Error":
-      return "text-amber-600 dark:text-amber-300 bg-amber-100/60 dark:bg-amber-900/40";
     case "Time Limit Exceeded":
-      return "text-sky-600 dark:text-sky-300 bg-sky-100/60 dark:bg-sky-900/40";
+    case "Compile Error":
+      return "text-red-600 dark:text-red-400 font-medium";
     default:
-      return "text-muted-foreground bg-muted";
+      return "text-muted-foreground";
   }
 };
 
@@ -82,13 +81,13 @@ const sortedSubmissions = computed(() =>
     const tsA = normalizeTimestamp(a.submittedAt ?? a.created_at) ?? 0;
     const tsB = normalizeTimestamp(b.submittedAt ?? b.created_at) ?? 0;
     return tsB - tsA;
-  }),
+  })
 );
 
 const decoratedSubmissions = computed(() =>
   sortedSubmissions.value.map((submission) => {
     const timestamp = normalizeTimestamp(
-      submission.submittedAt ?? submission.created_at,
+      submission.submittedAt ?? submission.created_at
     );
     return {
       ...submission,
@@ -97,7 +96,7 @@ const decoratedSubmissions = computed(() =>
         : submission.submittedAt,
       relativeSubmitted: formatRelativeTime(timestamp),
     };
-  }),
+  })
 );
 
 const handleSelect = (submission: SubmissionRecord) =>
@@ -135,12 +134,9 @@ const handleSelect = (submission: SubmissionRecord) =>
               @click="handleSelect(submission)"
             >
               <TableCell>
-                <Badge
-                  class="rounded-full px-3 py-0.5 text-xs font-semibold"
-                  :class="statusVariant(submission.status)"
-                >
+                <div :class="statusClass(submission.status)">
                   {{ submission.status }}
-                </Badge>
+                </div>
               </TableCell>
               <TableCell>{{ submission.language }}</TableCell>
               <TableCell class="text-center">{{

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import type { SubmissionRecord } from "@/types/submission";
-import { Clock, Microchip, Sparkles } from "lucide-vue-next";
+import { Clock, Microchip } from "lucide-vue-next";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
 
@@ -426,13 +426,13 @@ const handleWriteSolution = () => {
 <template>
   <div
     v-if="props.submission"
-    class="mx-auto flex w-full max-w-[700px] flex-col gap-3 px-3 py-2"
+    class="mx-auto flex w-full max-w-[700px] flex-col gap-4 px-3 py-2"
   >
-    <!-- 顶部状态栏 -->
+    <!-- Header -->
     <div class="flex w-full items-center justify-between gap-3">
       <div class="flex flex-1 flex-col items-start gap-0.5 overflow-hidden">
         <div
-          class="flex flex-1 items-center gap-1.5 text-sm font-medium leading-5"
+          class="flex flex-1 items-center gap-1.5 text-lg font-medium leading-tight"
           :class="[
             props.submission?.status === 'Accepted'
               ? 'text-green-600 dark:text-green-400'
@@ -442,53 +442,50 @@ const handleWriteSolution = () => {
           <span data-e2e-locator="submission-result">{{
             props.submission?.status
           }}</span>
-          <div class="text-[11px] font-normal text-muted-foreground">
-            <span
-              >{{
-                props.submission?.tests?.filter((t) => t.status === "Accepted")
-                  .length ?? 0
-              }}
-              / {{ props.submission?.tests?.length ?? 0 }} </span
-            >test cases passed
-          </div>
         </div>
+
+        <!-- Test cases info (only if not compile error) -->
         <div
-          class="flex max-w-full flex-1 items-center gap-1 overflow-hidden text-[11px]"
+          v-if="props.submission.status !== 'Compile Error'"
+          class="text-xs font-normal text-muted-foreground"
         >
-          <Avatar class="h-3.5 w-3.5 flex-none cursor-pointer">
-            <AvatarImage
-              src="https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png"
-              alt="User"
-            />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-          <div class="truncate max-w-full font-medium text-foreground">
-            User
-          </div>
-          <span class="text-muted-foreground flex-none whitespace-nowrap">
-            Submitted&nbsp;<span class="max-w-full truncate">{{
-              new Date(
-                props.submission?.submittedAt ?? props.submission?.created_at
-              ).toLocaleString("en-US", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            }}</span>
+          <span v-if="props.submission.status === 'Accepted'">
+            All test cases passed
+          </span>
+          <span v-else>
+            {{
+              props.submission?.tests?.filter((t) => t.status === "Accepted")
+                .length ?? 0
+            }}
+            / {{ props.submission?.tests?.length ?? 0 }} test cases passed
           </span>
         </div>
+
+        <div class="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+          <div class="flex items-center gap-1">
+            <Avatar class="h-4 w-4">
+              <AvatarImage
+                src="https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png"
+              />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+            <span class="font-medium text-foreground">User</span>
+            <span class="text-muted-foreground/60">submitted at</span>
+            <span>{{
+              new Date(
+                props.submission.submittedAt ?? props.submission.created_at
+              ).toLocaleString()
+            }}</span>
+          </div>
+        </div>
       </div>
-      <div class="flex flex-none gap-1.5">
-        <Button variant="secondary" size="sm" class="h-7 gap-1.5 text-xs">
-          Official Solution
-        </Button>
+
+      <div class="flex flex-none gap-2">
         <Button
           v-if="props.submission?.status === 'Accepted'"
           variant="default"
           size="sm"
-          class="h-7 gap-1.5 bg-green-600 hover:bg-green-700 text-xs text-white"
+          class="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
           @click="handleWriteSolution"
         >
           Write Solution
@@ -496,108 +493,135 @@ const handleWriteSolution = () => {
       </div>
     </div>
 
-    <!-- 分布统计卡片 -->
+    <!-- Content based on Status -->
+
+    <!-- 1. Compile Error -->
     <div
-      class="flex w-full flex-col gap-1.5 rounded-lg border border-border p-2"
+      v-if="props.submission.status === 'Compile Error'"
+      class="rounded-md bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 p-4"
     >
-      <div class="flex items-center justify-between gap-1.5">
-        <div class="flex w-full flex-wrap gap-2">
-          <!-- 执行用时分布 -->
-          <div
-            class="rounded-md group flex min-w-[240px] flex-1 cursor-pointer flex-col px-3 py-2 text-xs transition hover:opacity-100"
-            :class="showRuntimeDetail ? 'bg-accent' : 'opacity-40'"
-            @click="toggleRuntimeChart"
-          >
-            <div class="flex justify-between gap-1.5">
-              <div class="flex items-center gap-1 text-foreground">
-                <Clock class="h-3 w-3" />
-                <div class="flex-1 text-xs">Runtime Distribution</div>
-              </div>
-            </div>
-            <div class="mt-1.5 flex items-center gap-1">
-              <span class="font-medium text-foreground">
-                {{ props.submission?.runtime.toString().replace("ms", "") }} ms
-              </span>
-              <span class="text-muted-foreground">
-                Beats
-                {{ (props.submission?.runtimePercentile ?? 0).toFixed(1) }}%
-              </span>
-            </div>
-            <div
-              class="mt-0.5 flex w-fit cursor-pointer gap-0.5 text-[11px] opacity-0 group-hover:opacity-100"
-            >
-              <Sparkles class="h-3.5 w-3.5 text-blue-500" />
-              <span
-                class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent"
-                >Complexity Analysis</span
-              >
-            </div>
-          </div>
-
-          <!-- 消耗内存分布 -->
-          <div
-            class="rounded-md group flex min-w-[240px] flex-1 cursor-pointer flex-col px-3 py-2 text-xs transition hover:opacity-100"
-            :class="showMemoryDetail ? 'bg-accent' : 'opacity-40'"
-            @click="toggleMemoryChart"
-          >
-            <div class="flex justify-between gap-1.5">
-              <div class="flex items-center gap-1 text-foreground">
-                <Microchip class="h-3 w-3" />
-                <div class="flex-1 text-xs">Memory Distribution</div>
-              </div>
-            </div>
-            <div class="mt-1.5 flex items-center gap-1">
-              <span class="font-medium text-foreground">
-                {{ props.submission?.memory.toString().replace("MB", "") }} MB
-              </span>
-              <span class="text-muted-foreground">
-                Beats
-                {{ (props.submission?.memoryPercentile ?? 0).toFixed(1) }}%
-              </span>
-            </div>
-            <div
-              class="mt-0.5 flex w-fit cursor-pointer gap-0.5 text-[11px] opacity-0 group-hover:opacity-100"
-            >
-              <Sparkles class="h-3.5 w-3.5 text-blue-500" />
-              <span
-                class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent"
-                >Complexity Analysis</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
+      <h3 class="font-medium text-red-700 dark:text-red-400 text-sm mb-2">
+        Compile Error
+      </h3>
+      <pre
+        class="whitespace-pre-wrap text-sm font-mono text-red-600 dark:text-red-300 bg-transparent p-0"
+        >{{
+          props.submission.compiler_error || "No error message available."
+        }}</pre
+      >
     </div>
 
-    <!-- 执行用时详细图表 -->
-    <div v-if="showRuntimeDetail" class="rounded-lg border border-border p-3">
-      <div class="space-y-2">
-        <h3 class="text-xs font-medium text-foreground">
-          Runtime Distribution Details
-        </h3>
-        <template v-if="pairedDist.length">
-          <div ref="runtimeChartRef" class="w-full h-48"></div>
-        </template>
+    <!-- 2. Runtime Error / Wrong Answer / TLE -->
+    <div
+      v-else-if="
+        ['Wrong Answer', 'Runtime Error', 'Time Limit Exceeded'].includes(
+          props.submission.status
+        )
+      "
+      class="space-y-4"
+    >
+      <div v-if="props.submission.input" class="space-y-1.5">
+        <div class="text-xs font-medium text-muted-foreground">Input</div>
         <div
-          v-else
-          class="h-32 flex items-center justify-center text-[11px] text-muted-foreground"
+          class="rounded-md bg-muted px-3 py-2 text-sm font-mono text-foreground"
         >
-          No distribution data available
+          {{ props.submission.input }}
+        </div>
+      </div>
+
+      <div v-if="props.submission.output" class="space-y-1.5">
+        <div class="text-xs font-medium text-muted-foreground">Output</div>
+        <div
+          class="rounded-md bg-muted px-3 py-2 text-sm font-mono text-foreground"
+        >
+          {{ props.submission.output }}
+        </div>
+      </div>
+
+      <div v-if="props.submission.expected_output" class="space-y-1.5">
+        <div class="text-xs font-medium text-muted-foreground">Expected</div>
+        <div
+          class="rounded-md bg-muted px-3 py-2 text-sm font-mono text-foreground"
+        >
+          {{ props.submission.expected_output }}
         </div>
       </div>
     </div>
 
-    <!-- 消耗内存详细图表 -->
-    <div v-if="showMemoryDetail" class="rounded-lg border border-border p-3">
-      <div class="space-y-2">
-        <h3 class="text-xs font-medium text-foreground">
-          Memory Distribution Details
-        </h3>
-        <div ref="memoryChartRef" class="w-full h-48"></div>
+    <!-- 3. Accepted (Charts) -->
+    <div v-else-if="props.submission.status === 'Accepted'" class="space-y-4">
+      <!-- 分布统计卡片 -->
+      <div
+        class="flex w-full flex-col gap-1.5 rounded-lg border border-border p-2"
+      >
+        <div class="flex items-center justify-between gap-1.5">
+          <div class="flex w-full flex-wrap gap-2">
+            <!-- Runtime Trigger -->
+            <div
+              class="rounded-md group flex min-w-[240px] flex-1 cursor-pointer flex-col px-3 py-2 text-xs transition hover:opacity-100"
+              :class="showRuntimeDetail ? 'bg-accent' : 'opacity-40'"
+              @click="toggleRuntimeChart"
+            >
+              <div class="flex justify-between gap-1.5">
+                <div class="flex items-center gap-1 text-foreground">
+                  <Clock class="h-3 w-3" />
+                  <div class="flex-1 text-xs">Runtime Distribution</div>
+                </div>
+              </div>
+              <div class="mt-1.5 flex items-center gap-1">
+                <span class="font-medium text-foreground">
+                  {{ props.submission?.runtime.toString().replace("ms", "") }}
+                  ms
+                </span>
+                <span class="text-muted-foreground">
+                  Beats
+                  {{ (props.submission?.runtimePercentile ?? 0).toFixed(1) }}%
+                </span>
+              </div>
+            </div>
+
+            <!-- Memory Trigger -->
+            <div
+              class="rounded-md group flex min-w-[240px] flex-1 cursor-pointer flex-col px-3 py-2 text-xs transition hover:opacity-100"
+              :class="showMemoryDetail ? 'bg-accent' : 'opacity-40'"
+              @click="toggleMemoryChart"
+            >
+              <div class="flex justify-between gap-1.5">
+                <div class="flex items-center gap-1 text-foreground">
+                  <Microchip class="h-3 w-3" />
+                  <div class="flex-1 text-xs">Memory Distribution</div>
+                </div>
+              </div>
+              <div class="mt-1.5 flex items-center gap-1">
+                <span class="font-medium text-foreground">
+                  {{ props.submission?.memory.toString().replace("MB", "") }} MB
+                </span>
+                <span class="text-muted-foreground">
+                  Beats
+                  {{ (props.submission?.memoryPercentile ?? 0).toFixed(1) }}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div v-if="showRuntimeDetail" class="rounded-lg border border-border p-3">
+        <div class="h-48 w-full" ref="runtimeChartRef"></div>
+      </div>
+      <div v-if="showMemoryDetail" class="rounded-lg border border-border p-3">
+        <div class="h-48 w-full" ref="memoryChartRef"></div>
       </div>
     </div>
 
-    <!-- 代码展示 -->
-    <MarkdownView :content="codeMarkdown" editor-id="submission-code-preview" />
+    <!-- Code Section -->
+    <div class="space-y-2 mt-2">
+      <div class="text-xs font-medium text-muted-foreground">Code</div>
+      <MarkdownView
+        :content="codeMarkdown"
+        editor-id="submission-code-preview"
+      />
+    </div>
   </div>
 </template>
