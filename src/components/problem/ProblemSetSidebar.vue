@@ -8,8 +8,9 @@ import {
   getLocalTimeZone,
   today,
 } from "@internationalized/date";
+import { Badge } from "@/components/ui/badge";
 import { type Ref, ref } from "vue";
-import { ChevronLeft, ChevronRight, Search } from "lucide-vue-next";
+import { ChevronLeft, ChevronRight, Search, Building2 } from "lucide-vue-next";
 
 const date = ref(today(getLocalTimeZone())) as Ref<DateValue>;
 
