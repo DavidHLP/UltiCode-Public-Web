@@ -167,7 +167,7 @@ const defaultTemplate = `# Approach
 
 # Code
 
-\`\`\`java
+\`\`\`java {group="solution"}
 class Solution {
    public int[] twoSum(int[] nums, int target) {
        for (int i = 0; i < nums.length; i++) {
@@ -221,7 +221,7 @@ onMounted(async () => {
 
 # Code
 
-\`\`\`${lang}
+\`\`\`${lang} {group="solution"}
 ${code}
 \`\`\`
 `;
