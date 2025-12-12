@@ -38,43 +38,29 @@ const contestRoutes: RouteRecordRaw = {
   ],
 };
 
-const problemRoutes: RouteRecordRaw = {
-  path: "/problem",
+const problemSetRoute: RouteRecordRaw = {
+  path: "/problemset",
   component: () => import("@/features/sider/AppLayout.vue"),
   children: [
     {
       path: "",
-      component: () => import("@/views/problem/ProblemLayout.vue"),
-      children: [
-        { path: "", redirect: { name: "problem-set" } },
-        {
-          path: "problem-set",
-          name: "problem-set",
-          component: () =>
-            import("@/views/problem/problem-set/ProblemSetView.vue"),
-        },
-        {
-          path: "problem-list/:id",
-          name: "problem-list",
-          component: () =>
-            import("@/views/problem/problem-list/ProblemListView.vue"),
-        },
-      ],
+      name: "problem-set",
+      component: () => import("@/views/problemset/ProblemSetView.vue"),
     },
   ],
 };
 
 const problemDetailRoute: RouteRecordRaw = {
-  path: "/problems/:id",
+  path: "/problems/:id/:tab?",
   name: "problem-detail",
-  component: () => import("@/views/problem/detail/ProblemDetailView.vue"),
+  component: () => import("@/views/problems/ProblemDetailView.vue"),
 };
 
 const solutionCreateRoute: RouteRecordRaw = {
   path: "/problem/:id(\\d+)/solution/create",
   name: "solution-create",
   component: () =>
-    import("@/views/problem/detail/left-panel/solutions/SolutionsEditView.vue"),
+    import("@/views/problems/left-panel/solutions/SolutionsEditView.vue"),
 };
 
 const router = createRouter({
@@ -83,7 +69,7 @@ const router = createRouter({
     { path: "/", redirect: { name: "forum-home" } },
     forumRoutes,
     contestRoutes,
-    problemRoutes,
+    problemSetRoute,
     problemDetailRoute,
     solutionCreateRoute,
   ],

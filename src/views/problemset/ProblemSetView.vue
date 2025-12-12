@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProblemExplorer from "@/views/problem/components/ProblemExplorer.vue";
+import ProblemExplorer from "@/components/problem/ProblemExplorer.vue";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,

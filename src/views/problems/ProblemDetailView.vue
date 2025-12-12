@@ -10,7 +10,7 @@ import {
   type Component,
   type Ref,
 } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 
 import LayoutHeaderLeft from "./headers/LayoutHeaderLeft.vue";
@@ -38,6 +38,7 @@ import TestResultsView from "./right/bottom/TestResultsView.vue";
 
 // --- Data Fetching ---
 const route = useRoute();
+const router = useRouter();
 const problem = ref<ProblemDetail | null>(null);
 const runResult = ref<ProblemRunResult | null>(null);
 const bottomPanelStore = useBottomPanelStore();
@@ -518,9 +519,69 @@ const handleLayoutChange = (
   headerStore.initData(config.groups, config.layout);
 };
 
+const TAB_MAP: Record<string, number> = {
+  description: 1,
+  solutions: 2,
+  submissions: 3,
+};
+
+const REV_TAB_MAP: Record<number, string> = {
+  1: "description",
+  2: "solutions",
+  3: "submissions",
+};
+
+// Sync URL to Store (when route changes, e.g. back button)
+watch(
+  () => route.params.tab,
+  (newTab) => {
+    const tabName = Array.isArray(newTab) ? newTab[0] : newTab;
+    if (tabName && Object.prototype.hasOwnProperty.call(TAB_MAP, tabName)) {
+      const targetId = TAB_MAP[tabName];
+      if (
+        targetId !== undefined &&
+        headerStore.activeHeaderByGroup["problem-info"] !== targetId
+      ) {
+        headerStore.setActiveHeader("problem-info", targetId);
+      }
+    } else if (!tabName) {
+      // Default to description if no tab specified
+      if (headerStore.activeHeaderByGroup["problem-info"] !== 1) {
+        headerStore.setActiveHeader("problem-info", 1);
+      }
+    }
+  },
+);
+
+// Sync Store to URL (when user clicks tabs)
+watch(
+  () => headerStore.activeHeaderByGroup["problem-info"],
+  (newHeaderId) => {
+    if (newHeaderId && newHeaderId in REV_TAB_MAP) {
+      const tabName = REV_TAB_MAP[newHeaderId];
+      if (route.params.tab !== tabName) {
+        router.push({
+          name: "problem-detail",
+          params: { ...route.params, tab: tabName },
+        });
+      }
+    }
+  },
+);
+
 onMounted(() => {
   const initialConfig = getLeetLayoutConfig();
   headerStore.initData(initialConfig.groups, initialConfig.layout);
+
+  // Restore tab from URL
+  const tabParam = route.params.tab;
+  const tabName = Array.isArray(tabParam) ? tabParam[0] : tabParam;
+  if (tabName) {
+    const targetId = TAB_MAP[tabName];
+    if (targetId !== undefined) {
+      headerStore.setActiveHeader("problem-info", targetId);
+    }
+  }
 });
 </script>
 

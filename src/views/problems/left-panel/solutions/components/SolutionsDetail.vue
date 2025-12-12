@@ -2,7 +2,7 @@
 import type { SolutionFeedItem } from "@/types/solution";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import Badge from "../../../../../../components/ui/badge/Badge.vue";
+import Badge from "@/components/ui/badge/Badge.vue";
 import { Separator } from "@/components/ui/separator";
 import { Eye, MessageCircle, Triangle } from "lucide-vue-next";
 import { computed } from "vue";

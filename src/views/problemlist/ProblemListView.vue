@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import ProblemExplorer from "@/views/problem/components/ProblemExplorer.vue";
+import ProblemExplorer from "@/components/problem/ProblemExplorer.vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart } from "@/components/ui/chart-line";
@@ -45,7 +45,7 @@ const emptyStats = computed<ProblemListStats>(() => ({
   progress: 0,
 }));
 const safeStats = computed<ProblemListStats>(
-  () => stats.value ?? emptyStats.value,
+  () => stats.value ?? emptyStats.value
 );
 
 async function loadProblemList(id?: string) {
@@ -81,7 +81,7 @@ watch(
   (id) => {
     void loadProblemList(id);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 // 格式化日期
@@ -106,7 +106,7 @@ const statusColorTokens: Record<(typeof statusCategories)[number], string> = {
   Todo: "--chart-status-todo",
 };
 const statusColorScale = computed(() =>
-  statusCategories.map((label) => `hsl(var(${statusColorTokens[label]}))`),
+  statusCategories.map((label) => `hsl(var(${statusColorTokens[label]}))`)
 );
 const momentumColorScale = computed(() => [
   `hsl(var(--chart-status-solved))`,
@@ -128,7 +128,7 @@ const statusDonutData = computed(() =>
   statusDistribution.value.map((item) => ({
     name: item.label,
     total: item.value,
-  })),
+  }))
 );
 
 const difficultyBuckets = ["Easy", "Medium", "Hard"] as const;
@@ -136,13 +136,13 @@ const difficultyBuckets = ["Easy", "Medium", "Hard"] as const;
 const difficultyInsights = computed(() => {
   return difficultyBuckets.map((difficulty) => {
     const filtered = problems.value.filter(
-      (problem) => problem.difficulty === difficulty,
+      (problem) => problem.difficulty === difficulty
     );
     const solved = filtered.filter(
-      (problem) => problem.status === "solved",
+      (problem) => problem.status === "solved"
     ).length;
     const attempted = filtered.filter(
-      (problem) => problem.status === "attempted",
+      (problem) => problem.status === "attempted"
     ).length;
     const todo = filtered.filter((problem) => problem.status === "todo").length;
     return {
