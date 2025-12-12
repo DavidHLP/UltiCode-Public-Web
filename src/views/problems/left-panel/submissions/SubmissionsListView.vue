@@ -81,13 +81,13 @@ const sortedSubmissions = computed(() =>
     const tsA = normalizeTimestamp(a.submittedAt ?? a.created_at) ?? 0;
     const tsB = normalizeTimestamp(b.submittedAt ?? b.created_at) ?? 0;
     return tsB - tsA;
-  })
+  }),
 );
 
 const decoratedSubmissions = computed(() =>
   sortedSubmissions.value.map((submission) => {
     const timestamp = normalizeTimestamp(
-      submission.submittedAt ?? submission.created_at
+      submission.submittedAt ?? submission.created_at,
     );
     return {
       ...submission,
@@ -96,7 +96,7 @@ const decoratedSubmissions = computed(() =>
         : submission.submittedAt,
       relativeSubmitted: formatRelativeTime(timestamp),
     };
-  })
+  }),
 );
 
 const handleSelect = (submission: SubmissionRecord) =>

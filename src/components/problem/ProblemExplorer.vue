@@ -11,7 +11,12 @@ import {
   ListFilter,
   X,
   ChevronDown,
+  Terminal,
+  Cpu,
+  LayoutGrid, // All Topics
+  Calculator, // for Algorithms
 } from "lucide-vue-next";
+import { Database } from "lucide-vue-next";
 import CheckIcon from "~icons/radix-icons/check";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -42,6 +47,27 @@ const showPremium = ref<boolean | null>(null);
 const problemsPerPage = 50;
 const numProblemsToShow = ref(problemsPerPage);
 const fallbackProblems = ref<Problem[]>([]);
+
+const categories = [
+  { name: "All Topics", icon: LayoutGrid, value: "all" },
+  { name: "Algorithms", icon: Calculator, value: "algorithms" },
+  { name: "Database", icon: Database, value: "database" },
+  { name: "Shell", icon: Terminal, value: "shell" },
+  { name: "Concurrency", icon: Cpu, value: "concurrency" },
+];
+
+const selectedCategory = ref("all");
+
+function selectCategory(cat: string) {
+  selectedCategory.value = cat;
+  // TODO: Implement actual category filtering logic
+  if (cat === "database") {
+    // Mock behavior: select 'Database' tag if available, or just filter
+    if (!selectedTags.value.includes("Database")) {
+      // toggleTag("Database");
+    }
+  }
+}
 
 onMounted(async () => {
   try {
@@ -210,6 +236,31 @@ function loadMore() {
     <slot name="header" />
 
     <div class="space-y-4">
+      <!-- Category Toggles -->
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button
+          v-for="cat in categories"
+          :key="cat.name"
+          @click="selectCategory(cat.value)"
+          class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200"
+          :class="
+            selectedCategory === cat.value
+              ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+              : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'
+          "
+        >
+          <div
+            class="p-1 rounded bg-white dark:bg-zinc-950 shadow-sm"
+            :class="
+              selectedCategory === cat.value ? 'text-primary' : 'text-zinc-400'
+            "
+          >
+            <component :is="cat.icon" class="w-3 h-3" />
+          </div>
+          {{ cat.name }}
+        </button>
+      </div>
+
       <!-- Controls Bar -->
       <div
         class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
@@ -432,10 +483,10 @@ function loadMore() {
             <Badge
               v-for="tag in otherTags"
               :key="tag"
-              :variant="isTagSelected(tag) ? 'default' : 'outline'"
-              class="cursor-pointer hover:bg-primary/80 hover:text-primary-foreground transition-colors"
+              variant="outline"
+              class="cursor-pointer px-2.5 py-0.5 text-[11px] font-normal border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               :class="{
-                'bg-primary text-primary-foreground hover:bg-primary/90':
+                'bg-zinc-900 text-zinc-50 border-zinc-900 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900':
                   isTagSelected(tag),
               }"
               @click="toggleTag(tag)"
