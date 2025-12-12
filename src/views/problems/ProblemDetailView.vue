@@ -26,15 +26,15 @@ import {
 import type { ProblemDetail, ProblemTestCase } from "@/types/problem-detail";
 import type { ProblemRunResult } from "@/types/test-results";
 import { fetchProblemDetailById } from "@/api/problem-detail";
-import { useBottomPanelStore } from "./right/bottom/bottom";
+import { useBottomPanelStore } from "./test/test";
 import { fetchCurrentUserId } from "@/utils/auth";
 
-import DescriptionView from "./left-panel/description/DescriptionView.vue";
-import SolutionsView from "./left-panel/solutions/SolutionsView.vue";
-import SubmissionsView from "./left-panel/submissions/SubmissionsView.vue";
-import CodeView from "./right/top/CodeView.vue";
-import TestCaseView from "./right/bottom/TestCaseView.vue";
-import TestResultsView from "./right/bottom/TestResultsView.vue";
+import DescriptionView from "@/views/problems/description/DescriptionView.vue";
+import SolutionsView from "@/views/problems/solutions/SolutionsView.vue";
+import SubmissionsView from "@/views/problems/submissions/SubmissionsView.vue";
+import CodeView from "./code/CodeView.vue";
+import TestCaseView from "./test/TestCaseView.vue";
+import TestResultsView from "./test/TestResultsView.vue";
 
 // --- Data Fetching ---
 const route = useRoute();
@@ -61,12 +61,12 @@ watch(
   () => problem.value?.id,
   () => {
     runResult.value = null;
-  },
+  }
 );
 
 const buildRunResultFromCases = (
   cases: ProblemTestCase[],
-  problemId: number,
+  problemId: number
 ): ProblemRunResult => {
   const runId = `run-${problemId}-${Date.now()}`;
   const userId = fetchCurrentUserId();
@@ -121,7 +121,7 @@ watch(
         ? bottomPanelStore.testCases.value
         : (problem.value.testCases ?? []);
     runResult.value = buildRunResultFromCases(cases, problem.value.id);
-  },
+  }
 );
 
 // --- Context Provider ---
@@ -147,12 +147,12 @@ const ConnectedDescriptionView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(DescriptionView, { problem: problem.value }),
+            h(DescriptionView, { problem: problem.value })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -170,12 +170,12 @@ const ConnectedSolutionsView = defineComponent({
             h(SolutionsView, {
               problemId: problem.value.id,
               followUp: problem.value.followUp ?? "",
-            }),
+            })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -190,12 +190,12 @@ const ConnectedSubmissionsView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(SubmissionsView, { problemId: problem.value.id }),
+            h(SubmissionsView, { problemId: problem.value.id })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -214,7 +214,7 @@ const ConnectedCodeView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -229,12 +229,12 @@ const ConnectedTestCaseView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(TestCaseView, { testCases: problem.value.testCases ?? [] }),
+            h(TestCaseView, { testCases: problem.value.testCases ?? [] })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -248,7 +248,7 @@ const ConnectedTestResultsView = defineComponent({
       h(
         "div",
         { class: "px-1 py-2" },
-        h(TestResultsView, { runResult: runResult.value }),
+        h(TestResultsView, { runResult: runResult.value })
       );
   },
 });
@@ -498,7 +498,7 @@ const getWideLayoutConfig = () => {
 };
 
 const handleLayoutChange = (
-  newLayout: "leet" | "classic" | "compact" | "wide",
+  newLayout: "leet" | "classic" | "compact" | "wide"
 ) => {
   currentLayout.value = newLayout;
   let config;
@@ -550,7 +550,7 @@ watch(
         headerStore.setActiveHeader("problem-info", 1);
       }
     }
-  },
+  }
 );
 
 // Sync Store to URL (when user clicks tabs)
@@ -566,7 +566,7 @@ watch(
         });
       }
     }
-  },
+  }
 );
 
 onMounted(() => {

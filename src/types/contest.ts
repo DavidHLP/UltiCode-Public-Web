@@ -60,6 +60,7 @@ export interface ContestRankingEntry {
   ratingBefore?: number;
   ratingAfter?: number;
   country?: string;
+  avatar?: string;
 }
 
 export interface GlobalRankingEntry {

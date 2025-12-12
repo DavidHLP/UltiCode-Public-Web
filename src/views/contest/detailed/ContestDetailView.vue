@@ -399,6 +399,14 @@ function getCountryFlag(countryCode: string): string {
                             <span class="text-lg">{{
                               getCountryFlag(entry.country || "CN")
                             }}</span>
+                            <img
+                              :src="
+                                entry.avatar ||
+                                'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
+                              "
+                              class="h-6 w-6 rounded-full border border-border"
+                              alt="Avatar"
+                            />
                             <span class="font-semibold">{{
                               entry.username
                             }}</span>

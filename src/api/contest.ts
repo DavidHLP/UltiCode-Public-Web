@@ -31,8 +31,13 @@ export async function fetchRunningContests(): Promise<ContestListItem[]> {
 /**
  * 获取已结束的竞赛(往届竞赛)
  */
-export async function fetchPastContests(): Promise<ContestListItem[]> {
-  return apiGet<ContestListItem[]>("/contest/past");
+export async function fetchPastContests(
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<{ data: ContestListItem[]; total: number }> {
+  return apiGet<{ data: ContestListItem[]; total: number }>(
+    `/contest/past?page=${page}&limit=${pageSize}`,
+  );
 }
 
 /**

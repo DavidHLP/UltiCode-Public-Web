@@ -9,7 +9,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import { useBottomPanelStore } from "../right/bottom/bottom";
+import { useBottomPanelStore } from "../test/test";
 import { useHeaderStore } from "@/stores/headerStore";
 
 const { requestRun } = useBottomPanelStore();

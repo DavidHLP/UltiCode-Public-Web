@@ -10,7 +10,7 @@ import {
   EmptyHeader,
   EmptyMedia,
 } from "@/components/ui/empty";
-import { useBottomPanelStore } from "./bottom";
+import { useBottomPanelStore } from "./test";
 import type {
   ProblemCaseResultDetail,
   ProblemRunResult,
@@ -23,7 +23,7 @@ const props = defineProps<{
 const { activeCaseLabel } = useBottomPanelStore();
 
 const cases = computed<ProblemCaseResultDetail[]>(
-  () => props.runResult?.cases ?? [],
+  () => props.runResult?.cases ?? []
 );
 
 watch(
@@ -38,7 +38,7 @@ watch(
       activeCaseLabel.value = first.caseLabel;
     }
   },
-  { immediate: true, deep: true },
+  { immediate: true, deep: true }
 );
 
 const activeResult = computed<ProblemCaseResultDetail | undefined>(() => {
