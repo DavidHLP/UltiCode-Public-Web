@@ -225,7 +225,8 @@ onMounted(async () => {
 ${code}
 \`\`\`
 `;
-      // If editor content is empty, it will pick up this new template via the component watcher
+      // Force update the editor content
+      editorContent.value = dynamicTemplate.value;
     } catch (error) {
       console.error("Failed to validate submission", error);
       alert("Failed to validate submission.");
