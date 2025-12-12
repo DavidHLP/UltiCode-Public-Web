@@ -44,13 +44,13 @@ const runResult = ref<ProblemRunResult | null>(null);
 const bottomPanelStore = useBottomPanelStore();
 
 onMounted(async () => {
-  const idParam = route.params.id;
-  const id = Array.isArray(idParam) ? idParam[0] : idParam;
+  const slugParam = route.params.slug;
+  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
 
-  if (!id) return;
+  if (!slug) return;
 
   try {
-    problem.value = await fetchProblemDetailById(id);
+    problem.value = await fetchProblemDetailById(slug);
   } catch (error) {
     console.error("Failed to load problem detail", error);
     problem.value = null;

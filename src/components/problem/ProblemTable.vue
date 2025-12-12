@@ -42,8 +42,8 @@ const router = useRouter();
 
 const emit = defineEmits(["load-more"]);
 
-const goToDetail = (id: number) => {
-  router.push({ name: "problem-detail", params: { id } });
+const goToDetail = (slug: string) => {
+  router.push({ name: "problem-detail", params: { slug } });
 };
 
 const difficultyClass = (difficulty: Problem["difficulty"]) => {
@@ -102,7 +102,7 @@ onUnmounted(() => {
           v-for="problem in displayedProblems"
           :key="problem.id"
           class="odd:bg-muted/30 even:bg-background hover:bg-muted/50 cursor-pointer"
-          @click="goToDetail(problem.id)"
+          @click="goToDetail(problem.slug)"
         >
           <TableCell class="flex justify-center">
             <component

@@ -51,7 +51,7 @@ const problemSetRoute: RouteRecordRaw = {
 };
 
 const problemDetailRoute: RouteRecordRaw = {
-  path: "/problems/:id/:tab?",
+  path: "/problems/:slug/:tab?",
   name: "problem-detail",
   component: () => import("@/views/problems/ProblemDetailView.vue"),
 };

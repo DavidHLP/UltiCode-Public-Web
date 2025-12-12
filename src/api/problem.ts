@@ -5,6 +5,6 @@ export async function fetchProblems(): Promise<Problem[]> {
   return apiGet<Problem[]>("/problems");
 }
 
-export async function fetchProblemById(id: number): Promise<Problem> {
+export async function fetchProblemById(id: string | number): Promise<Problem> {
   return apiGet<Problem>(`/problems/${id}`);
 }
