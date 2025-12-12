@@ -27,30 +27,30 @@ const parseMs = (value: string | number) => {
 };
 
 const runtimeMs = computed(() =>
-  props.submission ? parseMs(props.submission.runtime) : null,
+  props.submission ? parseMs(props.submission.runtime) : null
 );
 
 const distBins = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? [],
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? []
 );
 const distCounts = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? [],
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? []
 );
 const distLength = computed(() =>
-  Math.min(distCounts.value.length, distBins.value.length),
+  Math.min(distCounts.value.length, distBins.value.length)
 );
 const pairedDist = computed(() =>
   Array.from({ length: distLength.value }, (_, i) => ({
     i,
     count: distCounts.value[i]!,
     bin: distBins.value[i]!,
-  })),
+  }))
 );
 const totalCount = computed(() =>
   pairedDist.value.reduce(
     (acc, d) => acc + (Number.isFinite(d.count) ? d.count : 0),
-    0,
-  ),
+    0
+  )
 );
 
 const highlightIndex = computed(() => {
@@ -244,7 +244,7 @@ const initMemoryChart = () => {
   });
 
   const memoryCounts = Array.from({ length: 80 }, () =>
-    Math.floor(Math.random() * 100),
+    Math.floor(Math.random() * 100)
   );
   const userMemoryIndex = 40; // 用户位置索引
   const userAvatar =
@@ -409,6 +409,18 @@ const codeMarkdown = computed(() => {
   const code = props.submission.code;
   return "```" + lang + "\n" + code + "\n" + "```";
 });
+
+import { useRouter } from "vue-router";
+const router = useRouter();
+
+const handleWriteSolution = () => {
+  if (props.submission?.id) {
+    router.push({
+      name: "solution-create-from-submission",
+      query: { submissionId: props.submission.id },
+    });
+  }
+};
 </script>
 
 <template>
@@ -422,21 +434,21 @@ const codeMarkdown = computed(() => {
         <div
           class="flex flex-1 items-center gap-1.5 text-sm font-medium leading-5"
           :class="[
-            props.submission.status === 'Accepted'
+            props.submission?.status === 'Accepted'
               ? 'text-green-600 dark:text-green-400'
               : 'text-red-600 dark:text-red-400',
           ]"
         >
           <span data-e2e-locator="submission-result">{{
-            props.submission.status
+            props.submission?.status
           }}</span>
           <div class="text-[11px] font-normal text-muted-foreground">
             <span
               >{{
-                props.submission.tests?.filter((t) => t.status === "Accepted")
+                props.submission?.tests?.filter((t) => t.status === "Accepted")
                   .length ?? 0
               }}
-              / {{ props.submission.tests?.length ?? 0 }} </span
+              / {{ props.submission?.tests?.length ?? 0 }} </span
             >test cases passed
           </div>
         </div>
@@ -456,7 +468,7 @@ const codeMarkdown = computed(() => {
           <span class="text-muted-foreground flex-none whitespace-nowrap">
             Submitted&nbsp;<span class="max-w-full truncate">{{
               new Date(
-                props.submission.submittedAt ?? props.submission.created_at,
+                props.submission?.submittedAt ?? props.submission?.created_at
               ).toLocaleString("en-US", {
                 year: "numeric",
                 month: "2-digit",
@@ -473,9 +485,11 @@ const codeMarkdown = computed(() => {
           Official Solution
         </Button>
         <Button
+          v-if="props.submission?.status === 'Accepted'"
           variant="default"
           size="sm"
           class="h-7 gap-1.5 bg-green-600 hover:bg-green-700 text-xs text-white"
+          @click="handleWriteSolution"
         >
           Write Solution
         </Button>
@@ -502,11 +516,11 @@ const codeMarkdown = computed(() => {
             </div>
             <div class="mt-1.5 flex items-center gap-1">
               <span class="font-medium text-foreground">
-                {{ props.submission.runtime.toString().replace("ms", "") }} ms
+                {{ props.submission?.runtime.toString().replace("ms", "") }} ms
               </span>
               <span class="text-muted-foreground">
                 Beats
-                {{ (props.submission.runtimePercentile ?? 0).toFixed(1) }}%
+                {{ (props.submission?.runtimePercentile ?? 0).toFixed(1) }}%
               </span>
             </div>
             <div
@@ -534,10 +548,11 @@ const codeMarkdown = computed(() => {
             </div>
             <div class="mt-1.5 flex items-center gap-1">
               <span class="font-medium text-foreground">
-                {{ props.submission.memory.toString().replace("MB", "") }} MB
+                {{ props.submission?.memory.toString().replace("MB", "") }} MB
               </span>
               <span class="text-muted-foreground">
-                Beats {{ (props.submission.memoryPercentile ?? 0).toFixed(1) }}%
+                Beats
+                {{ (props.submission?.memoryPercentile ?? 0).toFixed(1) }}%
               </span>
             </div>
             <div

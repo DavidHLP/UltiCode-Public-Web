@@ -150,7 +150,10 @@ import type { SolutionTopic } from "@/types/topic";
 import loader from "@monaco-editor/loader";
 import * as monaco from "monaco-editor";
 import { renderMarkdown } from "@/utils/markdown";
+import { configureMonacoWorkers } from "@/utils/monaco-workers";
 import "highlight.js/styles/atom-one-dark.css";
+
+configureMonacoWorkers();
 
 const router = useRouter();
 const route = useRoute();
@@ -261,8 +264,8 @@ const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
   topicOptions.value.filter((topic) =>
-    selectedTopicIds.value.includes(topic.id),
-  ),
+    selectedTopicIds.value.includes(topic.id)
+  )
 );
 const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
@@ -287,7 +290,7 @@ const loadTopics = async () => {
 
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "Draft saved" : "Editing draft...",
+  isDraftSaved.value ? "Draft saved" : "Editing draft..."
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -302,7 +305,7 @@ watch([title, editorContent, selectedTopicIds], () => {
 const toggleTopic = (topicId: string) => {
   if (selectedTopicIds.value.includes(topicId)) {
     selectedTopicIds.value = selectedTopicIds.value.filter(
-      (item) => item !== topicId,
+      (item) => item !== topicId
     );
   } else {
     selectedTopicIds.value = [...selectedTopicIds.value, topicId];
@@ -311,7 +314,7 @@ const toggleTopic = (topicId: string) => {
 
 const removeTopic = (topicId: string) => {
   selectedTopicIds.value = selectedTopicIds.value.filter(
-    (item) => item !== topicId,
+    (item) => item !== topicId
   );
 };
 
