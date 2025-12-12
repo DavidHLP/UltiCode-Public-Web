@@ -12,11 +12,11 @@ const emit = defineEmits<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
 );
 
 const languageLabel = computed(
-  () => props.item.language || props.item.languageFilter || "language",
+  () => props.item.language || props.item.languageFilter || "language"
 );
 
 const topicLabel = computed(
@@ -24,7 +24,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic",
+    "topic"
 );
 
 const handleSelect = () => emit("select", props.item);
@@ -39,7 +39,14 @@ const handleSelect = () => emit("select", props.item);
     @keyup.enter.prevent="handleSelect"
   >
     <header class="flex items-start gap-2">
+      <img
+        v-if="props.item.author.avatar"
+        :src="props.item.author.avatar"
+        class="h-9 w-9 rounded-full border border-border object-cover"
+        alt="Avatar"
+      />
       <div
+        v-else
         class="flex h-9 w-9 items-center justify-center rounded-full text-[11px] font-semibold text-white"
         :style="{ backgroundColor: props.item.author.avatarColor }"
       >

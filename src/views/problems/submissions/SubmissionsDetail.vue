@@ -27,30 +27,30 @@ const parseMs = (value: string | number) => {
 };
 
 const runtimeMs = computed(() =>
-  props.submission ? parseMs(props.submission.runtime) : null,
+  props.submission ? parseMs(props.submission.runtime) : null
 );
 
 const distBins = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? [],
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? []
 );
 const distCounts = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? [],
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? []
 );
 const distLength = computed(() =>
-  Math.min(distCounts.value.length, distBins.value.length),
+  Math.min(distCounts.value.length, distBins.value.length)
 );
 const pairedDist = computed(() =>
   Array.from({ length: distLength.value }, (_, i) => ({
     i,
     count: distCounts.value[i]!,
     bin: distBins.value[i]!,
-  })),
+  }))
 );
 const totalCount = computed(() =>
   pairedDist.value.reduce(
     (acc, d) => acc + (Number.isFinite(d.count) ? d.count : 0),
-    0,
-  ),
+    0
+  )
 );
 
 const highlightIndex = computed(() => {
@@ -91,7 +91,9 @@ const initRuntimeChart = () => {
   runtimeChart = echarts.init(runtimeChartRef.value);
 
   const userIndex = highlightIndex.value;
+  // Determine avatar URL: use dynamic user avatar or fallback to default
   const userAvatar =
+    props.submission?.user?.avatar ||
     "https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png";
 
   // 创建圆形头像 Image 对象
@@ -244,10 +246,11 @@ const initMemoryChart = () => {
   });
 
   const memoryCounts = Array.from({ length: 80 }, () =>
-    Math.floor(Math.random() * 100),
+    Math.floor(Math.random() * 100)
   );
   const userMemoryIndex = 40; // 用户位置索引
   const userAvatar =
+    props.submission?.user?.avatar ||
     "https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png";
 
   // 创建圆形头像 Image 对象
@@ -465,15 +468,20 @@ const handleWriteSolution = () => {
           <div class="flex items-center gap-1">
             <Avatar class="h-4 w-4">
               <AvatarImage
-                src="https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png"
+                :src="
+                  props.submission.user?.avatar ||
+                  'https://assets.leetcode.cn/aliyun-lc-upload/default_avatar.png'
+                "
               />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
-            <span class="font-medium text-foreground">User</span>
+            <span class="font-medium text-foreground">{{
+              props.submission.user?.username || "User"
+            }}</span>
             <span class="text-muted-foreground/60">submitted at</span>
             <span>{{
               new Date(
-                props.submission.submittedAt ?? props.submission.created_at,
+                props.submission.submittedAt ?? props.submission.created_at
               ).toLocaleString()
             }}</span>
           </div>
@@ -515,7 +523,7 @@ const handleWriteSolution = () => {
     <div
       v-else-if="
         ['Wrong Answer', 'Runtime Error', 'Time Limit Exceeded'].includes(
-          props.submission.status,
+          props.submission.status
         )
       "
       class="space-y-4"

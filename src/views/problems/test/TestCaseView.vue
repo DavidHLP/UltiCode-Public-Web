@@ -22,7 +22,7 @@ const generateId = (prefix: string) =>
   `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
 
 const createEmptyInputs = (
-  template?: ProblemTestCase
+  template?: ProblemTestCase,
 ): ProblemTestCaseInput[] => {
   if (template?.inputs?.length) {
     return template.inputs.map((input) => ({
@@ -51,7 +51,7 @@ watch(
     }));
     updateTestCases(localCases.value);
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 watch(
@@ -70,13 +70,13 @@ watch(
       activeId.value = firstCase.id;
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 watch(activeCaseLabel, (newLabel) => {
   if (!newLabel || !localCases.value.length) return;
   const matched = caseTabs.value.find(
-    (testCase) => testCase.displayLabel === newLabel
+    (testCase) => testCase.displayLabel === newLabel,
   );
   if (matched && matched.id !== activeId.value) {
     activeId.value = matched.id;
@@ -94,7 +94,7 @@ const caseTabs = computed(() =>
   localCases.value.map((testCase, index) => ({
     ...testCase,
     displayLabel: `Case ${index + 1}`,
-  }))
+  })),
 );
 
 watch(
@@ -103,7 +103,7 @@ watch(
     const tab = caseTabs.value.find((item) => item.id === activeCase.value?.id);
     activeCaseLabel.value = tab?.displayLabel ?? null;
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const inputFields = computed(() => activeCase.value?.inputs ?? []);

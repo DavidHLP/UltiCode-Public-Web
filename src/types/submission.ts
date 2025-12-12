@@ -30,4 +30,9 @@ export interface SubmissionRecord {
   runtimePercentile?: number;
   memoryPercentile?: number;
   tests?: SubmissionTestRecord[];
+  user?: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
 }
