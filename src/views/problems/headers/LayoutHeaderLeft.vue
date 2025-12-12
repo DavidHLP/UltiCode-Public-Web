@@ -72,7 +72,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
               <RouterLink
                 target="_blank"
                 class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
-                :to="{ name: 'problem-set' }"
+                :to="{ name: 'problemset' }"
                 doc="Open problem set in new tab"
               >
                 <ExternalLink class="h-3 w-3 text-gray-600" />

@@ -28,7 +28,7 @@ type NavItem = {
 const navItems: NavItem[] = [
   {
     label: "ProblemSet",
-    to: { name: "problem-set" },
+    to: { name: "problemset" },
   },
   {
     label: "Forum",

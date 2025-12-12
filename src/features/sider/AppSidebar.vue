@@ -2,7 +2,6 @@
 import type { SidebarProps } from "@/components/ui/sidebar";
 import Calendars from "@/features/sider/Calendars.vue";
 import { fetchProblemLists } from "@/api/problem-list";
-import DatePicker from "@/features/sider/DatePicker.vue";
 import NavUser from "@/features/sider/NavUser.vue";
 import SidebarNav from "@/features/sider/SidebarNav.vue";
 import {
@@ -45,7 +44,7 @@ onMounted(async () => {
   }
 });
 
-const isProblemContext = computed(() => route.path.startsWith("/problem-set"));
+const isProblemContext = computed(() => route.path.startsWith("/problemset"));
 const isContestContext = computed(() => route.path.startsWith("/contest"));
 
 const currentSidebarData = computed(() => {
@@ -73,9 +72,6 @@ const currentSidebarData = computed(() => {
         <!-- Existing Problem Lists Feature (Only for Problem Context) -->
         <Calendars :problemLists="problemLists" />
       </template>
-
-      <SidebarSeparator class="mx-0" />
-      <DatePicker />
     </SidebarContent>
     <SidebarFooter> </SidebarFooter>
     <SidebarRail />

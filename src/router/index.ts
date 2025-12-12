@@ -44,7 +44,7 @@ const problemSetRoute: RouteRecordRaw = {
   children: [
     {
       path: "",
-      name: "problem-set",
+      name: "problemset",
       component: () => import("@/views/problem-set/ProblemSetView.vue"),
     },
   ],

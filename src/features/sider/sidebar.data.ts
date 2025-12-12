@@ -8,7 +8,6 @@ import {
   Code2,
   Trophy,
   History,
-  Star,
   Box,
   Terminal,
   MessageSquare,
@@ -75,22 +74,11 @@ export const problemSidebarData: SidebarSection[] = [
   {
     name: "Problem Set",
     items: [
-      { title: "All Problems", url: "/problem-set", icon: LayoutGrid },
-      { title: "Algorithms", url: "/problem-set/algorithms", icon: Code2 },
-      { title: "Database", url: "/problem-set/database", icon: Box },
-      { title: "Shell", url: "/problem-set/shell", icon: Terminal },
-      { title: "Concurrency", url: "/problem-set/concurrency", icon: Cpu },
-    ],
-  },
-  {
-    name: "Study Plans",
-    items: [
-      {
-        title: "Top Interview 150",
-        url: "/study-plan/top-interview-150",
-        icon: Trophy,
-      },
-      { title: "LeetCode 75", url: "/study-plan/leetcode-75", icon: Star },
+      { title: "All Problems", url: "/problemset", icon: LayoutGrid },
+      { title: "Algorithms", url: "/problemset/algorithms", icon: Code2 },
+      { title: "Database", url: "/problemset/database", icon: Box },
+      { title: "Shell", url: "/problemset/shell", icon: Terminal },
+      { title: "Concurrency", url: "/problemset/concurrency", icon: Cpu },
     ],
   },
 ];
