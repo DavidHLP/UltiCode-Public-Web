@@ -6,3 +6,9 @@ export async function fetchProblemSubmissions(
 ): Promise<SubmissionRecord[]> {
   return apiGet<SubmissionRecord[]>(`/problems/${problemId}/submissions`);
 }
+
+export async function fetchSubmission(
+  submissionId: string,
+): Promise<SubmissionRecord> {
+  return apiGet<SubmissionRecord>(`/submissions/${submissionId}`);
+}

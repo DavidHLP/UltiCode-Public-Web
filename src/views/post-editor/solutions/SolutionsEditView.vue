@@ -145,6 +145,7 @@ import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fetchSolutionTopics } from "@/api/topic";
+import { fetchSubmission } from "@/api/submission";
 import type { SolutionTopic } from "@/types/topic";
 import loader from "@monaco-editor/loader";
 import * as monaco from "monaco-editor";
@@ -192,7 +193,33 @@ const isDark = usePreferredDark();
 const editorContainer = ref<HTMLElement | null>(null);
 let editorInstance: monaco.editor.IStandaloneCodeEditor | null = null;
 
+const resolvedProblemId = ref<string>(route.params.id as string);
+
 onMounted(async () => {
+  const submissionId = route.query.submissionId as string;
+  if (submissionId) {
+    try {
+      const submission = await fetchSubmission(submissionId);
+      if (submission.status !== "Accepted") {
+        alert("You must have an Accepted submission to create a solution.");
+        router.push({
+          name: "problem-detail",
+          params: { id: submission.problem_id.toString(), tab: "solution" },
+        });
+        return;
+      }
+      resolvedProblemId.value = submission.problem_id.toString();
+
+      // Optionally pre-fill code? User didn't ask for it, but might be nice.
+      // For now, sticking to requirements: check ACC status.
+    } catch (error) {
+      console.error("Failed to validate submission", error);
+      alert("Failed to validate submission.");
+      router.back();
+      return;
+    }
+  }
+
   loadTopics();
 
   if (editorContainer.value) {
@@ -295,10 +322,14 @@ const handlePublish = () => {
     topics: selectedTopicIds.value,
     topicLabels: selectedTopics.value.map((topic) => topic.name),
     content: editorContent.value,
-    problemId: route.params.id,
+    problemId: resolvedProblemId.value,
   });
   // 发布成功后返回题目详情页
-  router.push({ name: "problem-detail", params: { id: route.params.id } });
+  router.push({
+    name: "problem-detail",
+    params: { id: resolvedProblemId.value },
+  });
+  // TODO: Add actual publish API call here
 };
 
 const handleGoBack = () => {

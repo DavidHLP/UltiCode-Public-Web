@@ -45,7 +45,7 @@ const problemSetRoute: RouteRecordRaw = {
     {
       path: "",
       name: "problem-set",
-      component: () => import("@/views/problemset/ProblemSetView.vue"),
+      component: () => import("@/views/problem-set/ProblemSetView.vue"),
     },
   ],
 };
@@ -60,7 +60,14 @@ const solutionCreateRoute: RouteRecordRaw = {
   path: "/problem/:id(\\d+)/solution/create",
   name: "solution-create",
   component: () =>
-    import("@/views/problems/left-panel/solutions/SolutionsEditView.vue"),
+    import("@/views/post-editor/solutions/SolutionsEditView.vue"),
+};
+
+const solutionCreateFromSubmissionRoute: RouteRecordRaw = {
+  path: "/post-editor/solution/create",
+  name: "solution-create-from-submission",
+  component: () =>
+    import("@/views/post-editor/solutions/SolutionsEditView.vue"),
 };
 
 const router = createRouter({
@@ -72,6 +79,7 @@ const router = createRouter({
     problemSetRoute,
     problemDetailRoute,
     solutionCreateRoute,
+    solutionCreateFromSubmissionRoute,
   ],
 });
 
