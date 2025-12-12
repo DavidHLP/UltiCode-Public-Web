@@ -25,6 +25,13 @@ const groupFencesPlugin = (md: MarkdownIt) => {
     const newTokens: InstanceType<typeof state.Token>[] = [];
     let i = 0;
 
+    // Helper to extract group ID from info string
+    const getGroupId = (info: number | string): string | null => {
+      if (typeof info !== "string") return null;
+      const match = info.match(/\{group="([^"]+)"\}/);
+      return match && match[1] ? match[1] : null;
+    };
+
     while (i < tokens.length) {
       const token = tokens[i];
       if (!token) {
@@ -34,27 +41,43 @@ const groupFencesPlugin = (md: MarkdownIt) => {
 
       // Check for fence token
       if (token.type === "fence") {
-        const group = [token];
-        let j = i + 1;
+        const groupId = getGroupId(token.info || "");
 
-        // Look ahead for consecutive fences
-        while (j < tokens.length) {
-          const nextToken = tokens[j];
-          if (nextToken && nextToken.type === "fence") {
-            group.push(nextToken);
-            j++;
-          } else {
-            break;
+        // Only group if there is an explicit group ID
+        if (groupId) {
+          const group = [token];
+          let j = i + 1;
+
+          // Look ahead for consecutive fences with the SAME group ID
+          while (j < tokens.length) {
+            const nextToken = tokens[j];
+            if (nextToken && nextToken.type === "fence") {
+              const nextGroupId = getGroupId(nextToken.info || "");
+              if (nextGroupId === groupId) {
+                group.push(nextToken);
+                j++;
+              } else {
+                // Different group or no group, stop grouping
+                break;
+              }
+            } else {
+              // Not a fence, stop grouping
+              break;
+            }
           }
+
+          // Create a new token for the group
+          const groupToken = new state.Token("code_group", "div", 0);
+          groupToken.block = true;
+          groupToken.meta = { group }; // Store the original tokens
+          newTokens.push(groupToken);
+
+          i = j; // Skip the grouped tokens
+        } else {
+          // No group ID, treat as standalone
+          newTokens.push(token);
+          i++;
         }
-
-        // Create a new token for the group
-        const groupToken = new state.Token("code_group", "div", 0);
-        groupToken.block = true;
-        groupToken.meta = { group }; // Store the original tokens
-        newTokens.push(groupToken);
-
-        i = j; // Skip the grouped tokens
       } else {
         newTokens.push(token);
         i++;
@@ -72,6 +95,13 @@ const groupFencesPlugin = (md: MarkdownIt) => {
 
     if (!group || !group.length) return "";
 
+    // Helper to clean language name
+    const getLangName = (info: string): string => {
+      // Remove the metadata part e.g. {group="..."}
+      const cleanInfo = info.replace(/\{group="[^"]+"\}/, "").trim();
+      return cleanInfo.split(/\s+/)[0] || "Text";
+    };
+
     // Generate Header (Tabs)
     let tabsHtml = '<div class="lc-tabs-header">';
     group.forEach(
@@ -79,8 +109,7 @@ const groupFencesPlugin = (md: MarkdownIt) => {
         fence: InstanceType<typeof md.core.State.prototype.Token>,
         index: number,
       ) => {
-        const info = fence.info ? md.utils.unescapeAll(fence.info).trim() : "";
-        const langName = info.split(/\s+/)[0] || "Text";
+        const langName = getLangName(fence.info || "");
         const activeClass = index === 0 ? "active" : "";
 
         tabsHtml += `
@@ -99,8 +128,7 @@ const groupFencesPlugin = (md: MarkdownIt) => {
         fence: InstanceType<typeof md.core.State.prototype.Token>,
         index: number,
       ) => {
-        const info = fence.info ? md.utils.unescapeAll(fence.info).trim() : "";
-        const langName = info.split(/\s+/)[0] || "";
+        const langName = getLangName(fence.info || "");
 
         // Highlight code
         let highlightedCode = "";
