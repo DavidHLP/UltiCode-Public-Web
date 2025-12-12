@@ -4,7 +4,14 @@ import Calendars from "@/features/sider/Calendars.vue";
 import { fetchProblemLists } from "@/api/problem-list";
 import DatePicker from "@/features/sider/DatePicker.vue";
 import NavUser from "@/features/sider/NavUser.vue";
-import { onMounted, ref } from "vue";
+import SidebarNav from "@/features/sider/SidebarNav.vue";
+import {
+  forumSidebarData,
+  problemSidebarData,
+  contestSidebarData,
+} from "@/features/sider/sidebar.data";
+import { onMounted, ref, computed } from "vue";
+import { useRoute } from "vue-router";
 import type { ProblemListGroup } from "@/types/problem-list";
 import {
   Sidebar,
@@ -16,6 +23,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const props = defineProps<SidebarProps>();
+const route = useRoute();
+
 // This is sample data.
 const data = {
   user: {
@@ -35,6 +44,19 @@ onMounted(async () => {
     problemLists.value = [];
   }
 });
+
+const isProblemContext = computed(() => route.path.startsWith("/problem-set"));
+const isContestContext = computed(() => route.path.startsWith("/contest"));
+
+const currentSidebarData = computed(() => {
+  if (isProblemContext.value) {
+    return problemSidebarData;
+  }
+  if (isContestContext.value) {
+    return contestSidebarData;
+  }
+  return forumSidebarData;
+});
 </script>
 
 <template>
@@ -43,13 +65,19 @@ onMounted(async () => {
       <NavUser :user="data.user" />
     </SidebarHeader>
     <SidebarContent>
-      <DatePicker />
+      <!-- Dynamic Sidebar Navigation -->
+      <SidebarNav :sections="currentSidebarData" />
+
+      <template v-if="isProblemContext">
+        <SidebarSeparator class="mx-0" />
+        <!-- Existing Problem Lists Feature (Only for Problem Context) -->
+        <Calendars :problemLists="problemLists" />
+      </template>
+
       <SidebarSeparator class="mx-0" />
-      <Calendars :problemLists="problemLists" />
+      <DatePicker />
     </SidebarContent>
-    <SidebarFooter>
-      <!-- TODO: Implement new calendar feature -->
-    </SidebarFooter>
+    <SidebarFooter> </SidebarFooter>
     <SidebarRail />
   </Sidebar>
 </template>
