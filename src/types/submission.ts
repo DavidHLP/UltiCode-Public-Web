@@ -35,4 +35,9 @@ export interface SubmissionRecord {
     username: string;
     avatar?: string;
   };
+  problem?: {
+    id: number;
+    title: string;
+    slug: string;
+  };
 }

@@ -22,3 +22,9 @@ export async function fetchBestSubmission(
 ): Promise<SubmissionRecord> {
   return apiGet<SubmissionRecord>(`/problems/${problemId}/submissions/best`);
 }
+
+export async function fetchUserSubmissions(
+  userId: string,
+): Promise<SubmissionRecord[]> {
+  return apiGet<SubmissionRecord[]>(`/submissions?userId=${userId}`);
+}

@@ -9,43 +9,32 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageSquare, Eye, ArrowRight } from "lucide-vue-next";
+import {
+  ThumbsUp,
+  MessageSquare,
+  Eye,
+  ArrowRight,
+  FileCode2,
+} from "lucide-vue-next";
+import { onMounted, ref } from "vue";
+import { fetchUserSolutions, type SolutionFeedResponse } from "@/api/solution";
+import { RouterLink } from "vue-router";
 
-const solutions = [
-  {
-    id: 1,
-    title: "O(n) solution using HashMap",
-    problem: "Two Sum",
-    tags: ["Array", "Hash Table"],
-    lang: "TypeScript",
-    votes: 45,
-    views: 1205,
-    comments: 12,
-    date: "2 days ago",
-  },
-  {
-    id: 2,
-    title: "Simple recursive approach explained",
-    problem: "Merge Two Sorted Lists",
-    tags: ["Linked List", "Recursion"],
-    lang: "Python",
-    votes: 128,
-    views: 3500,
-    comments: 34,
-    date: "1 week ago",
-  },
-  {
-    id: 3,
-    title: "Binary Search optimization",
-    problem: "Search Insert Position",
-    tags: ["Array", "Binary Search"],
-    lang: "Go",
-    votes: 12,
-    views: 450,
-    comments: 2,
-    date: "2 weeks ago",
-  },
-];
+// Access the array type from the response type items or use any if hard to extract
+const solutions = ref<SolutionFeedResponse["items"]>([]);
+const loading = ref(true);
+
+onMounted(async () => {
+  try {
+    const userId = "u-001";
+    const response = await fetchUserSolutions(userId);
+    solutions.value = response.items;
+  } catch (e) {
+    console.error("Failed to load solutions", e);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
@@ -57,17 +46,25 @@ const solutions = [
       </p>
     </div>
 
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div v-if="loading" class="text-center text-muted-foreground py-8">
+      Loading solutions...
+    </div>
+    <div
+      v-else-if="solutions.length > 0"
+      class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
       <Card v-for="sol in solutions" :key="sol.id" class="flex flex-col">
         <CardHeader>
           <div class="flex items-start justify-between">
-            <Badge variant="secondary">{{ sol.lang }}</Badge>
-            <span class="text-xs text-muted-foreground">{{ sol.date }}</span>
+            <Badge variant="secondary">{{ sol.language }}</Badge>
+            <span class="text-xs text-muted-foreground">{{
+              new Date(sol.created_at).toLocaleDateString()
+            }}</span>
           </div>
           <CardTitle class="line-clamp-1 mt-2 text-lg">{{
             sol.title
           }}</CardTitle>
-          <CardDescription>For {{ sol.problem }}</CardDescription>
+          <CardDescription>Solution</CardDescription>
         </CardHeader>
         <CardContent class="flex-1">
           <div class="flex flex-wrap gap-2">
@@ -96,7 +93,7 @@ const solutions = [
               </div>
               <div class="flex items-center gap-1">
                 <MessageSquare class="h-3 w-3" />
-                <span>{{ sol.comments }}</span>
+                <span>{{ sol.stats?.comments || 0 }}</span>
               </div>
             </div>
             <Button variant="ghost" size="icon" class="h-6 w-6">
@@ -105,6 +102,28 @@ const solutions = [
           </div>
         </CardFooter>
       </Card>
+    </div>
+    <div
+      v-else
+      class="flex h-[400px] shrink-0 items-center justify-center rounded-md border border-dashed"
+    >
+      <div
+        class="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center"
+      >
+        <div
+          class="flex h-20 w-20 items-center justify-center rounded-full bg-muted"
+        >
+          <FileCode2 class="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h3 class="mt-4 text-lg font-semibold">No solutions posted</h3>
+        <p class="mb-4 mt-2 text-sm text-muted-foreground">
+          You haven't shared any solutions yet. Solve a problem and share your
+          approach!
+        </p>
+        <Button as-child>
+          <RouterLink to="/problemset">Solve Problems</RouterLink>
+        </Button>
+      </div>
     </div>
   </div>
 </template>

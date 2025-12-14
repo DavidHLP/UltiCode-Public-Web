@@ -15,70 +15,112 @@ import {
   GitCommit,
   Edit,
 } from "lucide-vue-next";
-
+import { onMounted, ref, computed } from "vue";
+import { RouterLink } from "vue-router";
 import ActivityHeatmap from "./components/ActivityHeatmap.vue";
+import { fetchUserProfile, type UserProfile } from "@/api/user";
+import { fetchUserSubmissions } from "@/api/submission";
+import type { SubmissionRecord } from "@/types/submission";
 
-// Mock Data
-const user = {
-  name: "Shad CN",
-  username: "shadcn",
-  email: "m@example.com",
-  avatar: "/avatars/shadcn.jpg",
-  bio: "Full-stack developer | UI/UX Enthusiast | Open Source Contributor. Building things that matter.",
-  location: "San Francisco, CA",
-  website: "shadcn.com",
-  twitter: "@shadcn",
-  github: "shadcn",
-  joined: "December 2023",
-  rank: 12403,
-  rankTier: "Diamond",
-  solved: 452,
-  totalProblems: 2500,
-  streak: 14,
-};
+const loading = ref(true);
+const user = ref<UserProfile | null>(null);
+const submissions = ref<SubmissionRecord[]>([]);
+const solvedCount = ref(0);
+const totalProblems = 2500; // Mock total for now
+const streak = ref(0); // Mock streak
 
-const stats = {
-  easy: { count: 200, total: 600, color: "text-green-500", bg: "bg-green-500" },
-  medium: {
-    count: 210,
-    total: 1200,
-    color: "text-yellow-500",
-    bg: "bg-yellow-500",
-  },
-  hard: { count: 42, total: 700, color: "text-red-500", bg: "bg-red-500" },
-};
+const stats = computed(() => {
+  if (!submissions.value.length)
+    return {
+      easy: {
+        count: 0,
+        total: 600,
+        color: "text-green-500",
+        bg: "bg-green-500",
+      },
+      medium: {
+        count: 0,
+        total: 1200,
+        color: "text-yellow-500",
+        bg: "bg-yellow-500",
+      },
+      hard: { count: 0, total: 700, color: "text-red-500", bg: "bg-red-500" },
+    };
 
-const recentActivity = [
-  {
-    action: "Solved",
-    problem: "Two Sum",
-    time: "2 hours ago",
-    status: "Accepted",
-  },
-  {
-    action: "Solved",
-    problem: "Median of Two Sorted Arrays",
-    time: "5 hours ago",
-    status: "Accepted",
-  },
-  {
-    action: "Attempted",
-    problem: "LRU Cache",
-    time: "1 day ago",
-    status: "Wrong Answer",
-  },
-];
+  // Basic mock distribution based on solved count
+  const total = solvedCount.value;
+  return {
+    easy: {
+      count: Math.floor(total * 0.5),
+      total: 600,
+      color: "text-green-500",
+      bg: "bg-green-500",
+    },
+    medium: {
+      count: Math.floor(total * 0.4),
+      total: 1200,
+      color: "text-yellow-500",
+      bg: "bg-yellow-500",
+    },
+    hard: {
+      count: total - Math.floor(total * 0.5) - Math.floor(total * 0.4),
+      total: 700,
+      color: "text-red-500",
+      bg: "bg-red-500",
+    },
+  };
+});
+
+const recentActivity = computed(() => {
+  return submissions.value.slice(0, 3).map((sub) => ({
+    action: sub.status === "Accepted" ? "Solved" : "Attempted",
+    problem: sub.problem?.title || "Unknown Problem",
+    time: new Date(sub.created_at).toLocaleDateString(),
+    status: sub.status,
+  }));
+});
+
+onMounted(async () => {
+  try {
+    // Hardcoded user ID for now
+    const userId = "u-001";
+    const [userData, userSubmissions] = await Promise.all([
+      fetchUserProfile(userId),
+      fetchUserSubmissions(userId),
+    ]);
+
+    user.value = userData;
+    submissions.value = userSubmissions;
+    solvedCount.value = userSubmissions.filter(
+      (s) => s.status === "Accepted",
+    ).length;
+    // Mock streak calculation
+    streak.value = Math.min(solvedCount.value, 15);
+  } catch (e) {
+    console.error("Failed to load profile data", e);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
-  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div v-if="loading" class="flex h-96 items-center justify-center">
+    <div class="text-muted-foreground">Loading profile...</div>
+  </div>
+  <div
+    v-else-if="user"
+    class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+  >
     <!-- Hero Section -->
     <div class="flex flex-col gap-8 md:flex-row">
       <div class="shrink-0">
         <div class="relative">
           <Avatar class="h-32 w-32 border-4 border-background shadow-xl">
             <AvatarImage :src="user.avatar" :alt="user.name" />
-            <AvatarFallback class="text-2xl">CN</AvatarFallback>
+            <AvatarFallback class="text-2xl">{{
+              user.username.substring(0, 2).toUpperCase()
+            }}</AvatarFallback>
           </Avatar>
           <div
             class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
@@ -91,7 +133,9 @@ const recentActivity = [
       <div class="flex flex-1 flex-col justify-center space-y-4">
         <div class="flex items-start justify-between">
           <div class="space-y-1">
-            <h1 class="text-3xl font-bold tracking-tight">{{ user.name }}</h1>
+            <h1 class="text-3xl font-bold tracking-tight">
+              {{ user.name || user.username }}
+            </h1>
             <p class="text-muted-foreground">@{{ user.username }}</p>
           </div>
           <Button variant="outline" size="sm" class="gap-2" as-child>
@@ -102,28 +146,40 @@ const recentActivity = [
           </Button>
         </div>
         <p class="max-w-2xl text-base leading-relaxed text-foreground/80">
-          {{ user.bio }}
+          {{ user.bio || "No bio provided." }}
         </p>
         <div class="flex flex-wrap gap-4 text-sm text-muted-foreground">
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1" v-if="user.location">
             <MapPin class="h-4 w-4" />
             <span>{{ user.location }}</span>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1" v-if="user.website">
             <LinkIcon class="h-4 w-4" />
-            <a href="#" class="hover:text-primary">{{ user.website }}</a>
+            <a
+              :href="user.website"
+              class="hover:text-primary"
+              target="_blank"
+              >{{ user.website }}</a
+            >
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1" v-if="user.github">
             <Github class="h-4 w-4" />
             <span>{{ user.github }}</span>
           </div>
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1" v-if="user.twitter">
             <Twitter class="h-4 w-4" />
             <span>{{ user.twitter }}</span>
           </div>
           <div class="flex items-center gap-1">
             <Calendar class="h-4 w-4" />
-            <span>Joined {{ user.joined }}</span>
+            <span
+              >Joined
+              {{
+                user.joined_at
+                  ? new Date(user.joined_at).toLocaleDateString()
+                  : "Recently"
+              }}</span
+            >
           </div>
         </div>
       </div>
@@ -144,7 +200,7 @@ const recentActivity = [
             <CardContent>
               <div class="flex items-baseline gap-2">
                 <span class="text-2xl font-bold">{{
-                  user.rank.toLocaleString()
+                  (user.rank || 12403).toLocaleString()
                 }}</span>
                 <span class="text-xs text-muted-foreground">Top 0.5%</span>
               </div>
@@ -153,7 +209,7 @@ const recentActivity = [
                   variant="secondary"
                   class="bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
                 >
-                  {{ user.rankTier }}
+                  Diamond
                 </Badge>
               </div>
             </CardContent>
@@ -166,9 +222,9 @@ const recentActivity = [
             </CardHeader>
             <CardContent>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold">{{ user.solved }}</span>
+                <span class="text-2xl font-bold">{{ solvedCount }}</span>
                 <span class="text-xs text-muted-foreground"
-                  >/ {{ user.totalProblems }}</span
+                  >/ {{ totalProblems }}</span
                 >
               </div>
               <div
@@ -176,9 +232,7 @@ const recentActivity = [
               >
                 <div
                   class="h-full bg-primary"
-                  :style="{
-                    width: (user.solved / user.totalProblems) * 100 + '%',
-                  }"
+                  :style="{ width: (solvedCount / totalProblems) * 100 + '%' }"
                 ></div>
               </div>
             </CardContent>
@@ -191,7 +245,7 @@ const recentActivity = [
             </CardHeader>
             <CardContent>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold">{{ user.streak }}</span>
+                <span class="text-2xl font-bold">{{ streak }}</span>
                 <span class="text-xs text-muted-foreground">Days</span>
               </div>
               <div class="mt-2 flex gap-1">
@@ -200,7 +254,7 @@ const recentActivity = [
                   v-for="i in 5"
                   :key="i"
                   class="h-2 w-2 rounded-sm bg-primary/20"
-                  :class="{ 'bg-primary': i > 2 }"
+                  :class="{ 'bg-primary': i <= streak }"
                 ></div>
               </div>
             </CardContent>
@@ -278,36 +332,31 @@ const recentActivity = [
           </CardHeader>
           <CardContent>
             <div
-              class="relative space-y-8 pl-2 before:absolute before:inset-y-0 before:left-0 before:w-[1px] before:bg-border"
+              class="relative space-y-8 pl-6 before:absolute before:inset-y-0 before:left-2 before:w-[2px] before:bg-muted"
             >
               <div
                 v-for="(item, index) in recentActivity"
                 :key="index"
-                class="relative pl-6"
+                class="relative"
               >
-                <!-- Timeline Dot -->
                 <div
-                  class="absolute left-[-4px] top-1 h-2 w-2 rounded-full border border-background bg-muted-foreground ring-2 ring-background"
-                ></div>
+                  class="absolute -left-[23px] flex h-4 w-4 items-center justify-center rounded-full bg-background ring-2 ring-muted"
+                >
+                  <div
+                    class="h-2 w-2 rounded-full bg-primary"
+                    :class="
+                      item.status !== 'Accepted' ? 'bg-muted-foreground' : ''
+                    "
+                  ></div>
+                </div>
                 <div class="flex flex-col gap-1">
-                  <span class="text-sm font-medium"
+                  <span class="text-sm font-medium leading-none"
                     >{{ item.action }}
                     <span class="text-primary">{{ item.problem }}</span></span
                   >
                   <span class="text-xs text-muted-foreground">{{
                     item.time
                   }}</span>
-                  <Badge
-                    variant="outline"
-                    class="w-fit text-[10px]"
-                    :class="{
-                      'border-green-500 text-green-600':
-                        item.status === 'Accepted',
-                      'border-red-500 text-red-600': item.status !== 'Accepted',
-                    }"
-                  >
-                    {{ item.status }}
-                  </Badge>
                 </div>
               </div>
             </div>

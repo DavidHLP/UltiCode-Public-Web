@@ -15,54 +15,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { onMounted, ref } from "vue";
+import { fetchUserSubmissions } from "@/api/submission";
+import type { SubmissionRecord } from "@/types/submission";
+import { ListX } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
+import { Button } from "@/components/ui/button";
 
-const submissions = [
-  {
-    id: "sub-1",
-    problem: "Two Sum",
-    status: "Accepted",
-    runtime: "52ms",
-    memory: "42.5MB",
-    language: "TypeScript",
-    submittedAt: "2 hours ago",
-  },
-  {
-    id: "sub-2",
-    problem: "Median of Two Sorted Arrays",
-    status: "Accepted",
-    runtime: "88ms",
-    memory: "45.1MB",
-    language: "Go",
-    submittedAt: "5 hours ago",
-  },
-  {
-    id: "sub-3",
-    problem: "LRU Cache",
-    status: "Wrong Answer",
-    runtime: "N/A",
-    memory: "N/A",
-    language: "Python",
-    submittedAt: "1 day ago",
-  },
-  {
-    id: "sub-4",
-    problem: "Merge Intervals",
-    status: "Accepted",
-    runtime: "76ms",
-    memory: "18.2MB",
-    language: "Rust",
-    submittedAt: "2 days ago",
-  },
-  {
-    id: "sub-5",
-    problem: "Trapping Rain Water",
-    status: "Time Limit Exceeded",
-    runtime: "N/A",
-    memory: "N/A",
-    language: "Java",
-    submittedAt: "3 days ago",
-  },
-];
+const submissions = ref<SubmissionRecord[]>([]);
+const loading = ref(true);
+
+onMounted(async () => {
+  try {
+    const userId = "u-001"; // This would typically come from user session/auth
+    submissions.value = await fetchUserSubmissions(userId);
+  } catch (e) {
+    console.error("Failed to load submissions", e);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
@@ -74,11 +46,14 @@ const submissions = [
       </p>
     </div>
 
-    <Card>
+    <div v-if="loading" class="text-center text-muted-foreground py-8">
+      Loading submissions...
+    </div>
+    <Card v-else-if="submissions.length > 0">
       <CardHeader>
         <CardTitle>Recent Submissions</CardTitle>
         <CardDescription>
-          You have made 5 submissions in the last week.
+          You have made {{ submissions.length }} submissions.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -96,7 +71,7 @@ const submissions = [
           <TableBody>
             <TableRow v-for="submission in submissions" :key="submission.id">
               <TableCell class="font-medium">{{
-                submission.problem
+                submission.problem?.title || "Unknown"
               }}</TableCell>
               <TableCell>
                 <Badge
@@ -113,15 +88,37 @@ const submissions = [
                 </Badge>
               </TableCell>
               <TableCell>{{ submission.language }}</TableCell>
-              <TableCell>{{ submission.runtime }}</TableCell>
-              <TableCell>{{ submission.memory }}</TableCell>
+              <TableCell>{{ submission.runtime }}ms</TableCell>
+              <TableCell>{{ submission.memory }}MB</TableCell>
               <TableCell class="text-right">{{
-                submission.submittedAt
+                new Date(submission.created_at).toLocaleDateString()
               }}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </CardContent>
     </Card>
+    <div
+      v-else
+      class="flex h-[400px] shrink-0 items-center justify-center rounded-md border border-dashed"
+    >
+      <div
+        class="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center"
+      >
+        <div
+          class="flex h-20 w-20 items-center justify-center rounded-full bg-muted"
+        >
+          <ListX class="h-10 w-10 text-muted-foreground" />
+        </div>
+        <h3 class="mt-4 text-lg font-semibold">No submissions yet</h3>
+        <p class="mb-4 mt-2 text-sm text-muted-foreground">
+          You haven't submitted any solutions yet. Start solving problems to see
+          your history here.
+        </p>
+        <Button as-child>
+          <RouterLink to="/problemset">Browse Problems</RouterLink>
+        </Button>
+      </div>
+    </div>
   </div>
 </template>

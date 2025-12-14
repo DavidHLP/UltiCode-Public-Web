@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-vue-next";
+import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-vue-next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -34,6 +27,26 @@ const { user } = defineProps<{
 }>();
 
 const { isMobile } = useSidebar();
+import { useRouter } from "vue-router";
+import { logout } from "@/api/auth";
+import { removeToken, removeUserId } from "@/utils/auth";
+import { toast } from "vue-sonner";
+
+const router = useRouter();
+
+async function handleLogout() {
+  try {
+    await logout();
+  } catch (error) {
+    console.error("Logout failed", error);
+    // Continue with local cleanup anyway
+  } finally {
+    removeToken();
+    removeUserId();
+    toast.success("Logged out successfully");
+    router.push("/login");
+  }
+}
 </script>
 
 <template>
@@ -76,13 +89,6 @@ const { isMobile } = useSidebar();
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Sparkles />
-              Upgrade to Pro
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
             <RouterLink to="/personal">
               <DropdownMenuItem>
                 <BadgeCheck />
@@ -90,16 +96,12 @@ const { isMobile } = useSidebar();
               </DropdownMenuItem>
             </RouterLink>
             <DropdownMenuItem>
-              <CreditCard />
-              Billing
-            </DropdownMenuItem>
-            <DropdownMenuItem>
               <Bell />
               Notifications
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem @click="handleLogout">
             <LogOut />
             Log out
           </DropdownMenuItem>

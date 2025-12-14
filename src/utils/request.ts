@@ -10,14 +10,16 @@ const service = axios.create({
   timeout: 10000,
 });
 
+import { getToken, removeToken } from "@/utils/auth";
+
 // Request interceptor
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Add auth token here if needed
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers['Authorization'] = `Bearer ${token}`;
-    // }
+    // Add auth token if available
+    const token = getToken();
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
     return config;
   },
   (error: AxiosError) => {
@@ -31,6 +33,16 @@ service.interceptors.response.use(
     return response.data;
   },
   (error: AxiosError) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      removeToken();
+      // Option: Redirect to login page if not already there
+      // if (window.location.pathname !== '/login') {
+      //    window.location.href = '/login';
+      // }
+    }
     console.error("Request error:", error);
     return Promise.reject(error);
   },
