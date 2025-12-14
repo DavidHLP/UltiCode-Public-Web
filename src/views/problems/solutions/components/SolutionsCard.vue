@@ -12,11 +12,11 @@ const emit = defineEmits<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
 
 const languageLabel = computed(
-  () => props.item.language || props.item.languageFilter || "language"
+  () => props.item.language || props.item.languageFilter || "language",
 );
 
 const topicLabel = computed(
@@ -24,7 +24,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic"
+    "topic",
 );
 
 const handleSelect = () => emit("select", props.item);

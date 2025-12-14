@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import type { SolutionFeedItem } from "@/types/solution";
+import type { SubmissionRecord } from "@/types/submission";
+import { fetchBestSubmission } from "@/api/submission";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +47,7 @@ const route = useRoute();
 const search = ref("");
 const languageFilter = ref("all");
 const sortBy = ref("likes");
+const bestSubmission = ref<SubmissionRecord | null>(null);
 
 const sortOptions = computed(() =>
   props.sortOptions.length
@@ -119,8 +122,28 @@ const handleSelect = (item: SolutionFeedItem) => {
 
 const handleCreateSolution = () => {
   const problemId = route.params.id || "1";
-  router.push({ name: "solution-create", params: { id: problemId } });
+  if (bestSubmission.value) {
+    router.push({
+      name: "solution-create",
+      params: { id: problemId },
+      query: { submissionId: bestSubmission.value.id },
+    });
+  } else {
+    // Fallback or show toast
+    router.push({ name: "solution-create", params: { id: problemId } });
+  }
 };
+
+onMounted(async () => {
+  const problemId = route.params.id as string;
+  if (problemId) {
+    try {
+      bestSubmission.value = await fetchBestSubmission(problemId);
+    } catch (e) {
+      console.error("Failed to fetch best submission", e);
+    }
+  }
+});
 </script>
 
 <template>
@@ -204,6 +227,7 @@ const handleCreateSolution = () => {
       <!-- 提交统计和操作栏 -->
       <div class="mx-3 mb-1.5 lc-md:mx-2 lc-md:mb-1">
         <div
+          v-if="bestSubmission"
           class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1"
         >
           <div class="flex items-center gap-1.5 flex-1 min-w-0">
@@ -215,9 +239,9 @@ const handleCreateSolution = () => {
               />
             </div>
             <span class="text-[11px] leading-tight">
-              Your last submission beats
+              Your best submission beats
               <span class="font-semibold text-green-600 dark:text-green-400"
-                >17%</span
+                >{{ bestSubmission.runtimePercentile?.toFixed(1) ?? 0 }}%</span
               >
               of users
             </span>
@@ -225,6 +249,23 @@ const handleCreateSolution = () => {
           <button
             class="flex h-5 flex-shrink-0 items-center gap-0.5 rounded bg-green-600 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm transition-all hover:bg-green-600/90 hover:shadow active:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50"
             @click="handleCreateSolution"
+          >
+            <PenLine class="h-2.5 w-2.5" />
+            Write Solution
+          </button>
+        </div>
+        <div
+          v-else
+          class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1"
+        >
+          <div class="flex items-center gap-1.5 flex-1 min-w-0">
+            <span class="text-[11px] leading-tight text-muted-foreground">
+              Solve the problem to write a solution
+            </span>
+          </div>
+          <button
+            class="flex h-5 flex-shrink-0 items-center gap-0.5 rounded bg-gray-400 px-2 py-0.5 text-[11px] font-medium text-white cursor-not-allowed opacity-70"
+            disabled
           >
             <PenLine class="h-2.5 w-2.5" />
             Write Solution

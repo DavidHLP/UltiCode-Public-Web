@@ -8,6 +8,7 @@ import {
   forumSidebarData,
   problemSidebarData,
   contestSidebarData,
+  personalSidebarData,
 } from "@/features/sider/sidebar.data";
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
@@ -46,6 +47,7 @@ onMounted(async () => {
 
 const isProblemContext = computed(() => route.path.startsWith("/problemset"));
 const isContestContext = computed(() => route.path.startsWith("/contest"));
+const isPersonalContext = computed(() => route.path.startsWith("/personal"));
 
 const currentSidebarData = computed(() => {
   if (isProblemContext.value) {
@@ -53,6 +55,9 @@ const currentSidebarData = computed(() => {
   }
   if (isContestContext.value) {
     return contestSidebarData;
+  }
+  if (isPersonalContext.value) {
+    return personalSidebarData;
   }
   return forumSidebarData;
 });

@@ -139,7 +139,8 @@ import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fetchSolutionTopics } from "@/api/topic";
-import { fetchSubmission } from "@/api/submission";
+import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
+import type { SubmissionRecord } from "@/types/submission";
 import type { SolutionTopic } from "@/types/topic";
 import "highlight.js/styles/atom-one-dark.css";
 
@@ -189,22 +190,48 @@ const resolvedProblemId = ref<string>(route.params.id as string);
 
 onMounted(async () => {
   const submissionId = route.query.submissionId as string;
+  let submissionToUse: SubmissionRecord | null = null;
+
   if (submissionId) {
     try {
-      const submission = await fetchSubmission(submissionId);
-      if (submission.status !== "Accepted") {
+      submissionToUse = await fetchSubmission(submissionId);
+    } catch (error) {
+      console.error("Failed to fetch submission", error);
+      alert("Failed to fetch submission.");
+      router.back();
+      return;
+    }
+  } else {
+    // Try to fetch best submission
+    try {
+      submissionToUse = await fetchBestSubmission(resolvedProblemId.value);
+    } catch (error) {
+      // It's okay if no best submission found, just continue with empty template
+      console.log("No best submission found or failed to fetch", error);
+    }
+  }
+
+  if (submissionToUse) {
+    if (submissionToUse.status !== "Accepted") {
+      if (submissionId) {
+        // Only strict check if user explicitly requested this submission
         alert("You must have an Accepted submission to create a solution.");
         router.push({
           name: "problem-detail",
-          params: { id: submission.problem_id.toString(), tab: "solution" },
+          params: {
+            id: submissionToUse.problem_id.toString(),
+            tab: "solution",
+          },
         });
         return;
       }
-      resolvedProblemId.value = submission.problem_id.toString();
+      // If auto-fetched best submission is somehow not accepted (shouldn't happen with findBest), ignore it
+    } else {
+      resolvedProblemId.value = submissionToUse.problem_id.toString();
 
       // Update dynamic template with submission code
-      const lang = submission.language.toLowerCase();
-      const code = submission.code;
+      const lang = submissionToUse.language.toLowerCase();
+      const code = submissionToUse.code;
       dynamicTemplate.value = `# Approach
 
 > What method do you use to solve this problem?
@@ -226,11 +253,6 @@ ${code}
 `;
       // Force update the editor content
       editorContent.value = dynamicTemplate.value;
-    } catch (error) {
-      console.error("Failed to validate submission", error);
-      alert("Failed to validate submission.");
-      router.back();
-      return;
     }
   }
 

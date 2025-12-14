@@ -8,7 +8,10 @@ export function formatDateTime(isoString: string): string {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-export function getDurationMinutes(startTime?: string, endTime?: string): number {
+export function getDurationMinutes(
+  startTime?: string,
+  endTime?: string,
+): number {
   if (!startTime || !endTime) return 0;
   const start = new Date(startTime).getTime();
   const end = new Date(endTime).getTime();

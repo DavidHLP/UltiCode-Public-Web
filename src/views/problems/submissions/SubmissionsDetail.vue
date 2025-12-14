@@ -27,30 +27,30 @@ const parseMs = (value: string | number) => {
 };
 
 const runtimeMs = computed(() =>
-  props.submission ? parseMs(props.submission.runtime) : null
+  props.submission ? parseMs(props.submission.runtime) : null,
 );
 
 const distBins = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? []
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.min) ?? [],
 );
 const distCounts = computed<number[]>(
-  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? []
+  () => props.submission?.runtimeDistBinsMs?.map((b) => b.count) ?? [],
 );
 const distLength = computed(() =>
-  Math.min(distCounts.value.length, distBins.value.length)
+  Math.min(distCounts.value.length, distBins.value.length),
 );
 const pairedDist = computed(() =>
   Array.from({ length: distLength.value }, (_, i) => ({
     i,
     count: distCounts.value[i]!,
     bin: distBins.value[i]!,
-  }))
+  })),
 );
 const totalCount = computed(() =>
   pairedDist.value.reduce(
     (acc, d) => acc + (Number.isFinite(d.count) ? d.count : 0),
-    0
-  )
+    0,
+  ),
 );
 
 const highlightIndex = computed(() => {
@@ -246,7 +246,7 @@ const initMemoryChart = () => {
   });
 
   const memoryCounts = Array.from({ length: 80 }, () =>
-    Math.floor(Math.random() * 100)
+    Math.floor(Math.random() * 100),
   );
   const userMemoryIndex = 40; // 用户位置索引
   const userAvatar =
@@ -481,7 +481,7 @@ const handleWriteSolution = () => {
             <span class="text-muted-foreground/60">submitted at</span>
             <span>{{
               new Date(
-                props.submission.submittedAt ?? props.submission.created_at
+                props.submission.submittedAt ?? props.submission.created_at,
               ).toLocaleString()
             }}</span>
           </div>
@@ -523,7 +523,7 @@ const handleWriteSolution = () => {
     <div
       v-else-if="
         ['Wrong Answer', 'Runtime Error', 'Time Limit Exceeded'].includes(
-          props.submission.status
+          props.submission.status,
         )
       "
       class="space-y-4"

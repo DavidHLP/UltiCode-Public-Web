@@ -16,6 +16,8 @@ import {
   Cpu,
   FileText,
   HelpCircle,
+  User,
+  Settings,
 } from "lucide-vue-next";
 
 export interface SidebarItem {
@@ -98,6 +100,27 @@ export const contestSidebarData: SidebarSection[] = [
     items: [
       { title: "Global Ranking", url: "/contest/global-ranking", icon: Globe },
       { title: "Local Ranking", url: "/contest/local-ranking", icon: Flame },
+    ],
+  },
+];
+
+export const personalSidebarData: SidebarSection[] = [
+  {
+    name: "Account",
+    items: [
+      { title: "Profile", url: "/personal", icon: User },
+      { title: "Account", url: "/personal/account", icon: Settings },
+    ],
+  },
+  {
+    name: "Activity",
+    items: [
+      {
+        title: "My Submissions",
+        url: "/personal/submissions",
+        icon: FileText,
+      },
+      { title: "My Solutions", url: "/personal/solutions", icon: FileText },
     ],
   },
 ];

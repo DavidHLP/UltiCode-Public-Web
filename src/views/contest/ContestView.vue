@@ -27,7 +27,7 @@ const currentPage = ref(1);
 const pageSize = 10;
 
 const totalPages = computed(() =>
-  Math.ceil(totalPastContests.value / pageSize)
+  Math.ceil(totalPastContests.value / pageSize),
 );
 
 // 加载数据
@@ -77,7 +77,7 @@ watch(currentPage, async (newPage) => {
         <h1
           class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-orange-500"
         >
-          LeetCode Contest
+          UltiCode Contest
         </h1>
       </div>
       <p class="text-lg text-muted-foreground">

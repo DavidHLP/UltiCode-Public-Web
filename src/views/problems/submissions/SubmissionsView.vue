@@ -20,10 +20,16 @@ const selectedSubmission = computed(
     ) ?? null,
 );
 
+// TODO: Get from store
+const CURRENT_USER_ID = "u-001";
+
 const loadSubmissions = async () => {
   isLoading.value = true;
   try {
-    submissions.value = await fetchProblemSubmissions(props.problemId);
+    submissions.value = await fetchProblemSubmissions(
+      props.problemId,
+      CURRENT_USER_ID,
+    );
   } catch (error) {
     console.error("Failed to load submissions", error);
     submissions.value = [];

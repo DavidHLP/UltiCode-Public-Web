@@ -70,6 +70,33 @@ const solutionCreateFromSubmissionRoute: RouteRecordRaw = {
     import("@/views/post-editor/solutions/SolutionsEditView.vue"),
 };
 
+const personalRoutes: RouteRecordRaw = {
+  path: "/personal",
+  component: () => import("@/features/sider/AppLayout.vue"),
+  children: [
+    {
+      path: "",
+      name: "personal-profile",
+      component: () => import("@/views/personal/PersonalView.vue"),
+    },
+    {
+      path: "account",
+      name: "personal-account",
+      component: () => import("@/views/personal/AccountView.vue"),
+    },
+    {
+      path: "submissions",
+      name: "personal-submissions",
+      component: () => import("@/views/personal/SubmissionsView.vue"),
+    },
+    {
+      path: "solutions",
+      name: "personal-solutions",
+      component: () => import("@/views/personal/SolutionsView.vue"),
+    },
+  ],
+};
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -80,6 +107,7 @@ const router = createRouter({
     problemDetailRoute,
     solutionCreateRoute,
     solutionCreateFromSubmissionRoute,
+    personalRoutes,
   ],
 });
 
