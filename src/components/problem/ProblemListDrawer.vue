@@ -45,7 +45,7 @@ const filteredProblems = computed(() => {
   if (!searchQuery.value) return problems.value;
   const q = searchQuery.value.toLowerCase();
   return problems.value.filter(
-    (p) => p.title.toLowerCase().includes(q) || p.id.toString().includes(q)
+    (p) => p.title.toLowerCase().includes(q) || p.id.toString().includes(q),
   );
 });
 
@@ -153,7 +153,7 @@ const navigateToProblem = (slug: string) => {
               @click="
                 navigateToProblem(
                   problem.slug ||
-                    problem.title.toLowerCase().replace(/\s+/g, '-')
+                    problem.title.toLowerCase().replace(/\s+/g, '-'),
                 )
               "
             >

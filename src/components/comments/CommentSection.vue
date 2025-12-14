@@ -116,7 +116,7 @@ const comments = ref<Comment[]>(mockData);
 const findAndAddReply = (
   nodes: Comment[],
   parentId: number | string,
-  content: string
+  content: string,
 ): boolean => {
   for (const node of nodes) {
     if (node.id === parentId) {

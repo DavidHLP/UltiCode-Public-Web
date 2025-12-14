@@ -33,6 +33,6 @@ export function formatRelativeTime(isoString: string): string {
   if (diffInDays < 7) return `${diffInDays}d ago`;
   const diffInWeeks = Math.floor(diffInDays / 7);
   if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
-  
+
   return formatDateTime(isoString);
 }

@@ -1,369 +1,399 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue 3 Reddit Style Comments (Unified SVG)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
-            color: #1a1a1b;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #ffffff;
+        color: #1a1a1b;
+      }
 
-        :root {
-            --indent-width: 36px;
-            --rail-x: 20px; 
-            --line-color: #edeff1;
-            --line-color-hover: #8c8c8c;
-            --line-width: 2px;
-            /* 按钮中心在 SVG 内部的 Y 坐标 */
-            /* top: -20px offset + 24px visual top = 44px (approx) */
-            /* 让我们重新校准：希望按钮视觉上距离顶部 24px */
-            /* SVG top: -20px. So button cy should be 20 + 24 = 44px */
-        }
+      :root {
+        --indent-width: 36px;
+        --rail-x: 20px;
+        --line-color: #edeff1;
+        --line-color-hover: #8c8c8c;
+        --line-width: 2px;
+        /* 按钮中心在 SVG 内部的 Y 坐标 */
+        /* top: -20px offset + 24px visual top = 44px (approx) */
+        /* 让我们重新校准：希望按钮视觉上距离顶部 24px */
+        /* SVG top: -20px. So button cy should be 20 + 24 = 44px */
+      }
 
-        /* 1. SVG 容器配置 */
-        .lines-svg-container {
-            position: absolute;
-            left: calc(var(--indent-width) * -1); 
-            /* 关键：向上延伸 20px，覆盖父级引线末端，实现无缝对接 */
-            top: -20px; 
-            bottom: 0;
-            width: var(--indent-width);
-            z-index: 10; /* 提升层级，确保 SVG 按钮在最上层 */
-            overflow: visible; 
-            pointer-events: none; /* 默认穿透，但内部元素可点击 */
-        }
+      /* 1. SVG 容器配置 */
+      .lines-svg-container {
+        position: absolute;
+        left: calc(var(--indent-width) * -1);
+        /* 关键：向上延伸 20px，覆盖父级引线末端，实现无缝对接 */
+        top: -20px;
+        bottom: 0;
+        width: var(--indent-width);
+        z-index: 10; /* 提升层级，确保 SVG 按钮在最上层 */
+        overflow: visible;
+        pointer-events: none; /* 默认穿透，但内部元素可点击 */
+      }
 
-        /* 2. SVG 内部元素 */
-        .tree-svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+      /* 2. SVG 内部元素 */
+      .tree-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
 
-        .svg-path {
-            fill: none;
-            stroke: var(--line-color);
-            stroke-width: var(--line-width);
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: stroke 0.2s; 
-        }
+      .svg-path {
+        fill: none;
+        stroke: var(--line-color);
+        stroke-width: var(--line-width);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: stroke 0.2s;
+      }
 
-        /* 3. 按钮组 (Group) */
-        .toggle-group {
-            cursor: pointer;
-            pointer-events: auto; /* 恢复按钮交互 */
-            transition: transform 0.2s;
-            transform-origin: 20px 44px; /* 围绕圆心缩放 */
-        }
-        
-        /* 按钮背景圆 */
-        .toggle-circle {
-            fill: white;
-            stroke: var(--line-color);
-            stroke-width: 2px;
-            transition: stroke 0.2s, fill 0.2s;
-        }
+      /* 3. 按钮组 (Group) */
+      .toggle-group {
+        cursor: pointer;
+        pointer-events: auto; /* 恢复按钮交互 */
+        transition: transform 0.2s;
+        transform-origin: 20px 44px; /* 围绕圆心缩放 */
+      }
 
-        /* 按钮图标 (+/-) */
-        .toggle-icon {
-            stroke: #878a8c;
-            stroke-width: 2px;
-            stroke-linecap: round;
-            transition: stroke 0.2s;
-        }
+      /* 按钮背景圆 */
+      .toggle-circle {
+        fill: white;
+        stroke: var(--line-color);
+        stroke-width: 2px;
+        transition:
+          stroke 0.2s,
+          fill 0.2s;
+      }
 
-        /* 4. 父级向下引线 */
-        .thread-line-parent {
-            width: 2px;
-            background-color: var(--line-color);
-            flex-grow: 1; 
-            margin-top: 4px; 
-            /* 让它稍微向下一点，确保被 SVG 的 top: -20px 区域覆盖 */
-            margin-bottom: 0;
-            margin-left: auto;
-            margin-right: auto;
-            transition: background-color 0.2s;
-        }
+      /* 按钮图标 (+/-) */
+      .toggle-icon {
+        stroke: #878a8c;
+        stroke-width: 2px;
+        stroke-linecap: round;
+        transition: stroke 0.2s;
+      }
 
-        /* --- 交互高亮逻辑 --- */
-        
-        /* 悬停整个评论块时： */
-        
-        /* 1. 亮起 SVG 路径 */
-        .comment-node:hover > .lines-svg-container .svg-path {
-            stroke: var(--line-color-hover);
-        }
+      /* 4. 父级向下引线 */
+      .thread-line-parent {
+        width: 2px;
+        background-color: var(--line-color);
+        flex-grow: 1;
+        margin-top: 4px;
+        /* 让它稍微向下一点，确保被 SVG 的 top: -20px 区域覆盖 */
+        margin-bottom: 0;
+        margin-left: auto;
+        margin-right: auto;
+        transition: background-color 0.2s;
+      }
 
-        /* 2. 亮起按钮圆圈边框 */
-        .comment-node:hover > .lines-svg-container .toggle-circle {
-            stroke: var(--line-color-hover);
-        }
+      /* --- 交互高亮逻辑 --- */
 
-        /* 3. 亮起父级引线 */
-        .comment-node:hover > .flex > .avatar-col > .thread-line-parent {
-            background-color: var(--line-color-hover);
-        }
+      /* 悬停整个评论块时： */
 
-        /* 4. 按钮自身的强交互 (Hover on Button) */
-        .toggle-group:hover {
-            transform: scale(1.1);
-        }
-        .toggle-group:hover .toggle-circle {
-            stroke: #1a1a1b !important; /* 黑色边框 */
-        }
-        .toggle-group:hover .toggle-icon {
-            stroke: #1a1a1b !important; /* 黑色图标 */
-        }
+      /* 1. 亮起 SVG 路径 */
+      .comment-node:hover > .lines-svg-container .svg-path {
+        stroke: var(--line-color-hover);
+      }
 
-        .action-btn:hover { background-color: #f3f4f6; }
+      /* 2. 亮起按钮圆圈边框 */
+      .comment-node:hover > .lines-svg-container .toggle-circle {
+        stroke: var(--line-color-hover);
+      }
+
+      /* 3. 亮起父级引线 */
+      .comment-node:hover > .flex > .avatar-col > .thread-line-parent {
+        background-color: var(--line-color-hover);
+      }
+
+      /* 4. 按钮自身的强交互 (Hover on Button) */
+      .toggle-group:hover {
+        transform: scale(1.1);
+      }
+      .toggle-group:hover .toggle-circle {
+        stroke: #1a1a1b !important; /* 黑色边框 */
+      }
+      .toggle-group:hover .toggle-icon {
+        stroke: #1a1a1b !important; /* 黑色图标 */
+      }
+
+      .action-btn:hover {
+        background-color: #f3f4f6;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="app" class="max-w-4xl mx-auto py-10 px-6">
+      <div class="bg-white">
+        <h2 class="text-xl font-bold mb-8 pb-4 border-b">
+          评论区 (SVG 一体化重构)
+        </h2>
 
-<div id="app" class="max-w-4xl mx-auto py-10 px-6">
-    <div class="bg-white">
-        <h2 class="text-xl font-bold mb-8 pb-4 border-b">评论区 (SVG 一体化重构)</h2>
-        
         <div class="space-y-4">
-            <comment-node 
-                v-for="comment in comments" 
-                :key="comment.id" 
-                :comment="comment"
-                :is-last="true" 
-                :is-root="true">
-            </comment-node>
+          <comment-node
+            v-for="comment in comments"
+            :key="comment.id"
+            :comment="comment"
+            :is-last="true"
+            :is-root="true"
+          >
+          </comment-node>
         </div>
+      </div>
     </div>
-</div>
 
-<script type="text/x-template" id="comment-node-template">
-    <div class="comment-node relative group">
-        
-        <!-- SVG 连线层 (一体化设计) -->
-        <div v-if="!isRoot" class="lines-svg-container">
-            <svg class="tree-svg" preserveAspectRatio="none">
-                <!-- 
-                   1. 垂直轨道 (Vertical Rail)
-                   起点 (20, 0): 这里的 0 其实是 relative top 的 -20px 位置，也就是父级引线的末端区域。
-                   这确保了线条是连续的。
-                -->
-                <line 
-                    v-if="!isLast" 
-                    x1="20" y1="0" 
-                    x2="20" y2="100%" 
-                    class="svg-path" 
-                />
-                
-                <!-- 
-                   2. 弯曲连接线 (Curve)
-                   从上方 (20, 0) 下来，穿过按钮 (20, 44)，然后弯曲到头像 (56, 44)。
-                   M 20,0     : 起点 (对接父级)
-                   L 20,32    : 直线向下，留出 12px 圆角空间 (44 - 12 = 32)
-                   Q 20,44 56,44 : 贝塞尔曲线，转向并连接到头像中心
-                -->
-                <path 
-                    d="M 20,0 L 20,32 Q 20,44 56,44" 
-                    class="svg-path" 
-                />
+    <script type="text/x-template" id="comment-node-template">
+      <div class="comment-node relative group">
 
-                <!-- 
-                   3. 嵌入式按钮 (Unified Button Group)
-                   圆心位置: cx=20, cy=44 
-                   (24px visual top + 20px svg offset = 44px)
-                -->
-                <g class="toggle-group" @click.stop="toggleCollapse">
-                    <!-- 背景圆 (纯白填充遮挡线条) -->
-                    <circle cx="20" cy="44" r="7" class="toggle-circle" />
-                    
-                    <!-- 图标: 减号 (展开状态) -->
-                    <line v-if="!isCollapsed" x1="15" y1="44" x2="25" y2="44" class="toggle-icon" />
-                    
-                    <!-- 图标: 加号 (折叠状态) -->
-                    <g v-else>
-                        <line x1="15" y1="44" x2="25" y2="44" class="toggle-icon" />
-                        <line x1="20" y1="39" x2="20" y2="49" class="toggle-icon" />
-                    </g>
-                </g>
-            </svg>
-        </div>
+          <!-- SVG 连线层 (一体化设计) -->
+          <div v-if="!isRoot" class="lines-svg-container">
+              <svg class="tree-svg" preserveAspectRatio="none">
+                  <!--
+                     1. 垂直轨道 (Vertical Rail)
+                     起点 (20, 0): 这里的 0 其实是 relative top 的 -20px 位置，也就是父级引线的末端区域。
+                     这确保了线条是连续的。
+                  -->
+                  <line
+                      v-if="!isLast"
+                      x1="20" y1="0"
+                      x2="20" y2="100%"
+                      class="svg-path"
+                  />
 
-        <!-- 内容层 -->
-        <div class="flex relative z-10 bg-white pl-1"> 
-            <!-- 左列: 头像 -->
-            <div class="flex-shrink-0 mr-3 flex flex-col items-center pt-1 relative w-8 avatar-col">
-                <div 
-                    class="w-8 h-8 rounded-full overflow-hidden relative cursor-pointer bg-gray-100 ring-1 ring-gray-100 hover:ring-gray-300 transition-all z-20"
-                    @click="toggleCollapse"
-                >
-                    <img :src="comment.avatar" class="w-full h-full object-cover" alt="avatar">
-                </div>
-                
-                <!-- 父级向下引线 -->
-                <div v-if="!isCollapsed && hasChildren" class="thread-line-parent"></div>
-            </div>
+                  <!--
+                     2. 弯曲连接线 (Curve)
+                     从上方 (20, 0) 下来，穿过按钮 (20, 44)，然后弯曲到头像 (56, 44)。
+                     M 20,0     : 起点 (对接父级)
+                     L 20,32    : 直线向下，留出 12px 圆角空间 (44 - 12 = 32)
+                     Q 20,44 56,44 : 贝塞尔曲线，转向并连接到头像中心
+                  -->
+                  <path
+                      d="M 20,0 L 20,32 Q 20,44 56,44"
+                      class="svg-path"
+                  />
 
-            <!-- 右列: 文字 -->
-            <div class="flex-grow pb-1">
-                <div class="flex items-center text-xs mb-1 h-5">
-                    <span class="font-bold text-black mr-1 hover:underline cursor-pointer">{{ comment.author }}</span>
-                    <span v-if="comment.isOp" class="text-blue-600 font-bold ml-1 text-[10px]">OP</span>
-                    <span class="text-gray-400 mx-1">•</span>
-                    <span class="text-gray-500">{{ comment.time }}</span>
-                </div>
+                  <!--
+                     3. 嵌入式按钮 (Unified Button Group)
+                     圆心位置: cx=20, cy=44
+                     (24px visual top + 20px svg offset = 44px)
+                  -->
+                  <g class="toggle-group" @click.stop="toggleCollapse">
+                      <!-- 背景圆 (纯白填充遮挡线条) -->
+                      <circle cx="20" cy="44" r="7" class="toggle-circle" />
 
-                <div v-if="isCollapsed" class="py-1 cursor-pointer select-none" @click="toggleCollapse">
-                    <span class="text-xs text-gray-400 italic font-medium hover:text-gray-600">
-                        Collapsed ({{ comment.children ? comment.children.length : 0 }} children)
-                    </span>
-                </div>
+                      <!-- 图标: 减号 (展开状态) -->
+                      <line v-if="!isCollapsed" x1="15" y1="44" x2="25" y2="44" class="toggle-icon" />
 
-                <div v-else>
-                    <div class="text-sm text-[#1a1a1b] leading-relaxed space-y-1 mb-2">
-                        <div v-for="(line, idx) in comment.content" :key="idx">
-                            {{ line }}
-                        </div>
-                    </div>
+                      <!-- 图标: 加号 (折叠状态) -->
+                      <g v-else>
+                          <line x1="15" y1="44" x2="25" y2="44" class="toggle-icon" />
+                          <line x1="20" y1="39" x2="20" y2="49" class="toggle-icon" />
+                      </g>
+                  </g>
+              </svg>
+          </div>
 
-                    <div class="flex items-center space-x-2 text-gray-500 font-bold text-xs select-none">
-                        <div class="flex items-center bg-gray-100 rounded-full px-1 py-0.5 space-x-0.5 border border-transparent hover:border-gray-300 transition-colors">
-                            <button class="p-1 hover:bg-gray-200 hover:text-orange-600 rounded-full"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
-                            <span class="text-xs px-1 text-black font-semibold min-w-[16px] text-center">{{ formatVotes(comment.votes) }}</span>
-                            <button class="p-1 hover:bg-gray-200 hover:text-blue-600 rounded-full"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
-                        </div>
-                        <button class="action-btn flex items-center space-x-1 px-2 py-1.5 rounded text-gray-500" @click="toggleCollapse">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="2" x2="22" y2="6"></line><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"></path></svg>
-                            <span class="hidden sm:inline">Reply</span>
-                        </button>
-                        <button class="action-btn flex items-center space-x-1 px-2 py-1.5 rounded text-gray-500">
-                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                            <span class="hidden sm:inline">Share</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+          <!-- 内容层 -->
+          <div class="flex relative z-10 bg-white pl-1">
+              <!-- 左列: 头像 -->
+              <div class="flex-shrink-0 mr-3 flex flex-col items-center pt-1 relative w-8 avatar-col">
+                  <div
+                      class="w-8 h-8 rounded-full overflow-hidden relative cursor-pointer bg-gray-100 ring-1 ring-gray-100 hover:ring-gray-300 transition-all z-20"
+                      @click="toggleCollapse"
+                  >
+                      <img :src="comment.avatar" class="w-full h-full object-cover" alt="avatar">
+                  </div>
 
-        <!-- 子评论 -->
-        <div v-if="!isCollapsed && hasChildren" class="children-container pl-[36px] relative">
-            <comment-node 
-                v-for="(child, index) in comment.children" 
-                :key="child.id" 
-                :comment="child"
-                :is-last="index === comment.children.length - 1"
-                :is-root="false">
-            </comment-node>
-        </div>
-    </div>
-</script>
+                  <!-- 父级向下引线 -->
+                  <div v-if="!isCollapsed && hasChildren" class="thread-line-parent"></div>
+              </div>
 
-<script>
-    const { createApp, ref, computed } = Vue;
+              <!-- 右列: 文字 -->
+              <div class="flex-grow pb-1">
+                  <div class="flex items-center text-xs mb-1 h-5">
+                      <span class="font-bold text-black mr-1 hover:underline cursor-pointer">{{ comment.author }}</span>
+                      <span v-if="comment.isOp" class="text-blue-600 font-bold ml-1 text-[10px]">OP</span>
+                      <span class="text-gray-400 mx-1">•</span>
+                      <span class="text-gray-500">{{ comment.time }}</span>
+                  </div>
 
-    const mockData = [
+                  <div v-if="isCollapsed" class="py-1 cursor-pointer select-none" @click="toggleCollapse">
+                      <span class="text-xs text-gray-400 italic font-medium hover:text-gray-600">
+                          Collapsed ({{ comment.children ? comment.children.length : 0 }} children)
+                      </span>
+                  </div>
+
+                  <div v-else>
+                      <div class="text-sm text-[#1a1a1b] leading-relaxed space-y-1 mb-2">
+                          <div v-for="(line, idx) in comment.content" :key="idx">
+                              {{ line }}
+                          </div>
+                      </div>
+
+                      <div class="flex items-center space-x-2 text-gray-500 font-bold text-xs select-none">
+                          <div class="flex items-center bg-gray-100 rounded-full px-1 py-0.5 space-x-0.5 border border-transparent hover:border-gray-300 transition-colors">
+                              <button class="p-1 hover:bg-gray-200 hover:text-orange-600 rounded-full"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+                              <span class="text-xs px-1 text-black font-semibold min-w-[16px] text-center">{{ formatVotes(comment.votes) }}</span>
+                              <button class="p-1 hover:bg-gray-200 hover:text-blue-600 rounded-full"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+                          </div>
+                          <button class="action-btn flex items-center space-x-1 px-2 py-1.5 rounded text-gray-500" @click="toggleCollapse">
+                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="2" x2="22" y2="6"></line><path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"></path></svg>
+                              <span class="hidden sm:inline">Reply</span>
+                          </button>
+                          <button class="action-btn flex items-center space-x-1 px-2 py-1.5 rounded text-gray-500">
+                               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                              <span class="hidden sm:inline">Share</span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- 子评论 -->
+          <div v-if="!isCollapsed && hasChildren" class="children-container pl-[36px] relative">
+              <comment-node
+                  v-for="(child, index) in comment.children"
+                  :key="child.id"
+                  :comment="child"
+                  :is-last="index === comment.children.length - 1"
+                  :is-root="false">
+              </comment-node>
+          </div>
+      </div>
+    </script>
+
+    <script>
+      const { createApp, ref, computed } = Vue;
+
+      const mockData = [
         {
-            id: 1,
-            author: "indicava",
-            avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=indicava",
-            time: "1d ago",
-            votes: 43,
-            content: ["The hell is \"AI Score\"?", "“AI 分数”到底是什么？"],
-            children: [
+          id: 1,
+          author: "indicava",
+          avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=indicava",
+          time: "1d ago",
+          votes: 43,
+          content: ['The hell is "AI Score"?', "“AI 分数”到底是什么？"],
+          children: [
+            {
+              id: 2,
+              author: "Hunting-Succcubus",
+              avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Hunting",
+              time: "1d ago",
+              votes: 22,
+              content: [
+                "Ai score is metric how much you can fool consumer",
+                "AI 分数是衡量你能骗过消费者多少",
+              ],
+              children: [
                 {
-                    id: 2,
-                    author: "Hunting-Succcubus",
-                    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Hunting",
-                    time: "1d ago",
-                    votes: 22,
-                    content: ["Ai score is metric how much you can fool consumer", "AI 分数是衡量你能骗过消费者多少"],
-                    children: [
-                        {
-                            id: 3,
-                            author: "geerlingguy",
-                            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=geerlingguy",
-                            time: "12h ago",
-                            votes: 1,
-                            content: ["AI score means as much to me as \"built in XX TOPS NPU\". It's like the megahertz race of the 90s.", "AI 分数对我来说和“内置 XX 超过 NPU”一样重要。"],
-                            children: [
-                                {
-                                    id: 4,
-                                    author: "FinalUser",
-                                    avatar: "https://api.dicebear.com/7.x/micah/svg?seed=Final",
-                                    time: "10h ago",
-                                    votes: 5,
-                                    content: ["Exactly. It creates a seamless experience now.", "确实。现在看起来是无缝连接的。"],
-                                    children: []
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
+                  id: 3,
+                  author: "geerlingguy",
+                  avatar:
+                    "https://api.dicebear.com/7.x/avataaars/svg?seed=geerlingguy",
+                  time: "12h ago",
+                  votes: 1,
+                  content: [
+                    'AI score means as much to me as "built in XX TOPS NPU". It\'s like the megahertz race of the 90s.',
+                    "AI 分数对我来说和“内置 XX 超过 NPU”一样重要。",
+                  ],
+                  children: [
+                    {
+                      id: 4,
+                      author: "FinalUser",
+                      avatar:
+                        "https://api.dicebear.com/7.x/micah/svg?seed=Final",
+                      time: "10h ago",
+                      votes: 5,
+                      content: [
+                        "Exactly. It creates a seamless experience now.",
+                        "确实。现在看起来是无缝连接的。",
+                      ],
+                      children: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
         {
-            id: 10,
-            author: "TestSubject",
-            avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=test",
-            time: "5h ago",
-            votes: 12,
-            content: ["This button is now an integral part of the SVG path.", "这个按钮现在是 SVG 路径的有机组成部分。"],
-            children: [
+          id: 10,
+          author: "TestSubject",
+          avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=test",
+          time: "5h ago",
+          votes: 12,
+          content: [
+            "This button is now an integral part of the SVG path.",
+            "这个按钮现在是 SVG 路径的有机组成部分。",
+          ],
+          children: [
+            {
+              id: 11,
+              author: "ChildNodeA",
+              avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=a",
+              time: "2h ago",
+              votes: 3,
+              content: [
+                "Hovering me lights up the line, the button, and the parent's line as one unit.",
+                "悬停我时，线条、按钮和父级线会作为一个整体亮起。",
+              ],
+              children: [
                 {
-                    id: 11,
-                    author: "ChildNodeA",
-                    avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=a",
-                    time: "2h ago",
-                    votes: 3,
-                    content: ["Hovering me lights up the line, the button, and the parent's line as one unit.", "悬停我时，线条、按钮和父级线会作为一个整体亮起。"],
-                    children: [
-                        {
-                            id: 12,
-                            author: "GrandChild",
-                            avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=b",
-                            time: "1h ago",
-                            votes: 1,
-                            content: ["Seamless vector graphics.", "无缝矢量图形。"],
-                            children: []
-                        }
-                    ]
-                }
-            ]
-        }
-    ];
+                  id: 12,
+                  author: "GrandChild",
+                  avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=b",
+                  time: "1h ago",
+                  votes: 1,
+                  content: ["Seamless vector graphics.", "无缝矢量图形。"],
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
+      ];
 
-    const CommentNode = {
-        name: 'CommentNode',
-        template: '#comment-node-template',
+      const CommentNode = {
+        name: "CommentNode",
+        template: "#comment-node-template",
         props: {
-            comment: { type: Object, required: true },
-            isLast: { type: Boolean, default: false },
-            isRoot: { type: Boolean, default: false }
+          comment: { type: Object, required: true },
+          isLast: { type: Boolean, default: false },
+          isRoot: { type: Boolean, default: false },
         },
         setup(props) {
-            const isCollapsed = ref(false);
-            const hasChildren = computed(() => props.comment.children && props.comment.children.length > 0);
-            const toggleCollapse = () => isCollapsed.value = !isCollapsed.value;
-            const formatVotes = (num) => num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
+          const isCollapsed = ref(false);
+          const hasChildren = computed(
+            () => props.comment.children && props.comment.children.length > 0,
+          );
+          const toggleCollapse = () => (isCollapsed.value = !isCollapsed.value);
+          const formatVotes = (num) =>
+            num >= 1000 ? (num / 1000).toFixed(1) + "k" : num;
 
-            return { isCollapsed, hasChildren, toggleCollapse, formatVotes };
-        }
-    };
+          return { isCollapsed, hasChildren, toggleCollapse, formatVotes };
+        },
+      };
 
-    createApp({
+      createApp({
         components: { CommentNode },
-        setup() { return { comments: ref(mockData) }; }
-    }).mount('#app');
-</script>
-
-</body>
+        setup() {
+          return { comments: ref(mockData) };
+        },
+      }).mount("#app");
+    </script>
+  </body>
 </html>

@@ -31,7 +31,7 @@ watch(
   (postId) => {
     void loadThread(postId);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 async function onSubmitComment(body: string, parentId?: string | null) {
