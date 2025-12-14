@@ -35,6 +35,15 @@ import SubmissionsView from "@/views/problems/submissions/SubmissionsView.vue";
 import CodeView from "./code/CodeView.vue";
 import TestCaseView from "./test/TestCaseView.vue";
 import TestResultsView from "./test/TestResultsView.vue";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import ProblemListDrawer from "@/components/problem/ProblemListDrawer.vue";
+
+const isSidePanelOpen = ref(false);
+const toggleSidePanel = () => {
+  isSidePanelOpen.value = !isSidePanelOpen.value;
+};
+
+provide("toggleSidePanel", toggleSidePanel);
 
 // --- Data Fetching ---
 const route = useRoute();
@@ -587,6 +596,15 @@ onMounted(() => {
 
 <template>
   <div class="h-screen flex flex-col bg-[#f0f0f0] antialiased">
+    <Sheet v-model:open="isSidePanelOpen">
+      <SheetContent side="left" class="p-0 w-[400px] sm:w-[540px]">
+        <ProblemListDrawer
+          :current-problem-id="problem?.id"
+          @close="isSidePanelOpen = false"
+        />
+      </SheetContent>
+    </Sheet>
+
     <header
       class="relative flex h-12 w-full min-w-[100px] shrink-0 items-center justify-between gap-2 bg-[#f0f0f0] px-2.5"
     >

@@ -16,6 +16,9 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
+import { inject } from "vue";
+
+const toggleSidePanel = inject<() => void>("toggleSidePanel");
 </script>
 
 <template>
@@ -42,6 +45,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
               class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-fill-quaternary text-gray-60 px-2"
               role="button"
               data-state="closed"
+              @click="toggleSidePanel"
             >
               <Indent class="h-4 w-4" />
               <div class="relative flex items-center gap-1 overflow-hidden">
