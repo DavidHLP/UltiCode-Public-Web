@@ -31,12 +31,12 @@ watch(
   (postId) => {
     void loadThread(postId);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
-async function onSubmitComment(body: string) {
+async function onSubmitComment(body: string, parentId?: string | null) {
   const postId = route.params.postId as string;
-  await createForumComment(postId, body, null);
+  await createForumComment(postId, body, parentId);
   await loadThread(postId);
 }
 </script>

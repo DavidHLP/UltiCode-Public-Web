@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { ForumComment } from "@/types/forum.ts";
+import type { Comment } from "@/types/comment.ts";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-vue-next";
-import CommentNode from "@/views/forum/comments/components/CommentNode.vue";
-import { ref } from "vue";
+import CommentNode from "@/components/comments/CommentNode.vue";
+import { ref, computed } from "vue";
+import { formatRelativeTime } from "@/utils/date";
 
 const props = defineProps<{
   comments: ForumComment[];
@@ -12,7 +14,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "submit", body: string): void;
+  (e: "submit", body: string, parentId?: string): void;
 }>();
 
 const commentText = ref("");
@@ -23,6 +25,29 @@ function submit() {
   emit("submit", text);
   commentText.value = "";
 }
+
+function handleReply(commentId: string | number, content: string) {
+  emit("submit", content, String(commentId));
+}
+
+function adaptComment(forumComment: ForumComment): Comment {
+  return {
+    id: forumComment.id,
+    author: forumComment.author.username,
+    avatar:
+      forumComment.author.avatar ||
+      `https://api.dicebear.com/7.x/identicon/svg?seed=${forumComment.author.username}`,
+    time: formatRelativeTime(forumComment.createdAt),
+    votes: forumComment.upvotes,
+    content: [forumComment.body],
+    isOp: false, // You could calculate this if you had the post author ID
+    children: forumComment.replies?.map(adaptComment) || [],
+  };
+}
+
+const adaptedComments = computed(() => {
+  return props.comments.map(adaptComment);
+});
 </script>
 
 <template>
@@ -58,18 +83,23 @@ function submit() {
 
     <div class="space-y-6">
       <div
-        v-if="comments.length === 0"
+        v-if="adaptedComments.length === 0"
         class="text-center py-10 text-muted-foreground text-sm"
       >
         No comments yet. Be the first to share what you think!
       </div>
-      <ul class="space-y-4">
+      <div class="space-y-4">
         <CommentNode
-          v-for="comment in comments"
+          v-for="comment in adaptedComments"
           :key="comment.id"
           :comment="comment"
+          :is-last="true"
+          :is-root="true"
+          @reply="
+            (id: number | string, content: string) => handleReply(id, content)
+          "
         />
-      </ul>
+      </div>
     </div>
   </div>
 </template>
