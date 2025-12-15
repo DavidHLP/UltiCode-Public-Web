@@ -318,17 +318,7 @@ const formatVotes = (num: number) => {
 }
 
 /* Hover Effects */
-.comment-node:hover > .lines-svg-container .svg-path {
-  stroke: #8c8c8c;
-}
-
-.comment-node:hover > .lines-svg-container .toggle-circle {
-  stroke: #8c8c8c;
-}
-
-.comment-node:hover > .flex > .avatar-col > .thread-line-parent {
-  background-color: #8c8c8c;
-}
+/* Removed line highlights as requested */
 
 .toggle-group:hover {
   transform: scale(1.1);

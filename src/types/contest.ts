@@ -35,6 +35,7 @@ export interface ContestProblemSummary {
   acceptanceRate?: string | number;
   solvedCount?: number;
   submissionCount?: number;
+  slug?: string;
 }
 
 export interface ContestDetail extends ContestListItem {

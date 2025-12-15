@@ -285,7 +285,7 @@ function getCountryFlag(countryCode: string): string {
                           <router-link
                             :to="{
                               name: 'problem-detail',
-                              params: { id: problem.problemId || problem.id },
+                              params: { slug: problem.slug },
                             }"
                             class="font-semibold hover:text-primary"
                           >
