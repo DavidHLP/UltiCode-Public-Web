@@ -30,23 +30,39 @@ function handleReply(commentId: string | number, content: string) {
   emit("submit", content, String(commentId));
 }
 
-function adaptComment(forumComment: ForumComment): Comment {
-  return {
-    id: forumComment.id,
-    author: forumComment.author.username,
-    avatar:
-      forumComment.author.avatar ||
-      `https://api.dicebear.com/7.x/identicon/svg?seed=${forumComment.author.username}`,
-    time: formatRelativeTime(forumComment.createdAt),
-    votes: forumComment.upvotes,
-    content: [forumComment.body],
-    isOp: false, // You could calculate this if you had the post author ID
-    children: forumComment.replies?.map(adaptComment) || [],
-  };
-}
-
 const adaptedComments = computed(() => {
-  return props.comments.map(adaptComment);
+  const commentMap = new Map<string, Comment>();
+  const roots: Comment[] = [];
+
+  // 1. Create all Comment objects
+  props.comments.forEach((c) => {
+    commentMap.set(c.id, {
+      id: c.id,
+      author: c.author.username,
+      avatar:
+        c.author.avatar ||
+        `https://api.dicebear.com/7.x/identicon/svg?seed=${c.author.username}`,
+      time: formatRelativeTime(c.createdAt),
+      votes: c.upvotes,
+      content: c.body.split(/\r?\n/), // Split by newline
+      isOp: false, // Could calculate if post author ID available
+      children: [],
+    });
+  });
+
+  // 2. Link children to parents
+  props.comments.forEach((c) => {
+    const current = commentMap.get(c.id)!;
+    if (c.parentId && commentMap.has(c.parentId)) {
+      const parent = commentMap.get(c.parentId)!;
+      parent.children = parent.children || [];
+      parent.children.push(current);
+    } else {
+      roots.push(current);
+    }
+  });
+
+  return roots;
 });
 </script>
 
