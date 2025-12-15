@@ -8,7 +8,11 @@
     >
       Markdown Editor
     </div>
-    <div ref="editorRef" class="flex-1 w-full h-full min-h-[300px]"></div>
+    <div
+      ref="editorRef"
+      class="flex-1 w-full h-full min-h-[300px]"
+      :class="editorClass"
+    ></div>
   </div>
 </template>
 
@@ -31,6 +35,7 @@ const props = withDefaults(defineProps<MarkdownEditProps>(), {
   defaultValue: "",
   hideHeader: false,
   readOnly: false,
+  editorClass: "",
 });
 
 const emit = defineEmits<{

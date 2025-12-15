@@ -94,10 +94,8 @@
         </div>
 
         <div v-else>
-          <div class="text-sm text-[#1a1a1b] leading-relaxed space-y-1 mb-2">
-            <div v-for="(line, idx) in comment.content" :key="idx">
-              {{ line }}
-            </div>
+          <div class="text-sm text-[#1a1a1b] leading-relaxed mb-2">
+            <MarkdownView :content="comment.content" />
           </div>
 
           <div
@@ -214,6 +212,7 @@
 import { ref, computed } from "vue";
 import type { Comment } from "@/types/comment";
 import CommentInput from "./CommentInput.vue";
+import MarkdownView from "@/components/markdown/MarkdownView.vue";
 
 const props = defineProps<{
   comment: Comment;

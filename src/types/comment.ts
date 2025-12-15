@@ -4,7 +4,7 @@ export interface Comment {
   avatar: string;
   time: string;
   votes: number;
-  content: string[];
+  content: string;
   isOp?: boolean;
   children?: Comment[];
 }

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { ForumComment } from "@/types/forum.ts";
 import type { Comment } from "@/types/comment.ts";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-vue-next";
 import CommentNode from "@/components/comments/CommentNode.vue";
+import MarkdownEdit from "@/components/markdown/MarkdownEdit.vue";
 import { ref, computed } from "vue";
 import { formatRelativeTime } from "@/utils/date";
 
@@ -44,7 +44,7 @@ const adaptedComments = computed(() => {
         `https://api.dicebear.com/7.x/identicon/svg?seed=${c.author.username}`,
       time: formatRelativeTime(c.createdAt),
       votes: c.upvotes,
-      content: c.body.split(/\r?\n/), // Split by newline
+      content: c.body,
       isOp: false, // Could calculate if post author ID available
       children: [],
     });
@@ -69,12 +69,16 @@ const adaptedComments = computed(() => {
 <template>
   <div class="space-y-4 px-4 sm:px-6 pb-6">
     <form class="space-y-2 mb-6" @submit.prevent="submit">
-      <Textarea
-        v-model="commentText"
-        placeholder="What are your thoughts?"
-        :disabled="isLocked"
-        class="min-h-[100px] resize-y"
-      />
+      <div
+        class="rounded-md border border-input min-h-[100px] bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+      >
+        <MarkdownEdit
+          v-model="commentText"
+          :hide-header="true"
+          :read-only="isLocked"
+          editor-class="!min-h-[100px]"
+        />
+      </div>
       <div
         class="flex items-center justify-between text-[11px] text-muted-foreground"
       >

@@ -9,11 +9,15 @@
       </div>
     </div>
     <div class="flex-1 space-y-2">
-      <textarea
-        v-model="content"
-        class="w-full min-h-[100px] p-2 text-sm rounded-md border border-input bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
-        placeholder="What are your thoughts?"
-      ></textarea>
+      <div
+        class="w-full min-h-[100px] rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-primary/50"
+      >
+        <MarkdownEdit
+          v-model="content"
+          :hide-header="true"
+          editor-class="!min-h-[100px]"
+        />
+      </div>
       <div class="flex justify-end gap-2">
         <button
           v-if="onCancel"
@@ -36,6 +40,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import MarkdownEdit from "@/components/markdown/MarkdownEdit.vue";
 
 const props = defineProps<{
   parentId?: number | string;

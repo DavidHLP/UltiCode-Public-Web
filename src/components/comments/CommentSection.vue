@@ -92,7 +92,7 @@ const buildCommentTree = (flatComments: ForumComment[]): Comment[] => {
         `https://api.dicebear.com/7.x/identicon/svg?seed=${c.author.username}`,
       time: formatRelativeTime(c.createdAt),
       votes: c.upvotes,
-      content: c.body.split(/\r?\n/), // Split by newline to support multi-paragraph rendering
+      content: c.body,
       children: [],
     });
   });

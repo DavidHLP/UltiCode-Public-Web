@@ -3,6 +3,7 @@ export interface MarkdownEditProps {
   defaultValue?: string;
   hideHeader?: boolean;
   readOnly?: boolean;
+  editorClass?: string;
 }
 
 export interface MarkdownViewProps {
