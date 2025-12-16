@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
-// 简单的页码生成逻辑
+// Simple pagination logic
 const visiblePages = computed(() => {
   const pages: (number | string)[] = [];
   const total = props.totalPages;

@@ -51,7 +51,7 @@ onMounted(async () => {
   }
 });
 
-// 格式化日期时间
+// Format Date Time
 function formatDateTime(isoString: string): string {
   const date = new Date(isoString);
   const year = date.getFullYear();
@@ -62,14 +62,14 @@ function formatDateTime(isoString: string): string {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-// 计算时长
+// Calculate Duration
 function getDurationMinutes(startTime: string, endTime: string): number {
   const start = new Date(startTime).getTime();
   const end = new Date(endTime).getTime();
   return Math.floor((end - start) / (1000 * 60));
 }
 
-// 获取难度颜色
+// Get Difficulty Color
 function getDifficultyColor(difficulty: string): string {
   const colors: Record<string, string> = {
     Easy: "text-green-600",
@@ -79,7 +79,7 @@ function getDifficultyColor(difficulty: string): string {
   return colors[difficulty] || "text-gray-600";
 }
 
-// 获取国旗emoji
+// Get Country Flag Emoji
 function getCountryFlag(countryCode: string): string {
   const flags: Record<string, string> = {
     CN: "🇨🇳",
@@ -100,14 +100,14 @@ function getCountryFlag(countryCode: string): string {
 <template>
   <div class="min-h-screen bg-background mx-auto max-w-[60%]">
     <div v-if="loading" class="flex h-screen items-center justify-center">
-      <p class="text-lg text-muted-foreground">加载中...</p>
+      <p class="text-lg text-muted-foreground">Loading...</p>
     </div>
 
     <div v-else-if="contest" class="">
-      <!-- 竞赛头部 -->
+      <!-- Contest Header -->
       <div class="border-b bg-card">
         <div class="container mx-auto px-4 py-6">
-          <!-- 返回按钮 -->
+          <!-- Back Button -->
           <Button
             variant="ghost"
             size="sm"
@@ -115,7 +115,7 @@ function getCountryFlag(countryCode: string): string {
             @click="$router.push({ name: 'contest-home' })"
           >
             <ArrowLeft class="h-4 w-4" />
-            返回竞赛列表
+            Back to Contest List
           </Button>
 
           <div class="flex items-start justify-between gap-4">
@@ -136,10 +136,10 @@ function getCountryFlag(countryCode: string): string {
                 >
                   {{
                     contest.status === "upcoming"
-                      ? "即将开始"
+                      ? "Upcoming"
                       : contest.status === "running"
-                        ? "进行中"
-                        : "已结束"
+                        ? "Live"
+                        : "Ended"
                   }}
                 </Badge>
               </div>
@@ -153,22 +153,22 @@ function getCountryFlag(countryCode: string): string {
             <div class="flex flex-col gap-2">
               <Button v-if="contest.canRegister" size="lg" class="gap-2">
                 <Users class="h-4 w-4" />
-                立即报名
+                Register Now
               </Button>
               <Button v-else-if="contest.canStart" size="lg" class="gap-2">
                 <PlayCircle class="h-4 w-4" />
-                开始虚拟竞赛
+                Start Virtual Contest
               </Button>
               <Button variant="outline" size="sm" class="gap-2">
                 <Calendar class="h-4 w-4" />
-                添加到日历
+                Add to Calendar
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 竞赛信息卡片 -->
+      <!-- Contest Info Card -->
       <div class="container mx-auto px-4 py-6">
         <Card>
           <CardContent class="p-0">
@@ -181,7 +181,7 @@ function getCountryFlag(countryCode: string): string {
                 </div>
                 <div>
                   <p class="text-sm font-medium text-muted-foreground">
-                    开始时间
+                    Start Time
                   </p>
                   <p class="text-base font-semibold">
                     {{ formatDateTime(contest.start_time) }}
@@ -196,13 +196,13 @@ function getCountryFlag(countryCode: string): string {
                 </div>
                 <div>
                   <p class="text-sm font-medium text-muted-foreground">
-                    比赛时长
+                    Duration
                   </p>
                   <p class="text-base font-semibold">
                     {{
                       getDurationMinutes(contest.start_time, contest.end_time)
                     }}
-                    分钟
+                    Minutes
                   </p>
                 </div>
               </div>
@@ -214,10 +214,10 @@ function getCountryFlag(countryCode: string): string {
                 </div>
                 <div>
                   <p class="text-sm font-medium text-muted-foreground">
-                    参赛人数
+                    Participants
                   </p>
                   <p class="text-base font-semibold">
-                    {{ contest.participant_count }} 人
+                    {{ contest.participant_count }}
                   </p>
                 </div>
               </div>
@@ -229,10 +229,10 @@ function getCountryFlag(countryCode: string): string {
                 </div>
                 <div>
                   <p class="text-sm font-medium text-muted-foreground">
-                    竞赛类型
+                    Contest Type
                   </p>
                   <p class="text-base font-semibold">
-                    {{ contest.isRated ? "计分赛" : "非计分" }}
+                    {{ contest.isRated ? "Rated" : "Unrated" }}
                   </p>
                 </div>
               </div>
@@ -241,29 +241,29 @@ function getCountryFlag(countryCode: string): string {
         </Card>
       </div>
 
-      <!-- 主要内容区域 -->
+      <!-- Main Content Area -->
       <div class="container mx-auto px-4 pb-8">
         <Tabs default-value="problems" class="w-full">
           <TabsList class="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="problems">题目</TabsTrigger>
-            <TabsTrigger value="ranking">排行榜</TabsTrigger>
+            <TabsTrigger value="problems">Problems</TabsTrigger>
+            <TabsTrigger value="ranking">Ranking</TabsTrigger>
           </TabsList>
 
-          <!-- 题目列表 -->
+          <!-- Problem List -->
           <TabsContent value="problems" class="space-y-4">
             <Card>
               <CardHeader class="pb-3">
-                <CardTitle class="text-xl">竞赛题目</CardTitle>
+                <CardTitle class="text-xl">Contest Problems</CardTitle>
               </CardHeader>
               <CardContent class="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow class="hover:bg-transparent">
-                      <TableHead class="w-20 pl-6">题号</TableHead>
-                      <TableHead>题目标题</TableHead>
-                      <TableHead class="w-24">难度</TableHead>
-                      <TableHead class="w-24 text-center">分值</TableHead>
-                      <TableHead class="w-32 text-center">通过率</TableHead>
+                      <TableHead class="w-20 pl-6">#</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead class="w-24">Difficulty</TableHead>
+                      <TableHead class="w-24 text-center">Score</TableHead>
+                      <TableHead class="w-32 text-center">Acceptance</TableHead>
                       <TableHead class="w-24 pr-6"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -296,9 +296,14 @@ function getCountryFlag(countryCode: string): string {
                           >
                             <span class="flex items-center gap-1">
                               <Target class="h-3 w-3" />
-                              {{ problem.solvedCount || 0 }} 通过
+                              {{ problem.solvedCount || 0 }} Solved
                             </span>
-                            <span>{{ problem.submissionCount || 0 }} 提交</span>
+                            <span
+                              >{{
+                                problem.submissionCount || 0
+                              }}
+                              Submissions</span
+                            >
                           </div>
                         </div>
                       </TableCell>
@@ -348,26 +353,28 @@ function getCountryFlag(countryCode: string): string {
             </Card>
           </TabsContent>
 
-          <!-- 排行榜 -->
+          <!-- Ranking -->
           <TabsContent value="ranking" class="space-y-4">
             <Card>
               <CardHeader
                 class="flex flex-row items-center justify-between pb-3"
               >
-                <CardTitle class="text-xl">排行榜</CardTitle>
-                <Button variant="outline" size="sm">查看完整排名</Button>
+                <CardTitle class="text-xl">Ranking</CardTitle>
+                <Button variant="outline" size="sm">View Full Ranking</Button>
               </CardHeader>
               <CardContent class="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow class="hover:bg-transparent">
-                      <TableHead class="w-20 pl-6">排名</TableHead>
-                      <TableHead>用户</TableHead>
-                      <TableHead class="w-24 text-center">得分</TableHead>
-                      <TableHead class="w-32 text-center">完成时间</TableHead>
-                      <TableHead class="w-48">题目结果</TableHead>
+                      <TableHead class="w-20 pl-6">Rank</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead class="w-24 text-center">Score</TableHead>
+                      <TableHead class="w-32 text-center"
+                        >Finish Time</TableHead
+                      >
+                      <TableHead class="w-48">Problem Results</TableHead>
                       <TableHead class="w-32 pr-6 text-right"
-                        >积分变化</TableHead
+                        >Rating Change</TableHead
                       >
                     </TableRow>
                   </TableHeader>
@@ -475,7 +482,7 @@ function getCountryFlag(countryCode: string): string {
     </div>
 
     <div v-else class="py-20 text-center">
-      <p class="text-muted-foreground">竞赛不存在</p>
+      <p class="text-muted-foreground">Contest Not Found</p>
     </div>
   </div>
 </template>

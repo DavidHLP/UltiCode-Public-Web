@@ -12,7 +12,7 @@ defineProps<{
 
 const router = useRouter();
 
-// 计算倒计时
+// Calculate countdown
 function getCountdown(startTime: string): string {
   const now = new Date().getTime();
   const start = new Date(startTime).getTime();
@@ -31,7 +31,7 @@ function getCountdown(startTime: string): string {
   return `${hours}h ${minutes}m ${seconds}s`;
 }
 
-// 获取竞赛类型标签
+// Get contest type label
 function getContestTypeLabel(type: string): string {
   const labels: Record<string, string> = {
     weekly: "Weekly Contest",

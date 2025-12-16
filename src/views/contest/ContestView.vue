@@ -15,7 +15,7 @@ import PastContests from "./components/PastContests.vue";
 const router = useRouter();
 const route = useRoute();
 
-// 状态
+// State
 const upcomingContests = ref<ContestListItem[]>([]);
 const pastContests = ref<ContestListItem[]>([]);
 const totalPastContests = ref(0);
@@ -27,10 +27,10 @@ const currentPage = ref(1);
 const pageSize = 10;
 
 const totalPages = computed(() =>
-  Math.ceil(totalPastContests.value / pageSize),
+  Math.ceil(totalPastContests.value / pageSize)
 );
 
-// 加载数据
+// Load data
 onMounted(async () => {
   try {
     const page = Number(route.query.page) || 1;
@@ -52,14 +52,14 @@ onMounted(async () => {
   }
 });
 
-// 监听分页变化
+// Watch pagination changes
 watch(currentPage, async (newPage) => {
   loadingPast.value = true;
   try {
     const res = await fetchPastContests(newPage, pageSize);
     pastContests.value = res.data;
     totalPastContests.value = res.total;
-    // 更新 URL Query
+    // Update URL Query
     router.replace({ query: { ...route.query, page: newPage } });
   } catch (error) {
     console.error("Failed to load past contests:", error);
