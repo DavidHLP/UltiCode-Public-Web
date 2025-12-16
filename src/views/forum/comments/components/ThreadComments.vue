@@ -2,7 +2,7 @@
 import type { ForumComment } from "@/types/forum.ts";
 import type { Comment } from "@/types/comment.ts";
 import { Button } from "@/components/ui/button";
-import { Lock } from "lucide-vue-next";
+import { Lock, Image as ImageIcon, FileVideo, Type } from "lucide-vue-next";
 import CommentNode from "@/components/comments/CommentNode.vue";
 import MarkdownEdit from "@/components/markdown/MarkdownEdit.vue";
 import { ref, computed } from "vue";
@@ -18,12 +18,14 @@ const emit = defineEmits<{
 }>();
 
 const commentText = ref("");
+const isCommenting = ref(false);
 
 function submit() {
   const text = commentText.value.trim();
   if (!text || props.isLocked) return;
   emit("submit", text);
   commentText.value = "";
+  isCommenting.value = false;
 }
 
 function handleReply(commentId: string | number, content: string) {
@@ -68,36 +70,79 @@ const adaptedComments = computed(() => {
 
 <template>
   <div class="space-y-4 px-4 sm:px-6 pb-6">
-    <form class="space-y-2 mb-6" @submit.prevent="submit">
+    <div v-if="!isCommenting && !props.isLocked" class="mb-6">
       <div
-        class="rounded-md border border-input min-h-[100px] bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+        class="w-full rounded-full border border-muted bg-muted/50 px-4 py-2.5 text-sm text-muted-foreground cursor-text hover:bg-muted/70 transition-colors"
+        @click="isCommenting = true"
+      >
+        Join the conversation
+      </div>
+    </div>
+
+    <form v-if="isCommenting" class="space-y-2 mb-6" @submit.prevent="submit">
+      <div
+        class="rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 overflow-hidden"
       >
         <MarkdownEdit
           v-model="commentText"
           :hide-header="true"
           :read-only="isLocked"
-          editor-class="!min-h-[100px]"
+          editor-class="!min-h-[60px] !border-0 rounded-none focus-within:ring-0"
         />
-      </div>
-      <div
-        class="flex items-center justify-between text-[11px] text-muted-foreground"
-      >
-        <span
-          v-if="isLocked"
-          class="inline-flex items-center gap-1 text-amber-600"
-        >
-          <Lock class="h-3 w-3" /> Thread is locked
-        </span>
-        <div class="ml-auto">
-          <Button
-            type="submit"
-            size="sm"
-            class="rounded-full px-4"
-            :disabled="!commentText.trim() || isLocked"
-          >
-            Comment
-          </Button>
+        <div class="flex items-center justify-between p-2 bg-muted/20 border-t">
+          <div class="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <ImageIcon class="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <FileVideo class="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <Type class="h-4 w-4" />
+            </Button>
+          </div>
+          <div class="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              class="rounded-full px-4 h-8 bg-muted hover:bg-muted/80"
+              @click="isCommenting = false"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              class="rounded-full px-4 h-8"
+              :disabled="!commentText.trim() || isLocked"
+            >
+              Comment
+            </Button>
+          </div>
         </div>
+      </div>
+
+      <div
+        v-if="isLocked"
+        class="flex items-center gap-1 text-[11px] text-amber-600 px-1"
+      >
+        <Lock class="h-3 w-3" /> Thread is locked
       </div>
     </form>
 
