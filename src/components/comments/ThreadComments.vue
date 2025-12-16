@@ -3,8 +3,8 @@ import type { ForumComment } from "@/types/forum";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Lock, Image as ImageIcon, FileVideo, Type } from "lucide-vue-next";
-import CommentTreeNode from "@/components/comment-thread/CommentTreeNode.vue";
-import { buildCommentTree } from "@/components/comment-thread/comment-tree";
+import CommentTreeNode from "./CommentTreeNode.vue";
+import { buildCommentTree } from "./comment-tree";
 import { ref, computed } from "vue";
 
 const props = defineProps<{

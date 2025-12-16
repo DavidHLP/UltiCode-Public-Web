@@ -39,8 +39,8 @@ export const buildCommentTree = (
       ...item,
       parentId: item.parentId ?? parentId,
     };
-    const nested = item.replies?.flatMap((reply) => flatten(reply, item.id)) ??
-      [];
+    const nested =
+      item.replies?.flatMap((reply) => flatten(reply, item.id)) ?? [];
     return [current, ...nested];
   };
 
@@ -68,7 +68,8 @@ export const buildCommentTree = (
 
 export const countComments = (tree: Comment[]): number => {
   return tree.reduce(
-    (total, node) => total + 1 + (node.children ? countComments(node.children) : 0),
+    (total, node) =>
+      total + 1 + (node.children ? countComments(node.children) : 0),
     0,
   );
 };

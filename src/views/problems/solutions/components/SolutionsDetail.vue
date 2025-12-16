@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { SolutionFeedItem } from "@/types/solution";
+import type { ForumComment } from "@/types/forum";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Badge from "@/components/ui/badge/Badge.vue";
 import { Separator } from "@/components/ui/separator";
 import { Eye, MessageCircle, Triangle } from "lucide-vue-next";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
+import { ThreadComments } from "@/components/comments";
+import { fetchSolutionComments, createSolutionComment } from "@/api/solution";
 import "highlight.js/styles/atom-one-dark.css";
 
 const props = defineProps<{
@@ -23,6 +26,33 @@ const topicLabel = computed(
     props.item.topic ||
     "topic",
 );
+
+const comments = ref<ForumComment[]>([]);
+
+const loadComments = async () => {
+  if (!props.item.id || props.item.id === "follow-up") {
+    comments.value = [];
+    return;
+  }
+  try {
+    comments.value = await fetchSolutionComments(props.item.id);
+  } catch (error) {
+    console.error("Failed to load comments", error);
+    comments.value = [];
+  }
+};
+
+const handleCommentSubmit = async (content: string, parentId?: string) => {
+  try {
+    if (!props.item.id || props.item.id === "follow-up") return;
+    await createSolutionComment(props.item.id, content, parentId);
+    await loadComments();
+  } catch (error) {
+    console.error("Failed to post comment", error);
+  }
+};
+
+watch(() => props.item.id, loadComments, { immediate: true });
 </script>
 
 <template>
@@ -121,5 +151,16 @@ const topicLabel = computed(
         </div>
       </div>
     </section>
+
+    <!-- Comments Section -->
+    <div class="mt-4">
+      <Separator class="mb-4" />
+      <h3 class="text-sm font-semibold mb-4">Comments</h3>
+      <ThreadComments
+        :comments="comments"
+        :is-locked="false"
+        @submit="handleCommentSubmit"
+      />
+    </div>
   </article>
 </template>

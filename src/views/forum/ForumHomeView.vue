@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
-import PostCard from "@/views/forum/comments/components/PostCard.vue";
-import PostSkeleton from "@/views/forum/comments/components/PostSkeleton.vue";
-import ForumSidebar from "@/views/forum/home/components/ForumHomeSidebar.vue";
+import PostCard from "@/views/forum/components/PostCard.vue";
+import PostSkeleton from "@/views/forum/components/PostSkeleton.vue";
+import ForumSidebar from "@/views/forum/components/ForumHomeSidebar.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,

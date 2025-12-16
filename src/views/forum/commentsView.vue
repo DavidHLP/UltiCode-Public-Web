@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { ForumThread } from "@/types/forum";
 import { Skeleton } from "@/components/ui/skeleton";
-import PostSkeleton from "@/views/forum/comments/components/PostSkeleton.vue";
-import ThreadContent from "@/views/forum/comments/components/ThreadContent.vue";
-import ThreadComments from "@/views/forum/comments/components/ThreadComments.vue";
+import PostSkeleton from "@/views/forum/components/PostSkeleton.vue";
+import ThreadContent from "@/views/forum/components/ThreadContent.vue";
+import { ThreadComments } from "@/components/comments";
 import { fetchForumThread, createForumComment } from "@/api/forum";
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";

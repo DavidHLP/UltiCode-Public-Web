@@ -11,12 +11,12 @@ const forumRoutes: RouteRecordRaw = {
     {
       path: "",
       name: "forum-home",
-      component: () => import("@/views/forum/home/ForumHomeView.vue"),
+      component: () => import("@/views/forum/ForumHomeView.vue"),
     },
     {
       path: "detailed/:postId",
       name: "forum-thread",
-      component: () => import("@/views/forum/comments/ThreadView.vue"),
+      component: () => import("@/views/forum/commentsView.vue"),
     },
   ],
 };
