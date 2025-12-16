@@ -3,14 +3,12 @@ import type { SolutionFeedItem } from "@/types/solution";
 import type { ForumComment } from "@/types/forum";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import Badge from "@/components/ui/badge/Badge.vue";
 import { Separator } from "@/components/ui/separator";
-import { Eye, MessageCircle } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { ThreadComments } from "@/components/comments";
 import { fetchSolutionComments, createSolutionComment } from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
-import { Vote } from "@/components/vote";
+import { PostFooter } from "@/components/post-footer";
 import "highlight.js/styles/atom-one-dark.css";
 
 const props = defineProps<{
@@ -18,7 +16,7 @@ const props = defineProps<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
 );
 
 const topicLabel = computed(
@@ -26,7 +24,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic",
+    "topic"
 );
 
 const comments = ref<ForumComment[]>([]);
@@ -45,7 +43,7 @@ watch(
     };
     userVote.value = newItem.userVote ?? 0;
   },
-  { immediate: true, deep: true },
+  { immediate: true, deep: true }
 );
 
 const loadComments = async () => {
@@ -81,7 +79,7 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
       VoteTargetType.SOLUTION,
       props.item.id,
       "u-001",
-      voteType,
+      voteType
     );
     localStats.value = { ...res };
   } catch (error) {
@@ -91,14 +89,14 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
 
 const handleCommentVote = async (
   commentId: string | number,
-  voteType: 1 | -1,
+  voteType: 1 | -1
 ) => {
   try {
     const res = await vote(
       VoteTargetType.SOLUTION_COMMENT,
       String(commentId),
       "u-001",
-      voteType,
+      voteType
     );
 
     // Update local state
@@ -194,26 +192,27 @@ watch(() => props.item.id, loadComments, { immediate: true });
 
       <Separator class="my-2" />
 
-      <!-- 统计信息 -->
       <!-- 统计信息和操作 -->
-      <div class="flex items-center gap-6 text-muted-foreground select-none">
-        <!-- Vote Pill -->
-        <Vote
-          :likes="localStats.likes"
-          :dislikes="localStats.dislikes"
-          :user-vote="userVote"
-          @vote="handleSolutionVote"
-        />
-
-        <div class="flex items-center gap-1.5 text-xs">
-          <Eye class="h-4 w-4" />
-          {{ props.item.stats.views }}
-        </div>
-        <div class="flex items-center gap-1.5 text-xs">
-          <MessageCircle class="h-4 w-4" />
-          {{ localStats.likes }}
-        </div>
-      </div>
+      <PostFooter
+        :vote="{
+          likes: localStats.likes,
+          dislikes: localStats.dislikes,
+          userVote: userVote,
+        }"
+        :config="{
+          views: { show: true, count: props.item.stats.views },
+          comments: {
+            show: true,
+            count: props.item.stats.comments,
+            text: 'Comments',
+            icon: 'message-circle',
+          },
+          share: { show: true, text: 'Share' },
+          save: { show: true, text: 'Save' },
+        }"
+        class="border-t pt-4"
+        @vote="handleSolutionVote"
+      />
     </section>
 
     <!-- Comments Section -->

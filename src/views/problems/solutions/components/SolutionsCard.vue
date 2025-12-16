@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
-import { Eye, MessageCircle } from "lucide-vue-next";
-import { Vote } from "@/components/vote";
+import { PostFooter } from "@/components/post-footer";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -13,11 +12,11 @@ const emit = defineEmits<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
 );
 
 const languageLabel = computed(
-  () => props.item.language || props.item.languageFilter || "language",
+  () => props.item.language || props.item.languageFilter || "language"
 );
 
 const topicLabel = computed(
@@ -25,7 +24,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic",
+    "topic"
 );
 
 const handleSelect = () => emit("select", props.item);
@@ -107,29 +106,26 @@ const handleSelect = () => emit("select", props.item);
       </p>
     </section>
 
-    <footer
-      class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-muted-foreground"
-    >
-      <div
-        class="flex flex-wrap items-center gap-3 font-medium text-foreground select-none"
-      >
-        <!-- Vote Pill (Static Preview) -->
-        <Vote
-          :likes="props.item.likes ?? props.item.stats.likes ?? 0"
-          :dislikes="props.item.dislikes ?? props.item.stats.dislikes ?? 0"
-          :user-vote="props.item.userVote ?? 0"
-          class="scale-90"
-        />
-
-        <span class="flex items-center gap-1.5 text-muted-foreground">
-          <Eye class="h-3.5 w-3.5" />
-          {{ props.item.stats.views }}
-        </span>
-        <span class="flex items-center gap-1.5 text-muted-foreground">
-          <MessageCircle class="h-3.5 w-3.5" />
-          {{ props.item.stats.comments }}
-        </span>
-      </div>
+    <footer class="mt-2">
+      <PostFooter
+        :vote="{
+          likes: props.item.likes ?? props.item.stats.likes ?? 0,
+          dislikes: props.item.dislikes ?? props.item.stats.dislikes ?? 0,
+          userVote: props.item.userVote,
+        }"
+        :config="{
+          views: { show: true, count: props.item.stats.views },
+          comments: {
+            show: true,
+            count: props.item.stats.comments,
+            variant: 'simple',
+            icon: 'message-circle',
+          },
+          share: { show: false },
+          save: { show: false },
+        }"
+        class="text-[10px]"
+      />
     </footer>
   </article>
 </template>

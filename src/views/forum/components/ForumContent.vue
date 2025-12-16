@@ -6,18 +6,8 @@ import type {
 } from "@/types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import {
-  Lock,
-  MessageSquare,
-  Pin,
-  Share2,
-  Bookmark,
-  BookmarkCheck,
-} from "lucide-vue-next";
-import { Vote } from "@/components/vote";
+import { Share2 } from "lucide-vue-next";
+import { PostFooter } from "@/components/post-footer";
 import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 
@@ -46,11 +36,11 @@ const userInitials = computed(() => {
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
-  () => props.thread.media as unknown as ForumPostMedia | undefined,
+  () => props.thread.media as unknown as ForumPostMedia | undefined
 );
 
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
+  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0"
 );
 
 function formatCount(value: number) {
@@ -304,46 +294,25 @@ function formatPollWidth(votes: number, totalVotes: number) {
     </div>
 
     <!-- Actions -->
-    <div
-      class="px-2 py-2 sm:px-6 flex items-center gap-2 text-muted-foreground border-t border-transparent"
-    >
-      <Vote
-        :likes="thread.likes ?? thread.stats?.likes ?? 0"
-        :dislikes="thread.dislikes ?? thread.stats?.dislikes ?? 0"
-        :user-vote="thread.userVote"
-        class="origin-left"
+    <div class="px-2 py-2 sm:px-6 border-t border-transparent">
+      <PostFooter
+        :vote="{
+          likes: thread.likes ?? thread.stats?.likes ?? 0,
+          dislikes: thread.dislikes ?? thread.stats?.dislikes ?? 0,
+          userVote: thread.userVote,
+        }"
+        :config="{
+          comments: {
+            show: true,
+            count: commentsDisplay,
+            text: 'Comments',
+            icon: 'message-square',
+          },
+          share: { show: true, text: 'Share' },
+          save: { show: true, isSaved: thread.isSaved, text: 'Save' },
+        }"
         @vote="(type: 1 | -1) => $emit('vote', type)"
       />
-
-      <Button
-        variant="ghost"
-        size="sm"
-        class="gap-2 rounded-full h-9 hover:bg-muted/50"
-      >
-        <MessageSquare class="h-4 w-4" />
-        <span class="text-xs font-semibold"
-          >{{ commentsDisplay }} Comments</span
-        >
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        class="gap-2 rounded-full h-9 hover:bg-muted/50"
-      >
-        <Share2 class="h-4 w-4" />
-        <span class="text-xs font-semibold">Share</span>
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        class="gap-2 rounded-full h-9 hover:bg-muted/50"
-      >
-        <component
-          :is="thread.isSaved ? BookmarkCheck : Bookmark"
-          class="h-4 w-4"
-        />
-        <span class="text-xs font-semibold">Save</span>
-      </Button>
     </div>
   </div>
 </template>
