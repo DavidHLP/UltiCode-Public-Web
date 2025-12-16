@@ -17,8 +17,14 @@ export async function fetchForumQuickFilters(): Promise<
   );
 }
 
-export async function fetchForumThread(postId: string): Promise<ForumThread> {
-  return apiGet<ForumThread>(`/forum/posts/${postId}/thread`);
+export async function fetchForumThread(
+  postId: string,
+  userId?: string,
+): Promise<ForumThread> {
+  const url = userId
+    ? `/forum/posts/${postId}/thread?userId=${userId}`
+    : `/forum/posts/${postId}/thread`;
+  return apiGet<ForumThread>(url);
 }
 
 export async function createForumComment(

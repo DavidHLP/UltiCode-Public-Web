@@ -117,8 +117,6 @@ const handleSelect = () => emit("select", props.item);
         <Vote
           :likes="props.item.stats.likes || 0"
           :dislikes="props.item.stats.dislikes || 0"
-          :user-vote="0"
-          readonly
           class="scale-90"
         />
 

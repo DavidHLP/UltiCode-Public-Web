@@ -17,7 +17,8 @@ async function loadThread(postId: string) {
   if (!postId) return;
   isLoading.value = true;
   try {
-    thread.value = await fetchForumThread(postId);
+    // TODO: Get real user ID from auth store
+    thread.value = await fetchForumThread(postId, "u-001");
   } catch (error) {
     console.error("Failed to load forum thread", error);
     thread.value = null;
@@ -53,8 +54,9 @@ async function handleThreadVote(type: 1 | -1) {
       type,
     );
     if (thread.value.stats) {
-      thread.value.stats.score = (res.likes || 0) - (res.dislikes || 0); // Approx score
+      thread.value.stats.score = (res.likes || 0) - (res.dislikes || 0);
       thread.value.stats.likes = res.likes;
+      thread.value.stats.dislikes = res.dislikes;
     }
     thread.value.voteState =
       res.userVote === 1
@@ -62,18 +64,29 @@ async function handleThreadVote(type: 1 | -1) {
         : res.userVote === -1
           ? "downvoted"
           : "neutral";
+    thread.value.userVote = res.userVote;
   } catch (error) {
     console.error("Failed to vote thread", error);
   }
 }
 
 async function handleCommentVote(commentId: string | number, type: 1 | -1) {
+  if (!thread.value?.comments) return;
   try {
-    // Note: Recursive update of comment state is complex without a flattener or deeply reactive map.
-    // For now, we just call the API. Optimistic update is skipped for simplicity.
-    await vote(VoteTargetType.FORUM_COMMENT, String(commentId), "u-001", type);
-    // Ideally reload thread or find and update comment
-    // await loadThread(route.params.postId as string); // Reloading might be too heavy?
+    const res = await vote(
+      VoteTargetType.FORUM_COMMENT,
+      String(commentId),
+      "u-001",
+      type,
+    );
+
+    // Find and update comment in the flat list
+    const comment = thread.value.comments.find((c) => c.id === commentId);
+    if (comment) {
+      comment.likes = res.likes;
+      comment.dislikes = res.dislikes;
+      comment.userVote = res.userVote;
+    }
   } catch (error) {
     console.error("Failed to vote comment", error);
   }
