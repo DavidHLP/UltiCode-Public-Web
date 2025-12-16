@@ -41,7 +41,7 @@
     </div>
 
     <!-- Content Layer -->
-    <div class="flex relative z-10 bg-white pl-1">
+    <div class="flex relative z-10 pl-1">
       <!-- Left Column: Avatar -->
       <div
         class="flex-shrink-0 mr-3 flex flex-col items-center pt-1 relative w-8 avatar-col"
@@ -108,8 +108,10 @@
           <!-- Actions -->
           <div class="flex items-center gap-2 select-none">
             <Vote
-              :votes="comment.votes"
-              class="scale-90 origin-left"
+              :likes="comment.likes || 0"
+              :dislikes="comment.dislikes || 0"
+              :user-vote="comment.userVote"
+              class="origin-left"
               @vote="(type: 1 | -1) => handleVote(type)"
             />
 

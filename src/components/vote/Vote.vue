@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { ArrowBigUp } from "lucide-vue-next";
-import { computed } from "vue";
 
 const props = defineProps<{
-  votes: number;
+  likes: number;
+  dislikes: number;
   userVote?: 1 | -1 | 0; // 1: upvoted, -1: downvoted, 0: neutral
   readonly?: boolean;
 }>();
@@ -13,11 +13,11 @@ const emit = defineEmits<{
   (e: "vote", type: 1 | -1): void;
 }>();
 
-const scoreDisplay = computed(() => {
-  const value = props.votes;
+// Helper to format large numbers
+const formatCount = (value: number) => {
   if (value >= 1000) return `${(value / 1000).toFixed(1).replace(/\.0$/, "")}k`;
   return value.toString();
-});
+};
 
 const handleVote = (type: 1 | -1) => {
   if (props.readonly) return;
@@ -30,56 +30,64 @@ defineOptions({
 </script>
 
 <template>
-  <div
-    class="flex items-center bg-muted/30 rounded-full p-0.5 border border-transparent transition-colors"
-    :class="{ 'hover:border-border/40': !readonly }"
-  >
+  <div class="flex items-center rounded-full px-1.5 h-7">
     <!-- Upvote -->
     <Button
       variant="ghost"
       size="icon"
-      class="h-8 w-8 rounded-full"
+      class="h-6 w-6 rounded-full -ml-0.5 hover:bg-muted"
       :class="{
-        'hover:text-orange-600 hover:bg-orange-100/50': !readonly,
-        'text-orange-600 bg-orange-100/50': userVote === 1,
+        'text-orange-600': userVote === 1,
         'cursor-default hover:bg-transparent hover:text-inherit': readonly,
       }"
-      :disabled="readonly && userVote !== 1"
+      :disabled="readonly"
       @click.stop="handleVote(1)"
     >
       <ArrowBigUp
-        class="h-5 w-5 transition-colors"
+        class="h-4 w-4 transition-colors"
         :class="{ 'fill-current': userVote === 1 }"
       />
     </Button>
 
-    <!-- Score -->
+    <!-- Likes Count -->
     <span
-      class="text-xs px-1 font-bold min-w-[1.5rem] text-center select-none"
+      class="text-xs font-medium px-1.5 min-w-[0.5rem] text-center select-none"
       :class="{
-        'text-orange-600': userVote === 1,
-        'text-blue-600': userVote === -1,
-        'text-foreground': userVote === 0 || userVote === undefined,
+        'text-orange-600 font-bold': userVote === 1,
+        'text-foreground': userVote !== 1,
       }"
     >
-      {{ scoreDisplay }}
+      {{ formatCount(likes) }}
+    </span>
+
+    <!-- Separator -->
+    <div class="h-3 w-px bg-border/50 mx-0.5"></div>
+
+    <!-- Dislikes Count -->
+    <span
+      class="text-xs font-medium px-1.5 min-w-[0.5rem] text-center select-none"
+      :class="{
+        'text-blue-600 font-bold': userVote === -1,
+        'text-foreground': userVote !== -1,
+      }"
+    >
+      {{ formatCount(dislikes) }}
     </span>
 
     <!-- Downvote -->
     <Button
       variant="ghost"
       size="icon"
-      class="h-8 w-8 rounded-full"
+      class="h-6 w-6 rounded-full -mr-0.5 hover:bg-muted"
       :class="{
-        'hover:text-blue-600 hover:bg-blue-100/50': !readonly,
-        'text-blue-600 bg-blue-100/50': userVote === -1,
+        'text-blue-600': userVote === -1,
         'cursor-default hover:bg-transparent hover:text-inherit': readonly,
       }"
-      :disabled="readonly && userVote !== -1"
+      :disabled="readonly"
       @click.stop="handleVote(-1)"
     >
       <ArrowBigUp
-        class="h-5 w-5 rotate-180 transition-colors"
+        class="h-4 w-4 rotate-180 transition-colors"
         :class="{ 'fill-current': userVote === -1 }"
       />
     </Button>

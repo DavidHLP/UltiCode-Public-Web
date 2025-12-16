@@ -118,6 +118,7 @@ export interface ForumPost {
   stats?: {
     views?: number;
     likes?: number;
+    dislikes?: number;
     comments?: number;
     score?: number;
     saves?: number;
@@ -126,6 +127,10 @@ export interface ForumPost {
     awards?: number;
   };
   // Frontend specific or extended properties
+  likes?: number; // Direct properties
+  dislikes?: number;
+  userVote?: 0 | 1 | -1;
+
   excerpt?: string;
   tags?: string[];
   community?: ForumCommunity;
@@ -146,6 +151,9 @@ export interface ForumComment {
   author: ForumUser;
   createdAt: string;
   upvotes: number;
+  likes?: number;
+  dislikes?: number;
+  userVote?: 0 | 1 | -1;
   replies?: ForumComment[];
   isPinned?: boolean;
   isLocked?: boolean;

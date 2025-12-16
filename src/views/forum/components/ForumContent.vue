@@ -46,13 +46,13 @@ const userInitials = computed(() => {
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
-  () => props.thread.media as unknown as ForumPostMedia | undefined
+  () => props.thread.media as unknown as ForumPostMedia | undefined,
 );
 
 const voteState = computed(() => props.thread.voteState ?? "neutral");
 
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0"
+  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
 );
 
 function formatCount(value: number) {
@@ -310,7 +310,8 @@ function formatPollWidth(votes: number, totalVotes: number) {
       class="px-2 py-2 sm:px-6 flex items-center gap-1 text-muted-foreground border-t border-transparent"
     >
       <Vote
-        :votes="thread.stats?.score ?? 0"
+        :likes="thread.stats?.likes ?? 0"
+        :dislikes="thread.stats?.dislikes ?? 0"
         :user-vote="
           voteState === 'upvoted' ? 1 : voteState === 'downvoted' ? -1 : 0
         "

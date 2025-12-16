@@ -31,13 +31,52 @@ watch(
   (postId) => {
     void loadThread(postId);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 async function onSubmitComment(body: string, parentId?: string | null) {
   const postId = route.params.postId as string;
   await createForumComment(postId, body, parentId);
   await loadThread(postId);
+}
+
+// Vote Handling
+import { vote, VoteTargetType } from "@/api/vote";
+
+async function handleThreadVote(type: 1 | -1) {
+  if (!thread.value) return;
+  try {
+    const res = await vote(
+      VoteTargetType.FORUM_POST,
+      thread.value.id,
+      "u-001",
+      type,
+    );
+    if (thread.value.stats) {
+      thread.value.stats.score = (res.likes || 0) - (res.dislikes || 0); // Approx score
+      thread.value.stats.likes = res.likes;
+    }
+    thread.value.voteState =
+      res.userVote === 1
+        ? "upvoted"
+        : res.userVote === -1
+          ? "downvoted"
+          : "neutral";
+  } catch (error) {
+    console.error("Failed to vote thread", error);
+  }
+}
+
+async function handleCommentVote(commentId: string | number, type: 1 | -1) {
+  try {
+    // Note: Recursive update of comment state is complex without a flattener or deeply reactive map.
+    // For now, we just call the API. Optimistic update is skipped for simplicity.
+    await vote(VoteTargetType.FORUM_COMMENT, String(commentId), "u-001", type);
+    // Ideally reload thread or find and update comment
+    // await loadThread(route.params.postId as string); // Reloading might be too heavy?
+  } catch (error) {
+    console.error("Failed to vote comment", error);
+  }
 }
 </script>
 
@@ -67,12 +106,13 @@ async function onSubmitComment(body: string, parentId?: string | null) {
           </RouterLink>
 
           <div class="flex-1 min-w-0 bg-card sm:rounded-xl overflow-hidden">
-            <ThreadContent :thread="thread" />
+            <ThreadContent :thread="thread" @vote="handleThreadVote" />
             <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
             <ThreadComments
               :comments="thread.comments"
               :is-locked="thread.isLocked"
               @submit="onSubmitComment"
+              @vote="handleCommentVote"
             />
           </div>
         </div>

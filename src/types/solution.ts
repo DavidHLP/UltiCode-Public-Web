@@ -18,6 +18,7 @@ export interface SolutionFeedItem {
     views: number;
     comments: number;
     likes: number;
+    dislikes: number;
   };
   score: number;
   is_pinned?: boolean;

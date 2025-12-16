@@ -19,6 +19,8 @@ const mapToComment = (
   avatar: buildAvatar(input.author.username, input.author.avatar),
   time: formatRelativeTime(input.createdAt),
   votes: input.upvotes,
+  likes: 0,
+  dislikes: 0,
   content: input.body,
   isOp:
     !!options?.postAuthorUsername &&

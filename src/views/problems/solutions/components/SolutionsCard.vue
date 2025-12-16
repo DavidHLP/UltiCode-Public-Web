@@ -13,11 +13,11 @@ const emit = defineEmits<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
 
 const languageLabel = computed(
-  () => props.item.language || props.item.languageFilter || "language"
+  () => props.item.language || props.item.languageFilter || "language",
 );
 
 const topicLabel = computed(
@@ -25,7 +25,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic"
+    "topic",
 );
 
 const handleSelect = () => emit("select", props.item);
@@ -114,7 +114,13 @@ const handleSelect = () => emit("select", props.item);
         class="flex flex-wrap items-center gap-3 font-medium text-foreground select-none"
       >
         <!-- Vote Pill (Static Preview) -->
-        <Vote :votes="props.item.stats.likes" readonly class="scale-90" />
+        <Vote
+          :likes="props.item.stats.likes || 0"
+          :dislikes="props.item.stats.dislikes || 0"
+          :user-vote="0"
+          readonly
+          class="scale-90"
+        />
 
         <span class="flex items-center gap-1.5 text-muted-foreground">
           <Eye class="h-3.5 w-3.5" />

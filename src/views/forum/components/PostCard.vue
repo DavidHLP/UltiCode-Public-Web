@@ -73,7 +73,7 @@ const media = computed(() => {
 });
 
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0)
+  formatCount(props.post.stats?.comments ?? 0),
 );
 
 function formatCount(value: number) {
@@ -140,6 +140,15 @@ function formatRelativeTime(value: string) {
             />
             <AvatarFallback class="text-xs">{{ userInitials }}</AvatarFallback>
           </Avatar>
+          <div
+            class="px-2 py-3 bg-muted/30 flex flex-col items-center gap-1 min-w-[40px]"
+          >
+            <Vote
+              :likes="post.likes || 0"
+              :dislikes="post.dislikes || 0"
+              :user-vote="post.userVote"
+            />
+          </div>
           <span class="flex items-center gap-1">
             <span
               v-if="post.community"
@@ -267,7 +276,8 @@ function formatRelativeTime(value: string) {
         <div class="flex items-center gap-2 pt-1">
           <!-- Vote (Horizontal Pill) -->
           <Vote
-            :votes="post.stats?.score ?? 0"
+            :likes="post.likes || 0"
+            :dislikes="post.dislikes || 0"
             :user-vote="
               post.voteState === 'upvoted'
                 ? 1

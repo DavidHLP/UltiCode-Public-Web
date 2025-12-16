@@ -55,6 +55,7 @@ const fallbackSolution = computed<SolutionFeedItem>(() => ({
   tags: [],
   stats: {
     likes: 0,
+    dislikes: 0,
     views: 0,
     comments: 0,
   },

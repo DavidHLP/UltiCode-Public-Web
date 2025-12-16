@@ -8,12 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { Eye, MessageCircle } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { ThreadComments } from "@/components/comments";
-import {
-  fetchSolutionComments,
-  createSolutionComment,
-  voteSolution,
-  voteSolutionComment,
-} from "@/api/solution";
+import { fetchSolutionComments, createSolutionComment } from "@/api/solution";
+import { vote, VoteTargetType } from "@/api/vote";
 import { Vote } from "@/components/vote";
 import "highlight.js/styles/atom-one-dark.css";
 
@@ -22,7 +18,7 @@ const props = defineProps<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
 
 const topicLabel = computed(
@@ -30,7 +26,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic"
+    "topic",
 );
 
 const comments = ref<ForumComment[]>([]);
@@ -47,7 +43,7 @@ watch(
       dislikes: 0, // Assuming initial dislikes are 0 or not provided by feed yet
     };
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 const loadComments = async () => {
@@ -79,7 +75,12 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
     // Optimistic update
     // Note: Use a more complex logic if we want to toggle locally first.
     // For now, let's just call API and update.
-    const res = await voteSolution(props.item.id, "u-001", voteType);
+    const res = await vote(
+      VoteTargetType.SOLUTION,
+      props.item.id,
+      "u-001",
+      voteType,
+    );
     localStats.value = { ...res };
   } catch (error) {
     console.error("Failed to vote solution", error);
@@ -88,10 +89,15 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
 
 const handleCommentVote = async (
   commentId: string | number,
-  voteType: 1 | -1
+  voteType: 1 | -1,
 ) => {
   try {
-    const res = await voteSolutionComment(String(commentId), "u-001", voteType);
+    const res = await vote(
+      VoteTargetType.SOLUTION_COMMENT,
+      String(commentId),
+      "u-001",
+      voteType,
+    );
 
     // Update local state
     const commentIndex = comments.value.findIndex((c) => c.id === commentId);
@@ -191,7 +197,8 @@ watch(() => props.item.id, loadComments, { immediate: true });
       <div class="flex items-center gap-6 text-muted-foreground select-none">
         <!-- Vote Pill -->
         <Vote
-          :votes="localStats.likes"
+          :likes="localStats.likes"
+          :dislikes="localStats.dislikes"
           :user-vote="0"
           @vote="handleSolutionVote"
         />
