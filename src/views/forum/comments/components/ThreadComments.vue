@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { ForumComment } from "@/types/forum.ts";
-import type { Comment } from "@/types/comment.ts";
+import type { ForumComment } from "@/types/forum";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Lock, Image as ImageIcon, FileVideo, Type } from "lucide-vue-next";
-import CommentNode from "@/components/comments/CommentNode.vue";
-import MarkdownEdit from "@/components/markdown/MarkdownEdit.vue";
+import CommentTreeNode from "@/components/comment-thread/CommentTreeNode.vue";
+import { buildCommentTree } from "@/components/comment-thread/comment-tree";
 import { ref, computed } from "vue";
-import { formatRelativeTime } from "@/utils/date";
 
 const props = defineProps<{
   comments: ForumComment[];
@@ -32,39 +31,8 @@ function handleReply(commentId: string | number, content: string) {
   emit("submit", content, String(commentId));
 }
 
-const adaptedComments = computed(() => {
-  const commentMap = new Map<string, Comment>();
-  const roots: Comment[] = [];
-
-  // 1. Create all Comment objects
-  props.comments.forEach((c) => {
-    commentMap.set(c.id, {
-      id: c.id,
-      author: c.author.username,
-      avatar:
-        c.author.avatar ||
-        `https://api.dicebear.com/7.x/identicon/svg?seed=${c.author.username}`,
-      time: formatRelativeTime(c.createdAt),
-      votes: c.upvotes,
-      content: c.body,
-      isOp: false, // Could calculate if post author ID available
-      children: [],
-    });
-  });
-
-  // 2. Link children to parents
-  props.comments.forEach((c) => {
-    const current = commentMap.get(c.id)!;
-    if (c.parentId && commentMap.has(c.parentId)) {
-      const parent = commentMap.get(c.parentId)!;
-      parent.children = parent.children || [];
-      parent.children.push(current);
-    } else {
-      roots.push(current);
-    }
-  });
-
-  return roots;
+const commentTree = computed(() => {
+  return buildCommentTree(props.comments);
 });
 </script>
 
@@ -83,11 +51,11 @@ const adaptedComments = computed(() => {
       <div
         class="rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 overflow-hidden"
       >
-        <MarkdownEdit
+        <Textarea
           v-model="commentText"
-          :hide-header="true"
-          :read-only="isLocked"
-          editor-class="!min-h-[60px] !border-0 rounded-none focus-within:ring-0"
+          placeholder="What are your thoughts?"
+          class="min-h-[60px] w-full resize-none border-0 bg-transparent px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="isLocked"
         />
         <div class="flex items-center justify-between p-2 bg-muted/20 border-t">
           <div class="flex items-center gap-1">
@@ -148,14 +116,14 @@ const adaptedComments = computed(() => {
 
     <div class="space-y-6">
       <div
-        v-if="adaptedComments.length === 0"
+        v-if="commentTree.length === 0"
         class="text-center py-10 text-muted-foreground text-sm"
       >
         No comments yet. Be the first to share what you think!
       </div>
       <div class="space-y-4">
-        <CommentNode
-          v-for="comment in adaptedComments"
+        <CommentTreeNode
+          v-for="comment in commentTree"
           :key="comment.id"
           :comment="comment"
           :is-last="true"

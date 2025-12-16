@@ -99,87 +99,63 @@
           </div>
 
           <div
-            class="flex items-center space-x-2 text-gray-500 font-bold text-xs select-none"
+            class="flex items-center space-x-2 text-muted-foreground font-bold text-xs select-none"
           >
             <div
-              class="flex items-center bg-gray-100 rounded-full px-1 py-0.5 space-x-0.5 border border-transparent hover:border-gray-300 transition-colors"
+              class="flex items-center bg-muted/30 rounded-full p-0.5 border border-transparent hover:border-border/40 transition-colors"
             >
-              <button
-                class="p-1 hover:bg-gray-200 hover:text-orange-600 rounded-full transition-colors"
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-6 w-6 rounded-full hover:text-orange-600 hover:bg-orange-100/50"
               >
-                <svg
-                  class="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M12 19V5M5 12l7-7 7 7" />
-                </svg>
-              </button>
+                <ArrowBigUp class="h-4 w-4" />
+              </Button>
               <span
-                class="text-xs px-1 text-black font-semibold min-w-[16px] text-center"
+                class="text-xs px-1 text-foreground font-semibold min-w-[16px] text-center"
                 >{{ formatVotes(comment.votes) }}</span
               >
-              <button
-                class="p-1 hover:bg-gray-200 hover:text-blue-600 rounded-full transition-colors"
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-6 w-6 rounded-full hover:text-blue-600 hover:bg-blue-100/50"
               >
-                <svg
-                  class="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M12 5v14M5 12l7 7 7-7" />
-                </svg>
-              </button>
+                <ArrowBigUp class="h-4 w-4 rotate-180" />
+              </Button>
             </div>
-            <button
-              class="action-btn flex items-center space-x-1 px-2 py-1.5 rounded text-gray-500 hover:bg-gray-100 transition-colors"
+
+            <Button
+              variant="ghost"
+              size="sm"
+              class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               @click="toggleReply"
             >
-              <svg
-                class="w-4 h-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="18" y1="2" x2="22" y2="6"></line>
-                <path d="M7.5 20.5 19 9l-4-4L3.5 16.5 2 22z"></path>
-              </svg>
-              <span class="hidden sm:inline">Reply</span>
-            </button>
-            <button
-              class="action-btn flex items-center space-x-1 px-2 py-1.5 rounded text-gray-500 hover:bg-gray-100 transition-colors"
+              <MessageSquare class="h-3.5 w-3.5" />
+              <span class="text-xs font-semibold hidden sm:inline">Reply</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             >
-              <svg
-                class="w-4 h-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
-              </svg>
-              <span class="hidden sm:inline">Share</span>
-            </button>
+              <Share2 class="h-3.5 w-3.5" />
+              <span class="text-xs font-semibold hidden sm:inline">Share</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            >
+              <Flag class="h-3.5 w-3.5" />
+              <span class="text-xs font-semibold hidden sm:inline">Report</span>
+            </Button>
           </div>
 
           <!-- Reply Input -->
           <div v-if="isReplying" class="mt-2">
-            <CommentInput
+            <CommentComposer
               :parent-id="comment.id"
               :on-cancel="() => (isReplying = false)"
               @submit="handleReplySubmit"
@@ -194,7 +170,7 @@
       v-if="!isCollapsed && hasChildren"
       class="children-container pl-[36px] relative"
     >
-      <CommentNode
+      <CommentTreeNode
         v-for="(child, index) in comment.children"
         :key="child.id"
         :comment="child"
@@ -211,8 +187,14 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { Comment } from "@/types/comment";
-import CommentInput from "./CommentInput.vue";
+import CommentComposer from "./CommentComposer.vue";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
+import { Button } from "@/components/ui/button";
+import { ArrowBigUp, MessageSquare, Share2, Flag } from "lucide-vue-next";
+
+defineOptions({
+  name: "CommentTreeNode",
+});
 
 const props = defineProps<{
   comment: Comment;
