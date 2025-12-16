@@ -27,7 +27,7 @@ const currentPage = ref(1);
 const pageSize = 10;
 
 const totalPages = computed(() =>
-  Math.ceil(totalPastContests.value / pageSize)
+  Math.ceil(totalPastContests.value / pageSize),
 );
 
 // Load data
