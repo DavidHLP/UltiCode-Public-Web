@@ -5,8 +5,12 @@ export type { SolutionFeedResponse };
 
 export async function fetchSolutionFeed(
   problemId: number,
+  userId?: string,
 ): Promise<SolutionFeedResponse> {
-  return apiGet<SolutionFeedResponse>(`/problems/${problemId}/solutions`);
+  const url = userId
+    ? `/problems/${problemId}/solutions?userId=${userId}`
+    : `/problems/${problemId}/solutions`;
+  return apiGet<SolutionFeedResponse>(url);
 }
 
 export async function fetchUserSolutions(

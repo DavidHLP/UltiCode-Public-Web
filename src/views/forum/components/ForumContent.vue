@@ -46,11 +46,11 @@ const userInitials = computed(() => {
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
-  () => props.thread.media as unknown as ForumPostMedia | undefined
+  () => props.thread.media as unknown as ForumPostMedia | undefined,
 );
 
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0"
+  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
 );
 
 function formatCount(value: number) {

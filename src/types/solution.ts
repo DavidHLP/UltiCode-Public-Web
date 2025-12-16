@@ -38,6 +38,9 @@ export interface SolutionFeedItem {
   tags: string[];
   votes: number;
   views: number;
+  likes: number; // flattened upvotes
+  dislikes?: number; // flattened downvotes
+  userVote?: 0 | 1 | -1;
 }
 
 export interface SolutionFeedResponse {

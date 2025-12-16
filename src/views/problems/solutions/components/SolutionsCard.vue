@@ -115,8 +115,9 @@ const handleSelect = () => emit("select", props.item);
       >
         <!-- Vote Pill (Static Preview) -->
         <Vote
-          :likes="props.item.stats.likes || 0"
-          :dislikes="props.item.stats.dislikes || 0"
+          :likes="props.item.likes ?? props.item.stats.likes ?? 0"
+          :dislikes="props.item.dislikes ?? props.item.stats.dislikes ?? 0"
+          :user-vote="props.item.userVote ?? 0"
           class="scale-90"
         />
 

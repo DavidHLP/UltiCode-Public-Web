@@ -34,14 +34,16 @@ const localStats = ref<{ likes: number; dislikes: number }>({
   likes: 0,
   dislikes: 0,
 });
+const userVote = ref<0 | 1 | -1>(0);
 
 watch(
   () => props.item,
   (newItem) => {
     localStats.value = {
-      likes: newItem.stats?.likes ?? 0,
-      dislikes: 0, // Assuming initial dislikes are 0 or not provided by feed yet
+      likes: newItem.likes ?? newItem.stats?.likes ?? 0,
+      dislikes: newItem.dislikes ?? newItem.stats?.dislikes ?? 0,
     };
+    userVote.value = newItem.userVote ?? 0;
   },
   { immediate: true, deep: true },
 );
@@ -199,7 +201,7 @@ watch(() => props.item.id, loadComments, { immediate: true });
         <Vote
           :likes="localStats.likes"
           :dislikes="localStats.dislikes"
-          :user-vote="0"
+          :user-vote="userVote"
           @vote="handleSolutionVote"
         />
 
