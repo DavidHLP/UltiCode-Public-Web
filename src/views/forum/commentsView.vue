@@ -2,7 +2,7 @@
 import type { ForumThread } from "@/types/forum";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostSkeleton from "@/views/forum/components/PostSkeleton.vue";
-import ThreadContent from "@/views/forum/components/ThreadContent.vue";
+import ThreadContent from "@/views/forum/components/ForumContent.vue";
 import { ThreadComments } from "@/components/comments";
 import { fetchForumThread, createForumComment } from "@/api/forum";
 import { ref, watch } from "vue";
@@ -31,7 +31,7 @@ watch(
   (postId) => {
     void loadThread(postId);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 async function onSubmitComment(body: string, parentId?: string | null) {

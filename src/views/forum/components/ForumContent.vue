@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
-  ArrowBigUp,
   Lock,
   MessageSquare,
   Pin,
@@ -18,6 +17,7 @@ import {
   Bookmark,
   BookmarkCheck,
 } from "lucide-vue-next";
+import { Vote } from "@/components/vote";
 import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 
@@ -46,16 +46,13 @@ const userInitials = computed(() => {
 const createdAgo = computed(() => formatRelativeTime(props.thread.createdAt));
 
 const media = computed(
-  () => props.thread.media as unknown as ForumPostMedia | undefined,
+  () => props.thread.media as unknown as ForumPostMedia | undefined
 );
 
 const voteState = computed(() => props.thread.voteState ?? "neutral");
 
-const scoreDisplay = computed(() =>
-  props.thread.stats?.score ? formatCount(props.thread.stats.score) : "0",
-);
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
+  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0"
 );
 
 function formatCount(value: number) {
@@ -312,37 +309,13 @@ function formatPollWidth(votes: number, totalVotes: number) {
     <div
       class="px-2 py-2 sm:px-6 flex items-center gap-1 text-muted-foreground border-t border-transparent"
     >
-      <div
-        class="flex items-center bg-muted/30 rounded-full hover:bg-muted/50 p-0.5"
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8 rounded-full hover:text-orange-600"
-          :class="{
-            'text-orange-600 bg-orange-100/50': voteState === 'upvoted',
-          }"
-        >
-          <ArrowBigUp
-            class="h-5 w-5"
-            :class="{ 'fill-current': voteState === 'upvoted' }"
-          />
-        </Button>
-        <span class="text-sm font-bold min-w-[1.5rem] text-center px-1">{{
-          scoreDisplay
-        }}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8 rounded-full hover:text-blue-600"
-          :class="{ 'text-blue-600 bg-blue-100/50': voteState === 'downvoted' }"
-        >
-          <ArrowBigUp
-            class="h-5 w-5 rotate-180"
-            :class="{ 'fill-current': voteState === 'downvoted' }"
-          />
-        </Button>
-      </div>
+      <Vote
+        :votes="thread.stats?.score ?? 0"
+        :user-vote="
+          voteState === 'upvoted' ? 1 : voteState === 'downvoted' ? -1 : 0
+        "
+        @vote="(type: 1 | -1) => $emit('vote', type)"
+      />
 
       <Button
         variant="ghost"

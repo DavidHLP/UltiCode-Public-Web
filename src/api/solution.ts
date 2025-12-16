@@ -29,6 +29,34 @@ export async function createSolutionComment(
   return apiPost<ForumComment>(`/solutions/${solutionId}/comments`, {
     content,
     parentId,
-    userId: "user-1", // TODO: Replace with actual auth user ID
+    userId: "u-001",
   });
+}
+
+export async function voteSolution(
+  solutionId: string,
+  userId: string,
+  voteType: 1 | -1 | 0,
+): Promise<{ likes: number; dislikes: number }> {
+  return apiPost<{ likes: number; dislikes: number }>(
+    `/solutions/${solutionId}/vote`,
+    {
+      userId,
+      voteType,
+    },
+  );
+}
+
+export async function voteSolutionComment(
+  commentId: string,
+  userId: string,
+  voteType: 1 | -1 | 0,
+): Promise<{ likes: number; dislikes: number }> {
+  return apiPost<{ likes: number; dislikes: number }>(
+    `/solutions/comments/${commentId}/vote`,
+    {
+      userId,
+      voteType,
+    },
+  );
 }

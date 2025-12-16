@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
-  ArrowBigDown,
-  ArrowBigUp,
   Bookmark,
   Link as LinkIcon,
   MessageSquare,
   Share2,
 } from "lucide-vue-next";
+import { Vote } from "@/components/vote";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
@@ -73,9 +72,8 @@ const media = computed(() => {
   return m;
 });
 
-const scoreDisplay = computed(() => formatCount(props.post.stats?.score ?? 0));
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0),
+  formatCount(props.post.stats?.comments ?? 0)
 );
 
 function formatCount(value: number) {
@@ -268,25 +266,18 @@ function formatRelativeTime(value: string) {
         <!-- Footer (Buttons) -->
         <div class="flex items-center gap-2 pt-1">
           <!-- Vote (Horizontal Pill) -->
-          <div
-            class="flex items-center bg-muted/50 rounded-full border border-transparent hover:border-border/50 text-muted-foreground"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              class="h-8 w-8 hover:bg-transparent hover:text-orange-600 rounded-l-full"
-            >
-              <ArrowBigUp class="h-5 w-5" />
-            </Button>
-            <span class="text-xs font-bold">{{ scoreDisplay }}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="h-8 w-8 hover:bg-transparent hover:text-blue-600 rounded-r-full"
-            >
-              <ArrowBigDown class="h-5 w-5" />
-            </Button>
-          </div>
+          <Vote
+            :votes="post.stats?.score ?? 0"
+            :user-vote="
+              post.voteState === 'upvoted'
+                ? 1
+                : post.voteState === 'downvoted'
+                  ? -1
+                  : 0
+            "
+            class="mr-2"
+            @vote="(type: 1 | -1) => $emit('vote', post.id, type)"
+          />
 
           <Button
             variant="ghost"

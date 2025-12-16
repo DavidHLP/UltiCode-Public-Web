@@ -66,20 +66,6 @@
 
       <!-- Right Column: Content -->
       <div class="flex-grow pb-1">
-        <div class="flex items-center text-xs mb-1 h-5">
-          <span
-            class="font-bold text-black mr-1 hover:underline cursor-pointer"
-            >{{ comment.author }}</span
-          >
-          <span
-            v-if="comment.isOp"
-            class="text-blue-600 font-bold ml-1 text-[10px]"
-            >OP</span
-          >
-          <span class="text-gray-400 mx-1">•</span>
-          <span class="text-gray-500">{{ comment.time }}</span>
-        </div>
-
         <div
           v-if="isCollapsed"
           class="py-1 cursor-pointer select-none"
@@ -93,36 +79,39 @@
           </span>
         </div>
 
-        <div v-else>
-          <div class="text-sm text-[#1a1a1b] leading-relaxed mb-2">
-            <MarkdownView :content="comment.content" />
+        <div v-else class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span
+              class="font-semibold text-sm cursor-pointer hover:underline"
+              :class="{
+                'text-blue-600 bg-blue-50 px-1 rounded': comment.isOp,
+              }"
+            >
+              {{ comment.author }}
+            </span>
+            <span
+              v-if="comment.isOp"
+              class="text-[10px] font-bold text-blue-600 uppercase tracking-wider"
+              >OP</span
+            >
+            <span class="text-xs text-muted-foreground"
+              >· {{ comment.time }}</span
+            >
           </div>
 
           <div
-            class="flex items-center space-x-2 text-muted-foreground font-bold text-xs select-none"
+            class="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap break-words mb-2"
           >
-            <div
-              class="flex items-center bg-muted/30 rounded-full p-0.5 border border-transparent hover:border-border/40 transition-colors"
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-6 w-6 rounded-full hover:text-orange-600 hover:bg-orange-100/50"
-              >
-                <ArrowBigUp class="h-4 w-4" />
-              </Button>
-              <span
-                class="text-xs px-1 text-foreground font-semibold min-w-[16px] text-center"
-                >{{ formatVotes(comment.votes) }}</span
-              >
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-6 w-6 rounded-full hover:text-blue-600 hover:bg-blue-100/50"
-              >
-                <ArrowBigUp class="h-4 w-4 rotate-180" />
-              </Button>
-            </div>
+            {{ comment.content }}
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2 select-none">
+            <Vote
+              :votes="comment.votes"
+              class="scale-90 origin-left"
+              @vote="(type: 1 | -1) => handleVote(type)"
+            />
 
             <Button
               variant="ghost"
@@ -179,6 +168,7 @@
         @reply="
           (id: number | string, content: string) => emit('reply', id, content)
         "
+        @vote="(id: number | string, type: 1 | -1) => emit('vote', id, type)"
       />
     </div>
   </div>
@@ -188,9 +178,10 @@
 import { ref, computed } from "vue";
 import type { Comment } from "@/types/comment";
 import CommentComposer from "./CommentComposer.vue";
-import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import { Button } from "@/components/ui/button";
-import { ArrowBigUp, MessageSquare, Share2, Flag } from "lucide-vue-next";
+import { Vote } from "@/components/vote";
+
+import { MessageSquare, Share2, Flag } from "lucide-vue-next";
 
 defineOptions({
   name: "CommentTreeNode",
@@ -204,6 +195,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "reply", commentId: number | string, content: string): void;
+  (e: "vote", commentId: number | string, voteType: 1 | -1): void;
 }>();
 
 const isCollapsed = ref(false);
@@ -226,8 +218,8 @@ const handleReplySubmit = (content: string) => {
   isCollapsed.value = false;
 };
 
-const formatVotes = (num: number) => {
-  return num >= 1000 ? (num / 1000).toFixed(1) + "k" : num;
+const handleVote = (type: 1 | -1) => {
+  emit("vote", props.comment.id, type);
 };
 </script>
 

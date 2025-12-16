@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
-import { Eye, MessageCircle, Triangle } from "lucide-vue-next";
+import { Eye, MessageCircle } from "lucide-vue-next";
+import { Vote } from "@/components/vote";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -12,11 +13,11 @@ const emit = defineEmits<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
 );
 
 const languageLabel = computed(
-  () => props.item.language || props.item.languageFilter || "language",
+  () => props.item.language || props.item.languageFilter || "language"
 );
 
 const topicLabel = computed(
@@ -24,7 +25,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic",
+    "topic"
 );
 
 const handleSelect = () => emit("select", props.item);
@@ -110,17 +111,16 @@ const handleSelect = () => emit("select", props.item);
       class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-muted-foreground"
     >
       <div
-        class="flex flex-wrap items-center gap-2 font-medium text-foreground"
+        class="flex flex-wrap items-center gap-3 font-medium text-foreground select-none"
       >
-        <span class="flex items-center gap-1.5">
-          <Triangle class="h-3.5 w-3.5 text-amber-500" />
-          {{ props.item.stats.likes }}
-        </span>
-        <span class="flex items-center gap-1.5">
+        <!-- Vote Pill (Static Preview) -->
+        <Vote :votes="props.item.stats.likes" readonly class="scale-90" />
+
+        <span class="flex items-center gap-1.5 text-muted-foreground">
           <Eye class="h-3.5 w-3.5" />
           {{ props.item.stats.views }}
         </span>
-        <span class="flex items-center gap-1.5">
+        <span class="flex items-center gap-1.5 text-muted-foreground">
           <MessageCircle class="h-3.5 w-3.5" />
           {{ props.item.stats.comments }}
         </span>

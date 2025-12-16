@@ -14,6 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "submit", body: string, parentId?: string): void;
+  (e: "vote", commentId: number | string, voteType: 1 | -1): void;
 }>();
 
 const commentText = ref("");
@@ -131,6 +132,7 @@ const commentTree = computed(() => {
           @reply="
             (id: number | string, content: string) => handleReply(id, content)
           "
+          @vote="(id: number | string, type: 1 | -1) => emit('vote', id, type)"
         />
       </div>
     </div>
