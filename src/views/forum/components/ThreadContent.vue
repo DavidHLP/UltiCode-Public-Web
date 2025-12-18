@@ -7,7 +7,7 @@ import type {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Share2 } from "lucide-vue-next";
-import { PostFooter } from "@/components/post-footer";
+import { PostActions } from "@/components/post-actions";
 import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
@@ -49,7 +49,11 @@ const userVote = computed(() =>
 );
 
 const voteCounts = computed(() =>
-  resolveVoteCounts(props.thread.likes, props.thread.dislikes, props.thread.stats),
+  resolveVoteCounts(
+    props.thread.likes,
+    props.thread.dislikes,
+    props.thread.stats,
+  ),
 );
 
 function formatCount(value: number) {
@@ -304,7 +308,7 @@ function formatPollWidth(votes: number, totalVotes: number) {
 
     <!-- Actions -->
     <div class="px-2 py-2 sm:px-6 border-t border-transparent">
-      <PostFooter
+      <PostActions
         :vote="{
           likes: voteCounts.likes,
           dislikes: voteCounts.dislikes,

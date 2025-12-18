@@ -6,10 +6,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { computed, ref, watch } from "vue";
-import { ThreadComments } from "@/components/comments";
+import { CommentThread } from "@/components/comments";
 import { fetchSolutionComments, createSolutionComment } from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
-import { PostFooter } from "@/components/post-footer";
+import { PostActions } from "@/components/post-actions";
 import "highlight.js/styles/atom-one-dark.css";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
@@ -18,7 +18,7 @@ const props = defineProps<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
 
 const topicLabel = computed(
@@ -26,7 +26,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic"
+    "topic",
 );
 
 const comments = ref<ForumComment[]>([]);
@@ -46,7 +46,7 @@ watch(
     );
     userVote.value = resolveUserVote(newItem.userVote);
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 const loadComments = async () => {
@@ -55,7 +55,7 @@ const loadComments = async () => {
     return;
   }
   try {
-    comments.value = await fetchSolutionComments(props.item.id);
+    comments.value = await fetchSolutionComments(props.item.id, "u-001");
   } catch (error) {
     console.error("Failed to load comments", error);
     comments.value = [];
@@ -82,7 +82,7 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
       VoteTargetType.SOLUTION,
       props.item.id,
       "u-001",
-      voteType
+      voteType,
     );
     localStats.value = { likes: res.likes, dislikes: res.dislikes };
     userVote.value = res.userVote;
@@ -93,14 +93,14 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
 
 const handleCommentVote = async (
   commentId: string | number,
-  voteType: 1 | -1
+  voteType: 1 | -1,
 ) => {
   try {
     const res = await vote(
       VoteTargetType.SOLUTION_COMMENT,
       String(commentId),
       "u-001",
-      voteType
+      voteType,
     );
 
     // Recursive helper to find and update comment
@@ -207,7 +207,7 @@ watch(() => props.item.id, loadComments, { immediate: true });
       </div>
 
       <!-- 统计信息和操作 -->
-      <PostFooter
+      <PostActions
         :vote="{
           likes: localStats.likes,
           dislikes: localStats.dislikes,
@@ -233,7 +233,7 @@ watch(() => props.item.id, loadComments, { immediate: true });
     <div class="mt-4">
       <Separator class="mb-4" />
       <h3 class="text-sm font-semibold mb-4">Comments</h3>
-      <ThreadComments
+      <CommentThread
         :comments="comments"
         :is-locked="false"
         @submit="handleCommentSubmit"

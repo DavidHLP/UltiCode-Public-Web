@@ -107,7 +107,7 @@
 
           <!-- Actions -->
           <div class="flex items-center gap-2 select-none">
-            <Vote
+            <VoteControl
               :likes="comment.likes || 0"
               :dislikes="comment.dislikes || 0"
               :user-vote="comment.userVote ?? 0"
@@ -146,7 +146,7 @@
 
           <!-- Reply Input -->
           <div v-if="isReplying" class="mt-2">
-            <CommentComposer
+            <CommentForm
               :parent-id="comment.id"
               :on-cancel="() => (isReplying = false)"
               @submit="handleReplySubmit"
@@ -161,7 +161,7 @@
       v-if="!isCollapsed && hasChildren"
       class="children-container pl-[36px] relative"
     >
-      <CommentTreeNode
+      <CommentNode
         v-for="(child, index) in comment.children"
         :key="child.id"
         :comment="child"
@@ -179,14 +179,14 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { Comment } from "@/types/comment";
-import CommentComposer from "./CommentComposer.vue";
+import CommentForm from "./CommentForm.vue";
 import { Button } from "@/components/ui/button";
-import { Vote } from "@/components/post-footer/vote";
+import { VoteControl } from "@/components/post-actions/vote-control";
 
 import { MessageSquare, Share2, Flag } from "lucide-vue-next";
 
 defineOptions({
-  name: "CommentTreeNode",
+  name: "CommentNode",
 });
 
 const props = defineProps<{

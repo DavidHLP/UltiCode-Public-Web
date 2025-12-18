@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
-import SolutionsListView from "./SolutionsListView.vue";
-import SolutionsDetail from "./components/SolutionsDetail.vue";
+import SolutionListView from "./SolutionListView.vue";
+import SolutionDetail from "./components/SolutionDetail.vue";
 import { fetchSolutionFeed } from "@/api/solution";
 
 const props = defineProps<{
@@ -27,7 +27,7 @@ watch(
     }
     isLoading.value = true;
     try {
-      feed.value = await fetchSolutionFeed(id);
+      feed.value = await fetchSolutionFeed(id, "u-001");
     } catch (error) {
       console.error("Failed to load solution feed", error);
       feed.value = null;
@@ -95,9 +95,9 @@ const resetSelectedSolution = () => {
       >
         &larr; Return solution list
       </button>
-      <SolutionsDetail :item="selectedSolution" />
+      <SolutionDetail :item="selectedSolution" />
     </div>
-    <SolutionsListView
+    <SolutionListView
       v-else
       :items="feed?.items ?? []"
       :follow-up="props.followUp"
@@ -109,6 +109,6 @@ const resetSelectedSolution = () => {
     <div v-if="isLoading" class="px-5 py-4 text-sm text-muted-foreground">
       Loading solutions…
     </div>
-    <SolutionsDetail v-else :item="fallbackSolution" />
+    <SolutionDetail v-else :item="fallbackSolution" />
   </div>
 </template>

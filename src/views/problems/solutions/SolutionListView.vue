@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import SolutionsCard from "./components/SolutionsCard.vue";
+import SolutionCard from "./components/SolutionCard.vue";
 import Separator from "@/components/ui/separator/Separator.vue";
 import Badge from "@/components/ui/badge/Badge.vue";
 import {
@@ -284,7 +284,7 @@ onMounted(async () => {
             class="flex flex-col"
           >
             <div class="px-3">
-              <SolutionsCard :item="item" @select="handleSelect" />
+              <SolutionCard :item="item" @select="handleSelect" />
             </div>
             <Separator v-if="index < sortedItems.length - 1" class="my-2" />
           </div>

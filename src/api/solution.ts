@@ -21,8 +21,12 @@ export async function fetchUserSolutions(
 
 export async function fetchSolutionComments(
   solutionId: string,
+  userId?: string,
 ): Promise<ForumComment[]> {
-  return apiGet<ForumComment[]>(`/solutions/${solutionId}/comments`);
+  const url = userId
+    ? `/solutions/${solutionId}/comments?userId=${userId}`
+    : `/solutions/${solutionId}/comments`;
+  return apiGet<ForumComment[]>(url);
 }
 
 export async function createSolutionComment(

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
-import { PostFooter } from "@/components/post-footer";
+import { PostActions } from "@/components/post-actions";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 const props = defineProps<{
@@ -113,7 +113,7 @@ const voteCounts = computed(() =>
     </section>
 
     <footer class="mt-2">
-      <PostFooter
+      <PostActions
         :vote="{
           likes: voteCounts.likes,
           dislikes: voteCounts.dislikes,

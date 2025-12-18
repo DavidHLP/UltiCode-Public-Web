@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Link as LinkIcon } from "lucide-vue-next";
-import { PostFooter } from "@/components/post-footer";
+import { PostActions } from "@/components/post-actions";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
@@ -68,7 +68,7 @@ const media = computed(() => {
 });
 
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0)
+  formatCount(props.post.stats?.comments ?? 0),
 );
 
 const userVote = computed(() =>
@@ -268,7 +268,7 @@ function formatRelativeTime(value: string) {
 
         <!-- Footer (Buttons) -->
         <div class="flex items-center gap-2 pt-1">
-          <PostFooter
+          <PostActions
             :vote="{
               likes: voteCounts.likes,
               dislikes: voteCounts.dislikes,

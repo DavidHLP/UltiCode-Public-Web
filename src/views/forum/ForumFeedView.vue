@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
-import PostCard from "@/views/forum/components/PostCard.vue";
-import PostSkeleton from "@/views/forum/components/PostSkeleton.vue";
-import ForumSidebar from "@/views/forum/components/ForumHomeSidebar.vue";
+import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
+import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
+import ForumSidebar from "@/views/forum/components/ForumSidebar.vue";
 import { computed, onMounted, ref } from "vue";
 import {
   fetchForumCommunities,
@@ -88,10 +88,14 @@ const sortedPosts = computed(() => {
     <!-- Main Feed -->
     <main class="w-full min-w-0 flex-1 space-y-4">
       <div v-if="isLoading" class="space-y-4">
-        <PostSkeleton v-for="i in 3" :key="i" />
+        <ForumPostSkeleton v-for="i in 3" :key="i" />
       </div>
       <div v-else class="space-y-4">
-        <PostCard v-for="post in sortedPosts" :key="post.id" :post="post" />
+        <ForumPostCard
+          v-for="post in sortedPosts"
+          :key="post.id"
+          :post="post"
+        />
       </div>
     </main>
 

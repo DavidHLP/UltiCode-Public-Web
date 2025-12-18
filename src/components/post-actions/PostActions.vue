@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Vote } from "@/components/post-footer/vote";
+import { VoteControl } from "@/components/post-actions/vote-control";
 import { Button } from "@/components/ui/button";
 import {
   MessageCircle,
@@ -11,7 +11,7 @@ import {
 } from "lucide-vue-next";
 import { computed } from "vue";
 
-export interface PostFooterConfig {
+export interface PostActionsConfig {
   comments?: {
     show: boolean;
     count: number | string;
@@ -42,7 +42,7 @@ export interface VoteData {
 
 const props = defineProps<{
   vote: VoteData;
-  config: PostFooterConfig;
+  config: PostActionsConfig;
   class?: string;
 }>();
 
@@ -67,7 +67,7 @@ const commentIcon = computed(() => {
       props.class,
     ]"
   >
-    <Vote
+    <VoteControl
       :likes="vote.likes"
       :dislikes="vote.dislikes"
       :user-vote="vote.userVote"

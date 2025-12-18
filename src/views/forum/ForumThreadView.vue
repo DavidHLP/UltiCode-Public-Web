@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { ForumThread } from "@/types/forum";
 import { Skeleton } from "@/components/ui/skeleton";
-import PostSkeleton from "@/views/forum/components/PostSkeleton.vue";
-import ThreadContent from "@/views/forum/components/ForumContent.vue";
-import { ThreadComments } from "@/components/comments";
+import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
+import ThreadContent from "@/views/forum/components/ThreadContent.vue";
+import { CommentThread } from "@/components/comments";
 import { fetchForumThread, createForumComment } from "@/api/forum";
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
@@ -97,7 +97,7 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
   <div class="mx-auto flex w-full max-w-5xl items-start gap-6 px-4 py-8">
     <main class="w-full min-w-0 flex-1 space-y-4">
       <div v-if="isLoading" class="space-y-6">
-        <PostSkeleton />
+        <ForumPostSkeleton />
         <div class="space-y-4 pl-4 border-l border-border/40">
           <div class="flex gap-3" v-for="i in 3" :key="i">
             <Skeleton class="h-8 w-8 rounded-full" />
@@ -121,7 +121,7 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
           <div class="flex-1 min-w-0 bg-card sm:rounded-xl overflow-hidden">
             <ThreadContent :thread="thread" @vote="handleThreadVote" />
             <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
-            <ThreadComments
+            <CommentThread
               :comments="thread.comments"
               :is-locked="thread.isLocked"
               @submit="onSubmitComment"

@@ -59,7 +59,7 @@ import { Button } from "@/components/ui/button";
 import { Image as ImageIcon, Type } from "lucide-vue-next";
 
 defineOptions({
-  name: "CommentComposer",
+  name: "CommentForm",
 });
 
 const props = defineProps<{

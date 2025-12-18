@@ -30,7 +30,7 @@ import { useBottomPanelStore } from "./test/test";
 import { fetchCurrentUserId } from "@/utils/auth";
 
 import DescriptionView from "@/views/problems/description/DescriptionView.vue";
-import SolutionsView from "@/views/problems/solutions/SolutionsView.vue";
+import ProblemSolutionsView from "@/views/problems/solutions/ProblemSolutionsView.vue";
 import SubmissionsView from "@/views/problems/submissions/SubmissionsView.vue";
 import CodeView from "./code/CodeView.vue";
 import TestCaseView from "./test/TestCaseView.vue";
@@ -176,7 +176,7 @@ const ConnectedSolutionsView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(SolutionsView, {
+            h(ProblemSolutionsView, {
               problemId: problem.value.id,
               followUp: problem.value.followUp ?? "",
             }),
