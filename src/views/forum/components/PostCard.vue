@@ -2,16 +2,10 @@
 import type { ForumFlairType, ForumPost } from "@/types/forum";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import {
-  Bookmark,
-  Link as LinkIcon,
-  MessageSquare,
-  Share2,
-} from "lucide-vue-next";
-import { Vote } from "@/components/post-footer/vote";
+import { Link as LinkIcon } from "lucide-vue-next";
+import { PostFooter } from "@/components/post-footer";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
@@ -75,6 +69,17 @@ const media = computed(() => {
 const commentsDisplay = computed(() =>
   formatCount(props.post.stats?.comments ?? 0)
 );
+
+const userVote = computed(() => {
+  if (props.post.userVote !== undefined && props.post.userVote !== null) {
+    return props.post.userVote;
+  }
+  return props.post.voteState === "upvoted"
+    ? 1
+    : props.post.voteState === "downvoted"
+      ? -1
+      : 0;
+});
 
 function formatCount(value: number) {
   if (value >= 1000) {
@@ -140,15 +145,6 @@ function formatRelativeTime(value: string) {
             />
             <AvatarFallback class="text-xs">{{ userInitials }}</AvatarFallback>
           </Avatar>
-          <div
-            class="px-2 py-3 bg-muted/30 flex flex-col items-center gap-1 min-w-[40px]"
-          >
-            <Vote
-              :likes="post.likes || 0"
-              :dislikes="post.dislikes || 0"
-              :user-vote="post.userVote"
-            />
-          </div>
           <span class="flex items-center gap-1">
             <span
               v-if="post.community"
@@ -274,47 +270,24 @@ function formatRelativeTime(value: string) {
 
         <!-- Footer (Buttons) -->
         <div class="flex items-center gap-2 pt-1">
-          <!-- Vote (Horizontal Pill) -->
-          <Vote
-            :likes="post.likes || 0"
-            :dislikes="post.dislikes || 0"
-            :user-vote="
-              post.voteState === 'upvoted'
-                ? 1
-                : post.voteState === 'downvoted'
-                  ? -1
-                  : 0
-            "
-            class="mr-2"
+          <PostFooter
+            :vote="{
+              likes: post.likes ?? post.stats?.likes ?? 0,
+              dislikes: post.dislikes ?? post.stats?.dislikes ?? 0,
+              userVote: userVote,
+            }"
+            :config="{
+              comments: {
+                show: true,
+                count: commentsDisplay,
+                text: 'comments',
+                icon: 'message-square',
+              },
+              share: { show: true, text: 'Share' },
+              save: { show: true, isSaved: post.isSaved, text: 'Save' },
+            }"
             @vote="(type: 1 | -1) => $emit('vote', post.id, type)"
           />
-
-          <Button
-            variant="ghost"
-            size="sm"
-            class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
-          >
-            <MessageSquare class="h-4 w-4" />
-            {{ commentsDisplay }}
-            <span class="hidden sm:inline">comments</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
-          >
-            <Share2 class="h-4 w-4" />
-            <span class="hidden sm:inline">Share</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
-          >
-            <Bookmark class="h-4 w-4" />
-            <span class="hidden sm:inline">Save</span>
-          </Button>
         </div>
       </div>
     </div>
