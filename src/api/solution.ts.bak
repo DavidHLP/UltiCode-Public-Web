@@ -1,7 +1,6 @@
 import { apiGet, apiPost } from "@/utils/request";
 import type { SolutionFeedResponse } from "@/types/solution";
 import type { ForumComment } from "@/types/forum";
-import { fetchCurrentUserId } from "@/utils/auth";
 export type { SolutionFeedResponse };
 
 export async function fetchSolutionFeed(
@@ -35,15 +34,10 @@ export async function createSolutionComment(
   content: string,
   parentId?: string,
 ): Promise<ForumComment> {
-  const userId = fetchCurrentUserId();
-  if (!userId) {
-    throw new Error("User must be logged in to create comments");
-  }
-
   return apiPost<ForumComment>(`/solutions/${solutionId}/comments`, {
     content,
     parentId,
-    userId,
+    userId: "u-001",
   });
 }
 
@@ -76,7 +70,5 @@ export async function voteSolutionComment(
 }
 
 export async function recordSolutionView(solutionId: string) {
-  const userId = fetchCurrentUserId();
-  if (!userId) return;
-  return apiPost(`/views/solution/${solutionId}`, { userId });
+  return apiPost(`/views/solution/${solutionId}`, { userId: "u-001" });
 }

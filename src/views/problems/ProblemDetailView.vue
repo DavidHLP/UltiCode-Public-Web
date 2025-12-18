@@ -113,7 +113,7 @@ const buildRunResultFromCases = (
     id: runId,
     submissionId: `${runId}-submission`,
     problemId,
-    userId,
+    userId: userId || "anonymous", // Handle null userId
     verdict: "Accepted",
     runtime: `${runtimeMs} ms`,
     memory: `${memoryMb} MB`,

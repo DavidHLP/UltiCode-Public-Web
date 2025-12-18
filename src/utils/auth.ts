@@ -21,13 +21,13 @@ export function removeUserId() {
   localStorage.removeItem(USER_ID_KEY);
 }
 
-export function fetchCurrentUserId(): string {
+export function fetchCurrentUserId(): string | null {
   // Try to get from local storage
   const stored = localStorage.getItem(USER_ID_KEY);
   if (stored) return stored;
 
-  // Fallback to default user if no auth (or could return null if strict)
-  return "u-001";
+  // Return null if no user is authenticated
+  return null;
 }
 
 export function isAuthenticated(): boolean {

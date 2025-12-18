@@ -21,8 +21,8 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const email = ref("shadcn"); // Using 'username' field on backend but form calls it email. I'll stick to 'shadcn' as default for now to match backend seed.
-const password = ref("password");
+const email = ref(""); // Using 'username' field on backend but form calls it email. Now using empty default.
+const password = ref("");
 const loading = ref(false);
 
 async function handleSubmit(e: Event) {
@@ -67,7 +67,7 @@ function handleGithubLogin() {
           id="email"
           type="text"
           v-model="email"
-          placeholder="shadcn"
+          placeholder="Enter your username"
           required
         />
       </Field>
