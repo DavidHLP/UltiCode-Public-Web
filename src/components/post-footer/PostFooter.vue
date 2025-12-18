@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Vote } from "@/components/vote";
+import { Vote } from "@/components/post-footer/vote";
 import { Button } from "@/components/ui/button";
 import {
   MessageCircle,

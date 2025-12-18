@@ -11,7 +11,7 @@ import {
   MessageSquare,
   Share2,
 } from "lucide-vue-next";
-import { Vote } from "@/components/vote";
+import { Vote } from "@/components/post-footer/vote";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
@@ -73,7 +73,7 @@ const media = computed(() => {
 });
 
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0),
+  formatCount(props.post.stats?.comments ?? 0)
 );
 
 function formatCount(value: number) {
