@@ -3,6 +3,7 @@ import type { SolutionFeedItem } from "@/types/solution";
 import type { ForumComment } from "@/types/forum";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { computed, ref, watch } from "vue";
 import { ThreadComments } from "@/components/comments";
@@ -99,11 +100,24 @@ const handleCommentVote = async (
       voteType
     );
 
-    // Update local state
-    const commentIndex = comments.value.findIndex((c) => c.id === commentId);
-    if (commentIndex !== -1 && comments.value[commentIndex]) {
-      comments.value[commentIndex].upvotes = res.likes;
-    }
+    // Recursive helper to find and update comment
+    const updateComment = (list: ForumComment[]) => {
+      for (const comment of list) {
+        if (comment.id === commentId) {
+          comment.likes = res.likes;
+          comment.dislikes = res.dislikes;
+          // Optimistically update userVote or assume we trust the action
+          comment.userVote = voteType;
+          return true;
+        }
+        if (comment.replies && comment.replies.length > 0) {
+          if (updateComment(comment.replies)) return true;
+        }
+      }
+      return false;
+    };
+
+    updateComment(comments.value);
   } catch (error) {
     console.error("Failed to vote comment", error);
   }
@@ -189,8 +203,6 @@ watch(() => props.item.id, loadComments, { immediate: true });
           {{ tag }}
         </Badge>
       </div>
-
-      <Separator class="my-2" />
 
       <!-- 统计信息和操作 -->
       <PostFooter

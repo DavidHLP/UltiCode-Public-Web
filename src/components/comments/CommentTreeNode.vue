@@ -110,7 +110,7 @@
             <Vote
               :likes="comment.likes || 0"
               :dislikes="comment.dislikes || 0"
-              :user-vote="comment.userVote"
+              :user-vote="comment.userVote ?? 0"
               class="origin-left"
               @vote="(type: 1 | -1) => handleVote(type)"
             />

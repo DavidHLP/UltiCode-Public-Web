@@ -71,7 +71,7 @@ const commentIcon = computed(() => {
       :likes="vote.likes"
       :dislikes="vote.dislikes"
       :user-vote="vote.userVote"
-      class="origin-left"
+      class="origin-left mr-2"
       @vote="(t: 1 | -1) => emit('vote', t)"
     />
 
@@ -90,12 +90,15 @@ const commentIcon = computed(() => {
         v-if="config.comments.variant !== 'simple'"
         variant="ghost"
         size="sm"
-        class="gap-2 rounded-full h-9 hover:bg-muted/50"
+        class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
         @click="emit('comment')"
       >
         <component :is="commentIcon" class="h-4 w-4" />
-        <span class="text-xs font-semibold">
+        <span class="text-xs font-medium hidden sm:inline">
           {{ config.comments.count }} {{ config.comments.text }}
+        </span>
+        <span class="text-xs font-medium sm:hidden">
+          {{ config.comments.count }}
         </span>
       </Button>
       <div
@@ -113,13 +116,15 @@ const commentIcon = computed(() => {
       v-if="config.share?.show"
       variant="ghost"
       size="sm"
-      class="gap-2 rounded-full h-9 hover:bg-muted/50"
+      class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
       @click="emit('share')"
     >
       <Share2 class="h-4 w-4" />
-      <span v-if="config.share.text" class="text-xs font-semibold">{{
-        config.share.text
-      }}</span>
+      <span
+        v-if="config.share.text"
+        class="text-xs font-medium hidden sm:inline"
+        >{{ config.share.text }}</span
+      >
     </Button>
 
     <!-- Save -->
@@ -127,16 +132,18 @@ const commentIcon = computed(() => {
       v-if="config.save?.show"
       variant="ghost"
       size="sm"
-      class="gap-2 rounded-full h-9 hover:bg-muted/50"
+      class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
       @click="emit('save')"
     >
       <component
         :is="config.save.isSaved ? BookmarkCheck : Bookmark"
         class="h-4 w-4"
       />
-      <span v-if="config.save.text" class="text-xs font-semibold">{{
-        config.save.text
-      }}</span>
+      <span
+        v-if="config.save.text"
+        class="text-xs font-medium hidden sm:inline"
+        >{{ config.save.text }}</span
+      >
     </Button>
   </div>
 </template>
