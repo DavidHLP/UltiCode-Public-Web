@@ -33,7 +33,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import ProblemTable from "./ProblemTable.vue";
-import { fetchProblems } from "@/api/problem";
+import { fetchProblems, fetchRandomProblem } from "@/api/problem";
 
 import type { ProblemExplorerProps } from "./type";
 
@@ -211,16 +211,18 @@ function clearFilters() {
   numProblemsToShow.value = problemsPerPage;
 }
 
-function pickOne() {
-  const problems = filteredProblems.value;
-  if (problems.length > 0) {
-    const randomIndex = Math.floor(Math.random() * problems.length);
-    const problem = problems[randomIndex];
+async function pickOne() {
+  try {
+    const problem = await fetchRandomProblem();
     if (problem) {
-      alert(`Let's try: ${problem.id}. ${problem.title}`);
+      // Navigate to problem detail page
+      window.location.href = `/problem/${problem.slug}`;
+    } else {
+      alert("No problems available.");
     }
-  } else {
-    alert("No problems to pick from. Try clearing your filters.");
+  } catch (error) {
+    console.error("Failed to fetch random problem", error);
+    alert("Failed to pick a random problem.");
   }
 }
 
