@@ -9,6 +9,7 @@ import { PostFooter } from "@/components/post-footer";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
+import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 const props = defineProps<{
   post: ForumPost;
@@ -70,16 +71,13 @@ const commentsDisplay = computed(() =>
   formatCount(props.post.stats?.comments ?? 0)
 );
 
-const userVote = computed(() => {
-  if (props.post.userVote !== undefined && props.post.userVote !== null) {
-    return props.post.userVote;
-  }
-  return props.post.voteState === "upvoted"
-    ? 1
-    : props.post.voteState === "downvoted"
-      ? -1
-      : 0;
-});
+const userVote = computed(() =>
+  resolveUserVote(props.post.userVote, props.post.voteState),
+);
+
+const voteCounts = computed(() =>
+  resolveVoteCounts(props.post.likes, props.post.dislikes, props.post.stats),
+);
 
 function formatCount(value: number) {
   if (value >= 1000) {
@@ -272,8 +270,8 @@ function formatRelativeTime(value: string) {
         <div class="flex items-center gap-2 pt-1">
           <PostFooter
             :vote="{
-              likes: post.likes ?? post.stats?.likes ?? 0,
-              dislikes: post.dislikes ?? post.stats?.dislikes ?? 0,
+              likes: voteCounts.likes,
+              dislikes: voteCounts.dislikes,
               userVote: userVote,
             }"
             :config="{

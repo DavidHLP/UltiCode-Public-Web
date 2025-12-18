@@ -11,6 +11,7 @@ import { fetchSolutionComments, createSolutionComment } from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
 import { PostFooter } from "@/components/post-footer";
 import "highlight.js/styles/atom-one-dark.css";
+import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -38,11 +39,12 @@ const userVote = ref<0 | 1 | -1>(0);
 watch(
   () => props.item,
   (newItem) => {
-    localStats.value = {
-      likes: newItem.likes ?? newItem.stats?.likes ?? 0,
-      dislikes: newItem.dislikes ?? newItem.stats?.dislikes ?? 0,
-    };
-    userVote.value = newItem.userVote ?? 0;
+    localStats.value = resolveVoteCounts(
+      newItem.likes,
+      newItem.dislikes,
+      newItem.stats,
+    );
+    userVote.value = resolveUserVote(newItem.userVote);
   },
   { immediate: true, deep: true }
 );
@@ -82,7 +84,8 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
       "u-001",
       voteType
     );
-    localStats.value = { ...res };
+    localStats.value = { likes: res.likes, dislikes: res.dislikes };
+    userVote.value = res.userVote;
   } catch (error) {
     console.error("Failed to vote solution", error);
   }
@@ -106,8 +109,7 @@ const handleCommentVote = async (
         if (comment.id === commentId) {
           comment.likes = res.likes;
           comment.dislikes = res.dislikes;
-          // Optimistically update userVote or assume we trust the action
-          comment.userVote = voteType;
+          comment.userVote = res.userVote;
           return true;
         }
         if (comment.replies && comment.replies.length > 0) {

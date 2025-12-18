@@ -10,6 +10,7 @@ import { Share2 } from "lucide-vue-next";
 import { PostFooter } from "@/components/post-footer";
 import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
+import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 const props = defineProps<{
   thread: ForumThread;
@@ -41,6 +42,14 @@ const media = computed(
 
 const commentsDisplay = computed(() =>
   props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
+);
+
+const userVote = computed(() =>
+  resolveUserVote(props.thread.userVote, props.thread.voteState),
+);
+
+const voteCounts = computed(() =>
+  resolveVoteCounts(props.thread.likes, props.thread.dislikes, props.thread.stats),
 );
 
 function formatCount(value: number) {
@@ -297,9 +306,9 @@ function formatPollWidth(votes: number, totalVotes: number) {
     <div class="px-2 py-2 sm:px-6 border-t border-transparent">
       <PostFooter
         :vote="{
-          likes: thread.likes ?? thread.stats?.likes ?? 0,
-          dislikes: thread.dislikes ?? thread.stats?.dislikes ?? 0,
-          userVote: thread.userVote,
+          likes: voteCounts.likes,
+          dislikes: voteCounts.dislikes,
+          userVote: userVote,
         }"
         :config="{
           comments: {

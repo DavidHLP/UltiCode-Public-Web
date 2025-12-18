@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
 import { PostFooter } from "@/components/post-footer";
+import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -28,6 +29,11 @@ const topicLabel = computed(
 );
 
 const handleSelect = () => emit("select", props.item);
+
+const userVote = computed(() => resolveUserVote(props.item.userVote));
+const voteCounts = computed(() =>
+  resolveVoteCounts(props.item.likes, props.item.dislikes, props.item.stats),
+);
 </script>
 
 <template>
@@ -109,9 +115,9 @@ const handleSelect = () => emit("select", props.item);
     <footer class="mt-2">
       <PostFooter
         :vote="{
-          likes: props.item.likes ?? props.item.stats.likes ?? 0,
-          dislikes: props.item.dislikes ?? props.item.stats.dislikes ?? 0,
-          userVote: props.item.userVote,
+          likes: voteCounts.likes,
+          dislikes: voteCounts.dislikes,
+          userVote: userVote,
         }"
         :config="{
           views: { show: true, count: props.item.stats.views },

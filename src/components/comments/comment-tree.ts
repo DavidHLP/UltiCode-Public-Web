@@ -1,6 +1,7 @@
 import type { Comment } from "@/types/comment";
 import type { ForumComment } from "@/types/forum";
 import { formatRelativeTime } from "@/utils/date";
+import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 interface BuildTreeOptions {
   postAuthorUsername?: string;
@@ -13,21 +14,26 @@ const buildAvatar = (username: string, avatar?: string) =>
 const mapToComment = (
   input: ForumComment,
   options?: BuildTreeOptions,
-): Comment => ({
-  id: input.id,
-  author: input.author.username,
-  avatar: buildAvatar(input.author.username, input.author.avatar),
-  time: formatRelativeTime(input.createdAt),
-  votes: input.upvotes,
-  likes: input.likes || 0,
-  dislikes: input.dislikes || 0,
-  userVote: input.userVote,
-  content: input.body,
-  isOp:
-    !!options?.postAuthorUsername &&
-    input.author.username === options.postAuthorUsername,
-  children: [],
-});
+): Comment => {
+  const voteCounts = resolveVoteCounts(input.likes, input.dislikes);
+  const userVote = resolveUserVote(input.userVote);
+
+  return {
+    id: input.id,
+    author: input.author.username,
+    avatar: buildAvatar(input.author.username, input.author.avatar),
+    time: formatRelativeTime(input.createdAt),
+    votes: voteCounts.likes - voteCounts.dislikes,
+    likes: voteCounts.likes,
+    dislikes: voteCounts.dislikes,
+    userVote,
+    content: input.body,
+    isOp:
+      !!options?.postAuthorUsername &&
+      input.author.username === options.postAuthorUsername,
+    children: [],
+  };
+};
 
 // Normalizes flat lists and nested replies into a consistent tree structure
 export const buildCommentTree = (
