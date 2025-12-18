@@ -7,7 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { computed, ref, watch } from "vue";
 import { CommentThread } from "@/components/comments";
-import { fetchSolutionComments, createSolutionComment } from "@/api/solution";
+import {
+  fetchSolutionComments,
+  createSolutionComment,
+  recordSolutionView,
+} from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
 import { PostActions } from "@/components/post-actions";
 import "highlight.js/styles/atom-one-dark.css";
@@ -125,7 +129,20 @@ const handleCommentVote = async (
   }
 };
 
-watch(() => props.item.id, loadComments, { immediate: true });
+watch(
+  () => props.item.id,
+  async (newId) => {
+    loadComments();
+    if (newId && newId !== "follow-up") {
+      try {
+        await recordSolutionView(newId);
+      } catch (e) {
+        console.error("Failed to record view", e);
+      }
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

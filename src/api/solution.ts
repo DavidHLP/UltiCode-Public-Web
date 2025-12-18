@@ -68,3 +68,7 @@ export async function voteSolutionComment(
     },
   );
 }
+
+export async function recordSolutionView(solutionId: string) {
+  return apiPost(`/views/solution/${solutionId}`, { userId: "u-001" });
+}

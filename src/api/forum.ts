@@ -37,3 +37,7 @@ export async function createForumComment(
     parentId: parentId ?? null,
   });
 }
+
+export async function recordForumView(postId: string) {
+  return apiPost(`/views/forum/${postId}`, { userId: "u-001" });
+}

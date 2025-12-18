@@ -4,7 +4,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import ThreadContent from "@/views/forum/components/ThreadContent.vue";
 import { CommentThread } from "@/components/comments";
-import { fetchForumThread, createForumComment } from "@/api/forum";
+import {
+  fetchForumThread,
+  createForumComment,
+  recordForumView,
+} from "@/api/forum";
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
@@ -31,6 +35,11 @@ watch(
   () => route.params.postId as string,
   (postId) => {
     void loadThread(postId);
+    if (postId) {
+      recordForumView(postId).catch((e) =>
+        console.error("Failed to record view", e),
+      );
+    }
   },
   { immediate: true },
 );
