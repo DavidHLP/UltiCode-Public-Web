@@ -4,6 +4,7 @@ import SubmissionsListView from "./SubmissionsListView.vue";
 import SubmissionsDetail from "./SubmissionsDetail.vue";
 import type { SubmissionRecord } from "@/types/submission";
 import { fetchProblemSubmissions } from "@/api/submission";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const props = defineProps<{
   problemId: number;
@@ -20,15 +21,13 @@ const selectedSubmission = computed(
     ) ?? null,
 );
 
-// TODO: Get from store
-const CURRENT_USER_ID = "u-001";
-
 const loadSubmissions = async () => {
   isLoading.value = true;
   try {
+    const userId = fetchCurrentUserId();
     submissions.value = await fetchProblemSubmissions(
       props.problemId,
-      CURRENT_USER_ID,
+      userId || undefined,
     );
   } catch (error) {
     console.error("Failed to load submissions", error);

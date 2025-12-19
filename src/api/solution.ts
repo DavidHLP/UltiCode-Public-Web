@@ -39,23 +39,19 @@ export async function createSolutionComment(
   if (!userId) {
     throw new Error("User must be logged in to create comments");
   }
-
   return apiPost<ForumComment>(`/solutions/${solutionId}/comments`, {
     content,
     parentId,
-    userId,
   });
 }
 
 export async function voteSolution(
   solutionId: string,
-  userId: string,
   voteType: 1 | -1 | 0,
 ): Promise<{ likes: number; dislikes: number }> {
   return apiPost<{ likes: number; dislikes: number }>(
     `/solutions/${solutionId}/vote`,
     {
-      userId,
       voteType,
     },
   );
@@ -63,13 +59,11 @@ export async function voteSolution(
 
 export async function voteSolutionComment(
   commentId: string,
-  userId: string,
   voteType: 1 | -1 | 0,
 ): Promise<{ likes: number; dislikes: number }> {
   return apiPost<{ likes: number; dislikes: number }>(
     `/solutions/comments/${commentId}/vote`,
     {
-      userId,
       voteType,
     },
   );

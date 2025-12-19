@@ -19,14 +19,18 @@ import {
 import { onMounted, ref } from "vue";
 import { fetchUserSolutions, type SolutionFeedResponse } from "@/api/solution";
 import { RouterLink } from "vue-router";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 // Access the array type from the response type items or use any if hard to extract
 const solutions = ref<SolutionFeedResponse["items"]>([]);
 const loading = ref(true);
+const hasUser = ref(false);
 
 onMounted(async () => {
   try {
-    const userId = "u-001";
+    const userId = fetchCurrentUserId();
+    if (!userId) return;
+    hasUser.value = true;
     const response = await fetchUserSolutions(userId);
     solutions.value = response.items;
   } catch (e) {
@@ -48,6 +52,9 @@ onMounted(async () => {
 
     <div v-if="loading" class="text-center text-muted-foreground py-8">
       Loading solutions...
+    </div>
+    <div v-else-if="!hasUser" class="text-center text-muted-foreground py-8">
+      Please log in to view your solutions.
     </div>
     <div
       v-else-if="solutions.length > 0"

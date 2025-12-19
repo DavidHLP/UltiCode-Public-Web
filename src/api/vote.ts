@@ -16,18 +16,11 @@ export interface VoteResponse {
 export const vote = async (
   targetType: VoteTargetType,
   targetId: string,
-  userId: string,
   voteType: 1 | -1,
 ): Promise<VoteResponse> => {
-  return apiPost<VoteResponse>(
-    `/votes`,
-    {
-      targetType,
-      targetId,
-      voteType,
-    },
-    {
-      params: { userId },
-    },
-  );
+  return apiPost<VoteResponse>(`/votes`, {
+    targetType,
+    targetId,
+    voteType,
+  });
 };

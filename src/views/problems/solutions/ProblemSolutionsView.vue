@@ -4,6 +4,7 @@ import type { SolutionFeedItem } from "@/types/solution";
 import SolutionListView from "./SolutionListView.vue";
 import SolutionDetail from "./components/SolutionDetail.vue";
 import { fetchSolutionFeed } from "@/api/solution";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const props = defineProps<{
   problemId: number;
@@ -27,7 +28,8 @@ watch(
     }
     isLoading.value = true;
     try {
-      feed.value = await fetchSolutionFeed(id, "u-001");
+      const userId = fetchCurrentUserId();
+      feed.value = await fetchSolutionFeed(id, userId || undefined);
     } catch (error) {
       console.error("Failed to load solution feed", error);
       feed.value = null;

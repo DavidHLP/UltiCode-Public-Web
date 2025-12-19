@@ -16,6 +16,7 @@ import { vote, VoteTargetType } from "@/api/vote";
 import { PostActions } from "@/components/post-actions";
 import "highlight.js/styles/atom-one-dark.css";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -59,7 +60,8 @@ const loadComments = async () => {
     return;
   }
   try {
-    comments.value = await fetchSolutionComments(props.item.id, "u-001");
+    const userId = fetchCurrentUserId();
+    comments.value = await fetchSolutionComments(props.item.id, userId || undefined);
   } catch (error) {
     console.error("Failed to load comments", error);
     comments.value = [];
@@ -79,15 +81,7 @@ const handleCommentSubmit = async (content: string, parentId?: string) => {
 const handleSolutionVote = async (voteType: 1 | -1) => {
   try {
     if (!props.item.id || props.item.id === "follow-up") return;
-    // Optimistic update
-    // Note: Use a more complex logic if we want to toggle locally first.
-    // For now, let's just call API and update.
-    const res = await vote(
-      VoteTargetType.SOLUTION,
-      props.item.id,
-      "u-001",
-      voteType,
-    );
+    const res = await vote(VoteTargetType.SOLUTION, props.item.id, voteType);
     localStats.value = { likes: res.likes, dislikes: res.dislikes };
     userVote.value = res.userVote;
   } catch (error) {
@@ -103,7 +97,6 @@ const handleCommentVote = async (
     const res = await vote(
       VoteTargetType.SOLUTION_COMMENT,
       String(commentId),
-      "u-001",
       voteType,
     );
 

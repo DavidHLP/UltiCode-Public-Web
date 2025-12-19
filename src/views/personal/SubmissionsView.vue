@@ -21,13 +21,17 @@ import type { SubmissionRecord } from "@/types/submission";
 import { ListX } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 import { Button } from "@/components/ui/button";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const submissions = ref<SubmissionRecord[]>([]);
 const loading = ref(true);
+const hasUser = ref(false);
 
 onMounted(async () => {
   try {
-    const userId = "u-001"; // This would typically come from user session/auth
+    const userId = fetchCurrentUserId();
+    if (!userId) return;
+    hasUser.value = true;
     submissions.value = await fetchUserSubmissions(userId);
   } catch (e) {
     console.error("Failed to load submissions", e);
@@ -48,6 +52,9 @@ onMounted(async () => {
 
     <div v-if="loading" class="text-center text-muted-foreground py-8">
       Loading submissions...
+    </div>
+    <div v-else-if="!hasUser" class="text-center text-muted-foreground py-8">
+      Please log in to view your submissions.
     </div>
     <Card v-else-if="submissions.length > 0">
       <CardHeader>

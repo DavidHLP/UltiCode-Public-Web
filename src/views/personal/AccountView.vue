@@ -13,21 +13,33 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { fetchUserProfile, type UserProfile } from "@/api/user";
+import { fetchCurrentUserId } from "@/utils/auth";
+import { onMounted, ref } from "vue";
 
-const user = {
-  username: "shadcn",
-  email: "m@example.com",
-  bio: "Full-stack developer and UI/UX enthusiast.",
-  urls: {
-    website: "https://shadcn.com",
-    twitter: "https://twitter.com/shadcn",
-    github: "https://github.com/shadcn",
-  },
-};
+const loading = ref(true);
+const user = ref<UserProfile | null>(null);
+
+onMounted(async () => {
+  try {
+    const userId = fetchCurrentUserId();
+    if (!userId) return;
+    user.value = await fetchUserProfile(userId);
+  } catch (error) {
+    console.error("Failed to load user profile", error);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="space-y-6">
+    <div v-if="loading" class="text-muted-foreground">Loading account...</div>
+    <div v-else-if="!user" class="text-muted-foreground">
+      Please log in to manage your account.
+    </div>
+    <div v-else class="space-y-6">
     <div class="space-y-0.5">
       <h2 class="text-2xl font-bold tracking-tight">Account Settings</h2>
       <p class="text-muted-foreground">
@@ -54,7 +66,7 @@ const user = {
           <CardContent class="space-y-4">
             <div class="space-y-1">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" :defaultValue="user.username" />
+              <Input id="username" :defaultValue="user?.username" />
               <p class="text-[0.8rem] text-muted-foreground">
                 This is your public display name. It can be your real name or a
                 pseudonym.
@@ -62,7 +74,7 @@ const user = {
             </div>
             <div class="space-y-1">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" :defaultValue="user.email" />
+              <Input id="email" :defaultValue="user?.email" />
               <p class="text-[0.8rem] text-muted-foreground">
                 You can manage verified email addresses in your email settings.
               </p>
@@ -72,7 +84,7 @@ const user = {
               <textarea
                 class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 id="bio"
-                :value="user.bio"
+                :value="user?.bio"
               ></textarea>
               <p class="text-[0.8rem] text-muted-foreground">
                 You can @mention other users and organizations to link to them.
@@ -82,11 +94,11 @@ const user = {
               <Label>URLs</Label>
               <div class="space-y-2">
                 <Input
-                  :defaultValue="user.urls.website"
+                  :defaultValue="user?.website"
                   placeholder="https://example.com"
                 />
                 <Input
-                  :defaultValue="user.urls.twitter"
+                  :defaultValue="user?.twitter"
                   placeholder="https://twitter.com/..."
                 />
               </div>
@@ -177,5 +189,6 @@ const user = {
         </Card>
       </TabsContent>
     </Tabs>
+    </div>
   </div>
 </template>

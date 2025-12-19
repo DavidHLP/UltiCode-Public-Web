@@ -2,6 +2,7 @@
 import type { SidebarProps } from "@/components/ui/sidebar";
 import Calendars from "@/features/sider/Calendars.vue";
 import { fetchProblemLists } from "@/api/problem-list";
+import { fetchUserProfile } from "@/api/user";
 import NavUser from "@/features/sider/NavUser.vue";
 import SidebarNav from "@/features/sider/SidebarNav.vue";
 import {
@@ -13,6 +14,7 @@ import {
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import type { ProblemListGroup } from "@/types/problem-list";
+import { fetchCurrentUserId } from "@/utils/auth";
 import {
   Sidebar,
   SidebarContent,
@@ -25,14 +27,11 @@ import {
 const props = defineProps<SidebarProps>();
 const route = useRoute();
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-};
+const user = ref({
+  name: "Guest",
+  email: "guest@example.com",
+  avatar: "",
+});
 
 const problemLists = ref<ProblemListGroup[]>([]);
 
@@ -42,6 +41,19 @@ onMounted(async () => {
   } catch (error) {
     console.error("Failed to load problem lists", error);
     problemLists.value = [];
+  }
+
+  try {
+    const userId = fetchCurrentUserId();
+    if (!userId) return;
+    const profile = await fetchUserProfile(userId);
+    user.value = {
+      name: profile.name || profile.username,
+      email: profile.email || "",
+      avatar: profile.avatar || "",
+    };
+  } catch (error) {
+    console.error("Failed to load user profile", error);
   }
 });
 
@@ -64,9 +76,9 @@ const currentSidebarData = computed(() => {
 </script>
 
 <template>
-  <Sidebar v-bind="props">
+    <Sidebar v-bind="props">
     <SidebarHeader class="h-16 border-b border-sidebar-border">
-      <NavUser :user="data.user" />
+      <NavUser :user="user" />
     </SidebarHeader>
     <SidebarContent>
       <!-- Dynamic Sidebar Navigation -->

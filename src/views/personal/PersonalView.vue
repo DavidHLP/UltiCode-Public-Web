@@ -21,6 +21,7 @@ import ActivityHeatmap from "./components/ActivityHeatmap.vue";
 import { fetchUserProfile, type UserProfile } from "@/api/user";
 import { fetchUserSubmissions } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const loading = ref(true);
 const user = ref<UserProfile | null>(null);
@@ -82,8 +83,8 @@ const recentActivity = computed(() => {
 
 onMounted(async () => {
   try {
-    // Hardcoded user ID for now
-    const userId = "u-001";
+    const userId = fetchCurrentUserId();
+    if (!userId) return;
     const [userData, userSubmissions] = await Promise.all([
       fetchUserProfile(userId),
       fetchUserSubmissions(userId),
@@ -107,6 +108,9 @@ onMounted(async () => {
 <template>
   <div v-if="loading" class="flex h-96 items-center justify-center">
     <div class="text-muted-foreground">Loading profile...</div>
+  </div>
+  <div v-else-if="!user" class="flex h-96 items-center justify-center">
+    <div class="text-muted-foreground">Please log in to view your profile.</div>
   </div>
   <div
     v-else-if="user"

@@ -12,6 +12,7 @@ import {
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const route = useRoute();
 const thread = ref<ForumThread | null>(null);
@@ -21,8 +22,8 @@ async function loadThread(postId: string) {
   if (!postId) return;
   isLoading.value = true;
   try {
-    // TODO: Get real user ID from auth store
-    thread.value = await fetchForumThread(postId, "u-001");
+    const userId = fetchCurrentUserId();
+    thread.value = await fetchForumThread(postId, userId || undefined);
   } catch (error) {
     console.error("Failed to load forum thread", error);
     thread.value = null;
@@ -59,7 +60,6 @@ async function handleThreadVote(type: 1 | -1) {
     const res = await vote(
       VoteTargetType.FORUM_POST,
       thread.value.id,
-      "u-001",
       type,
     );
     if (thread.value.stats) {
@@ -85,7 +85,6 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
     const res = await vote(
       VoteTargetType.FORUM_COMMENT,
       String(commentId),
-      "u-001",
       type,
     );
 

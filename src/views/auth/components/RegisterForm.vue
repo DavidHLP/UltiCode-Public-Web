@@ -21,9 +21,9 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const username = ref("shadcn");
-const email = ref("m@example.com");
-const password = ref("password");
+const username = ref("");
+const email = ref("");
+const password = ref("");
 const loading = ref(false);
 
 async function handleSubmit(e: Event) {
@@ -67,7 +67,7 @@ function handleGithubLogin() {
           id="username"
           type="text"
           v-model="username"
-          placeholder="shadcn"
+          placeholder="Enter your username"
           required
         />
       </Field>
@@ -77,7 +77,7 @@ function handleGithubLogin() {
           id="email"
           type="email"
           v-model="email"
-          placeholder="m@example.com"
+          placeholder="you@example.com"
           required
         />
       </Field>
