@@ -4,11 +4,15 @@ import type { SubmissionRecord } from "@/types/submission";
 // Helper to map backend snake_case to frontend camelCase
 function mapSubmission(sub: unknown): SubmissionRecord {
   if (!sub || typeof sub !== "object") return sub as SubmissionRecord;
-  const s = sub as Record<string, any>;
+  const s = sub as Record<string, unknown>;
   return {
     ...s,
-    runtimePercentile: s.runtime_percentile ?? s.runtimePercentile,
-    memoryPercentile: s.memory_percentile ?? s.memoryPercentile,
+    runtimePercentile: (s.runtime_percentile ?? s.runtimePercentile) as
+      | number
+      | undefined,
+    memoryPercentile: (s.memory_percentile ?? s.memoryPercentile) as
+      | number
+      | undefined,
   } as SubmissionRecord;
 }
 
