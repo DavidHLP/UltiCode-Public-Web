@@ -66,4 +66,12 @@ export async function apiPost<T>(
   return service.post<T, T, unknown>(path, body, { ...init });
 }
 
+export async function apiPatch<T>(
+  path: string,
+  body?: unknown,
+  init?: AxiosRequestConfig,
+): Promise<T> {
+  return service.patch<T, T, unknown>(path, body, { ...init });
+}
+
 export default service;

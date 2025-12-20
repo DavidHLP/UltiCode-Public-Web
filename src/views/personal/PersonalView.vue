@@ -18,7 +18,12 @@ import {
 import { onMounted, ref, computed } from "vue";
 import { RouterLink } from "vue-router";
 import ActivityHeatmap from "./components/ActivityHeatmap.vue";
-import { fetchUserProfile, type UserProfile } from "@/api/user";
+import {
+  fetchUserProfile,
+  fetchUserStats,
+  type UserProfile,
+  type UserStats,
+} from "@/api/user";
 import { fetchUserSubmissions } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import { fetchCurrentUserId } from "@/utils/auth";
@@ -26,46 +31,43 @@ import { fetchCurrentUserId } from "@/utils/auth";
 const loading = ref(true);
 const user = ref<UserProfile | null>(null);
 const submissions = ref<SubmissionRecord[]>([]);
-const solvedCount = ref(0);
-const totalProblems = 2500; // Mock total for now
-const streak = ref(0); // Mock streak
+const statsData = ref<UserStats | null>(null);
 
 const stats = computed(() => {
-  if (!submissions.value.length)
+  if (!statsData.value)
     return {
       easy: {
         count: 0,
-        total: 600,
+        total: 0,
         color: "text-green-500",
         bg: "bg-green-500",
       },
       medium: {
         count: 0,
-        total: 1200,
+        total: 0,
         color: "text-yellow-500",
         bg: "bg-yellow-500",
       },
-      hard: { count: 0, total: 700, color: "text-red-500", bg: "bg-red-500" },
+      hard: { count: 0, total: 0, color: "text-red-500", bg: "bg-red-500" },
     };
 
-  // Basic mock distribution based on solved count
-  const total = solvedCount.value;
+  const { stats } = statsData.value;
   return {
     easy: {
-      count: Math.floor(total * 0.5),
-      total: 600,
+      count: stats.Easy.count,
+      total: stats.Easy.total,
       color: "text-green-500",
       bg: "bg-green-500",
     },
     medium: {
-      count: Math.floor(total * 0.4),
-      total: 1200,
+      count: stats.Medium.count,
+      total: stats.Medium.total,
       color: "text-yellow-500",
       bg: "bg-yellow-500",
     },
     hard: {
-      count: total - Math.floor(total * 0.5) - Math.floor(total * 0.4),
-      total: 700,
+      count: stats.Hard.count,
+      total: stats.Hard.total,
       color: "text-red-500",
       bg: "bg-red-500",
     },
@@ -85,18 +87,15 @@ onMounted(async () => {
   try {
     const userId = fetchCurrentUserId();
     if (!userId) return;
-    const [userData, userSubmissions] = await Promise.all([
+    const [userData, userSubmissions, userStats] = await Promise.all([
       fetchUserProfile(userId),
       fetchUserSubmissions(userId),
+      fetchUserStats(userId),
     ]);
 
     user.value = userData;
     submissions.value = userSubmissions;
-    solvedCount.value = userSubmissions.filter(
-      (s) => s.status === "Accepted",
-    ).length;
-    // Mock streak calculation
-    streak.value = Math.min(solvedCount.value, 15);
+    statsData.value = userStats;
   } catch (e) {
     console.error("Failed to load profile data", e);
   } finally {
@@ -226,9 +225,16 @@ onMounted(async () => {
             </CardHeader>
             <CardContent>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold">{{ solvedCount }}</span>
+                ><span class="text-2xl font-bold">{{
+                  statsData?.totalSolved || 0
+                }}</span>
                 <span class="text-xs text-muted-foreground"
-                  >/ {{ totalProblems }}</span
+                  >/
+                  {{
+                    (statsData?.stats?.Easy.total || 0) +
+                    (statsData?.stats?.Medium.total || 0) +
+                    (statsData?.stats?.Hard.total || 0)
+                  }}</span
                 >
               </div>
               <div
@@ -236,7 +242,15 @@ onMounted(async () => {
               >
                 <div
                   class="h-full bg-primary"
-                  :style="{ width: (solvedCount / totalProblems) * 100 + '%' }"
+                  :style="{
+                    width:
+                      ((statsData?.totalSolved || 0) /
+                        ((statsData?.stats?.Easy.total || 0) +
+                          (statsData?.stats?.Medium.total || 0) +
+                          (statsData?.stats?.Hard.total || 0) || 1)) *
+                        100 +
+                      '%',
+                  }"
                 ></div>
               </div>
             </CardContent>
@@ -249,7 +263,9 @@ onMounted(async () => {
             </CardHeader>
             <CardContent>
               <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold">{{ streak }}</span>
+                <span class="text-2xl font-bold">{{
+                  statsData?.streak || 0
+                }}</span>
                 <span class="text-xs text-muted-foreground">Days</span>
               </div>
               <div class="mt-2 flex gap-1">
@@ -258,7 +274,7 @@ onMounted(async () => {
                   v-for="i in 5"
                   :key="i"
                   class="h-2 w-2 rounded-sm bg-primary/20"
-                  :class="{ 'bg-primary': i <= streak }"
+                  :class="{ 'bg-primary': i <= (statsData?.streak || 0) % 5 }"
                 ></div>
               </div>
             </CardContent>
@@ -320,7 +336,7 @@ onMounted(async () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ActivityHeatmap />
+            <ActivityHeatmap :data="statsData?.heatmap" />
           </CardContent>
         </Card>
       </div>

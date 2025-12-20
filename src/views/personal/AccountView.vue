@@ -13,12 +13,32 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { fetchUserProfile, type UserProfile } from "@/api/user";
+import { toast } from "vue-sonner";
+import {
+  fetchUserProfile,
+  updateUserProfile,
+  type UserProfile,
+} from "@/api/user";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { onMounted, ref } from "vue";
 
 const loading = ref(true);
+const saving = ref(false);
 const user = ref<UserProfile | null>(null);
+
+const saveProfile = async () => {
+  if (!user.value) return;
+  saving.value = true;
+  try {
+    await updateUserProfile(user.value.id, user.value);
+    toast.success("Profile updated successfully");
+  } catch (error) {
+    console.error("Failed to update profile", error);
+    toast.error("Failed to update profile");
+  } finally {
+    saving.value = false;
+  }
+};
 
 onMounted(async () => {
   try {
@@ -66,7 +86,14 @@ onMounted(async () => {
             <CardContent class="space-y-4">
               <div class="space-y-1">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" :defaultValue="user?.username" />
+                <Input id="username" v-model="user.username" disabled />
+                <p class="text-[0.8rem] text-muted-foreground">
+                  Username cannot be changed.
+                </p>
+              </div>
+              <div class="space-y-1">
+                <Label htmlFor="name">Display Name</Label>
+                <Input id="name" v-model="user.name" />
                 <p class="text-[0.8rem] text-muted-foreground">
                   This is your public display name. It can be your real name or
                   a pseudonym.
@@ -74,10 +101,9 @@ onMounted(async () => {
               </div>
               <div class="space-y-1">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" :defaultValue="user?.email" />
+                <Input id="email" v-model="user.email" disabled />
                 <p class="text-[0.8rem] text-muted-foreground">
-                  You can manage verified email addresses in your email
-                  settings.
+                  Email cannot be changed currently.
                 </p>
               </div>
               <div class="space-y-1">
@@ -85,7 +111,7 @@ onMounted(async () => {
                 <textarea
                   class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   id="bio"
-                  :value="user?.bio"
+                  v-model="user.bio"
                 ></textarea>
                 <p class="text-[0.8rem] text-muted-foreground">
                   You can @mention other users and organizations to link to
@@ -93,15 +119,27 @@ onMounted(async () => {
                 </p>
               </div>
               <div class="space-y-1">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  v-model="user.location"
+                  placeholder="San Francisco, CA"
+                />
+              </div>
+              <div class="space-y-1">
                 <Label>URLs</Label>
                 <div class="space-y-2">
                   <Input
-                    :defaultValue="user?.website"
-                    placeholder="https://example.com"
+                    v-model="user.website"
+                    placeholder="Website (https://example.com)"
                   />
                   <Input
-                    :defaultValue="user?.twitter"
-                    placeholder="https://twitter.com/..."
+                    v-model="user.twitter"
+                    placeholder="Twitter Profile URL"
+                  />
+                  <Input
+                    v-model="user.github"
+                    placeholder="GitHub Profile URL"
                   />
                 </div>
                 <p class="text-[0.8rem] text-muted-foreground">
@@ -110,7 +148,10 @@ onMounted(async () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button>Save Changes</Button>
+              <Button @click="saveProfile" :disabled="saving">
+                <span v-if="saving">Saving...</span>
+                <span v-else>Save Changes</span>
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>

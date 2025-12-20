@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import {
   Tooltip,
   TooltipContent,
@@ -7,30 +8,48 @@ import {
 } from "@/components/ui/tooltip";
 
 // Generate mock data for the last 365 days
-const generateData = () => {
-  const data = [];
+const props = defineProps<{
+  data?: { date: string; level: number }[];
+}>();
+
+const activityData = computed(() => {
+  if (props.data && props.data.length > 0) {
+    // Fill in missing days for the last year with 0
+    const fullData: { date: string; level: number }[] = [];
+    const today = new Date();
+    // Start from 365 days ago
+    for (let i = 364; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      if (dateStr) {
+        const existing = props.data.find((item) => item.date === dateStr);
+        fullData.push({
+          date: dateStr,
+          level: existing ? existing.level : 0,
+        });
+      }
+    }
+    return fullData;
+  }
+
+  // Fallback if no data provided (e.g. loading or empty) - generate empty grid
+  const emptyData: { date: string; level: number }[] = [];
   const today = new Date();
   for (let i = 0; i < 365; i++) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    // Random activity level: 0 (none) to 4 (high)
-    // Skew towards 0 for realism
-    const rand = Math.random();
-    let level = 0;
-    if (rand > 0.9) level = 4;
-    else if (rand > 0.8) level = 3;
-    else if (rand > 0.7) level = 2;
-    else if (rand > 0.5) level = 1;
-
-    data.push({
-      date: date.toISOString().split("T")[0],
-      level,
-    });
+    const dateStr = date.toISOString().split("T")[0];
+    if (dateStr) {
+      emptyData.push({
+        date: dateStr,
+        level: 0,
+      });
+    }
   }
-  return data.reverse();
-};
 
-const activityData = generateData();
+  return emptyData.reverse();
+});
 
 const getColorClass = (level: number) => {
   switch (level) {
