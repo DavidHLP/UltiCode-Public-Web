@@ -139,6 +139,7 @@ import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { toast } from "vue-sonner";
 import { fetchSolutionTopics } from "@/api/topic";
 import { createSolution } from "@/api/solution";
 import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
@@ -201,7 +202,7 @@ onMounted(async () => {
       submissionToUse = await fetchSubmission(submissionId);
     } catch (error) {
       console.error("Failed to fetch submission", error);
-      alert("Failed to fetch submission.");
+      toast.error("Failed to fetch submission.");
       router.back();
       return;
     }
@@ -224,7 +225,9 @@ onMounted(async () => {
     if (submissionToUse.status !== "Accepted") {
       if (submissionId) {
         // Only strict check if user explicitly requested this submission via query param
-        alert("You must have an Accepted submission to create a solution.");
+        toast.error(
+          "You must have an Accepted submission to create a solution."
+        );
         router.push({
           name: "problem-detail",
           params: {
@@ -279,8 +282,8 @@ const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
   topicOptions.value.filter((topic) =>
-    selectedTopicIds.value.includes(topic.id),
-  ),
+    selectedTopicIds.value.includes(topic.id)
+  )
 );
 const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
@@ -305,7 +308,7 @@ const loadTopics = async () => {
 
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "Draft saved" : "Editing draft...",
+  isDraftSaved.value ? "Draft saved" : "Editing draft..."
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -320,7 +323,7 @@ watch([title, editorContent, selectedTopicIds], () => {
 const toggleTopic = (topicId: string) => {
   if (selectedTopicIds.value.includes(topicId)) {
     selectedTopicIds.value = selectedTopicIds.value.filter(
-      (item) => item !== topicId,
+      (item) => item !== topicId
     );
   } else {
     selectedTopicIds.value = [...selectedTopicIds.value, topicId];
@@ -329,17 +332,17 @@ const toggleTopic = (topicId: string) => {
 
 const removeTopic = (topicId: string) => {
   selectedTopicIds.value = selectedTopicIds.value.filter(
-    (item) => item !== topicId,
+    (item) => item !== topicId
   );
 };
 
 const handlePublish = async () => {
   if (!title.value.trim()) {
-    alert("Please enter a title");
+    toast.error("Please enter a title");
     return;
   }
   if (!editorContent.value.trim()) {
-    alert("Please enter some content");
+    toast.error("Please enter some content");
     return;
   }
 
@@ -366,7 +369,7 @@ const handlePublish = async () => {
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || message;
     }
-    alert(message);
+    toast.error(message);
     isDraftSaved.value = true;
   }
 };

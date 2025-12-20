@@ -4,6 +4,7 @@ import { useRouter, useRoute } from "vue-router";
 import type { SolutionFeedItem } from "@/types/solution";
 import type { SubmissionRecord } from "@/types/submission";
 import { fetchBestSubmission } from "@/api/submission";
+import { toast } from "vue-sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,7 +57,7 @@ const sortOptions = computed(() =>
     : [
         { label: "Most liked", value: "likes" },
         { label: "Most recent", value: "newest" },
-      ],
+      ]
 );
 
 const feedItems = computed<SolutionFeedItem[]>(() => props.items ?? []);
@@ -105,12 +106,12 @@ const sortedItems = computed(() => {
     case "newest":
       return items.sort(
         (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
     case "oldest":
       return items.sort(
         (a, b) =>
-          new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime(),
+          new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
       );
     default:
       return items;
@@ -130,7 +131,7 @@ const handleCreateSolution = () => {
       query: { submissionId: bestSubmission.value.id },
     });
   } else {
-    alert("You must have an accepted submission to create a solution.");
+    toast.error("You must have an accepted submission to create a solution.");
   }
 };
 
@@ -206,7 +207,7 @@ onMounted(async () => {
           </Badge>
           <Badge
             v-for="option in languageOptions.filter(
-              (opt) => opt.value !== 'all',
+              (opt) => opt.value !== 'all'
             )"
             :key="option.value"
             translate="no"

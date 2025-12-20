@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/collapsible";
 import ProblemTable from "./ProblemTable.vue";
 import { fetchProblems, fetchRandomProblem } from "@/api/problem";
+import { toast } from "vue-sonner";
 
 import type { ProblemExplorerProps } from "./type";
 
@@ -138,7 +139,7 @@ const popularTags = ref([
   "Sorting",
 ]);
 const otherTags = computed(() =>
-  allTags.value.filter((t) => !popularTags.value.includes(t)),
+  allTags.value.filter((t) => !popularTags.value.includes(t))
 );
 
 function toggleStatusSolved(checked: boolean) {
@@ -169,7 +170,7 @@ function togglePremiumPremium(checked: boolean) {
 function toggleFilter(
   targetArray: Ref<string[]>,
   item: string,
-  checked: boolean,
+  checked: boolean
 ) {
   const currentItems = targetArray.value;
   const isPresent = currentItems.includes(item);
@@ -218,11 +219,11 @@ async function pickOne() {
       // Navigate to problem detail page
       window.location.href = `/problem/${problem.slug}`;
     } else {
-      alert("No problems available.");
+      toast.error("No problems available.");
     }
   } catch (error) {
     console.error("Failed to fetch random problem", error);
-    alert("Failed to pick a random problem.");
+    toast.error("Failed to pick a random problem.");
   }
 }
 
@@ -373,7 +374,7 @@ function loadMore() {
                 @click="
                   () =>
                     toggleDifficultyMedium(
-                      !selectedDifficulty.includes('Medium'),
+                      !selectedDifficulty.includes('Medium')
                     )
                 "
               >
