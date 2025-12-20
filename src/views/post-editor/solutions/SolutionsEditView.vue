@@ -142,6 +142,7 @@ import axios from "axios";
 import { toast } from "vue-sonner";
 import { fetchSolutionTopics } from "@/api/topic";
 import { createSolution } from "@/api/solution";
+import { fetchProblemById } from "@/api/problem";
 import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import type { SolutionTopic } from "@/types/topic";
@@ -176,7 +177,7 @@ class Solution {
    public int[] twoSum(int[] nums, int target) {
        for (int i = 0; i < nums.length; i++) {
            for (int j = i + 1; j < nums.length; j++) {
-               if (nums[i] + nums[j] == target) { 
+               if (nums[i] + nums[j] == target) {
                    return new int[] { i, j };
                }
            }
@@ -191,6 +192,7 @@ const editorContent = ref<string>("");
 const dynamicTemplate = ref<string>(defaultTemplate);
 
 const resolvedProblemId = ref<string>(route.params.id as string);
+const resolvedProblemSlug = ref<string>("");
 
 onMounted(async () => {
   const submissionId = route.query.submissionId as string;
@@ -226,12 +228,14 @@ onMounted(async () => {
       if (submissionId) {
         // Only strict check if user explicitly requested this submission via query param
         toast.error(
-          "You must have an Accepted submission to create a solution."
+          "You must have an Accepted submission to create a solution.",
         );
         router.push({
           name: "problem-detail",
           params: {
-            id: submissionToUse.problem_id.toString(),
+            slug:
+              resolvedProblemSlug.value ||
+              submissionToUse.problem_id.toString(),
             tab: "solution",
           },
         });
@@ -271,6 +275,16 @@ ${code}
   editorContent.value = initialMd;
   dynamicTemplate.value = initialMd; // Keep this consistent just in case
 
+  // Fetch problem detail to get the slug now that we have a definitive resolvedProblemId
+  if (resolvedProblemId.value) {
+    try {
+      const problem = await fetchProblemById(resolvedProblemId.value);
+      resolvedProblemSlug.value = problem.slug;
+    } catch (error) {
+      console.error("Failed to fetch problem detail", error);
+    }
+  }
+
   loadTopics();
 });
 
@@ -282,8 +296,8 @@ const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
   topicOptions.value.filter((topic) =>
-    selectedTopicIds.value.includes(topic.id)
-  )
+    selectedTopicIds.value.includes(topic.id),
+  ),
 );
 const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
@@ -308,7 +322,7 @@ const loadTopics = async () => {
 
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "Draft saved" : "Editing draft..."
+  isDraftSaved.value ? "Draft saved" : "Editing draft...",
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -323,7 +337,7 @@ watch([title, editorContent, selectedTopicIds], () => {
 const toggleTopic = (topicId: string) => {
   if (selectedTopicIds.value.includes(topicId)) {
     selectedTopicIds.value = selectedTopicIds.value.filter(
-      (item) => item !== topicId
+      (item) => item !== topicId,
     );
   } else {
     selectedTopicIds.value = [...selectedTopicIds.value, topicId];
@@ -332,7 +346,7 @@ const toggleTopic = (topicId: string) => {
 
 const removeTopic = (topicId: string) => {
   selectedTopicIds.value = selectedTopicIds.value.filter(
-    (item) => item !== topicId
+    (item) => item !== topicId,
   );
 };
 
@@ -361,7 +375,10 @@ const handlePublish = async () => {
     // Redirect to problem detail page
     router.push({
       name: "problem-detail",
-      params: { id: resolvedProblemId.value, tab: "solution" },
+      params: {
+        slug: resolvedProblemSlug.value || resolvedProblemId.value,
+        tab: "solution",
+      },
     });
   } catch (error: unknown) {
     console.error("Failed to publish solution", error);
