@@ -56,7 +56,7 @@ const sortOptions = computed(() =>
     : [
         { label: "Most liked", value: "likes" },
         { label: "Most recent", value: "newest" },
-      ],
+      ]
 );
 
 const feedItems = computed<SolutionFeedItem[]>(() => props.items ?? []);
@@ -105,12 +105,12 @@ const sortedItems = computed(() => {
     case "newest":
       return items.sort(
         (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
     case "oldest":
       return items.sort(
         (a, b) =>
-          new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime(),
+          new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
       );
     default:
       return items;
@@ -130,8 +130,7 @@ const handleCreateSolution = () => {
       query: { submissionId: bestSubmission.value.id },
     });
   } else {
-    // Fallback or show toast
-    router.push({ name: "solution-create", params: { id: problemId } });
+    alert("You must have an accepted submission to create a solution.");
   }
 };
 
@@ -207,7 +206,7 @@ onMounted(async () => {
           </Badge>
           <Badge
             v-for="option in languageOptions.filter(
-              (opt) => opt.value !== 'all',
+              (opt) => opt.value !== 'all'
             )"
             :key="option.value"
             translate="no"
@@ -228,45 +227,36 @@ onMounted(async () => {
       <!-- 提交统计和操作栏 -->
       <div class="mx-3 mb-1.5 lc-md:mx-2 lc-md:mb-1">
         <div
-          v-if="bestSubmission"
           class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1"
         >
           <div class="flex items-center gap-1.5 flex-1 min-w-0">
-            <div
-              class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0"
-            >
-              <Plus
-                class="h-2.5 w-2.5 text-text-primary dark:text-text-primary"
-              />
-            </div>
-            <span class="text-[11px] leading-tight">
-              Your most recent submission ran for more than
-              <span class="font-semibold text-green-600 dark:text-green-400"
-                >{{ bestSubmission.runtimePercentile?.toFixed(1) ?? 0 }}%</span
+            <template v-if="bestSubmission">
+              <div
+                class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0"
               >
-              of users
-            </span>
+                <Plus
+                  class="h-2.5 w-2.5 text-text-primary dark:text-text-primary"
+                />
+              </div>
+              <span class="text-[11px] leading-tight">
+                Your most recent submission ran for more than
+                <span class="font-semibold text-green-600 dark:text-green-400"
+                  >{{
+                    bestSubmission.runtimePercentile?.toFixed(1) ?? 0
+                  }}%</span
+                >
+                of users
+              </span>
+            </template>
+            <template v-else>
+              <span class="text-[11px] leading-tight text-muted-foreground">
+                Solve the problem to write a solution
+              </span>
+            </template>
           </div>
           <button
             class="flex h-5 flex-shrink-0 items-center gap-0.5 rounded bg-green-600 px-2 py-0.5 text-[11px] font-medium text-white shadow-sm transition-all hover:bg-green-600/90 hover:shadow active:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50"
             @click="handleCreateSolution"
-          >
-            <PenLine class="h-2.5 w-2.5" />
-            Write Solution
-          </button>
-        </div>
-        <div
-          v-else
-          class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1"
-        >
-          <div class="flex items-center gap-1.5 flex-1 min-w-0">
-            <span class="text-[11px] leading-tight text-muted-foreground">
-              Solve the problem to write a solution
-            </span>
-          </div>
-          <button
-            class="flex h-5 flex-shrink-0 items-center gap-0.5 rounded bg-gray-400 px-2 py-0.5 text-[11px] font-medium text-white cursor-not-allowed opacity-70"
-            disabled
           >
             <PenLine class="h-2.5 w-2.5" />
             Write Solution

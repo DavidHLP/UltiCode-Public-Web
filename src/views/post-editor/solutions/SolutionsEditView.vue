@@ -138,7 +138,9 @@ import { useDebounceFn } from "@vueuse/core";
 import { SendHorizonal, Tag, X, ArrowLeft, Check } from "lucide-vue-next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 import { fetchSolutionTopics } from "@/api/topic";
+import { createSolution } from "@/api/solution";
 import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import type { SolutionTopic } from "@/types/topic";
@@ -149,6 +151,7 @@ import { MarkdownEdit, MarkdownView } from "@/components/markdown";
 const router = useRouter();
 const route = useRoute();
 
+const language = ref<string>("java");
 const title = ref("");
 
 // Default template content
@@ -237,6 +240,7 @@ onMounted(async () => {
 
       // Update template with submission code
       const lang = submissionToUse.language.toLowerCase();
+      language.value = lang;
       const code = submissionToUse.code;
       initialMd = `# Approach
 
@@ -275,8 +279,8 @@ const topicOptions = ref<SolutionTopic[]>([]);
 const selectedTopicIds = ref<string[]>([]);
 const selectedTopics = computed(() =>
   topicOptions.value.filter((topic) =>
-    selectedTopicIds.value.includes(topic.id),
-  ),
+    selectedTopicIds.value.includes(topic.id)
+  )
 );
 const showTopicPicker = ref<boolean>(false);
 const isLoadingTopics = ref(false);
@@ -301,7 +305,7 @@ const loadTopics = async () => {
 
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "Draft saved" : "Editing draft...",
+  isDraftSaved.value ? "Draft saved" : "Editing draft..."
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -316,7 +320,7 @@ watch([title, editorContent, selectedTopicIds], () => {
 const toggleTopic = (topicId: string) => {
   if (selectedTopicIds.value.includes(topicId)) {
     selectedTopicIds.value = selectedTopicIds.value.filter(
-      (item) => item !== topicId,
+      (item) => item !== topicId
     );
   } else {
     selectedTopicIds.value = [...selectedTopicIds.value, topicId];
@@ -325,25 +329,46 @@ const toggleTopic = (topicId: string) => {
 
 const removeTopic = (topicId: string) => {
   selectedTopicIds.value = selectedTopicIds.value.filter(
-    (item) => item !== topicId,
+    (item) => item !== topicId
   );
 };
 
-const handlePublish = () => {
-  isDraftSaved.value = true;
-  console.log("Publishing solution", {
-    title: title.value,
-    topics: selectedTopicIds.value,
-    topicLabels: selectedTopics.value.map((topic) => topic.name),
-    content: editorContent.value,
-    problemId: resolvedProblemId.value,
-  });
-  // 发布成功后返回题目详情页
-  router.push({
-    name: "problem-detail",
-    params: { id: resolvedProblemId.value },
-  });
-  // TODO: Add actual publish API call here
+const handlePublish = async () => {
+  if (!title.value.trim()) {
+    alert("Please enter a title");
+    return;
+  }
+  if (!editorContent.value.trim()) {
+    alert("Please enter some content");
+    return;
+  }
+
+  isDraftSaved.value = false;
+  try {
+    await createSolution(resolvedProblemId.value, {
+      title: title.value,
+      content: editorContent.value,
+      language: language.value,
+      tags: selectedTopicIds.value,
+    });
+
+    // Release draft saved status
+    isDraftSaved.value = true;
+
+    // Redirect to problem detail page
+    router.push({
+      name: "problem-detail",
+      params: { id: resolvedProblemId.value, tab: "solution" },
+    });
+  } catch (error: unknown) {
+    console.error("Failed to publish solution", error);
+    let message = "Failed to publish solution";
+    if (axios.isAxiosError(error)) {
+      message = error.response?.data?.message || message;
+    }
+    alert(message);
+    isDraftSaved.value = true;
+  }
 };
 
 const handleGoBack = () => {

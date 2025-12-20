@@ -4,6 +4,20 @@ import type { ForumComment } from "@/types/forum";
 import { fetchCurrentUserId } from "@/utils/auth";
 export type { SolutionFeedResponse };
 
+export interface CreateSolutionDto {
+  title: string;
+  content: string;
+  language: string;
+  tags?: string[];
+}
+
+export async function createSolution(
+  problemId: string,
+  data: CreateSolutionDto,
+): Promise<void> {
+  return apiPost<void>(`/problems/${problemId}/solutions`, data);
+}
+
 export async function fetchSolutionFeed(
   problemId: number,
   userId?: string,
