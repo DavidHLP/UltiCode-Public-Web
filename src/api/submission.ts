@@ -1,4 +1,4 @@
-import { apiGet } from "@/utils/request";
+import { apiGet, apiPost } from "@/utils/request";
 import type { SubmissionRecord } from "@/types/submission";
 
 // Helper to map backend snake_case to frontend camelCase
@@ -46,4 +46,15 @@ export async function fetchUserSubmissions(
 ): Promise<SubmissionRecord[]> {
   const data = await apiGet<unknown[]>(`/submissions?userId=${userId}`);
   return data.map(mapSubmission);
+}
+
+export async function createSubmission(
+  problemId: number,
+  data: { language: string; code: string },
+): Promise<SubmissionRecord> {
+  const response = await apiPost<unknown>(
+    `/problems/${problemId}/submissions`,
+    data,
+  );
+  return mapSubmission(response);
 }

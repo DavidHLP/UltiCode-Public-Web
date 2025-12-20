@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -16,9 +16,45 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import { inject } from "vue";
+import { inject, ref, watch, type Ref } from "vue";
+import { fetchAdjacentProblems, fetchRandomProblem } from "@/api/problem";
+import type { ProblemDetail } from "@/types/problem-detail";
 
 const toggleSidePanel = inject<() => void>("toggleSidePanel");
+const problemContext = inject<{ problem: Ref<ProblemDetail | null> }>(
+  "problemContext",
+);
+const router = useRouter();
+
+const adj = ref<{ prev: string | null; next: string | null }>({
+  prev: null,
+  next: null,
+});
+
+watch(
+  () => problemContext?.problem.value?.id,
+  async (id) => {
+    if (id) {
+      try {
+        adj.value = await fetchAdjacentProblems(Number(id));
+      } catch (e) {
+        console.error("Failed to fetch adjacent problems", e);
+      }
+    }
+  },
+  { immediate: true },
+);
+
+async function handleRandom() {
+  try {
+    const random = await fetchRandomProblem();
+    if (random && random.slug) {
+      router.push(`/problems/${random.slug}`);
+    }
+  } catch (e) {
+    console.error("Failed to fetch random problem", e);
+  }
+}
 </script>
 
 <template>
@@ -77,7 +113,6 @@ const toggleSidePanel = inject<() => void>("toggleSidePanel");
                 target="_blank"
                 class="flex-none cursor-pointer justify-center flex items-center h-6 w-6 focus:outline-none focus:ring-0 focus:ring-offset-0 rounded no-underline -translate-x-3 hover:bg-gray-300 hover:text-gray-900 transition-colors duration-200"
                 :to="{ name: 'problemset' }"
-                doc="Open problem set in new tab"
               >
                 <ExternalLink class="h-3 w-3 text-gray-600" />
               </RouterLink>
@@ -99,15 +134,16 @@ const toggleSidePanel = inject<() => void>("toggleSidePanel");
           variant="ghost"
           size="icon"
           class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          doc="Previous Problem"
-          as-child
+          :class="!adj.prev && 'opacity-50 pointer-events-none'"
         >
           <RouterLink
-            to="/problems/sparse-similarity-lcci"
-            active-class="bg-[#0000000a]"
+            v-if="adj.prev"
+            :to="`/problems/${adj.prev}`"
+            class="flex items-center justify-center w-full h-full"
           >
             <ChevronLeft class="h-4 w-4" />
           </RouterLink>
+          <ChevronLeft v-else class="h-4 w-4" />
         </Button>
       </HoverCardTrigger>
       <HoverCardContent class="h-auto w-auto p-2">
@@ -131,15 +167,16 @@ const toggleSidePanel = inject<() => void>("toggleSidePanel");
           variant="ghost"
           size="icon"
           class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          doc="Next Problem"
-          as-child
+          :class="!adj.next && 'opacity-50 pointer-events-none'"
         >
           <RouterLink
-            to="/problems/add-two-numbers"
-            active-class="bg-[#0000000a]"
+            v-if="adj.next"
+            :to="`/problems/${adj.next}`"
+            class="flex items-center justify-center w-full h-full"
           >
             <ChevronRight class="h-4 w-4" />
           </RouterLink>
+          <ChevronRight v-else class="h-4 w-4" />
         </Button>
       </HoverCardTrigger>
       <HoverCardContent class="h-auto w-auto p-2">
@@ -163,12 +200,9 @@ const toggleSidePanel = inject<() => void>("toggleSidePanel");
           variant="ghost"
           size="icon"
           class="flex-none cursor-pointer justify-center flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-          doc="Random Problem"
-          as-child
+          @click="handleRandom"
         >
-          <RouterLink to="/problems/random" active-class="bg-[#0000000a]">
-            <Shuffle class="h-4 w-4" />
-          </RouterLink>
+          <Shuffle class="h-4 w-4" />
         </Button>
       </HoverCardTrigger>
       <HoverCardContent class="h-auto w-auto p-2">

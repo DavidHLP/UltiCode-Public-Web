@@ -37,13 +37,20 @@ import TestCaseView from "./test/TestCaseView.vue";
 import TestResultsView from "./test/TestResultsView.vue";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import ProblemListDrawer from "@/components/problem/ProblemListDrawer.vue";
+import ProblemNotesDrawer from "@/components/problem/ProblemNotesDrawer.vue";
 
 const isSidePanelOpen = ref(false);
 const toggleSidePanel = () => {
   isSidePanelOpen.value = !isSidePanelOpen.value;
 };
 
+const isNotesOpen = ref(false);
+const toggleNotes = () => {
+  isNotesOpen.value = !isNotesOpen.value;
+};
+
 provide("toggleSidePanel", toggleSidePanel);
+provide("toggleNotes", toggleNotes);
 
 // --- Data Fetching ---
 const route = useRoute();
@@ -601,6 +608,16 @@ onMounted(() => {
         <ProblemListDrawer
           :current-problem-id="problem?.id"
           @close="isSidePanelOpen = false"
+        />
+      </SheetContent>
+    </Sheet>
+
+    <Sheet :open="isNotesOpen" @update:open="isNotesOpen = $event">
+      <SheetContent side="right" class="p-0 w-[400px] sm:w-[500px]">
+        <ProblemNotesDrawer
+          v-if="problem"
+          :problem-id="Number(problem.id)"
+          @close="isNotesOpen = false"
         />
       </SheetContent>
     </Sheet>

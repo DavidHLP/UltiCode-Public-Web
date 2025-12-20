@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { onBeforeUnmount, ref } from "vue";
+import { onBeforeUnmount, ref, inject, type Ref } from "vue";
 import { Play, CloudUpload, StickyNote } from "lucide-vue-next";
 import {
   HoverCard,
@@ -11,11 +11,19 @@ import {
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useBottomPanelStore } from "../test/test";
 import { useHeaderStore } from "@/stores/headerStore";
+import { createSubmission } from "@/api/submission";
+import type { ProblemDetail } from "@/types/problem-detail";
+import { toast } from "vue-sonner";
 
 const { requestRun } = useBottomPanelStore();
 const headerStore = useHeaderStore();
+const problemContext = inject<{ problem: Ref<ProblemDetail | null> }>(
+  "problemContext",
+);
+const toggleNotes = inject<() => void>("toggleNotes");
 
 const isRunning = ref(false);
+const isSubmitting = ref(false);
 const runPulseKey = ref(0);
 const runTimer = ref<ReturnType<typeof setTimeout> | null>(null);
 
@@ -32,6 +40,29 @@ const handleRun = () => {
     isRunning.value = false;
   }, 1200);
 };
+
+async function handleSubmit() {
+  const prob = problemContext?.problem.value;
+  if (!prob) return;
+
+  // For now, we mock the code since the editor logic is complex and handled elsewhere
+  isSubmitting.value = true;
+  try {
+    const res = await createSubmission(prob.id, {
+      language: "typescript",
+      code: "// Mock code submission\nconsole.log('Hello World');",
+    });
+    toast.success(`Submission ${res.status}!`);
+    // Navigate to submissions tab
+    headerStore.setActiveGroup("problem-info");
+    headerStore.setActiveHeader("problem-info", 4);
+  } catch (e) {
+    toast.error("Submission failed");
+    console.error(e);
+  } finally {
+    isSubmitting.value = false;
+  }
+}
 
 onBeforeUnmount(() => {
   if (runTimer.value) {
@@ -91,20 +122,25 @@ onBeforeUnmount(() => {
           class="h-7 w-px flex-none bg-gray-200"
         />
 
-        <!-- Submit button using navigation layout style -->
+        <!-- Submit button -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
             <Button
               variant="ghost"
               aria-label="Submit"
-              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-gray-200 text-gray-60 px-2 bg-gray-200"
+              :disabled="isSubmitting"
+              class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-gray-200 text-gray-60 px-2 bg-gray-200 disabled:opacity-50"
+              @click="handleSubmit"
             >
-              <CloudUpload class="h-4 w-4" />
+              <CloudUpload
+                class="h-4 w-4"
+                :class="isSubmitting && 'animate-bounce'"
+              />
               <div class="relative flex items-center gap-1 overflow-hidden">
                 <div
                   class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
                 >
-                  Submit
+                  {{ isSubmitting ? "Submitting..." : "Submit" }}
                 </div>
               </div>
             </Button>
@@ -121,7 +157,7 @@ onBeforeUnmount(() => {
           </HoverCardContent>
         </HoverCard>
 
-        <!-- Notes button with HoverCard -->
+        <!-- Notes button -->
         <HoverCard :open-delay="200">
           <HoverCardTrigger as-child>
             <Button
@@ -129,6 +165,7 @@ onBeforeUnmount(() => {
               size="icon"
               aria-label="Notes"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-200"
+              @click="toggleNotes"
             >
               <StickyNote class="h-4 w-4" />
             </Button>

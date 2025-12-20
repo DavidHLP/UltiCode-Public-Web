@@ -9,6 +9,10 @@ import {
   ThumbsUp,
   ThumbsDown,
   Bookmark,
+  FileCode,
+  History,
+  Settings,
+  LogOut,
 } from "lucide-vue-next";
 import {
   DropdownMenu,
@@ -16,13 +20,23 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import type {
   ProblemDetail,
   ProblemInteractionCounts,
-  ProblemInteractionSnapshot,
   ProblemReactionType,
 } from "@/types/problem-detail";
+import {
+  toggleFavorite as apiToggleFavorite,
+  toggleVote,
+  FavoriteTargetType,
+  VoteTargetType,
+} from "@/api/interaction";
+import { RouterLink } from "vue-router";
 
 interface Props {
   currentLayout: "leet" | "classic" | "compact" | "wide";
@@ -40,9 +54,10 @@ const interactionCounts = ref<ProblemInteractionCounts>({
   favorites: 0,
 });
 
-const viewerInteraction = ref<
-  NonNullable<ProblemInteractionSnapshot["viewer"]>
->({
+const viewerInteraction = ref<{
+  reaction: ProblemReactionType | undefined;
+  isFavorite: boolean;
+}>({
   reaction: undefined,
   isFavorite: false,
 });
@@ -52,9 +67,10 @@ watch(
   (interactions) => {
     if (!interactions) return;
     interactionCounts.value = { ...interactions.counts };
-    viewerInteraction.value = interactions.viewer
-      ? { ...interactions.viewer }
-      : { reaction: undefined, isFavorite: false };
+    viewerInteraction.value = {
+      reaction: interactions.viewer?.reaction,
+      isFavorite: !!interactions.viewer?.isFavorite,
+    };
   },
   { immediate: true, deep: true },
 );
@@ -66,41 +82,40 @@ const isDisliked = computed(
 );
 const isFavorited = computed(() => viewerInteraction.value.isFavorite);
 
-const adjustReactionCount = (reaction: ProblemReactionType, delta: number) => {
-  if (reaction === "like") {
-    interactionCounts.value.likes = Math.max(
-      0,
-      interactionCounts.value.likes + delta,
+const toggleReaction = async (reaction: "like" | "dislike") => {
+  if (!props.problem) return;
+  const voteType = reaction === "like" ? 1 : -1;
+  try {
+    const res = await toggleVote(
+      VoteTargetType.PROBLEM,
+      props.problem.id.toString(),
+      voteType,
     );
-  } else if (reaction === "dislike") {
-    interactionCounts.value.dislikes = Math.max(
-      0,
-      interactionCounts.value.dislikes + delta,
-    );
+    interactionCounts.value.likes = res.likes;
+    interactionCounts.value.dislikes = res.dislikes;
+    viewerInteraction.value.reaction =
+      res.userVote === 1 ? "like" : res.userVote === -1 ? "dislike" : undefined;
+  } catch (e) {
+    console.error("Failed to toggle reaction", e);
   }
 };
 
-const toggleReaction = (reaction: ProblemReactionType) => {
-  if (!reaction) return;
-  const previous = viewerInteraction.value.reaction;
-  if (previous === reaction) {
-    adjustReactionCount(reaction, -1);
-    viewerInteraction.value.reaction = undefined;
-    return;
+const toggleFavorite = async () => {
+  if (!props.problem) return;
+  try {
+    const res = await apiToggleFavorite(
+      FavoriteTargetType.PROBLEM,
+      props.problem.id.toString(),
+    );
+    viewerInteraction.value.isFavorite = res.isFavorited;
+    if (res.isFavorited) {
+      interactionCounts.value.favorites++;
+    } else {
+      interactionCounts.value.favorites--;
+    }
+  } catch (e) {
+    console.error("Failed to toggle favorite", e);
   }
-
-  if (previous) adjustReactionCount(previous, -1);
-  viewerInteraction.value.reaction = reaction;
-  adjustReactionCount(reaction, 1);
-};
-
-const toggleFavorite = () => {
-  const next = !viewerInteraction.value.isFavorite;
-  viewerInteraction.value.isFavorite = next;
-  interactionCounts.value.favorites = Math.max(
-    0,
-    interactionCounts.value.favorites + (next ? 1 : -1),
-  );
 };
 
 // Layout options
@@ -210,7 +225,7 @@ const selectedLayout = computed({
               <DropdownMenuRadioGroup
                 :model-value="selectedLayout"
                 @update:model-value="
-                  (value) =>
+                  (value: string) =>
                     emit(
                       'layout-change',
                       value as 'leet' | 'classic' | 'compact' | 'wide',
@@ -323,15 +338,55 @@ const selectedLayout = computed({
           class="h-7 w-px flex-none bg-gray-200"
         />
 
-        <!-- User button -->
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="User"
-          class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
-        >
-          <User class="h-4 w-4" />
-        </Button>
+        <!-- User button with Dropdown -->
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="User"
+              class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
+            >
+              <User class="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent class="w-56" align="end">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <RouterLink to="/personal">
+                <DropdownMenuItem class="cursor-pointer">
+                  <User class="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+              </RouterLink>
+              <RouterLink to="/personal/solutions">
+                <DropdownMenuItem class="cursor-pointer">
+                  <FileCode class="mr-2 h-4 w-4" />
+                  <span>Solutions</span>
+                </DropdownMenuItem>
+              </RouterLink>
+              <RouterLink to="/personal/submissions">
+                <DropdownMenuItem class="cursor-pointer">
+                  <History class="mr-2 h-4 w-4" />
+                  <span>Submissions</span>
+                </DropdownMenuItem>
+              </RouterLink>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <RouterLink to="/personal/account">
+              <DropdownMenuItem class="cursor-pointer">
+                <Settings class="mr-2 h-4 w-4" />
+                <span>Account Settings</span>
+              </DropdownMenuItem>
+            </RouterLink>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem class="text-rose-600 cursor-pointer">
+              <LogOut class="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   </div>
