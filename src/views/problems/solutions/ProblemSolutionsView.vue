@@ -37,7 +37,7 @@ watch(
       isLoading.value = false;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 const fallbackSolution = computed<SolutionFeedItem>(() => ({
   id: "follow-up",
