@@ -37,7 +37,7 @@ watch(
       isLoading.value = false;
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 const fallbackSolution = computed<SolutionFeedItem>(() => ({
   id: "follow-up",
@@ -101,6 +101,7 @@ const resetSelectedSolution = () => {
     </div>
     <SolutionListView
       v-else
+      :problem-id="props.problemId"
       :items="feed?.items ?? []"
       :follow-up="props.followUp"
       :sort-options="feed?.sortOptions ?? []"

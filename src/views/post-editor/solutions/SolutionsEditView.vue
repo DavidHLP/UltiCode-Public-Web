@@ -191,6 +191,7 @@ const resolvedProblemId = ref<string>(route.params.id as string);
 onMounted(async () => {
   const submissionId = route.query.submissionId as string;
   let submissionToUse: SubmissionRecord | null = null;
+  let initialMd = defaultTemplate;
 
   if (submissionId) {
     try {
@@ -204,7 +205,12 @@ onMounted(async () => {
   } else {
     // Try to fetch best submission
     try {
-      submissionToUse = await fetchBestSubmission(resolvedProblemId.value);
+      // If we don't have a submissionId from query, we try to find the user's best accepted submission
+      // for this problem to pre-fill the editor.
+      const best = await fetchBestSubmission(resolvedProblemId.value);
+      if (best && best.status === "Accepted") {
+        submissionToUse = best;
+      }
     } catch (error) {
       // It's okay if no best submission found, just continue with empty template
       console.log("No best submission found or failed to fetch", error);
@@ -214,7 +220,7 @@ onMounted(async () => {
   if (submissionToUse) {
     if (submissionToUse.status !== "Accepted") {
       if (submissionId) {
-        // Only strict check if user explicitly requested this submission
+        // Only strict check if user explicitly requested this submission via query param
         alert("You must have an Accepted submission to create a solution.");
         router.push({
           name: "problem-detail",
@@ -225,14 +231,14 @@ onMounted(async () => {
         });
         return;
       }
-      // If auto-fetched best submission is somehow not accepted (shouldn't happen with findBest), ignore it
+      // If auto-fetched best submission is somehow not accepted (shouldn't happen with logic above), ignore it
     } else {
       resolvedProblemId.value = submissionToUse.problem_id.toString();
 
-      // Update dynamic template with submission code
+      // Update template with submission code
       const lang = submissionToUse.language.toLowerCase();
       const code = submissionToUse.code;
-      dynamicTemplate.value = `# Approach
+      initialMd = `# Approach
 
 > What method do you use to solve this problem?
 
@@ -251,10 +257,12 @@ onMounted(async () => {
 ${code}
 \`\`\`
 `;
-      // Force update the editor content
-      editorContent.value = dynamicTemplate.value;
     }
   }
+
+  // Set the content once we've decided what it should be
+  editorContent.value = initialMd;
+  dynamicTemplate.value = initialMd; // Keep this consistent just in case
 
   loadTopics();
 });

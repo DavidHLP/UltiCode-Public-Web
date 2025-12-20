@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/empty";
 
 const props = defineProps<{
+  problemId?: number;
   items: SolutionFeedItem[];
   followUp: string;
   sortOptions: Array<{ label: string; value: string }>;
@@ -55,7 +56,7 @@ const sortOptions = computed(() =>
     : [
         { label: "Most liked", value: "likes" },
         { label: "Most recent", value: "newest" },
-      ],
+      ]
 );
 
 const feedItems = computed<SolutionFeedItem[]>(() => props.items ?? []);
@@ -104,12 +105,12 @@ const sortedItems = computed(() => {
     case "newest":
       return items.sort(
         (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
       );
     case "oldest":
       return items.sort(
         (a, b) =>
-          new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime(),
+          new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
       );
     default:
       return items;
@@ -121,7 +122,7 @@ const handleSelect = (item: SolutionFeedItem) => {
 };
 
 const handleCreateSolution = () => {
-  const problemId = route.params.id || "1";
+  const problemId = props.problemId?.toString() || route.params.id || "1";
   if (bestSubmission.value) {
     router.push({
       name: "solution-create",
@@ -135,7 +136,7 @@ const handleCreateSolution = () => {
 };
 
 onMounted(async () => {
-  const problemId = route.params.id as string;
+  const problemId = props.problemId?.toString() || (route.params.id as string);
   if (problemId) {
     try {
       bestSubmission.value = await fetchBestSubmission(problemId);
@@ -206,7 +207,7 @@ onMounted(async () => {
           </Badge>
           <Badge
             v-for="option in languageOptions.filter(
-              (opt) => opt.value !== 'all',
+              (opt) => opt.value !== 'all'
             )"
             :key="option.value"
             translate="no"
@@ -239,7 +240,7 @@ onMounted(async () => {
               />
             </div>
             <span class="text-[11px] leading-tight">
-              Your best submission beats
+              Your most recent submission ran for more than
               <span class="font-semibold text-green-600 dark:text-green-400"
                 >{{ bestSubmission.runtimePercentile?.toFixed(1) ?? 0 }}%</span
               >

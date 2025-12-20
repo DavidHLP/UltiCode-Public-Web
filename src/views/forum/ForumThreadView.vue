@@ -57,11 +57,7 @@ import { vote, VoteTargetType } from "@/api/vote";
 async function handleThreadVote(type: 1 | -1) {
   if (!thread.value) return;
   try {
-    const res = await vote(
-      VoteTargetType.FORUM_POST,
-      thread.value.id,
-      type,
-    );
+    const res = await vote(VoteTargetType.FORUM_POST, thread.value.id, type);
     if (thread.value.stats) {
       thread.value.stats.score = (res.likes || 0) - (res.dislikes || 0);
       thread.value.stats.likes = res.likes;

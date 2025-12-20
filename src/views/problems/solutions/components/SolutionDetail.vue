@@ -61,7 +61,10 @@ const loadComments = async () => {
   }
   try {
     const userId = fetchCurrentUserId();
-    comments.value = await fetchSolutionComments(props.item.id, userId || undefined);
+    comments.value = await fetchSolutionComments(
+      props.item.id,
+      userId || undefined,
+    );
   } catch (error) {
     console.error("Failed to load comments", error);
     comments.value = [];

@@ -1,30 +1,45 @@
 import { apiGet } from "@/utils/request";
 import type { SubmissionRecord } from "@/types/submission";
 
+// Helper to map backend snake_case to frontend camelCase
+function mapSubmission(sub: unknown): SubmissionRecord {
+  if (!sub || typeof sub !== "object") return sub as SubmissionRecord;
+  const s = sub as Record<string, any>;
+  return {
+    ...s,
+    runtimePercentile: s.runtime_percentile ?? s.runtimePercentile,
+    memoryPercentile: s.memory_percentile ?? s.memoryPercentile,
+  } as SubmissionRecord;
+}
+
 export async function fetchProblemSubmissions(
   problemId: number,
   userId?: string,
 ): Promise<SubmissionRecord[]> {
   const query = userId ? `?userId=${userId}` : "";
-  return apiGet<SubmissionRecord[]>(
+  const data = await apiGet<unknown[]>(
     `/problems/${problemId}/submissions${query}`,
   );
+  return data.map(mapSubmission);
 }
 
 export async function fetchSubmission(
   submissionId: string,
 ): Promise<SubmissionRecord> {
-  return apiGet<SubmissionRecord>(`/submissions/${submissionId}`);
+  const data = await apiGet<unknown>(`/submissions/${submissionId}`);
+  return mapSubmission(data);
 }
 
 export async function fetchBestSubmission(
   problemId: string,
 ): Promise<SubmissionRecord> {
-  return apiGet<SubmissionRecord>(`/problems/${problemId}/submissions/best`);
+  const data = await apiGet<unknown>(`/problems/${problemId}/submissions/best`);
+  return mapSubmission(data);
 }
 
 export async function fetchUserSubmissions(
   userId: string,
 ): Promise<SubmissionRecord[]> {
-  return apiGet<SubmissionRecord[]>(`/submissions?userId=${userId}`);
+  const data = await apiGet<unknown[]>(`/submissions?userId=${userId}`);
+  return data.map(mapSubmission);
 }
