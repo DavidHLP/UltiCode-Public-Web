@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-vue-next";
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  LogOut,
+  User,
+  History,
+  FileCode,
+} from "lucide-vue-next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -91,8 +99,26 @@ async function handleLogout() {
           <DropdownMenuGroup>
             <RouterLink to="/personal">
               <DropdownMenuItem>
+                <User />
+                Profile
+              </DropdownMenuItem>
+            </RouterLink>
+            <RouterLink to="/personal/account">
+              <DropdownMenuItem>
                 <BadgeCheck />
                 Account
+              </DropdownMenuItem>
+            </RouterLink>
+            <RouterLink to="/personal/submissions">
+              <DropdownMenuItem>
+                <History />
+                Submissions
+              </DropdownMenuItem>
+            </RouterLink>
+            <RouterLink to="/personal/solutions">
+              <DropdownMenuItem>
+                <FileCode />
+                Solutions
               </DropdownMenuItem>
             </RouterLink>
             <DropdownMenuItem>
