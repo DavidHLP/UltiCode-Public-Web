@@ -1,5 +1,5 @@
-import { apiGet, apiPost } from "@/utils/request";
-import type { SolutionFeedResponse } from "@/types/solution";
+import { apiGet, apiPost, apiPatch, apiDelete } from "@/utils/request";
+import type { SolutionFeedResponse, SolutionFeedItem } from "@/types/solution";
 import type { ForumComment } from "@/types/forum";
 import { fetchCurrentUserId } from "@/utils/auth";
 export type { SolutionFeedResponse };
@@ -16,6 +16,23 @@ export async function createSolution(
   data: CreateSolutionDto,
 ): Promise<void> {
   return apiPost<void>(`/problems/${problemId}/solutions`, data);
+}
+
+export async function updateSolution(
+  solutionId: string,
+  data: CreateSolutionDto,
+): Promise<void> {
+  return apiPatch<void>(`/solutions/${solutionId}`, data);
+}
+
+export async function deleteSolution(solutionId: string): Promise<void> {
+  return apiDelete<void>(`/solutions/${solutionId}`);
+}
+
+export async function fetchSolution(
+  solutionId: string,
+): Promise<SolutionFeedItem> {
+  return apiGet<SolutionFeedItem>(`/solutions/${solutionId}`);
 }
 
 export async function fetchSolutionFeed(

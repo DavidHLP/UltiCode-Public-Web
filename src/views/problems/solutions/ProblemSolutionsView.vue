@@ -41,6 +41,7 @@ watch(
 );
 const fallbackSolution = computed<SolutionFeedItem>(() => ({
   id: "follow-up",
+  problem_id: props.problemId.toString(),
   title: "Follow-up Insight",
   summary: props.followUp,
   highlight: "Follow-up discussion",

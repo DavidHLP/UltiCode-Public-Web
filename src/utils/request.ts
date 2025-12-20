@@ -74,4 +74,11 @@ export async function apiPatch<T>(
   return service.patch<T, T, unknown>(path, body, { ...init });
 }
 
+export async function apiDelete<T>(
+  path: string,
+  init?: AxiosRequestConfig,
+): Promise<T> {
+  return service.delete<T, T>(path, { ...init });
+}
+
 export default service;

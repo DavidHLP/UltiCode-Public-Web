@@ -70,6 +70,13 @@ const solutionCreateFromSubmissionRoute: RouteRecordRaw = {
     import("@/views/post-editor/solutions/SolutionsEditView.vue"),
 };
 
+const solutionEditRoute: RouteRecordRaw = {
+  path: "/solutions/:id/edit",
+  name: "solution-edit",
+  component: () =>
+    import("@/views/post-editor/solutions/SolutionsEditView.vue"),
+};
+
 const personalRoutes: RouteRecordRaw = {
   path: "/personal",
   component: () => import("@/features/sider/AppLayout.vue"),
@@ -107,6 +114,7 @@ const router = createRouter({
     problemDetailRoute,
     solutionCreateRoute,
     solutionCreateFromSubmissionRoute,
+    solutionEditRoute,
     {
       path: "/login",
       name: "login",

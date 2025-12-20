@@ -12,7 +12,7 @@
       </span>
       <Button size="sm" class="ml-4 gap-2" @click="handlePublish">
         <SendHorizonal class="h-4 w-4" />
-        Publish Solution
+        {{ isEditMode ? "Update Solution" : "Publish Solution" }}
       </Button>
     </header>
 
@@ -141,7 +141,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { toast } from "vue-sonner";
 import { fetchSolutionTopics } from "@/api/topic";
-import { createSolution } from "@/api/solution";
+import { createSolution, fetchSolution, updateSolution } from "@/api/solution";
 import { fetchProblemById } from "@/api/problem";
 import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
@@ -191,10 +191,50 @@ class Solution {
 const editorContent = ref<string>("");
 const dynamicTemplate = ref<string>(defaultTemplate);
 
-const resolvedProblemId = ref<string>(route.params.id as string);
+const resolvedProblemId = ref<string>("");
 const resolvedProblemSlug = ref<string>("");
+const isEditMode = ref(false);
+const solutionId = ref<string>("");
 
 onMounted(async () => {
+  if (route.name === "solution-edit" && route.params.id) {
+    isEditMode.value = true;
+    solutionId.value = route.params.id as string;
+    await loadSolution(solutionId.value);
+  } else {
+    // Creation flow
+    resolvedProblemId.value = route.params.id as string; // might be in route params if coming from /problem/:id/solution/create
+    await initCreationFlow();
+  }
+
+  loadTopics();
+});
+
+const loadSolution = async (id: string) => {
+  try {
+    const solution = await fetchSolution(id);
+    title.value = solution.title;
+    editorContent.value = solution.content;
+    dynamicTemplate.value = solution.content; // Pre-fill editor
+    language.value = solution.language;
+    if (solution.tags) {
+      selectedTopicIds.value = solution.tags;
+    }
+    resolvedProblemId.value = solution.problem_id.toString();
+
+    // Fetch problem slug
+    if (resolvedProblemId.value) {
+      const problem = await fetchProblemById(resolvedProblemId.value);
+      resolvedProblemSlug.value = problem.slug;
+    }
+  } catch (error) {
+    console.error("Failed to load solution", error);
+    toast.error("Failed to load solution");
+    router.back();
+  }
+};
+
+const initCreationFlow = async () => {
   const submissionId = route.query.submissionId as string;
   let submissionToUse: SubmissionRecord | null = null;
   let initialMd = defaultTemplate;
@@ -208,17 +248,14 @@ onMounted(async () => {
       router.back();
       return;
     }
-  } else {
-    // Try to fetch best submission
+  } else if (resolvedProblemId.value) {
+    // Try to fetch best submission only if we have a problem ID
     try {
-      // If we don't have a submissionId from query, we try to find the user's best accepted submission
-      // for this problem to pre-fill the editor.
       const best = await fetchBestSubmission(resolvedProblemId.value);
       if (best && best.status === "Accepted") {
         submissionToUse = best;
       }
     } catch (error) {
-      // It's okay if no best submission found, just continue with empty template
       console.log("No best submission found or failed to fetch", error);
     }
   }
@@ -226,7 +263,6 @@ onMounted(async () => {
   if (submissionToUse) {
     if (submissionToUse.status !== "Accepted") {
       if (submissionId) {
-        // Only strict check if user explicitly requested this submission via query param
         toast.error(
           "You must have an Accepted submission to create a solution.",
         );
@@ -241,11 +277,11 @@ onMounted(async () => {
         });
         return;
       }
-      // If auto-fetched best submission is somehow not accepted (shouldn't happen with logic above), ignore it
     } else {
-      resolvedProblemId.value = submissionToUse.problem_id.toString();
+      if (!resolvedProblemId.value) {
+        resolvedProblemId.value = submissionToUse.problem_id.toString();
+      }
 
-      // Update template with submission code
       const lang = submissionToUse.language.toLowerCase();
       language.value = lang;
       const code = submissionToUse.code;
@@ -271,11 +307,9 @@ ${code}
     }
   }
 
-  // Set the content once we've decided what it should be
   editorContent.value = initialMd;
-  dynamicTemplate.value = initialMd; // Keep this consistent just in case
+  dynamicTemplate.value = initialMd;
 
-  // Fetch problem detail to get the slug now that we have a definitive resolvedProblemId
   if (resolvedProblemId.value) {
     try {
       const problem = await fetchProblemById(resolvedProblemId.value);
@@ -284,9 +318,7 @@ ${code}
       console.error("Failed to fetch problem detail", error);
     }
   }
-
-  loadTopics();
-});
+};
 
 // Watch logic for isDark is handled inside MarkdownEdit now
 // Editor instance management is also inside MarkdownEdit
@@ -309,7 +341,8 @@ const loadTopics = async () => {
   try {
     const { topics } = await fetchSolutionTopics();
     topicOptions.value = topics;
-    if (!selectedTopicIds.value.length && topics.length) {
+    if (!selectedTopicIds.value.length && topics.length && !isEditMode.value) {
+      // Only auto-select first topic in create mode
       selectedTopicIds.value = [topics[0]!.id];
     }
   } catch (error) {
@@ -362,26 +395,41 @@ const handlePublish = async () => {
 
   isDraftSaved.value = false;
   try {
-    await createSolution(resolvedProblemId.value, {
-      title: title.value,
-      content: editorContent.value,
-      language: language.value,
-      tags: selectedTopicIds.value,
-    });
+    if (isEditMode.value) {
+      await updateSolution(solutionId.value, {
+        title: title.value,
+        content: editorContent.value,
+        language: language.value,
+        tags: selectedTopicIds.value,
+      });
+      toast.success("Solution updated successfully");
+    } else {
+      await createSolution(resolvedProblemId.value, {
+        title: title.value,
+        content: editorContent.value,
+        language: language.value,
+        tags: selectedTopicIds.value,
+      });
+      toast.success("Solution published successfully");
+    }
 
     // Release draft saved status
     isDraftSaved.value = true;
 
-    // Redirect to problem detail page
-    router.push({
-      name: "problem-detail",
-      params: {
-        slug: resolvedProblemSlug.value || resolvedProblemId.value,
-        tab: "solution",
-      },
-    });
+    // Redirect to problem detail page or appropriate page
+    if (resolvedProblemSlug.value) {
+      router.push({
+        name: "problem-detail",
+        params: {
+          slug: resolvedProblemSlug.value,
+          tab: "solution",
+        },
+      });
+    } else {
+      router.back();
+    }
   } catch (error: unknown) {
-    console.error("Failed to publish solution", error);
+    console.error("Failed to publish/update solution", error);
     let message = "Failed to publish solution";
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || message;

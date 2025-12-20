@@ -15,16 +15,48 @@ import {
   Eye,
   ArrowRight,
   FileCode2,
+  MoreVertical,
+  Pencil,
+  Trash2,
 } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
-import { fetchUserSolutions, type SolutionFeedResponse } from "@/api/solution";
-import { RouterLink } from "vue-router";
+import {
+  fetchUserSolutions,
+  type SolutionFeedResponse,
+  deleteSolution,
+} from "@/api/solution";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "vue-sonner";
+import { RouterLink, useRouter } from "vue-router";
 import { fetchCurrentUserId } from "@/utils/auth";
 
 // Access the array type from the response type items or use any if hard to extract
+const router = useRouter();
+
 const solutions = ref<SolutionFeedResponse["items"]>([]);
 const loading = ref(true);
 const hasUser = ref(false);
+
+const handleEdit = (solutionId: string) => {
+  router.push({ name: "solution-edit", params: { id: solutionId } });
+};
+
+const handleDelete = async (solutionId: string) => {
+  try {
+    await deleteSolution(solutionId);
+    toast.success("Solution deleted successfully");
+    // Remove from list
+    solutions.value = solutions.value.filter((s) => s.id !== solutionId);
+  } catch (error) {
+    console.error("Failed to delete solution", error);
+    toast.error("Failed to delete solution");
+  }
+};
 
 onMounted(async () => {
   try {
@@ -68,9 +100,31 @@ onMounted(async () => {
               new Date(sol.created_at).toLocaleDateString()
             }}</span>
           </div>
-          <CardTitle class="line-clamp-1 mt-2 text-lg">{{
-            sol.title
-          }}</CardTitle>
+          <div class="flex items-start justify-between">
+            <CardTitle class="line-clamp-1 mt-2 text-lg">{{
+              sol.title
+            }}</CardTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button variant="ghost" size="icon" class="h-8 w-8 -mr-2">
+                  <MoreVertical class="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem @click="handleEdit(sol.id)">
+                  <Pencil class="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  @click="handleDelete(sol.id)"
+                  class="text-destructive focus:text-destructive"
+                >
+                  <Trash2 class="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <CardDescription>Solution</CardDescription>
         </CardHeader>
         <CardContent class="flex-1">

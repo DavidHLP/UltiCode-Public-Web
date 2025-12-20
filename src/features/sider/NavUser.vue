@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  BadgeCheck,
   Bell,
   ChevronsUpDown,
   LogOut,
@@ -101,12 +100,6 @@ async function handleLogout() {
               <DropdownMenuItem>
                 <User />
                 Profile
-              </DropdownMenuItem>
-            </RouterLink>
-            <RouterLink to="/personal/account">
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
               </DropdownMenuItem>
             </RouterLink>
             <RouterLink to="/personal/submissions">
