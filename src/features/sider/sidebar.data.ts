@@ -3,17 +3,14 @@ import {
   Flame,
   LayoutGrid,
   TrendingUp,
+  Cpu,
   Globe,
   Home,
-  Code2,
   Trophy,
   History,
-  Box,
-  Terminal,
   MessageSquare,
   Briefcase,
   DollarSign,
-  Cpu,
   FileText,
   HelpCircle,
   User,
@@ -72,16 +69,12 @@ export const forumSidebarData: SidebarSection[] = [
   },
 ];
 
+import { PROBLEM_CATEGORIES } from "@/constants/problem-categories";
+
 export const problemSidebarData: SidebarSection[] = [
   {
     name: "Problem Set",
-    items: [
-      { title: "All Problems", url: "/problemset", icon: LayoutGrid },
-      { title: "Algorithms", url: "/problemset/algorithms", icon: Code2 },
-      { title: "Database", url: "/problemset/database", icon: Box },
-      { title: "Shell", url: "/problemset/shell", icon: Terminal },
-      { title: "Concurrency", url: "/problemset/concurrency", icon: Cpu },
-    ],
+    items: [...PROBLEM_CATEGORIES] as unknown as SidebarItem[],
   },
 ];
 

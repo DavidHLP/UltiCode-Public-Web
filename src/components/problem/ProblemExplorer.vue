@@ -11,11 +11,6 @@ import {
   ListFilter,
   X,
   ChevronDown,
-  Terminal,
-  Cpu,
-  LayoutGrid, // All Topics
-  Calculator, // for Algorithms
-  Database,
   CircleDot,
 } from "lucide-vue-next";
 import CheckIcon from "~icons/radix-icons/check";
@@ -51,24 +46,18 @@ const problemsPerPage = 50;
 const numProblemsToShow = ref(problemsPerPage);
 const fallbackProblems = ref<Problem[]>([]);
 
-const categories = [
-  { name: "All Topics", icon: LayoutGrid, value: "all" },
-  { name: "Algorithms", icon: Calculator, value: "algorithms" },
-  { name: "Database", icon: Database, value: "database" },
-  { name: "Shell", icon: Terminal, value: "shell" },
-  { name: "Concurrency", icon: Cpu, value: "concurrency" },
-];
+import { PROBLEM_CATEGORIES } from "@/constants/problem-categories";
+
+const categories = PROBLEM_CATEGORIES;
 
 const selectedCategory = ref(props.initialCategory || "all");
 
 watch(
   () => props.initialCategory,
   (newVal) => {
-    if (newVal) {
-      selectedCategory.value = newVal;
-      void loadProblems();
-    }
-  },
+    selectedCategory.value = newVal || "all";
+    void loadProblems();
+  }
 );
 
 function selectCategory(cat: string) {
@@ -170,7 +159,7 @@ const popularTags = ref([
   "Sorting",
 ]);
 const otherTags = computed(() =>
-  allTags.value.filter((t) => !popularTags.value.includes(t)),
+  allTags.value.filter((t) => !popularTags.value.includes(t))
 );
 
 function toggleStatusSolved(checked: boolean) {
@@ -201,7 +190,7 @@ function togglePremiumPremium(checked: boolean) {
 function toggleFilter(
   targetArray: Ref<string[]>,
   item: string,
-  checked: boolean,
+  checked: boolean
 ) {
   const currentItems = targetArray.value;
   const isPresent = currentItems.includes(item);
@@ -405,7 +394,7 @@ function loadMore() {
                 @click="
                   () =>
                     toggleDifficultyMedium(
-                      !selectedDifficulty.includes('Medium'),
+                      !selectedDifficulty.includes('Medium')
                     )
                 "
               >
