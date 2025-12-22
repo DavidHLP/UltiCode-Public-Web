@@ -34,7 +34,11 @@ import {
 } from "@/components/ui/collapsible";
 import ProblemTable from "./ProblemTable.vue";
 import { fetchProblems, fetchRandomProblem } from "@/api/problem";
+import { fetchUserSubmissions } from "@/api/submission";
 import { toast } from "vue-sonner";
+import { fetchCurrentUserId } from "@/utils/auth";
+import { applyProblemStatuses } from "@/utils/problem-status";
+import type { SubmissionRecord } from "@/types/submission";
 
 import type { ProblemExplorerProps } from "./type";
 
@@ -48,6 +52,7 @@ const showPremium = ref<boolean | null>(null);
 const problemsPerPage = 50;
 const numProblemsToShow = ref(problemsPerPage);
 const fallbackProblems = ref<Problem[]>([]);
+const userSubmissions = ref<SubmissionRecord[]>([]);
 
 const categories = [
   { name: "All Topics", icon: LayoutGrid, value: "all" },
@@ -70,16 +75,38 @@ function selectCategory(cat: string) {
   }
 }
 
-onMounted(async () => {
+const loadProblems = async () => {
   try {
     fallbackProblems.value = await fetchProblems();
   } catch (error) {
     console.error("Failed to load problems", error);
     fallbackProblems.value = [];
   }
+};
+
+const loadUserSubmissions = async () => {
+  const userId = fetchCurrentUserId();
+  if (!userId) {
+    userSubmissions.value = [];
+    return;
+  }
+  try {
+    userSubmissions.value = await fetchUserSubmissions(userId);
+  } catch (error) {
+    console.error("Failed to load user submissions", error);
+    userSubmissions.value = [];
+  }
+};
+
+onMounted(() => {
+  void loadProblems();
+  void loadUserSubmissions();
 });
 
 const sourceProblems = computed(() => props.problems ?? fallbackProblems.value);
+const enrichedProblems = computed(() =>
+  applyProblemStatuses(sourceProblems.value, userSubmissions.value),
+);
 
 // 搜索变化时，重置展示数量
 watch(searchQuery, () => {
@@ -87,7 +114,7 @@ watch(searchQuery, () => {
 });
 
 const filteredProblems = computed(() => {
-  return sourceProblems.value.filter((p) => {
+  return enrichedProblems.value.filter((p) => {
     const searchMatch =
       !searchQuery.value ||
       p.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -126,7 +153,7 @@ const displayedProblems = computed(() => {
 
 const allTags = computed(() => {
   const tags = new Set<string>();
-  sourceProblems.value.forEach((p) => p.tags.forEach((t) => tags.add(t)));
+  enrichedProblems.value.forEach((p) => p.tags.forEach((t) => tags.add(t)));
   return Array.from(tags).sort();
 });
 

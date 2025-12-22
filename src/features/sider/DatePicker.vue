@@ -2,15 +2,23 @@
 import { Calendar } from "@/components/ui/calendar";
 import { SidebarGroup, SidebarGroupContent } from "@/components/ui/sidebar";
 import { fetchProblems } from "@/api/problem";
+import { fetchUserSubmissions } from "@/api/submission";
 import type { Problem } from "@/types/problem";
 import { computed, onMounted, ref } from "vue";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { fetchCurrentUserId } from "@/utils/auth";
+import { applyProblemStatuses } from "@/utils/problem-status";
 
 const problems = ref<Problem[]>([]);
 
 onMounted(async () => {
   try {
-    problems.value = await fetchProblems();
+    const userId = fetchCurrentUserId();
+    const [problemList, submissions] = await Promise.all([
+      fetchProblems(),
+      userId ? fetchUserSubmissions(userId) : Promise.resolve([]),
+    ]);
+    problems.value = applyProblemStatuses(problemList, submissions);
   } catch (error) {
     console.error("Failed to load problems", error);
     problems.value = [];

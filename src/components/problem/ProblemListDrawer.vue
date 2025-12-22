@@ -16,6 +16,9 @@ import {
 } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import { cn } from "@/lib/utils";
+import { fetchUserSubmissions } from "@/api/submission";
+import { fetchCurrentUserId } from "@/utils/auth";
+import { applyProblemStatuses } from "@/utils/problem-status";
 
 defineProps<{
   currentProblemId?: number;
@@ -33,7 +36,12 @@ const loading = ref(true);
 onMounted(async () => {
   try {
     loading.value = true;
-    problems.value = await fetchProblems();
+    const userId = fetchCurrentUserId();
+    const [problemList, submissions] = await Promise.all([
+      fetchProblems(),
+      userId ? fetchUserSubmissions(userId) : Promise.resolve([]),
+    ]);
+    problems.value = applyProblemStatuses(problemList, submissions);
   } catch (error) {
     console.error("Failed to load problems", error);
   } finally {

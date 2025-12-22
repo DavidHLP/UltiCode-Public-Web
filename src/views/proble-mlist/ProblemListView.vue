@@ -16,11 +16,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ProblemListItem, ProblemListStats } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
+import type { SubmissionRecord } from "@/types/submission";
 import {
   fetchProblemListItem,
-  fetchProblemListStats,
   fetchProblemsByListId,
 } from "@/api/problem-list";
+import { fetchUserSubmissions } from "@/api/submission";
+import { fetchCurrentUserId } from "@/utils/auth";
+import { applyProblemStatuses } from "@/utils/problem-status";
 import {
   Empty,
   EmptyContent,
@@ -35,26 +38,18 @@ const listId = computed(() => route.params.id as string);
 // 获取当前列表的详细信息
 const currentList = ref<ProblemListItem | null>(null);
 const problems = ref<Problem[]>([]);
-const stats = ref<ProblemListStats | null>(null);
-const emptyStats = computed<ProblemListStats>(() => ({
-  listId: listId.value || "",
-  totalCount: 0,
-  solvedCount: 0,
-  attemptedCount: 0,
-  todoCount: 0,
-  progress: 0,
-}));
-const safeStats = computed<ProblemListStats>(
-  () => stats.value ?? emptyStats.value,
+const userSubmissions = ref<SubmissionRecord[]>([]);
+const problemsWithStatus = computed(() =>
+  applyProblemStatuses(problems.value, userSubmissions.value),
 );
 
 async function loadProblemList(id?: string) {
   if (!id) {
     currentList.value = null;
     problems.value = [];
-    stats.value = null;
     return;
   }
+  const userId = fetchCurrentUserId();
   try {
     currentList.value = await fetchProblemListItem(id);
   } catch (error) {
@@ -67,12 +62,15 @@ async function loadProblemList(id?: string) {
     console.error("Failed to load problems for list", error);
     problems.value = [];
   }
-  try {
-    const allStats = await fetchProblemListStats();
-    stats.value = allStats.find((s) => s.listId === id) ?? emptyStats.value;
-  } catch (error) {
-    console.error("Failed to load list stats", error);
-    stats.value = emptyStats.value;
+  if (userId) {
+    try {
+      userSubmissions.value = await fetchUserSubmissions(userId);
+    } catch (error) {
+      console.error("Failed to load user submissions", error);
+      userSubmissions.value = [];
+    }
+  } else {
+    userSubmissions.value = [];
   }
 }
 
@@ -116,12 +114,46 @@ const momentumColorScale = computed(() => [
 ]);
 
 const statusDistribution = computed(() => {
-  const current = safeStats.value;
+  const derived = problemsWithStatus.value.reduce(
+    (acc, problem) => {
+      if (problem.status === "solved") acc.solved += 1;
+      if (problem.status === "attempted") acc.attempted += 1;
+      if (problem.status === "todo") acc.todo += 1;
+      return acc;
+    },
+    { solved: 0, attempted: 0, todo: 0 },
+  );
   return [
-    { label: "Solved", value: current.solvedCount },
-    { label: "Attempted", value: current.attemptedCount },
-    { label: "Todo", value: current.todoCount },
+    { label: "Solved", value: derived.solved },
+    { label: "Attempted", value: derived.attempted },
+    { label: "Todo", value: derived.todo },
   ];
+});
+
+const derivedStats = computed<ProblemListStats>(() => {
+  const totalCount = problemsWithStatus.value.length;
+  const solvedCount = statusDistribution.value.find(
+    (item) => item.label === "Solved",
+  )?.value;
+  const attemptedCount = statusDistribution.value.find(
+    (item) => item.label === "Attempted",
+  )?.value;
+  const todoCount = statusDistribution.value.find(
+    (item) => item.label === "Todo",
+  )?.value;
+  const solved = solvedCount ?? 0;
+  const attempted = attemptedCount ?? 0;
+  const todo = todoCount ?? 0;
+  const progress = totalCount > 0 ? (solved / totalCount) * 100 : 0;
+
+  return {
+    listId: listId.value || "",
+    totalCount,
+    solvedCount: solved,
+    attemptedCount: attempted,
+    todoCount: todo,
+    progress,
+  };
 });
 
 const statusDonutData = computed(() =>
@@ -135,7 +167,7 @@ const difficultyBuckets = ["Easy", "Medium", "Hard"] as const;
 
 const difficultyInsights = computed(() => {
   return difficultyBuckets.map((difficulty) => {
-    const filtered = problems.value.filter(
+    const filtered = problemsWithStatus.value.filter(
       (problem) => problem.difficulty === difficulty,
     );
     const solved = filtered.filter(
@@ -159,7 +191,7 @@ const progressMomentum = computed(() => {
   let attempted = 0;
   let todo = 0;
 
-  return problems.value.map((problem, index) => {
+  return problemsWithStatus.value.map((problem, index) => {
     if (problem.status === "solved") solved += 1;
     if (problem.status === "attempted") attempted += 1;
     if (problem.status === "todo") todo += 1;
@@ -194,7 +226,7 @@ const percentAxisFormatter = (value: number | Date) => {
 
 <template>
   <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <ProblemExplorer :problems="problems">
+    <ProblemExplorer :problems="problemsWithStatus">
       <template #header>
         <div class="space-y-8 pb-8 border-b border-border/40">
           <!-- 标题和操作按钮 -->
@@ -266,7 +298,9 @@ const percentAxisFormatter = (value: number | Date) => {
                 class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Total</span
               >
-              <span class="text-2xl font-bold">{{ safeStats.totalCount }}</span>
+              <span class="text-2xl font-bold">{{
+                derivedStats.totalCount
+              }}</span>
             </div>
             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
               <span
@@ -275,7 +309,7 @@ const percentAxisFormatter = (value: number | Date) => {
               >
               <span
                 class="text-2xl font-bold text-[hsl(var(--chart-status-solved))]"
-                >{{ safeStats.solvedCount }}</span
+                >{{ derivedStats.solvedCount }}</span
               >
             </div>
             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
@@ -285,7 +319,7 @@ const percentAxisFormatter = (value: number | Date) => {
               >
               <span
                 class="text-2xl font-bold text-[hsl(var(--chart-status-attempted))]"
-                >{{ safeStats.attemptedCount }}</span
+                >{{ derivedStats.attemptedCount }}</span
               >
             </div>
             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
@@ -295,7 +329,7 @@ const percentAxisFormatter = (value: number | Date) => {
               >
               <span
                 class="text-2xl font-bold text-[hsl(var(--chart-status-todo))]"
-                >{{ safeStats.todoCount }}</span
+                >{{ derivedStats.todoCount }}</span
               >
             </div>
             <div class="flex flex-col gap-1 p-3 rounded-lg bg-muted/50">
@@ -304,7 +338,7 @@ const percentAxisFormatter = (value: number | Date) => {
                 >Progress</span
               >
               <span class="text-2xl font-bold"
-                >{{ safeStats.progress.toFixed(1) }}%</span
+                >{{ derivedStats.progress.toFixed(1) }}%</span
               >
             </div>
           </div>
