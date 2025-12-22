@@ -20,6 +20,7 @@ import {
   Scan,
   CheckIcon,
 } from "lucide-vue-next";
+import { problemHooks } from "@/hooks/problem-hooks";
 
 const props = defineProps<{
   languages: ProblemLanguageOption[];
@@ -46,10 +47,16 @@ const activeLanguageLabel = computed(
 
 watch(
   () => activeLanguageValue.value,
-  (value) => {
+  (value, previous) => {
     const target = props.languages.find((lang) => lang.value === value);
     if (target) {
       code.value = target.starterCode;
+    }
+    if (previous !== undefined && value !== previous) {
+      void problemHooks.emit("problem:code:language:change", {
+        from: previous,
+        to: value,
+      });
     }
   },
   { immediate: true },

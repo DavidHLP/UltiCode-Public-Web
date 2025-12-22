@@ -138,7 +138,10 @@ async function handleRandom() {
         >
           <RouterLink
             v-if="adj.prev"
-            :to="`/problems/${adj.prev}`"
+            :to="{
+              name: 'problem-detail',
+              params: { slug: adj.prev, tab: $route.params.tab },
+            }"
             class="flex items-center justify-center w-full h-full"
           >
             <ChevronLeft class="h-4 w-4" />
@@ -171,7 +174,10 @@ async function handleRandom() {
         >
           <RouterLink
             v-if="adj.next"
-            :to="`/problems/${adj.next}`"
+            :to="{
+              name: 'problem-detail',
+              params: { slug: adj.next, tab: $route.params.tab },
+            }"
             class="flex items-center justify-center w-full h-full"
           >
             <ChevronRight class="h-4 w-4" />

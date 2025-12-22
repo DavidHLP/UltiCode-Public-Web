@@ -5,6 +5,7 @@ import SubmissionsDetail from "./SubmissionsDetail.vue";
 import type { SubmissionRecord } from "@/types/submission";
 import { fetchProblemSubmissions } from "@/api/submission";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { problemHooks } from "@/hooks/problem-hooks";
 
 const props = defineProps<{
   problemId: number;
@@ -23,15 +24,29 @@ const selectedSubmission = computed(
 
 const loadSubmissions = async () => {
   isLoading.value = true;
+  const userId = fetchCurrentUserId();
+  await problemHooks.emit("problem:submissions:load:before", {
+    problemId: props.problemId,
+    userId,
+  });
   try {
-    const userId = fetchCurrentUserId();
     submissions.value = await fetchProblemSubmissions(
       props.problemId,
       userId || undefined,
     );
+    await problemHooks.emit("problem:submissions:load:after", {
+      problemId: props.problemId,
+      userId,
+      submissions: submissions.value,
+    });
   } catch (error) {
     console.error("Failed to load submissions", error);
     submissions.value = [];
+    await problemHooks.emit("problem:submissions:load:error", {
+      problemId: props.problemId,
+      userId,
+      error,
+    });
   } finally {
     isLoading.value = false;
   }

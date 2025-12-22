@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   onMounted,
+  onUnmounted,
   ref,
   watch,
   provide,
@@ -38,6 +39,7 @@ import TestResultsView from "./test/TestResultsView.vue";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import ProblemListDrawer from "@/components/problem/ProblemListDrawer.vue";
 import ProblemNotesDrawer from "@/components/problem/ProblemNotesDrawer.vue";
+import { problemHooks, type ProblemLayout } from "@/hooks/problem-hooks";
 
 const isSidePanelOpen = ref(false);
 const toggleSidePanel = () => {
@@ -59,19 +61,39 @@ const problem = ref<ProblemDetail | null>(null);
 const runResult = ref<ProblemRunResult | null>(null);
 const bottomPanelStore = useBottomPanelStore();
 
-onMounted(async () => {
-  const slugParam = route.params.slug;
-  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
-
-  if (!slug) return;
-
+const loadProblem = async (slug: string) => {
+  await problemHooks.emit("problem:load:before", { slug });
   try {
     problem.value = await fetchProblemDetailById(slug);
+    await problemHooks.emit("problem:load:after", {
+      slug,
+      problem: problem.value,
+    });
   } catch (error) {
     console.error("Failed to load problem detail", error);
     problem.value = null;
+    await problemHooks.emit("problem:load:error", { slug, error });
+  }
+};
+
+onMounted(async () => {
+  const slugParam = route.params.slug;
+  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
+  void problemHooks.emit("problem:view:mount", { slug: slug ?? null });
+  if (slug) {
+    await loadProblem(slug);
   }
 });
+
+watch(
+  () => route.params.slug,
+  async (newSlug) => {
+    const slug = Array.isArray(newSlug) ? newSlug[0] : newSlug;
+    if (slug) {
+      await loadProblem(slug);
+    }
+  },
+);
 
 watch(
   () => problem.value?.id,
@@ -130,13 +152,22 @@ const buildRunResultFromCases = (
 
 watch(
   () => bottomPanelStore.lastRunToken.value,
-  () => {
+  async () => {
     if (!problem.value) return;
     const cases =
       bottomPanelStore.testCases.value.length > 0
         ? bottomPanelStore.testCases.value
         : (problem.value.testCases ?? []);
-    runResult.value = buildRunResultFromCases(cases, problem.value.id);
+    await problemHooks.emit("problem:run:before", {
+      problemId: problem.value.id,
+      caseCount: cases.length,
+    });
+    const result = buildRunResultFromCases(cases, problem.value.id);
+    runResult.value = result;
+    await problemHooks.emit("problem:run:after", {
+      problemId: problem.value.id,
+      runResult: result,
+    });
   },
 );
 
@@ -224,6 +255,7 @@ const ConnectedCodeView = defineComponent({
     return () =>
       problem.value && problem.value.languages.length
         ? h(CodeView, {
+            key: problem.value.id,
             languages: problem.value.languages,
             starterNotes: problem.value.starterNotes ?? [],
           })
@@ -284,7 +316,8 @@ provide("panelComponentMap", panelComponentMap);
 // --- Layout Logic ---
 const headerStore = useHeaderStore();
 const { layoutConfig } = storeToRefs(headerStore);
-const currentLayout = ref<"leet" | "classic" | "compact" | "wide">("leet");
+const currentLayout = ref<ProblemLayout>("leet");
+const lastTab = ref<string | null>(null);
 
 const createInitialHeaderGroups = (): HeaderGroup[] => {
   return [
@@ -513,9 +546,7 @@ const getWideLayoutConfig = () => {
   return { groups, layout };
 };
 
-const handleLayoutChange = (
-  newLayout: "leet" | "classic" | "compact" | "wide",
-) => {
+const handleLayoutChange = (newLayout: ProblemLayout) => {
   currentLayout.value = newLayout;
   let config;
   switch (newLayout) {
@@ -533,6 +564,7 @@ const handleLayoutChange = (
       break;
   }
   headerStore.initData(config.groups, config.layout);
+  void problemHooks.emit("problem:layout:change", { layout: newLayout });
 };
 
 const TAB_MAP: Record<string, number> = {
@@ -575,6 +607,14 @@ watch(
   (newHeaderId) => {
     if (newHeaderId && newHeaderId in REV_TAB_MAP) {
       const tabName = REV_TAB_MAP[newHeaderId];
+      if (!tabName) return;
+      if (tabName !== lastTab.value) {
+        void problemHooks.emit("problem:tab:change", {
+          from: lastTab.value,
+          to: tabName,
+        });
+        lastTab.value = tabName;
+      }
       if (route.params.tab !== tabName) {
         router.push({
           name: "problem-detail",
@@ -597,7 +637,16 @@ onMounted(() => {
     if (targetId !== undefined) {
       headerStore.setActiveHeader("problem-info", targetId);
     }
+    lastTab.value = tabName;
+  } else {
+    lastTab.value = "description";
   }
+});
+
+onUnmounted(() => {
+  const slugParam = route.params.slug;
+  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
+  void problemHooks.emit("problem:view:unmount", { slug: slug ?? null });
 });
 </script>
 
