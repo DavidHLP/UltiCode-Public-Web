@@ -58,3 +58,18 @@ export async function createSubmission(
   );
   return mapSubmission(response);
 }
+export async function fetchUserProblemStatusMap(
+  userId: string,
+): Promise<
+  Record<
+    number,
+    { status: "solved" | "attempted" | "todo"; completed_time?: string }
+  >
+> {
+  return apiGet<
+    Record<
+      number,
+      { status: "solved" | "attempted" | "todo"; completed_time?: string }
+    >
+  >(`/submissions/status/map?userId=${userId}`);
+}

@@ -16,14 +16,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ProblemListItem, ProblemListStats } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
-import type { SubmissionRecord } from "@/types/submission";
 import {
   fetchProblemListItem,
   fetchProblemsByListId,
 } from "@/api/problem-list";
-import { fetchUserSubmissions } from "@/api/submission";
 import { fetchCurrentUserId } from "@/utils/auth";
-import { applyProblemStatuses } from "@/utils/problem-status";
 import {
   Empty,
   EmptyContent,
@@ -38,10 +35,7 @@ const listId = computed(() => route.params.id as string);
 // 获取当前列表的详细信息
 const currentList = ref<ProblemListItem | null>(null);
 const problems = ref<Problem[]>([]);
-const userSubmissions = ref<SubmissionRecord[]>([]);
-const problemsWithStatus = computed(() =>
-  applyProblemStatuses(problems.value, userSubmissions.value),
-);
+const problemsWithStatus = computed(() => problems.value);
 
 async function loadProblemList(id?: string) {
   if (!id) {
@@ -57,20 +51,10 @@ async function loadProblemList(id?: string) {
     currentList.value = null;
   }
   try {
-    problems.value = await fetchProblemsByListId(id);
+    problems.value = await fetchProblemsByListId(id, userId ?? undefined);
   } catch (error) {
     console.error("Failed to load problems for list", error);
     problems.value = [];
-  }
-  if (userId) {
-    try {
-      userSubmissions.value = await fetchUserSubmissions(userId);
-    } catch (error) {
-      console.error("Failed to load user submissions", error);
-      userSubmissions.value = [];
-    }
-  } else {
-    userSubmissions.value = [];
   }
 }
 

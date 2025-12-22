@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Problem } from "@/types/problem";
 
-import { computed, onMounted, ref, watch, type Ref } from "vue";
+import { computed, onMounted, ref, watch, type Ref, markRaw } from "vue";
 import {
   CheckCircle2,
   FileEdit,
@@ -15,8 +15,9 @@ import {
   Cpu,
   LayoutGrid, // All Topics
   Calculator, // for Algorithms
+  Database,
+  CircleDot,
 } from "lucide-vue-next";
-import { Database } from "lucide-vue-next";
 import CheckIcon from "~icons/radix-icons/check";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -34,11 +35,8 @@ import {
 } from "@/components/ui/collapsible";
 import ProblemTable from "./ProblemTable.vue";
 import { fetchProblems, fetchRandomProblem } from "@/api/problem";
-import { fetchUserSubmissions } from "@/api/submission";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId } from "@/utils/auth";
-import { applyProblemStatuses } from "@/utils/problem-status";
-import type { SubmissionRecord } from "@/types/submission";
 
 import type { ProblemExplorerProps } from "./type";
 
@@ -52,7 +50,6 @@ const showPremium = ref<boolean | null>(null);
 const problemsPerPage = 50;
 const numProblemsToShow = ref(problemsPerPage);
 const fallbackProblems = ref<Problem[]>([]);
-const userSubmissions = ref<SubmissionRecord[]>([]);
 
 const categories = [
   { name: "All Topics", icon: LayoutGrid, value: "all" },
@@ -77,36 +74,37 @@ function selectCategory(cat: string) {
 
 const loadProblems = async () => {
   try {
-    fallbackProblems.value = await fetchProblems();
+    const userId = fetchCurrentUserId();
+    fallbackProblems.value = await fetchProblems(userId ?? undefined);
   } catch (error) {
     console.error("Failed to load problems", error);
     fallbackProblems.value = [];
   }
 };
 
-const loadUserSubmissions = async () => {
-  const userId = fetchCurrentUserId();
-  if (!userId) {
-    userSubmissions.value = [];
-    return;
-  }
-  try {
-    userSubmissions.value = await fetchUserSubmissions(userId);
-  } catch (error) {
-    console.error("Failed to load user submissions", error);
-    userSubmissions.value = [];
-  }
-};
-
 onMounted(() => {
   void loadProblems();
-  void loadUserSubmissions();
 });
 
 const sourceProblems = computed(() => props.problems ?? fallbackProblems.value);
-const enrichedProblems = computed(() =>
-  applyProblemStatuses(sourceProblems.value, userSubmissions.value),
-);
+const enrichedProblems = computed(() => {
+  const enriched = sourceProblems.value.map((p) => {
+    const status = p.status ?? "todo";
+    const icon =
+      status === "solved"
+        ? markRaw(CheckCircle2)
+        : status === "attempted"
+          ? markRaw(CircleDot)
+          : undefined;
+
+    return {
+      ...p,
+      status,
+      statusIcon: icon,
+    };
+  });
+  return enriched;
+});
 
 // 搜索变化时，重置展示数量
 watch(searchQuery, () => {

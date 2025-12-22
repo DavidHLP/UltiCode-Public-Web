@@ -1,5 +1,6 @@
 import { apiGet } from "@/utils/request";
 import type { Problem } from "@/types/problem";
+import { mapProblem } from "@/api/problem";
 import type {
   ProblemListGroup,
   ProblemListStats,
@@ -17,12 +18,20 @@ export async function fetchProblemListItem(
   return apiGet<ProblemListItem>(`/problem-lists/${id}`);
 }
 
-export async function fetchProblemListStats(): Promise<ProblemListStats[]> {
-  return apiGet<ProblemListStats[]>("/problem-lists/stats");
+export async function fetchProblemListStats(
+  userId?: string,
+): Promise<ProblemListStats[]> {
+  const query = userId ? `?userId=${userId}` : "";
+  return apiGet<ProblemListStats[]>(`/problem-lists/stats${query}`);
 }
 
 export async function fetchProblemsByListId(
   listId: ProblemListId,
+  userId?: string,
 ): Promise<Problem[]> {
-  return apiGet<Problem[]>(`/problem-lists/${listId}/problems`);
+  const query = userId ? `?userId=${userId}` : "";
+  const data = await apiGet<unknown[]>(
+    `/problem-lists/${listId}/problems${query}`,
+  );
+  return data.map(mapProblem);
 }

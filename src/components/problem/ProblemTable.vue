@@ -89,13 +89,15 @@ onUnmounted(() => {
           class="odd:bg-muted/30 even:bg-background hover:bg-muted/50 cursor-pointer"
           @click="goToDetail(problem.slug)"
         >
-          <TableCell class="flex justify-center">
-            <component
-              :is="problem.statusIcon"
-              v-if="problem.statusIcon"
-              class="h-5 w-5"
-              :class="{ 'text-emerald-600': problem.status === 'solved' }"
-            />
+          <TableCell>
+            <div class="flex justify-center items-center">
+              <component
+                :is="problem.statusIcon"
+                v-if="problem.statusIcon"
+                class="h-5 w-5"
+                :class="{ 'text-emerald-600': problem.status === 'solved' }"
+              />
+            </div>
           </TableCell>
 
           <TableCell>
