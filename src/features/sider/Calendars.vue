@@ -32,7 +32,7 @@ defineProps<{
             >
               <span class="flex-1 truncate">{{ item.name }}</span>
               <span class="text-xs text-muted-foreground">{{
-                item.problem_count
+                item.problemCount
               }}</span>
             </RouterLink>
           </li>

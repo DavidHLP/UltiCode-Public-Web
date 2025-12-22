@@ -3,14 +3,15 @@ import type { Problem } from "./problem";
 export interface ProblemList {
   id: string;
   name: string;
-  description: string;
-  problem_count: number;
+  description?: string;
+  problemCount: number;
   problems?: Problem[];
 }
 
 export interface ProblemListGroup {
   id: string;
   name: string;
+  sortOrder?: number;
   lists: ProblemList[];
 }
 
@@ -28,11 +29,12 @@ export interface ProblemListStats {
 export type ProblemListId = string;
 
 export interface ProblemListItem {
-  id: number | string;
+  id: string;
   name: string;
   description?: string;
+  authorId?: string;
+  groupId?: string;
+  isPublic?: boolean;
   createdAt?: string;
   updatedAt?: string;
-  title?: string; // Keep title if used elsewhere, but component uses name
-  difficulty?: "Easy" | "Medium" | "Hard";
 }
