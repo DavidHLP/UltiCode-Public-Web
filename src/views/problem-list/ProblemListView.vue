@@ -16,6 +16,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import type { ProblemListItem } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
@@ -69,7 +70,7 @@ watch(
   (id) => {
     void loadProblemList(id);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 // 格式化日期

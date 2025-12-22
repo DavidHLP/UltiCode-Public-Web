@@ -57,7 +57,7 @@ watch(
   (newVal) => {
     selectedCategory.value = newVal || "all";
     void loadProblems();
-  },
+  }
 );
 
 function selectCategory(cat: string) {
@@ -124,8 +124,21 @@ const filteredProblems = computed(() => {
     const premiumMatch =
       showPremium.value === null || p.isPremium === showPremium.value;
 
+    const categoryConfig = PROBLEM_CATEGORIES.find(
+      (c) => c.value === selectedCategory.value
+    );
+    const categoryMatch =
+      selectedCategory.value === "all" ||
+      !categoryConfig ||
+      (p.tags && p.tags.includes(categoryConfig.name));
+
     return (
-      searchMatch && tagMatch && statusMatch && difficultyMatch && premiumMatch
+      searchMatch &&
+      tagMatch &&
+      statusMatch &&
+      difficultyMatch &&
+      premiumMatch &&
+      categoryMatch
     );
   });
 });
@@ -159,7 +172,7 @@ const popularTags = ref([
   "Sorting",
 ]);
 const otherTags = computed(() =>
-  allTags.value.filter((t) => !popularTags.value.includes(t)),
+  allTags.value.filter((t) => !popularTags.value.includes(t))
 );
 
 function toggleStatusSolved(checked: boolean) {
@@ -190,7 +203,7 @@ function togglePremiumPremium(checked: boolean) {
 function toggleFilter(
   targetArray: Ref<string[]>,
   item: string,
-  checked: boolean,
+  checked: boolean
 ) {
   const currentItems = targetArray.value;
   const isPresent = currentItems.includes(item);
@@ -394,7 +407,7 @@ function loadMore() {
                 @click="
                   () =>
                     toggleDifficultyMedium(
-                      !selectedDifficulty.includes('Medium'),
+                      !selectedDifficulty.includes('Medium')
                     )
                 "
               >
