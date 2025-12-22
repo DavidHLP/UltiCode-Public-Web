@@ -16,14 +16,13 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import { inject, ref, watch, type Ref } from "vue";
+import { inject, ref, watch } from "vue";
 import { fetchAdjacentProblems, fetchRandomProblem } from "@/api/problem";
-import type { ProblemDetail } from "@/types/problem-detail";
+import { ToggleSidePanelKey } from "../problem-context";
+import { useProblemContext } from "../useProblemContext";
 
-const toggleSidePanel = inject<() => void>("toggleSidePanel");
-const problemContext = inject<{ problem: Ref<ProblemDetail | null> }>(
-  "problemContext",
-);
+const toggleSidePanel = inject(ToggleSidePanelKey, () => {});
+const problemContext = useProblemContext();
 const router = useRouter();
 
 const adj = ref<{ prev: string | null; next: string | null }>({
@@ -32,7 +31,7 @@ const adj = ref<{ prev: string | null; next: string | null }>({
 });
 
 watch(
-  () => problemContext?.problem.value?.id,
+  () => problemContext.problem.value?.id,
   async (id) => {
     if (id) {
       try {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { onBeforeUnmount, ref, inject, type Ref } from "vue";
+import { onBeforeUnmount, ref, inject } from "vue";
 import { Play, CloudUpload, StickyNote } from "lucide-vue-next";
 import {
   HoverCard,
@@ -12,15 +12,14 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useBottomPanelStore } from "../test/test";
 import { useHeaderStore } from "@/stores/headerStore";
 import { createSubmission } from "@/api/submission";
-import type { ProblemDetail } from "@/types/problem-detail";
 import { toast } from "vue-sonner";
+import { ToggleNotesKey } from "../problem-context";
+import { useProblemContext } from "../useProblemContext";
 
 const { requestRun } = useBottomPanelStore();
 const headerStore = useHeaderStore();
-const problemContext = inject<{ problem: Ref<ProblemDetail | null> }>(
-  "problemContext",
-);
-const toggleNotes = inject<() => void>("toggleNotes");
+const problemContext = useProblemContext();
+const toggleNotes = inject(ToggleNotesKey, () => {});
 
 const isRunning = ref(false);
 const isSubmitting = ref(false);
@@ -42,7 +41,7 @@ const handleRun = () => {
 };
 
 async function handleSubmit() {
-  const prob = problemContext?.problem.value;
+  const prob = problemContext.problem.value;
   if (!prob) return;
 
   // For now, we mock the code since the editor logic is complex and handled elsewhere

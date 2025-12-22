@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  computed,
   onMounted,
   onUnmounted,
   ref,
@@ -7,9 +8,7 @@ import {
   provide,
   h,
   defineComponent,
-  inject,
   type Component,
-  type Ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
@@ -24,11 +23,7 @@ import {
   type LayoutNode,
 } from "@/stores/headerStore";
 
-import type { ProblemDetail, ProblemTestCase } from "@/types/problem-detail";
-import type { ProblemRunResult } from "@/types/test-results";
-import { fetchProblemDetailById } from "@/api/problem-detail";
-import { useBottomPanelStore } from "./test/test";
-import { fetchCurrentUserId } from "@/utils/auth";
+import { useProblemDetail } from "./useProblemDetail";
 
 import DescriptionView from "@/views/problems/description/DescriptionView.vue";
 import ProblemSolutionsView from "@/views/problems/solutions/ProblemSolutionsView.vue";
@@ -40,6 +35,13 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import ProblemListDrawer from "@/components/problem/ProblemListDrawer.vue";
 import ProblemNotesDrawer from "@/components/problem/ProblemNotesDrawer.vue";
 import { problemHooks, type ProblemLayout } from "@/hooks/problem-hooks";
+import {
+  ProblemContextKey,
+  ToggleNotesKey,
+  ToggleSidePanelKey,
+} from "./problem-context";
+import { PanelComponentMapKey } from "@/features/layout/panels/panel-context";
+import { useProblemContext } from "./useProblemContext";
 
 const isSidePanelOpen = ref(false);
 const toggleSidePanel = () => {
@@ -51,144 +53,32 @@ const toggleNotes = () => {
   isNotesOpen.value = !isNotesOpen.value;
 };
 
-provide("toggleSidePanel", toggleSidePanel);
-provide("toggleNotes", toggleNotes);
+provide(ToggleSidePanelKey, toggleSidePanel);
+provide(ToggleNotesKey, toggleNotes);
 
 // --- Data Fetching ---
 const route = useRoute();
 const router = useRouter();
-const problem = ref<ProblemDetail | null>(null);
-const runResult = ref<ProblemRunResult | null>(null);
-const bottomPanelStore = useBottomPanelStore();
-
-const loadProblem = async (slug: string) => {
-  await problemHooks.emit("problem:load:before", { slug });
-  try {
-    problem.value = await fetchProblemDetailById(slug);
-    await problemHooks.emit("problem:load:after", {
-      slug,
-      problem: problem.value,
-    });
-  } catch (error) {
-    console.error("Failed to load problem detail", error);
-    problem.value = null;
-    await problemHooks.emit("problem:load:error", { slug, error });
-  }
-};
-
-onMounted(async () => {
+const slug = computed(() => {
   const slugParam = route.params.slug;
-  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
-  void problemHooks.emit("problem:view:mount", { slug: slug ?? null });
-  if (slug) {
-    await loadProblem(slug);
-  }
+  return Array.isArray(slugParam) ? slugParam[0] : slugParam ?? null;
+});
+const { problem, runResult } = useProblemDetail(slug);
+
+onMounted(() => {
+  void problemHooks.emit("problem:view:mount", { slug: slug.value });
 });
 
-watch(
-  () => route.params.slug,
-  async (newSlug) => {
-    const slug = Array.isArray(newSlug) ? newSlug[0] : newSlug;
-    if (slug) {
-      await loadProblem(slug);
-    }
-  },
-);
-
-watch(
-  () => problem.value?.id,
-  () => {
-    runResult.value = null;
-  },
-);
-
-const buildRunResultFromCases = (
-  cases: ProblemTestCase[],
-  problemId: number,
-): ProblemRunResult => {
-  const runId = `run-${problemId}-${Date.now()}`;
-  const userId = fetchCurrentUserId();
-  const runtimeMs = 40 + cases.length * 5;
-  const memoryMb = 8 + cases.length * 2;
-
-  const mappedCases = cases.map((testCase, index) => {
-    const displayLabel = `Case ${index + 1}`;
-    const output =
-      testCase.inputs?.map((input) => input.value || "").join(" | ") || "OK";
-
-    return {
-      id: `${runId}-case-${index + 1}`,
-      runId,
-      submissionTestId: testCase.id,
-      testCaseId: testCase.id,
-      caseLabel: displayLabel,
-      status: "Accepted" as const,
-      runtime: `${Math.max(1, testCase.inputs?.length ?? 1) * 2} ms`,
-      memory: `${10 + index} MB`,
-      detail: "Sample run using provided inputs.",
-      output,
-      expectedOutput: output,
-      inputs:
-        testCase.inputs?.map((input) => ({
-          id: input.id ?? `input-${index}-${input.name}`,
-          label: input.label ?? input.name,
-          name: input.name,
-          value: input.value,
-        })) ?? [],
-    };
-  });
-
-  return {
-    id: runId,
-    submissionId: `${runId}-submission`,
-    problemId,
-    userId: userId || "anonymous", // Handle null userId
-    verdict: "Accepted",
-    runtime: `${runtimeMs} ms`,
-    memory: `${memoryMb} MB`,
-    cases: mappedCases,
-  };
-};
-
-watch(
-  () => bottomPanelStore.lastRunToken.value,
-  async () => {
-    if (!problem.value) return;
-    const cases =
-      bottomPanelStore.testCases.value.length > 0
-        ? bottomPanelStore.testCases.value
-        : (problem.value.testCases ?? []);
-    await problemHooks.emit("problem:run:before", {
-      problemId: problem.value.id,
-      caseCount: cases.length,
-    });
-    const result = buildRunResultFromCases(cases, problem.value.id);
-    runResult.value = result;
-    await problemHooks.emit("problem:run:after", {
-      problemId: problem.value.id,
-      runResult: result,
-    });
-  },
-);
-
 // --- Context Provider ---
-// Define the context type
-interface ProblemContextType {
-  problem: Ref<ProblemDetail | null>;
-  runResult: Ref<ProblemRunResult | null>;
-}
-
 // Provide problem and runResult to connector components
-provide<ProblemContextType>("problemContext", { problem, runResult });
+provide(ProblemContextKey, { problem, runResult });
 
 // --- Connector Components ---
 // These wrappers adapt the injected context to the specific props required by the views
 
 const ConnectedDescriptionView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>("problemContext");
-    if (!context) throw new Error("problemContext not provided");
-    const { problem } = context;
+    const { problem } = useProblemContext();
     return () =>
       problem.value
         ? h(
@@ -206,9 +96,7 @@ const ConnectedDescriptionView = defineComponent({
 
 const ConnectedSolutionsView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>("problemContext");
-    if (!context) throw new Error("problemContext not provided");
-    const { problem } = context;
+    const { problem } = useProblemContext();
     return () =>
       problem.value
         ? h(
@@ -229,9 +117,7 @@ const ConnectedSolutionsView = defineComponent({
 
 const ConnectedSubmissionsView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>("problemContext");
-    if (!context) throw new Error("problemContext not provided");
-    const { problem } = context;
+    const { problem } = useProblemContext();
     return () =>
       problem.value
         ? h(
@@ -249,9 +135,7 @@ const ConnectedSubmissionsView = defineComponent({
 
 const ConnectedCodeView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>("problemContext");
-    if (!context) throw new Error("problemContext not provided");
-    const { problem } = context;
+    const { problem } = useProblemContext();
     return () =>
       problem.value && problem.value.languages.length
         ? h(CodeView, {
@@ -269,9 +153,7 @@ const ConnectedCodeView = defineComponent({
 
 const ConnectedTestCaseView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>("problemContext");
-    if (!context) throw new Error("problemContext not provided");
-    const { problem } = context;
+    const { problem } = useProblemContext();
     return () =>
       problem.value
         ? h(
@@ -289,9 +171,7 @@ const ConnectedTestCaseView = defineComponent({
 
 const ConnectedTestResultsView = defineComponent({
   setup() {
-    const context = inject<ProblemContextType>("problemContext");
-    if (!context) throw new Error("problemContext not provided");
-    const { runResult } = context;
+    const { runResult } = useProblemContext();
     return () =>
       h(
         "div",
@@ -311,7 +191,7 @@ const panelComponentMap: Record<number, Component> = {
   6: ConnectedTestResultsView,
 };
 
-provide("panelComponentMap", panelComponentMap);
+provide(PanelComponentMapKey, panelComponentMap);
 
 // --- Layout Logic ---
 const headerStore = useHeaderStore();
@@ -644,9 +524,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  const slugParam = route.params.slug;
-  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
-  void problemHooks.emit("problem:view:unmount", { slug: slug ?? null });
+  void problemHooks.emit("problem:view:unmount", { slug: slug.value });
 });
 </script>
 

@@ -1,5 +1,6 @@
-import type { ProblemDetail } from "@/types/problem-detail";
+import type { ProblemDetail, ProblemTestCase } from "@/types/problem-detail";
 import { apiGet } from "@/utils/request";
+import { mapProblem } from "@/api/problem";
 
 interface BackendExampleInput {
   name: string;
@@ -22,59 +23,66 @@ interface BackendProblemDetail {
   hints: string[] | null;
 }
 
-interface BackendProblemResponse extends ProblemDetail {
-  detail: BackendProblemDetail;
-  examples: BackendExample[];
+interface BackendProblemResponse {
+  detail?: BackendProblemDetail | null;
+  examples?: BackendExample[] | null;
+  summary?: string | null;
+  constraints?: string[] | null;
+  followUp?: string | null;
+  companies?: BackendProblemDetail["companies"] | null;
+  starterNotes?: string[] | null;
+  [key: string]: unknown;
 }
 
 export async function fetchProblemDetailById(
   id: number | string,
+  userId?: string,
 ): Promise<ProblemDetail> {
-  const response = await apiGet<BackendProblemResponse>(`/problems/${id}`);
+  const query = userId ? `?userId=${userId}` : "";
+  const response = await apiGet<BackendProblemResponse>(`/problems/${id}${query}`);
+  return mapProblemDetail(response);
+}
 
-  // Map backend naming to frontend interface
-  // The backend returns a nested 'detail' object containing much of this info
-  const detail = response.detail;
+const mapExamplesToTestCases = (
+  examples: BackendExample[],
+): ProblemTestCase[] =>
+  examples.map((ex, index) => ({
+    id: ex.id || `case-${index}`,
+    label: `Case ${index + 1}`,
+    explanation: ex.explanation,
+    inputs: ex.inputs
+      ? ex.inputs.map((input: BackendExampleInput) => ({
+          name: input.name,
+          value: input.value,
+          label: input.name,
+        }))
+      : [],
+    output: ex.outputText,
+  }));
 
-  // Ensure ID is a number (backend may return string for BigInt)
-  response.id = Number(response.id);
+const mapExamplesToDescription = (examples: BackendExample[]) =>
+  examples.map((ex) => ({
+    input: ex.inputText || "",
+    output: ex.outputText || "",
+    explanation: ex.explanation,
+  }));
 
-  response.content = detail.summary || "";
-  response.constraints = detail.constraints_json || [];
-  response.followUp = detail.follow_up;
-  response.companies = detail.companies || [];
-  response.starterNotes = detail.hints || [];
+export function mapProblemDetail(
+  response: BackendProblemResponse,
+): ProblemDetail {
+  const base = mapProblem(response);
+  const detail = response.detail ?? {};
+  const examples = (response.examples ?? []).filter(Boolean) as BackendExample[];
 
-  if (response.examples && response.examples.length > 0) {
-    const originalExamples = response.examples;
-
-    // Map for TestCaseView (expecting inputs array)
-    response.testCases = originalExamples.map(
-      (ex: BackendExample, index: number) => ({
-        id: ex.id || `case-${index}`,
-        label: `Case ${index + 1}`,
-        explanation: ex.explanation,
-        inputs: ex.inputs
-          ? ex.inputs.map((input: BackendExampleInput) => ({
-              name: input.name,
-              value: input.value,
-              label: input.name,
-            }))
-          : [],
-        // Use outputText as the expected output for reference if needed
-        output: ex.outputText,
-      }),
-    );
-
-    // Map for DescriptionView (expecting input/output/explanation)
-    (response as ProblemDetail).examples = originalExamples.map(
-      (ex: BackendExample) => ({
-        input: ex.inputText || "",
-        output: ex.outputText || "",
-        explanation: ex.explanation,
-      }),
-    );
-  }
-
-  return response;
+  return {
+    ...base,
+    content: detail.summary ?? response.summary ?? "",
+    summary: detail.summary ?? response.summary ?? "",
+    constraints: detail.constraints_json ?? response.constraints ?? [],
+    followUp: detail.follow_up ?? response.followUp ?? "",
+    companies: detail.companies ?? response.companies ?? [],
+    starterNotes: detail.hints ?? response.starterNotes ?? [],
+    testCases: examples.length > 0 ? mapExamplesToTestCases(examples) : [],
+    examples: examples.length > 0 ? mapExamplesToDescription(examples) : [],
+  } as ProblemDetail;
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, inject, type Component } from "vue";
+import { computed, inject } from "vue";
 
 import type { HeaderModel } from "@/stores/headerStore";
+import { PanelComponentMapKey } from "./panel-context";
 
 // Receive active header as property
 const props = defineProps<{
@@ -10,8 +11,7 @@ const props = defineProps<{
 }>();
 
 // Inject the component map from the parent view (DetailedView)
-const panelComponentMap =
-  inject<Record<number, Component>>("panelComponentMap");
+const panelComponentMap = inject(PanelComponentMapKey);
 
 const contentComponent = computed(() => {
   if (!props.activeHeader || !panelComponentMap) return null;
