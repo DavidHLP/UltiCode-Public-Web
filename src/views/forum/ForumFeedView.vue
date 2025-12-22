@@ -3,7 +3,8 @@ import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
 import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import ForumSidebar from "@/views/forum/components/ForumSidebar.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import {
   fetchForumCommunities,
   fetchForumPosts,
@@ -36,10 +37,40 @@ onMounted(async () => {
   }
 });
 
+const props = defineProps<{
+  filter?: string;
+}>();
+
+const route = useRoute();
 const searchQuery = ref("");
-const quickFilter = ref("hot");
+const quickFilter = ref(props.filter || "hot");
 const selectedCommunity = ref("all");
 const selectedFlair = ref<"all" | ForumFlairType>("all");
+
+// Check route params for category
+watch(
+  () => route.params.category,
+  (newCategory) => {
+    if (newCategory) {
+      selectedCommunity.value = String(newCategory);
+    } else {
+      selectedCommunity.value = "all";
+    }
+  },
+  { immediate: true }
+);
+
+// Check props for filter
+watch(
+  () => props.filter,
+  (newFilter: string | undefined) => {
+    if (newFilter) {
+      quickFilter.value = newFilter;
+    }
+  },
+  { immediate: true }
+);
+
 const filteredPosts = computed(() => {
   const normalizedSearch = searchQuery.value.trim().toLowerCase();
   return posts.value.filter((post) => {
@@ -49,7 +80,7 @@ const filteredPosts = computed(() => {
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
       (Array.isArray(post.tags) &&
         post.tags.some((tag: string) =>
-          tag.toLowerCase().includes(normalizedSearch),
+          tag.toLowerCase().includes(normalizedSearch)
         ));
 
     const matchesCommunity =

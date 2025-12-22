@@ -15,6 +15,10 @@ import PastContests from "./components/PastContests.vue";
 const router = useRouter();
 const route = useRoute();
 
+defineProps<{
+  tab?: string;
+}>();
+
 // State
 const upcomingContests = ref<ContestListItem[]>([]);
 const pastContests = ref<ContestListItem[]>([]);
@@ -27,7 +31,7 @@ const currentPage = ref(1);
 const pageSize = 10;
 
 const totalPages = computed(() =>
-  Math.ceil(totalPastContests.value / pageSize),
+  Math.ceil(totalPastContests.value / pageSize)
 );
 
 // Load data
@@ -90,22 +94,42 @@ watch(currentPage, async (newPage) => {
     </div>
 
     <div v-else class="space-y-8">
-      <!-- Upcoming Contests Top Section -->
-      <UpcomingContests :contests="upcomingContests" />
+      <!-- Home View -->
+      <template v-if="!tab">
+        <UpcomingContests :contests="upcomingContests" />
+        <div class="grid gap-8 lg:grid-cols-3">
+          <GlobalRanking :rankings="globalRankings" />
+          <PastContests
+            :contests="pastContests"
+            :loading="loadingPast"
+            v-model:currentPage="currentPage"
+            :totalPages="totalPages"
+          />
+        </div>
+      </template>
 
-      <!-- Main Grid: Left Ranking, Right Past Contests -->
-      <div class="grid gap-8 lg:grid-cols-3">
-        <!-- LEFT: Ranking -->
-        <GlobalRanking :rankings="globalRankings" />
-
-        <!-- RIGHT: Past Contests -->
+      <!-- Past Contests View -->
+      <template v-else-if="tab === 'past'">
         <PastContests
           :contests="pastContests"
           :loading="loadingPast"
           v-model:currentPage="currentPage"
           :totalPages="totalPages"
+          class="lg:col-span-3"
         />
-      </div>
+      </template>
+
+      <!-- Rankings View -->
+      <template v-else-if="tab === 'ranking'">
+        <GlobalRanking :rankings="globalRankings" class="lg:col-span-3" />
+      </template>
+
+      <!-- My Contests View (Placeholder) -->
+      <template v-else-if="tab === 'my'">
+        <div class="text-center py-20 text-muted-foreground">
+          My Contests feature coming soon.
+        </div>
+      </template>
     </div>
   </div>
 </template>

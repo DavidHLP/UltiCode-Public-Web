@@ -14,6 +14,29 @@ const forumRoutes: RouteRecordRaw = {
       component: () => import("@/views/forum/ForumFeedView.vue"),
     },
     {
+      path: "popular",
+      name: "forum-popular",
+      component: () => import("@/views/forum/ForumFeedView.vue"),
+      props: { filter: "hot" },
+    },
+    {
+      path: "explore",
+      name: "forum-explore",
+      component: () => import("@/views/forum/ForumFeedView.vue"),
+      props: { filter: "explore" },
+    },
+    {
+      path: "all",
+      name: "forum-all",
+      component: () => import("@/views/forum/ForumFeedView.vue"),
+      props: { filter: "new" },
+    },
+    {
+      path: "c/:category",
+      name: "forum-category",
+      component: () => import("@/views/forum/ForumFeedView.vue"),
+    },
+    {
       path: "detailed/:postId",
       name: "forum-thread",
       component: () => import("@/views/forum/ForumThreadView.vue"),
@@ -31,6 +54,30 @@ const contestRoutes: RouteRecordRaw = {
       component: () => import("@/views/contest/ContestView.vue"),
     },
     {
+      path: "past",
+      name: "contest-past",
+      component: () => import("@/views/contest/ContestView.vue"),
+      props: { tab: "past" },
+    },
+    {
+      path: "my",
+      name: "contest-my",
+      component: () => import("@/views/contest/ContestView.vue"),
+      props: { tab: "my" },
+    },
+    {
+      path: "global-ranking",
+      name: "contest-global-ranking",
+      component: () => import("@/views/contest/ContestView.vue"), // Reuse or create specific view
+      props: { tab: "ranking" },
+    },
+    {
+      path: "local-ranking",
+      name: "contest-local-ranking",
+      component: () => import("@/views/contest/ContestView.vue"), // Reuse or create specific view
+      props: { tab: "ranking" },
+    },
+    {
       path: ":contestId",
       name: "contest-detail",
       component: () => import("@/views/contest/detailed/ContestDetailView.vue"),
@@ -45,6 +92,16 @@ const problemSetRoute: RouteRecordRaw = {
     {
       path: "",
       name: "problemset",
+      component: () => import("@/views/problem-set/ProblemSetView.vue"),
+    },
+    {
+      path: "list/:id",
+      name: "problem-list-detail",
+      component: () => import("@/views/problem-list/ProblemListView.vue"),
+    },
+    {
+      path: ":category",
+      name: "problemset-category",
       component: () => import("@/views/problem-set/ProblemSetView.vue"),
     },
   ],

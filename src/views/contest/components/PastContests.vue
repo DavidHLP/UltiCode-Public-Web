@@ -53,7 +53,7 @@ const visiblePages = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-6 lg:col-span-2">
+  <div class="space-y-6">
     <!-- Header -->
     <div class="flex items-end justify-between">
       <div class="space-y-1">

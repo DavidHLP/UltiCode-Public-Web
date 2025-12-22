@@ -2,6 +2,14 @@
 import ProblemExplorer from "@/components/problem/ProblemExplorer.vue";
 import ProblemSetSidebar from "@/components/problem/ProblemSetSidebar.vue";
 import FeaturedBanners from "@/components/problem/FeaturedBanners.vue";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
+
+const route = useRoute();
+const category = computed(() => {
+  const c = route.params.category;
+  return Array.isArray(c) ? c[0] : c;
+});
 </script>
 
 <template>
@@ -15,7 +23,7 @@ import FeaturedBanners from "@/components/problem/FeaturedBanners.vue";
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <!-- Left Column: Problem List (9 cols) -->
       <main class="lg:col-span-9 space-y-6">
-        <ProblemExplorer />
+        <ProblemExplorer :initial-category="category" />
       </main>
 
       <!-- Right Column: Sidebar (3 cols) -->
