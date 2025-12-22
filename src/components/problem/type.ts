@@ -7,6 +7,7 @@ export type DisplayedProblem = Problem & {
 
 export interface ProblemExplorerProps {
   problems?: Problem[];
+  initialCategory?: string;
 }
 
 export interface ProblemTableProps {

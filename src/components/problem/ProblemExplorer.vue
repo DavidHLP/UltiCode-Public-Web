@@ -59,23 +59,29 @@ const categories = [
   { name: "Concurrency", icon: Cpu, value: "concurrency" },
 ];
 
-const selectedCategory = ref("all");
+const selectedCategory = ref(props.initialCategory || "all");
+
+watch(
+  () => props.initialCategory,
+  (newVal) => {
+    if (newVal) {
+      selectedCategory.value = newVal;
+      void loadProblems();
+    }
+  },
+);
 
 function selectCategory(cat: string) {
   selectedCategory.value = cat;
-  // TODO: Implement actual category filtering logic
-  if (cat === "database") {
-    // Mock behavior: select 'Database' tag if available, or just filter
-    if (!selectedTags.value.includes("Database")) {
-      // toggleTag("Database");
-    }
-  }
+  void loadProblems();
 }
 
 const loadProblems = async () => {
   try {
     const userId = fetchCurrentUserId();
-    fallbackProblems.value = await fetchProblems(userId ?? undefined);
+    fallbackProblems.value = await fetchProblems(userId ?? undefined, {
+      category: selectedCategory.value,
+    });
   } catch (error) {
     console.error("Failed to load problems", error);
     fallbackProblems.value = [];

@@ -57,7 +57,7 @@ watch(
       selectedCommunity.value = "all";
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Check props for filter
@@ -68,7 +68,7 @@ watch(
       quickFilter.value = newFilter;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const filteredPosts = computed(() => {
@@ -80,7 +80,7 @@ const filteredPosts = computed(() => {
       post.excerpt?.toLowerCase().includes(normalizedSearch) ||
       (Array.isArray(post.tags) &&
         post.tags.some((tag: string) =>
-          tag.toLowerCase().includes(normalizedSearch)
+          tag.toLowerCase().includes(normalizedSearch),
         ));
 
     const matchesCommunity =

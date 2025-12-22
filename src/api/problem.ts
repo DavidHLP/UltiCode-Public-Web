@@ -29,12 +29,24 @@ function mapProblem(problem: unknown): Problem {
     isPremium: (p.isPremium ?? p.is_premium) as boolean | undefined,
     hasSolution: (p.hasSolution ?? p.has_solution) as boolean | undefined,
     completedTime,
+    tags: Array.isArray(p.tagRelations)
+      ? p.tagRelations
+          .map((r: { tag?: { label: string } }) => r.tag?.label)
+          .filter((l): l is string => typeof l === "string")
+      : (p.tags as string[]) || [],
   } as Problem;
 }
 
-export async function fetchProblems(userId?: string): Promise<Problem[]> {
-  const query = userId ? `?userId=${userId}` : "";
-  const data = await apiGet<unknown[]>(`/problems${query}`);
+export async function fetchProblems(
+  userId?: string,
+  filters: { category?: string } = {},
+): Promise<Problem[]> {
+  const params = new URLSearchParams();
+  if (userId) params.append("userId", userId);
+  if (filters.category) params.append("category", filters.category);
+
+  const queryString = params.toString() ? `?${params.toString()}` : "";
+  const data = await apiGet<unknown[]>(`/problems${queryString}`);
   return data.map(mapProblem);
 }
 
