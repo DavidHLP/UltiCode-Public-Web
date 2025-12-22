@@ -39,7 +39,9 @@ export async function fetchProblemDetailById(
   userId?: string,
 ): Promise<ProblemDetail> {
   const query = userId ? `?userId=${userId}` : "";
-  const response = await apiGet<BackendProblemResponse>(`/problems/${id}${query}`);
+  const response = await apiGet<BackendProblemResponse>(
+    `/problems/${id}${query}`,
+  );
   return mapProblemDetail(response);
 }
 
@@ -71,8 +73,16 @@ export function mapProblemDetail(
   response: BackendProblemResponse,
 ): ProblemDetail {
   const base = mapProblem(response);
-  const detail = response.detail ?? {};
-  const examples = (response.examples ?? []).filter(Boolean) as BackendExample[];
+  const detail: BackendProblemDetail = response.detail ?? {
+    summary: "",
+    companies: null,
+    constraints_json: [],
+    follow_up: "",
+    hints: null,
+  };
+  const examples = (response.examples ?? []).filter(
+    Boolean,
+  ) as BackendExample[];
 
   return {
     ...base,

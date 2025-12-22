@@ -61,7 +61,8 @@ const route = useRoute();
 const router = useRouter();
 const slug = computed(() => {
   const slugParam = route.params.slug;
-  return Array.isArray(slugParam) ? slugParam[0] : slugParam ?? null;
+  const resolved = Array.isArray(slugParam) ? slugParam[0] : slugParam;
+  return resolved ?? null;
 });
 const { problem, runResult } = useProblemDetail(slug);
 

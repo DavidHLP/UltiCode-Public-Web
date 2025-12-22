@@ -7,7 +7,7 @@ import { problemHooks } from "@/hooks/problem-hooks";
 import { useBottomPanelStore } from "./test/test";
 import { buildRunResultFromCases } from "./test/run-result";
 
-export function useProblemDetail(slug: Ref<string | null>) {
+export function useProblemDetail(slug: Ref<string | null | undefined>) {
   const problem = ref<ProblemDetail | null>(null);
   const runResult = ref<ProblemRunResult | null>(null);
   const isLoading = ref(false);
