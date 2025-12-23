@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuCheckboxItem,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -37,6 +38,9 @@ import {
   VoteTargetType,
 } from "@/api/interaction";
 import { RouterLink } from "vue-router";
+import { fetchProblemLists, addProblemToList } from "@/api/problem-list";
+import type { ProblemList } from "@/types/problem-list";
+import { toast } from "vue-sonner";
 
 interface Props {
   currentLayout: "leet" | "classic" | "compact" | "wide";
@@ -61,6 +65,40 @@ const viewerInteraction = ref<{
   reaction: undefined,
   isFavorite: false,
 });
+
+// List Management
+const userLists = ref<ProblemList[]>([]);
+const isLoadingLists = ref(false);
+const userId = "user-yuki"; // TODO: Get from auth context
+
+const loadUserLists = async () => {
+  if (userLists.value.length > 0) return;
+  isLoadingLists.value = true;
+  try {
+    const groups = await fetchProblemLists();
+    // Filter for lists created by me (assuming 'group-created' is the ID for created lists)
+    const createdGroup = groups.find((g) => g.id === "group-created");
+    if (createdGroup) {
+      userLists.value = createdGroup.lists;
+    }
+  } catch (error) {
+    console.error("Failed to fetch lists", error);
+    toast.error("Failed to load your lists");
+  } finally {
+    isLoadingLists.value = false;
+  }
+};
+
+const handleAddToList = async (listId: string) => {
+  if (!props.problem) return;
+  try {
+    await addProblemToList(listId, userId, Number(props.problem.id));
+    toast.success("Added to list successfully");
+  } catch (error) {
+    console.error("Failed to add to list", error);
+    toast.error("Failed to add to list");
+  }
+};
 
 watch(
   () => props.problem?.interactions,
@@ -185,20 +223,65 @@ const selectedLayout = computed({
           <span class="text-xs">{{ reactionCounts.dislikes }}</span>
         </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Save"
-          :aria-pressed="isFavorited"
-          :class="[
-            'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
-            isFavorited ? 'text-amber-600' : 'text-gray-600',
-          ]"
-          @click="toggleFavorite"
-        >
-          <Bookmark class="h-4 w-4" />
-          <span class="text-xs">{{ reactionCounts.favorites }}</span>
-        </Button>
+        <!-- Save / Add to List (Merged) -->
+        <DropdownMenu @update:open="(isOpen) => isOpen && loadUserLists()">
+          <DropdownMenuTrigger as-child>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Save"
+              :aria-pressed="isFavorited"
+              :class="[
+                'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
+                isFavorited ? 'text-amber-600' : 'text-gray-600',
+              ]"
+            >
+              <Bookmark class="h-4 w-4" />
+              <span class="text-xs">{{ reactionCounts.favorites }}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent class="w-56" align="end">
+            <DropdownMenuLabel>Save to...</DropdownMenuLabel>
+            <DropdownMenuCheckboxItem
+              :checked="isFavorited"
+              @select.prevent="toggleFavorite"
+            >
+              <span class="flex-1">Favorites</span>
+              <span
+                class="text-xs text-gray-500 ml-2"
+                v-if="reactionCounts.favorites > 0"
+              >
+                {{ reactionCounts.favorites }}
+              </span>
+            </DropdownMenuCheckboxItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuLabel>My Lists</DropdownMenuLabel>
+            <div
+              v-if="isLoadingLists"
+              class="p-2 text-xs text-center text-gray-500"
+            >
+              Loading...
+            </div>
+            <div
+              v-else-if="userLists.length === 0"
+              class="p-2 text-xs text-center text-gray-500"
+            >
+              No custom lists found
+            </div>
+            <DropdownMenuGroup v-else>
+              <DropdownMenuItem
+                v-for="list in userLists"
+                :key="list.id"
+                class="cursor-pointer"
+                @select="handleAddToList(list.id)"
+              >
+                <span>{{ list.name }}</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <Separator
           orientation="vertical"
