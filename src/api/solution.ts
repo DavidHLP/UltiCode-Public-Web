@@ -1,4 +1,10 @@
 import { apiGet, apiPost, apiPatch, apiDelete } from "@/utils/request";
+import {
+  EdgeOperationTargetType,
+  EdgeOperationType,
+  operateEdgeOperation,
+} from "./edge-operations";
+import type { EdgeOperationResponse } from "./edge-operations";
 import type { SolutionFeedResponse, SolutionFeedItem } from "@/types/solution";
 import type { ForumComment } from "@/types/forum";
 import { fetchCurrentUserId } from "@/utils/auth";
@@ -79,24 +85,28 @@ export async function createSolutionComment(
 export async function voteSolution(
   solutionId: string,
   voteType: 1 | -1 | 0,
-): Promise<{ likes: number; dislikes: number }> {
-  return apiPost<{ likes: number; dislikes: number }>(
-    `/solutions/${solutionId}/vote`,
-    {
-      voteType,
-    },
+): Promise<EdgeOperationResponse> {
+  if (voteType === 0) {
+    throw new Error("voteType must be 1 or -1");
+  }
+  return operateEdgeOperation(
+    voteType === 1 ? EdgeOperationType.VOTE_UP : EdgeOperationType.VOTE_DOWN,
+    EdgeOperationTargetType.SOLUTION,
+    solutionId,
   );
 }
 
 export async function voteSolutionComment(
   commentId: string,
   voteType: 1 | -1 | 0,
-): Promise<{ likes: number; dislikes: number }> {
-  return apiPost<{ likes: number; dislikes: number }>(
-    `/solutions/comments/${commentId}/vote`,
-    {
-      voteType,
-    },
+): Promise<EdgeOperationResponse> {
+  if (voteType === 0) {
+    throw new Error("voteType must be 1 or -1");
+  }
+  return operateEdgeOperation(
+    voteType === 1 ? EdgeOperationType.VOTE_UP : EdgeOperationType.VOTE_DOWN,
+    EdgeOperationTargetType.SOLUTION_COMMENT,
+    commentId,
   );
 }
 

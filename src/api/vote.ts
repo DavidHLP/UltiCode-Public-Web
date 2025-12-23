@@ -1,26 +1,31 @@
-import { apiPost } from "@/utils/request";
+import {
+  EdgeOperationTargetType,
+  EdgeOperationType,
+  operateEdgeOperation,
+} from "@/api/edge-operations";
+import type { EdgeOperationResponse } from "@/api/edge-operations";
 
-export enum VoteTargetType {
-  SOLUTION = "SOLUTION",
-  SOLUTION_COMMENT = "SOLUTION_COMMENT",
-  FORUM_POST = "FORUM_POST",
-  FORUM_COMMENT = "FORUM_COMMENT",
-}
+export { EdgeOperationTargetType as VoteTargetType };
 
-export interface VoteResponse {
-  likes: number;
-  dislikes: number;
+export interface VoteResponse extends EdgeOperationResponse {
   userVote: 0 | 1 | -1;
 }
 
 export const vote = async (
-  targetType: VoteTargetType,
+  targetType: EdgeOperationTargetType,
   targetId: string,
   voteType: 1 | -1,
 ): Promise<VoteResponse> => {
-  return apiPost<VoteResponse>(`/votes`, {
-    targetType,
-    targetId,
-    voteType,
-  });
+  const operationType =
+    voteType === 1 ? EdgeOperationType.VOTE_UP : EdgeOperationType.VOTE_DOWN;
+  const res = await operateEdgeOperation(operationType, targetType, targetId);
+  return {
+    ...res,
+    userVote:
+      res.userOperation === EdgeOperationType.VOTE_UP
+        ? 1
+        : res.userOperation === EdgeOperationType.VOTE_DOWN
+          ? -1
+          : 0,
+  };
 };

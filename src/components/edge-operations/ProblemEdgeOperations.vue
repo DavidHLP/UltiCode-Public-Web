@@ -19,10 +19,9 @@ import type {
   ProblemReactionType,
 } from "@/types/problem-detail";
 import {
-  toggleFavorite as apiToggleFavorite,
-  toggleVote,
-  FavoriteTargetType,
-  VoteTargetType,
+  operateEdgeOperation,
+  EdgeOperationTargetType,
+  EdgeOperationType,
 } from "@/api/interaction";
 import { fetchProblemLists, addProblemToList } from "@/api/problem-list";
 import type { ProblemList } from "@/types/problem-list";
@@ -102,17 +101,25 @@ const isFavorited = computed(() => viewerInteraction.value.isFavorite);
 
 const toggleReaction = async (reaction: "like" | "dislike") => {
   if (!props.problem) return;
-  const voteType = reaction === "like" ? 1 : -1;
+  const operationType =
+    reaction === "like"
+      ? EdgeOperationType.VOTE_UP
+      : EdgeOperationType.VOTE_DOWN;
   try {
-    const res = await toggleVote(
-      VoteTargetType.PROBLEM,
+    const res = await operateEdgeOperation(
+      operationType,
+      EdgeOperationTargetType.PROBLEM,
       props.problem.id.toString(),
-      voteType,
     );
     interactionCounts.value.likes = res.likes;
     interactionCounts.value.dislikes = res.dislikes;
+    interactionCounts.value.favorites = res.favorites;
     viewerInteraction.value.reaction =
-      res.userVote === 1 ? "like" : res.userVote === -1 ? "dislike" : undefined;
+      res.userOperation === EdgeOperationType.VOTE_UP
+        ? "like"
+        : res.userOperation === EdgeOperationType.VOTE_DOWN
+          ? "dislike"
+          : undefined;
   } catch (e) {
     console.error("Failed to toggle reaction", e);
   }
@@ -121,16 +128,16 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
 const toggleFavorite = async () => {
   if (!props.problem) return;
   try {
-    const res = await apiToggleFavorite(
-      FavoriteTargetType.PROBLEM,
+    const res = await operateEdgeOperation(
+      EdgeOperationType.FAVORITE,
+      EdgeOperationTargetType.PROBLEM,
       props.problem.id.toString(),
     );
-    viewerInteraction.value.isFavorite = res.isFavorited;
-    if (res.isFavorited) {
-      interactionCounts.value.favorites++;
-    } else {
-      interactionCounts.value.favorites--;
-    }
+    interactionCounts.value.likes = res.likes;
+    interactionCounts.value.dislikes = res.dislikes;
+    interactionCounts.value.favorites = res.favorites;
+    viewerInteraction.value.isFavorite =
+      res.userOperation === EdgeOperationType.FAVORITE;
   } catch (e) {
     console.error("Failed to toggle favorite", e);
   }
