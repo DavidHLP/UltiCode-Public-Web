@@ -1,4 +1,4 @@
-import { apiGet } from "@/utils/request";
+import { apiGet, apiPost, apiDelete, apiPatch } from "@/utils/request";
 import type { Problem } from "@/types/problem";
 import { mapProblem } from "@/api/problem";
 import type {
@@ -126,4 +126,49 @@ export async function fetchProblemsByListId(
     `/problem-lists/${listId}/problems${query}`,
   );
   return data.map(mapProblem);
+}
+
+export async function forkProblemList(
+  listId: string,
+  userId: string,
+): Promise<string> {
+  const res = await apiPost<{ id: string }>(
+    `/problem-lists/${listId}/fork?userId=${userId}`,
+  );
+  return res.id;
+}
+
+export async function deleteProblemList(
+  listId: string,
+  userId: string,
+): Promise<void> {
+  await apiDelete(`/problem-lists/${listId}?userId=${userId}`);
+}
+
+export async function updateProblemList(
+  listId: string,
+  userId: string,
+  data: { name?: string; description?: string; isPublic?: boolean },
+): Promise<void> {
+  await apiPatch(`/problem-lists/${listId}?userId=${userId}`, data);
+}
+
+export async function addProblemToList(
+  listId: string,
+  userId: string,
+  problemId: number,
+): Promise<void> {
+  await apiPost(`/problem-lists/${listId}/problems?userId=${userId}`, {
+    problemId,
+  });
+}
+
+export async function removeProblemFromList(
+  listId: string,
+  userId: string,
+  problemId: number,
+): Promise<void> {
+  await apiDelete(
+    `/problem-lists/${listId}/problems/${problemId}?userId=${userId}`,
+  );
 }

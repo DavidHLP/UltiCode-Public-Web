@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import ProblemExplorer from "@/components/problem/ProblemExplorer.vue";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +10,10 @@ import {
   Share2,
   CalendarDays,
   Clock,
+  Copy,
+  Pencil,
+  Trash2,
+  Settings,
 } from "lucide-vue-next";
 import {
   DropdownMenu,
@@ -18,11 +22,26 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import type { ProblemListItem } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
 import {
   fetchProblemListItem,
   fetchProblemsByListId,
+  forkProblemList,
+  deleteProblemList,
+  updateProblemList,
 } from "@/api/problem-list";
 import { fetchCurrentUserId } from "@/utils/auth";
 import {
@@ -34,15 +53,30 @@ import {
 } from "@/components/ui/empty";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "vue-sonner";
 import ProblemListAnalytics from "./ProblemListAnalytics.vue";
 
 const route = useRoute();
+const router = useRouter();
 const listId = computed(() => route.params.id as string);
 
 // 获取当前列表的详细信息
 const currentList = ref<ProblemListItem | null>(null);
 const problems = ref<Problem[]>([]);
 const problemsWithStatus = computed(() => problems.value);
+const currentUser = fetchCurrentUserId();
+
+// State for dialogs
+const isEditOpen = ref(false);
+const isDeleteOpen = ref(false);
+const isForking = ref(false);
+const isDeleting = ref(false);
+
+const editForm = ref({
+  name: "",
+  description: "",
+  isPublic: false,
+});
 
 async function loadProblemList(id?: string) {
   if (!id) {
@@ -53,6 +87,13 @@ async function loadProblemList(id?: string) {
   const userId = fetchCurrentUserId();
   try {
     currentList.value = await fetchProblemListItem(id);
+    if (currentList.value) {
+      editForm.value = {
+        name: currentList.value.name,
+        description: currentList.value.description || "",
+        isPublic: currentList.value.isPublic || false,
+      };
+    }
   } catch (error) {
     console.error("Failed to load problem list", error);
     currentList.value = null;
@@ -70,7 +111,7 @@ watch(
   (id) => {
     void loadProblemList(id);
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // 格式化日期
@@ -83,6 +124,100 @@ const formatDate = (date?: Date | string) => {
     day: "numeric",
   }).format(d);
 };
+
+// Actions
+const handleShare = async () => {
+  const url = window.location.href;
+  await navigator.clipboard.writeText(url);
+  toast({
+    title: "Link copied",
+    description:
+      "The link to this problem list has been copied to your clipboard.",
+  });
+};
+
+const handleFork = async () => {
+  if (!currentUser) {
+    toast({
+      title: "Authentication required",
+      description: "Please sign in to fork this list.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  isForking.value = true;
+  try {
+    const newListId = await forkProblemList(listId.value, currentUser);
+    toast({
+      title: "List forked",
+      description: "You have successfully forked this problem list.",
+    });
+    router.push(`/problem-list/${newListId}`);
+  } catch {
+    toast({
+      title: "Failed to fork list",
+      description: "An error occurred while forking the list.",
+      variant: "destructive",
+    });
+  } finally {
+    isForking.value = false;
+  }
+};
+
+const handleDelete = async () => {
+  if (!currentUser || !currentList.value) return;
+
+  isDeleting.value = true;
+  try {
+    await deleteProblemList(listId.value, currentUser);
+    toast({
+      title: "List deleted",
+      description: "The problem list has been permanently deleted.",
+    });
+    router.push("/problemset"); // Redirect to main problem set or lists page
+  } catch {
+    toast({
+      title: "Failed to delete list",
+      description: "An error occurred while deleting the list.",
+      variant: "destructive",
+    });
+  } finally {
+    isDeleting.value = false;
+    isDeleteOpen.value = false;
+  }
+};
+
+const handleSaveEdit = async () => {
+  if (!currentUser || !currentList.value) return;
+
+  try {
+    await updateProblemList(listId.value, currentUser, {
+      name: editForm.value.name,
+      description: editForm.value.description,
+      isPublic: editForm.value.isPublic,
+    });
+
+    // Refresh list data
+    await loadProblemList(listId.value);
+
+    toast({
+      title: "List updated",
+      description: "Problem list details have been updated.",
+    });
+    isEditOpen.value = false;
+  } catch {
+    toast({
+      title: "Failed to update list",
+      description: "An error occurred while updating the list.",
+      variant: "destructive",
+    });
+  }
+};
+
+const isOwner = computed(() => {
+  return currentUser && currentList.value?.authorId === currentUser;
+});
 </script>
 
 <template>
@@ -148,13 +283,19 @@ const formatDate = (date?: Date | string) => {
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <Button variant="secondary" size="sm" class="h-9">
+        <Button variant="secondary" size="sm" class="h-9" @click="handleShare">
           <Share2 class="mr-2 h-4 w-4" />
           Share
         </Button>
-        <Button variant="outline" size="sm" class="h-9">
+        <Button
+          variant="outline"
+          size="sm"
+          class="h-9"
+          @click="handleFork"
+          :disabled="isForking"
+        >
           <GitFork class="mr-2 h-4 w-4" />
-          Fork
+          {{ isForking ? "Forking..." : "Fork" }}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
@@ -162,18 +303,101 @@ const formatDate = (date?: Date | string) => {
               <MoreHorizontal class="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" class="w-48">
-            <DropdownMenuItem>Edit List Details</DropdownMenuItem>
-            <DropdownMenuItem>Manage Problems</DropdownMenuItem>
-            <DropdownMenuItem>Duplicate List</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem class="text-destructive"
-              >Delete List</DropdownMenuItem
-            >
+          <DropdownMenuContent align="end" class="w-56">
+            <template v-if="isOwner">
+              <DropdownMenuItem @click="isEditOpen = true">
+                <Pencil class="mr-2 h-4 w-4" />
+                Edit List Details
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled title="Coming soon">
+                <Settings class="mr-2 h-4 w-4" />
+                Manage Problems
+              </DropdownMenuItem>
+            </template>
+            <DropdownMenuItem @click="handleFork" :disabled="isForking">
+              <Copy class="mr-2 h-4 w-4" />
+              Duplicate List
+            </DropdownMenuItem>
+            <template v-if="isOwner">
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                class="text-destructive focus:text-destructive"
+                @click="isDeleteOpen = true"
+              >
+                <Trash2 class="mr-2 h-4 w-4" />
+                Delete List
+              </DropdownMenuItem>
+            </template>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </div>
+
+    <!-- Edit Dialog -->
+    <Dialog v-model:open="isEditOpen">
+      <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit List Details</DialogTitle>
+          <DialogDescription>
+            Make changes to your problem list here. Click save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <div class="grid gap-4 py-4">
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="name" class="text-right">Name</Label>
+            <Input id="name" v-model="editForm.name" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="description" class="text-right">Description</Label>
+            <Textarea
+              id="description"
+              v-model="editForm.description"
+              class="col-span-3"
+            />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="public" class="text-right">Public</Label>
+            <div class="col-span-3 flex items-center space-x-2">
+              <Switch id="public" v-model:checked="editForm.isPublic" />
+              <span class="text-sm text-muted-foreground">{{
+                editForm.isPublic
+                  ? "Everyone can see this list"
+                  : "Only you can see this list"
+              }}</span>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="submit" @click="handleSaveEdit">Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <!-- Delete Confirmation -->
+    <Dialog v-model:open="isDeleteOpen">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete the
+            problem list "<strong>{{ currentList?.name }}</strong
+            >".
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter class="gap-2 sm:gap-0">
+          <Button variant="outline" @click="isDeleteOpen = false"
+            >Cancel</Button
+          >
+          <Button
+            variant="destructive"
+            @click="handleDelete"
+            :disabled="isDeleting"
+          >
+            {{ isDeleting ? "Deleting..." : "Delete List" }}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     <div v-if="problems.length === 0" class="py-12">
       <Empty
