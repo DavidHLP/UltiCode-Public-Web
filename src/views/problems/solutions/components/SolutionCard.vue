@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
-import { PostActions } from "@/components/post-actions";
+import { PostActions } from "@/components/edge-operations";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 const props = defineProps<{

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VoteControl } from "@/components/post-actions/vote-control";
+import { VoteControl } from "@/components/edge-operations/vote-control";
 import { Button } from "@/components/ui/button";
 import {
   MessageCircle,

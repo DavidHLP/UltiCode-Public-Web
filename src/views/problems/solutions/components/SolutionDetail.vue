@@ -13,7 +13,7 @@ import {
   recordSolutionView,
 } from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
-import { PostActions } from "@/components/post-actions";
+import { PostActions } from "@/components/edge-operations";
 import "highlight.js/styles/atom-one-dark.css";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 import { fetchCurrentUserId } from "@/utils/auth";

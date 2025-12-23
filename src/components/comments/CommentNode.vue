@@ -181,7 +181,7 @@ import { ref, computed } from "vue";
 import type { Comment } from "@/types/comment";
 import CommentForm from "./CommentForm.vue";
 import { Button } from "@/components/ui/button";
-import { VoteControl } from "@/components/post-actions/vote-control";
+import { VoteControl } from "@/components/edge-operations/vote-control";
 
 import { MessageSquare, Share2, Flag } from "lucide-vue-next";
 

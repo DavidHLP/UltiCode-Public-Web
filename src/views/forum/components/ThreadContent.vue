@@ -7,7 +7,7 @@ import type {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Share2 } from "lucide-vue-next";
-import { PostActions } from "@/components/post-actions";
+import { PostActions } from "@/components/edge-operations";
 import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";

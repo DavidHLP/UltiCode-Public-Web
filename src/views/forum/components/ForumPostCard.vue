@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Link as LinkIcon } from "lucide-vue-next";
-import { PostActions } from "@/components/post-actions";
+import { PostActions } from "@/components/edge-operations";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
