@@ -48,14 +48,22 @@ function mapProblem(problem: unknown): Problem {
 
 export async function fetchProblems(
   userId?: string,
-  filters: { category?: string } = {},
+  filters: { category?: string; search?: string } = {},
 ): Promise<Problem[]> {
   const params = new URLSearchParams();
   if (userId) params.append("userId", userId);
   if (filters.category) params.append("category", filters.category);
+  if (filters.search) params.append("search", filters.search);
 
   const queryString = params.toString() ? `?${params.toString()}` : "";
   const data = await apiGet<unknown[]>(`/problems${queryString}`);
+  return data.map(mapProblem);
+}
+
+export async function searchProblems(query: string): Promise<Problem[]> {
+  if (!query.trim()) return [];
+  const params = new URLSearchParams({ search: query });
+  const data = await apiGet<unknown[]>(`/problems?${params.toString()}`);
   return data.map(mapProblem);
 }
 

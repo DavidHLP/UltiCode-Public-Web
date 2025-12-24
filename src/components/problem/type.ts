@@ -8,10 +8,12 @@ export type DisplayedProblem = Problem & {
 export interface ProblemExplorerProps {
   problems?: Problem[];
   initialCategory?: string;
+  editable?: boolean;
 }
 
 export interface ProblemTableProps {
   displayedProblems: DisplayedProblem[];
   numProblemsToShow: number;
   totalFilteredProblems: number;
+  editable?: boolean;
 }

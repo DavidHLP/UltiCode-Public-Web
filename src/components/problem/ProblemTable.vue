@@ -2,7 +2,7 @@
 import type { Problem } from "@/types/problem";
 import { onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { Lock, SearchX, Video } from "lucide-vue-next";
+import { Lock, SearchX, Video, Trash2 } from "lucide-vue-next";
 import {
   Table,
   TableBody,
@@ -18,14 +18,15 @@ import {
   EmptyHeader,
   EmptyMedia,
 } from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
 
 import type { ProblemTableProps } from "./type";
 
-defineProps<ProblemTableProps>();
+const props = defineProps<ProblemTableProps>();
 
 const router = useRouter();
 
-const emit = defineEmits(["load-more"]);
+const emit = defineEmits(["load-more", "remove"]);
 
 const goToDetail = (slug: string) => {
   router.push({ name: "problem-detail", params: { slug } });
@@ -60,6 +61,11 @@ const handleScroll = () => {
   }
 };
 
+const handleRemove = (e: Event, problem: Problem) => {
+  e.stopPropagation();
+  emit("remove", problem);
+};
+
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
 });
@@ -77,6 +83,9 @@ onUnmounted(() => {
         <TableHead>Title</TableHead>
         <TableHead class="w-[120px] text-center">Acceptance</TableHead>
         <TableHead class="w-[100px] text-center">Difficulty</TableHead>
+        <TableHead v-if="props.editable" class="w-[80px] text-center"
+          >Actions</TableHead
+        >
       </TableRow>
     </TableHeader>
 
@@ -132,11 +141,22 @@ onUnmounted(() => {
           >
             {{ problem.difficulty }}
           </TableCell>
+
+          <TableCell v-if="props.editable" class="text-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 text-muted-foreground hover:text-destructive"
+              @click="(e: MouseEvent) => handleRemove(e, problem)"
+            >
+              <Trash2 class="h-4 w-4" />
+            </Button>
+          </TableCell>
         </TableRow>
       </template>
 
       <TableRow v-else>
-        <TableCell colspan="4" class="p-0">
+        <TableCell :colspan="props.editable ? 5 : 4" class="p-0">
           <Empty class="border-none bg-transparent px-6 py-8">
             <EmptyContent>
               <EmptyMedia variant="icon">

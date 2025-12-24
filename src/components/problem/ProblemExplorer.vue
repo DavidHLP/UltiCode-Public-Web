@@ -32,10 +32,17 @@ import ProblemTable from "./ProblemTable.vue";
 import { fetchProblems, fetchRandomProblem } from "@/api/problem";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useRouter } from "vue-router";
 
 import type { ProblemExplorerProps } from "./type";
 
+const router = useRouter();
+
 const props = defineProps<ProblemExplorerProps>();
+
+const emit = defineEmits<{
+  remove: [problem: Problem];
+}>();
 
 const searchQuery = ref("");
 const selectedTags = ref<string[]>([]);
@@ -246,11 +253,22 @@ function clearFilters() {
 }
 
 async function pickOne() {
+  // Pick from current filtered problems if available
+  const currentProblems = filteredProblems.value;
+  if (currentProblems.length > 0) {
+    const randomIndex = Math.floor(Math.random() * currentProblems.length);
+    const problem = currentProblems[randomIndex];
+    if (problem && problem.slug) {
+      await router.push(`/problems/${problem.slug}`);
+    }
+    return;
+  }
+
+  // Fallback to fetch random from backend if no filtered problems
   try {
     const problem = await fetchRandomProblem();
     if (problem) {
-      // Navigate to problem detail page
-      window.location.href = `/problem/${problem.slug}`;
+      await router.push(`/problems/${problem.slug}`);
     } else {
       toast.error("No problems available.");
     }
@@ -538,7 +556,9 @@ function loadMore() {
       :displayed-problems="displayedProblems"
       :num-problems-to-show="numProblemsToShow"
       :total-filtered-problems="totalFilteredProblems"
+      :editable="props.editable"
       @load-more="loadMore"
+      @remove="(problem) => emit('remove', problem)"
     />
   </section>
 </template>

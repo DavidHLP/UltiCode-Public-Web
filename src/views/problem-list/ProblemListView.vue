@@ -13,7 +13,9 @@ import {
   Copy,
   Pencil,
   Trash2,
-  Settings,
+  Plus,
+  Search,
+  Check,
 } from "lucide-vue-next";
 import {
   DropdownMenu,
@@ -34,6 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ProblemListItem } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
 import {
@@ -42,7 +45,10 @@ import {
   forkProblemList,
   deleteProblemList,
   updateProblemList,
+  addProblemToList,
+  removeProblemFromList,
 } from "@/api/problem-list";
+import { searchProblems } from "@/api/problem";
 import { fetchCurrentUserId } from "@/utils/auth";
 import {
   Empty,
@@ -69,8 +75,16 @@ const currentUser = fetchCurrentUserId();
 // State for dialogs
 const isEditOpen = ref(false);
 const isDeleteOpen = ref(false);
+const isAddProblemsOpen = ref(false);
 const isForking = ref(false);
 const isDeleting = ref(false);
+
+// Add problems state
+const searchQuery = ref("");
+const searchResults = ref<Problem[]>([]);
+const isSearching = ref(false);
+const addingProblemIds = ref<Set<number>>(new Set());
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const editForm = ref({
   name: "",
@@ -153,7 +167,7 @@ const handleFork = async () => {
       title: "List forked",
       description: "You have successfully forked this problem list.",
     });
-    router.push(`/problem-list/${newListId}`);
+    router.push(`/problemset/list/${newListId}`);
   } catch {
     toast({
       title: "Failed to fork list",
@@ -216,8 +230,83 @@ const handleSaveEdit = async () => {
 };
 
 const isOwner = computed(() => {
-  return currentUser && currentList.value?.authorId === currentUser;
+  return !!(currentUser && currentList.value?.authorId === currentUser);
 });
+
+// Check if problem is already in the list
+const problemIdsInList = computed(() => {
+  return new Set(problems.value.map((p) => p.id));
+});
+
+// Search for problems with debounce
+const handleSearch = () => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(async () => {
+    const query = searchQuery.value.trim();
+    if (!query) {
+      searchResults.value = [];
+      return;
+    }
+    isSearching.value = true;
+    try {
+      searchResults.value = await searchProblems(query);
+    } catch (e) {
+      console.error("Failed to search problems", e);
+      searchResults.value = [];
+    } finally {
+      isSearching.value = false;
+    }
+  }, 300);
+};
+
+const handleAddProblem = async (problem: Problem) => {
+  if (!currentUser || addingProblemIds.value.has(problem.id)) return;
+
+  addingProblemIds.value.add(problem.id);
+  try {
+    await addProblemToList(listId.value, currentUser, problem.id);
+    // Add to local list
+    problems.value = [...problems.value, problem];
+    toast.success(`Added "${problem.title}" to the list`);
+  } catch (e) {
+    console.error("Failed to add problem", e);
+    toast.error("Failed to add problem to the list");
+  } finally {
+    addingProblemIds.value.delete(problem.id);
+  }
+};
+
+const handleRemoveProblem = async (problem: Problem) => {
+  if (!currentUser) return;
+
+  try {
+    await removeProblemFromList(listId.value, currentUser, problem.id);
+    problems.value = problems.value.filter((p) => p.id !== problem.id);
+    toast.success(`Removed "${problem.title}" from the list`);
+  } catch (e) {
+    console.error("Failed to remove problem", e);
+    toast.error("Failed to remove problem from the list");
+  }
+};
+
+const openAddProblemsDialog = () => {
+  searchQuery.value = "";
+  searchResults.value = [];
+  isAddProblemsOpen.value = true;
+};
+
+const getDifficultyColor = (difficulty: string) => {
+  switch (difficulty?.toLowerCase()) {
+    case "easy":
+      return "text-green-600 bg-green-100";
+    case "medium":
+      return "text-yellow-600 bg-yellow-100";
+    case "hard":
+      return "text-red-600 bg-red-100";
+    default:
+      return "text-gray-600 bg-gray-100";
+  }
+};
 </script>
 
 <template>
@@ -309,9 +398,9 @@ const isOwner = computed(() => {
                 <Pencil class="mr-2 h-4 w-4" />
                 Edit List Details
               </DropdownMenuItem>
-              <DropdownMenuItem disabled title="Coming soon">
-                <Settings class="mr-2 h-4 w-4" />
-                Manage Problems
+              <DropdownMenuItem @click="openAddProblemsDialog">
+                <Plus class="mr-2 h-4 w-4" />
+                Add Problems
               </DropdownMenuItem>
             </template>
             <DropdownMenuItem @click="handleFork" :disabled="isForking">
@@ -399,6 +488,111 @@ const isOwner = computed(() => {
       </DialogContent>
     </Dialog>
 
+    <!-- Add Problems Dialog -->
+    <Dialog v-model:open="isAddProblemsOpen">
+      <DialogContent class="sm:max-w-[650px] max-h-[80vh] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Add Problems</DialogTitle>
+          <DialogDescription>
+            Search for problems to add to your list.
+          </DialogDescription>
+        </DialogHeader>
+        <div class="flex-1 space-y-4 py-4 overflow-hidden">
+          <!-- Search Input -->
+          <div class="relative">
+            <Search
+              class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+            />
+            <Input
+              v-model="searchQuery"
+              placeholder="Search by problem title or ID..."
+              class="pl-10"
+              @input="handleSearch"
+            />
+          </div>
+
+          <!-- Search Results -->
+          <div class="border rounded-md overflow-hidden">
+            <div
+              v-if="isSearching"
+              class="flex items-center justify-center py-12"
+            >
+              <span class="text-muted-foreground">Searching...</span>
+            </div>
+            <div
+              v-else-if="searchQuery && searchResults.length === 0"
+              class="flex items-center justify-center py-12"
+            >
+              <span class="text-muted-foreground">No problems found</span>
+            </div>
+            <div
+              v-else-if="!searchQuery"
+              class="flex items-center justify-center py-12"
+            >
+              <span class="text-muted-foreground"
+                >Enter a search term to find problems</span
+              >
+            </div>
+            <ScrollArea v-else class="h-[320px]">
+              <div class="divide-y">
+                <div
+                  v-for="problem in searchResults"
+                  :key="problem.id"
+                  class="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+                >
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <span
+                      class="text-sm font-mono text-muted-foreground w-10 shrink-0 text-right"
+                    >
+                      {{ problem.id }}
+                    </span>
+                    <span class="text-sm font-medium truncate flex-1">
+                      {{ problem.title }}
+                    </span>
+                    <Badge
+                      :class="getDifficultyColor(problem.difficulty)"
+                      class="text-xs shrink-0"
+                    >
+                      {{ problem.difficulty }}
+                    </Badge>
+                  </div>
+                  <div class="shrink-0 ml-3">
+                    <Button
+                      v-if="problemIdsInList.has(problem.id)"
+                      variant="ghost"
+                      size="sm"
+                      class="text-green-600 gap-1 pointer-events-none"
+                    >
+                      <Check class="h-4 w-4" />
+                      Added
+                    </Button>
+                    <Button
+                      v-else
+                      variant="outline"
+                      size="sm"
+                      class="gap-1"
+                      :disabled="addingProblemIds.has(problem.id)"
+                      @click="handleAddProblem(problem)"
+                    >
+                      <Plus class="h-4 w-4" />
+                      {{
+                        addingProblemIds.has(problem.id) ? "Adding..." : "Add"
+                      }}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" @click="isAddProblemsOpen = false"
+            >Done</Button
+          >
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     <div v-if="problems.length === 0" class="py-12">
       <Empty
         class="h-80 border border-dashed border-border/60 bg-muted/20 rounded-xl"
@@ -419,7 +613,16 @@ const isOwner = computed(() => {
               progress.
             </EmptyDescription>
           </EmptyHeader>
-          <Button class="mt-6" size="lg">Add Problems</Button>
+          <Button
+            class="mt-6"
+            size="lg"
+            @click="openAddProblemsDialog"
+            v-if="isOwner"
+            >Add Problems</Button
+          >
+          <Button class="mt-6" size="lg" @click="handleFork" v-else
+            >Fork and Add Problems</Button
+          >
         </EmptyContent>
       </Empty>
     </div>
@@ -428,23 +631,16 @@ const isOwner = computed(() => {
     <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
       <!-- Left Column: Problem List (8 cols) -->
       <div class="lg:col-span-8 space-y-6">
-        <ProblemExplorer :problems="problemsWithStatus" />
+        <ProblemExplorer
+          :problems="problemsWithStatus"
+          :editable="isOwner"
+          @remove="handleRemoveProblem"
+        />
       </div>
 
       <!-- Right Column: Analytics Sidebar (4 cols) -->
       <div class="lg:col-span-4 space-y-6 sticky top-6">
         <ProblemListAnalytics :problems="problemsWithStatus" />
-
-        <!-- Motivation Card (Optional Placeholder) -->
-        <div class="bg-primary/5 rounded-lg p-5 border border-primary/10">
-          <h4 class="font-medium text-primary mb-2 flex items-center gap-2">
-            🔥 Keep it up!
-          </h4>
-          <p class="text-sm text-primary/80">
-            Solve <strong>3 more</strong> problems to reach 50% completion on
-            this list.
-          </p>
-        </div>
       </div>
     </div>
   </div>
