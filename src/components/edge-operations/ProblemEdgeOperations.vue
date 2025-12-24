@@ -20,12 +20,14 @@ import type {
 } from "@/types/problem-detail";
 import {
   operateEdgeOperation,
+  fetchEdgeOperationStatus,
   EdgeOperationTargetType,
   EdgeOperationType,
 } from "@/api/interaction";
 import { fetchProblemLists, addProblemToList } from "@/api/problem-list";
 import type { ProblemList } from "@/types/problem-list";
 import { toast } from "vue-sonner";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 interface Props {
   problem?: ProblemDetail | null;
@@ -49,7 +51,37 @@ const viewerInteraction = ref<{
 
 const userLists = ref<ProblemList[]>([]);
 const isLoadingLists = ref(false);
-const userId = "user-yuki"; // TODO: Get from auth context
+const isLoadingInteractions = ref(false);
+
+const loadInteractions = async (problemId: number | string) => {
+  isLoadingInteractions.value = true;
+  try {
+    const userId = fetchCurrentUserId();
+    const res = await fetchEdgeOperationStatus(
+      EdgeOperationTargetType.PROBLEM,
+      problemId.toString(),
+      userId ?? undefined,
+    );
+    interactionCounts.value = {
+      likes: res.likes,
+      dislikes: res.dislikes,
+      favorites: res.favorites,
+    };
+    viewerInteraction.value = {
+      reaction:
+        res.userOperation === EdgeOperationType.VOTE_UP
+          ? "like"
+          : res.userOperation === EdgeOperationType.VOTE_DOWN
+            ? "dislike"
+            : undefined,
+      isFavorite: res.userOperation === EdgeOperationType.FAVORITE,
+    };
+  } catch (e) {
+    console.error("Failed to load interactions", e);
+  } finally {
+    isLoadingInteractions.value = false;
+  }
+};
 
 const loadUserLists = async () => {
   if (userLists.value.length > 0) return;
@@ -70,6 +102,11 @@ const loadUserLists = async () => {
 
 const handleAddToList = async (listId: string) => {
   if (!props.problem) return;
+  const userId = fetchCurrentUserId();
+  if (!userId) {
+    toast.error("Please login first");
+    return;
+  }
   try {
     await addProblemToList(listId, userId, Number(props.problem.id));
     toast.success("Added to list successfully");
@@ -80,16 +117,23 @@ const handleAddToList = async (listId: string) => {
 };
 
 watch(
-  () => props.problem?.interactions,
-  (interactions) => {
-    if (!interactions) return;
-    interactionCounts.value = { ...interactions.counts };
-    viewerInteraction.value = {
-      reaction: interactions.viewer?.reaction,
-      isFavorite: !!interactions.viewer?.isFavorite,
-    };
+  () => props.problem?.id,
+  (problemId) => {
+    if (problemId) {
+      // First try to use interactions from props if available
+      if (props.problem?.interactions) {
+        interactionCounts.value = { ...props.problem.interactions.counts };
+        viewerInteraction.value = {
+          reaction: props.problem.interactions.viewer?.reaction,
+          isFavorite: !!props.problem.interactions.viewer?.isFavorite,
+        };
+      } else {
+        // Otherwise fetch from API
+        loadInteractions(problemId);
+      }
+    }
   },
-  { immediate: true, deep: true },
+  { immediate: true },
 );
 
 const reactionCounts = computed(() => interactionCounts.value);

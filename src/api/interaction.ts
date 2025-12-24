@@ -3,10 +3,16 @@ import {
   EdgeOperationTargetType,
   EdgeOperationType,
   operateEdgeOperation,
+  fetchEdgeOperationStatus,
 } from "@/api/edge-operations";
 import type { EdgeOperationResponse } from "@/api/edge-operations";
 
-export { EdgeOperationTargetType, EdgeOperationType, operateEdgeOperation };
+export {
+  EdgeOperationTargetType,
+  EdgeOperationType,
+  operateEdgeOperation,
+  fetchEdgeOperationStatus,
+};
 export type { EdgeOperationResponse };
 
 export async function fetchProblemNote(

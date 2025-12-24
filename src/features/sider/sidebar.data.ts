@@ -15,6 +15,7 @@ import {
   HelpCircle,
   User,
   Settings,
+  List,
 } from "lucide-vue-next";
 
 export interface SidebarItem {
@@ -114,6 +115,7 @@ export const personalSidebarData: SidebarSection[] = [
         icon: FileText,
       },
       { title: "My Solutions", url: "/personal/solutions", icon: FileText },
+      { title: "My Problem Lists", url: "/personal/problem-lists", icon: List },
     ],
   },
 ];

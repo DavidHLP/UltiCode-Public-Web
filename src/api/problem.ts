@@ -20,8 +20,17 @@ function mapProblem(problem: unknown): Problem {
       : completedRaw instanceof Date
         ? completedRaw.toISOString()
         : String(completedRaw);
+  // Convert id to number (bigint from backend comes as string in JSON)
+  const rawId = p.id;
+  const id =
+    typeof rawId === "number"
+      ? rawId
+      : typeof rawId === "string"
+        ? Number(rawId)
+        : rawId;
   return {
     ...p,
+    id,
     acceptance_rate:
       acceptanceRate ??
       (typeof p.acceptance_rate === "number" ? p.acceptance_rate : undefined),

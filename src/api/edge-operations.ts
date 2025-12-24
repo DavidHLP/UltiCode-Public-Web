@@ -1,4 +1,4 @@
-import { apiPost } from "@/utils/request";
+import { apiGet, apiPost } from "@/utils/request";
 
 export enum EdgeOperationType {
   VOTE_UP = "VOTE_UP",
@@ -22,6 +22,17 @@ export interface EdgeOperationResponse {
   favorites: number;
   userOperation: EdgeOperationType | null;
 }
+
+export const fetchEdgeOperationStatus = async (
+  targetType: EdgeOperationTargetType,
+  targetId: string,
+  userId?: string,
+): Promise<EdgeOperationResponse> => {
+  const query = userId ? `?userId=${userId}` : "";
+  return apiGet<EdgeOperationResponse>(
+    `/edge-operations/${targetType}/${targetId}${query}`,
+  );
+};
 
 export const operateEdgeOperation = async (
   operationType: EdgeOperationType,

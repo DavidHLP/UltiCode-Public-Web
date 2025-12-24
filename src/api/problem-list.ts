@@ -172,3 +172,18 @@ export async function removeProblemFromList(
     `/problem-lists/${listId}/problems/${problemId}?userId=${userId}`,
   );
 }
+
+export async function createProblemList(
+  userId: string,
+  data: { name: string; description?: string; isPublic?: boolean },
+): Promise<ProblemListItem> {
+  const res = await apiPost<unknown>(`/problem-lists?userId=${userId}`, data);
+  return mapProblemListItem(res);
+}
+
+export async function fetchUserProblemLists(
+  userId: string,
+): Promise<ProblemListItem[]> {
+  const data = await apiGet<unknown[]>(`/problem-lists/user/${userId}`);
+  return data.map(mapProblemListItem);
+}
