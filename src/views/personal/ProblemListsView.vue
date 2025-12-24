@@ -64,6 +64,9 @@ import {
   ChevronRight,
   User,
   Star,
+  Folder,
+  GripVertical,
+  Save,
 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import type {
@@ -76,6 +79,7 @@ import {
   createProblemList,
   deleteProblemList,
   unsaveList,
+  saveList,
   createCategory,
   updateCategory,
   deleteCategory,
@@ -136,9 +140,19 @@ const sortedMyLists = computed(() => {
 const sortedSavedLists = computed(() => {
   // Filter out lists that are in categories
   const inCategoryIds = new Set(
-    data.value.categories.flatMap((c) => c.lists.map((l) => l.id))
+    data.value.categories.flatMap((c) => c.lists.map((l) => l.id)),
   );
   return data.value.savedLists.filter((l) => !inCategoryIds.has(l.id));
+});
+
+// Total saved lists count (uncategorized + in categories)
+const totalSavedCount = computed(() => {
+  return data.value.savedLists.length;
+});
+
+// Sort categories by sortOrder
+const sortedCategories = computed(() => {
+  return [...data.value.categories].sort((a, b) => a.sortOrder - b.sortOrder);
 });
 
 const loadData = async () => {
@@ -219,7 +233,7 @@ const handleUnsaveList = async (list: ProblemList) => {
 // --- Move List to Category ---
 const handleMoveToCategory = async (
   list: ProblemList,
-  categoryId: string | null
+  categoryId: string | null,
 ) => {
   if (!currentUserId) return;
   try {
@@ -227,7 +241,7 @@ const handleMoveToCategory = async (
     toast.success(
       categoryId
         ? `Moved "${list.name}" to category`
-        : `Removed "${list.name}" from category`
+        : `Removed "${list.name}" from category`,
     );
     await loadData();
   } catch (e) {
@@ -282,6 +296,19 @@ const handleEditCategory = async () => {
     toast.error("Failed to update category");
   } finally {
     isEditingCategory.value = false;
+  }
+};
+
+// --- Save Featured List ---
+const handleSaveList = async (list: ProblemList) => {
+  if (!currentUserId) return;
+  try {
+    await saveList(list.id, currentUserId);
+    toast.success(`Saved "${list.name}" to your lists`);
+    await loadData();
+  } catch (e) {
+    console.error("Failed to save list", e);
+    toast.error("Failed to save list");
   }
 };
 
@@ -371,7 +398,14 @@ onMounted(loadData);
             <Bookmark class="h-4 w-4" />
             Saved
             <Badge variant="secondary" class="ml-1">{{
-              data.savedLists.length
+              totalSavedCount
+            }}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="categories" class="gap-2">
+            <Folder class="h-4 w-4" />
+            Categories
+            <Badge variant="secondary" class="ml-1">{{
+              data.categories.length
             }}</Badge>
           </TabsTrigger>
           <TabsTrigger value="featured" class="gap-2">
@@ -711,6 +745,171 @@ onMounted(loadData);
           </Empty>
         </TabsContent>
 
+        <!-- Categories Tab -->
+        <TabsContent value="categories" class="mt-0 space-y-6">
+          <!-- Category Management Header -->
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold">Manage Categories</h3>
+              <p class="text-sm text-muted-foreground">
+                Organize your saved lists into categories
+              </p>
+            </div>
+            <Button @click="isCreateCategoryOpen = true" class="gap-2">
+              <FolderPlus class="h-4 w-4" />
+              New Category
+            </Button>
+          </div>
+
+          <!-- Empty State for Categories -->
+          <Empty
+            v-if="data.categories.length === 0"
+            class="h-64 border border-dashed border-border/60 bg-muted/20 rounded-xl"
+          >
+            <EmptyContent>
+              <EmptyMedia
+                variant="icon"
+                class="bg-background p-4 rounded-full shadow-sm mb-4"
+              >
+                <Folder class="h-8 w-8 text-muted-foreground" />
+              </EmptyMedia>
+              <EmptyHeader>
+                <h3 class="text-xl font-semibold text-foreground mb-1">
+                  No categories yet
+                </h3>
+                <EmptyDescription class="text-base">
+                  Create categories to organize your saved lists.
+                </EmptyDescription>
+              </EmptyHeader>
+              <Button class="mt-6" @click="isCreateCategoryOpen = true">
+                <FolderPlus class="mr-2 h-4 w-4" />
+                Create Your First Category
+              </Button>
+            </EmptyContent>
+          </Empty>
+
+          <!-- Categories List -->
+          <div v-else class="space-y-4">
+            <div
+              v-for="category in sortedCategories"
+              :key="category.id"
+              class="border rounded-lg overflow-hidden"
+            >
+              <!-- Category Header -->
+              <div
+                class="flex items-center justify-between px-4 py-3 bg-muted/30"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-2">
+                    <GripVertical
+                      class="h-4 w-4 text-muted-foreground cursor-grab"
+                    />
+                    <Folder class="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 class="font-semibold">{{ category.name }}</h4>
+                    <p class="text-xs text-muted-foreground">
+                      {{ category.lists.length }} list{{
+                        category.lists.length !== 1 ? "s" : ""
+                      }}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    @click="openEditCategoryDialog(category)"
+                  >
+                    <Pencil class="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="text-destructive hover:text-destructive"
+                    @click="openDeleteCategoryDialog(category)"
+                  >
+                    <Trash2 class="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <!-- Category Lists -->
+              <div class="p-4">
+                <div
+                  v-if="category.lists.length === 0"
+                  class="text-sm text-muted-foreground text-center py-4"
+                >
+                  No lists in this category. Move saved lists here from the
+                  Saved tab.
+                </div>
+                <div v-else class="space-y-2">
+                  <div
+                    v-for="list in category.lists"
+                    :key="list.id"
+                    class="flex items-center justify-between p-3 rounded-md bg-muted/20 hover:bg-muted/40 transition-colors group"
+                  >
+                    <RouterLink
+                      :to="`/problemset/list/${list.id}`"
+                      class="flex items-center gap-3 flex-1 min-w-0"
+                    >
+                      <List class="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span class="font-medium truncate">{{ list.name }}</span>
+                      <Badge variant="secondary" class="text-xs shrink-0">
+                        {{ list.problemCount }} problems
+                      </Badge>
+                    </RouterLink>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger as-child>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                          @click.prevent.stop
+                        >
+                          <MoreHorizontal class="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" class="w-48">
+                        <DropdownMenuSub
+                          v-if="data.categories.length > 1"
+                        >
+                          <DropdownMenuSubTrigger>
+                            <FolderInput class="mr-2 h-4 w-4" />
+                            Move to Another
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuItem
+                              v-for="cat in data.categories.filter(
+                                (c) => c.id !== category.id,
+                              )"
+                              :key="cat.id"
+                              @click="handleMoveToCategory(list, cat.id)"
+                            >
+                              {{ cat.name }}
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                        <DropdownMenuItem
+                          @click="handleMoveToCategory(list, null)"
+                        >
+                          <FolderInput class="mr-2 h-4 w-4" />
+                          Remove from Category
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem @click="handleUnsaveList(list)">
+                          <BookmarkMinus class="mr-2 h-4 w-4" />
+                          Unsave
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
         <!-- Featured Tab -->
         <TabsContent value="featured" class="mt-0">
           <Empty
@@ -739,31 +938,55 @@ onMounted(loadData);
             <Card
               v-for="list in data.featured"
               :key="list.id"
-              class="group hover:shadow-md transition-shadow cursor-pointer"
+              class="group hover:shadow-md transition-shadow"
             >
-              <RouterLink :to="`/problemset/list/${list.id}`" class="block">
-                <CardHeader class="pb-3">
-                  <div class="flex items-start justify-between">
-                    <div class="space-y-1 flex-1 min-w-0">
-                      <div class="flex items-center gap-2">
-                        <CardTitle class="text-lg truncate">{{
-                          list.name
-                        }}</CardTitle>
-                        <Star class="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <Badge
-                          v-if="list.isSaved"
-                          variant="secondary"
-                          class="gap-1 text-xs"
-                        >
-                          <Bookmark class="h-3 w-3" />
-                          Saved
-                        </Badge>
-                      </div>
+              <CardHeader class="pb-3">
+                <div class="flex items-start justify-between">
+                  <RouterLink
+                    :to="`/problemset/list/${list.id}`"
+                    class="space-y-1 flex-1 min-w-0"
+                  >
+                    <div class="flex items-center gap-2">
+                      <CardTitle class="text-lg truncate">{{
+                        list.name
+                      }}</CardTitle>
+                      <Star class="h-4 w-4 text-yellow-500 fill-yellow-500" />
                     </div>
-                  </div>
-                </CardHeader>
+                    <div class="flex items-center gap-2">
+                      <Badge
+                        v-if="list.isSaved"
+                        variant="secondary"
+                        class="gap-1 text-xs"
+                      >
+                        <Bookmark class="h-3 w-3" />
+                        Saved
+                      </Badge>
+                    </div>
+                  </RouterLink>
+                  <!-- Save/Unsave Button -->
+                  <Button
+                    v-if="!list.isSaved"
+                    variant="outline"
+                    size="sm"
+                    class="gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    @click="handleSaveList(list)"
+                  >
+                    <Save class="h-4 w-4" />
+                    Save
+                  </Button>
+                  <Button
+                    v-else
+                    variant="ghost"
+                    size="sm"
+                    class="gap-1 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                    @click="handleUnsaveList(list)"
+                  >
+                    <BookmarkMinus class="h-4 w-4" />
+                    Unsave
+                  </Button>
+                </div>
+              </CardHeader>
+              <RouterLink :to="`/problemset/list/${list.id}`" class="block">
                 <CardContent>
                   <p
                     v-if="list.description"

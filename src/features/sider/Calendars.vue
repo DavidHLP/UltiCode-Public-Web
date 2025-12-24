@@ -36,6 +36,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   ChevronRight,
   MoreHorizontal,
@@ -47,6 +49,7 @@ import {
   Bookmark,
   User,
   BookmarkMinus,
+  ListPlus,
 } from "lucide-vue-next";
 import type {
   ProblemList,
@@ -64,6 +67,7 @@ import {
   unsaveList,
   moveListToCategory,
   deleteProblemList,
+  createProblemList,
 } from "@/api/problem-list";
 import { toast } from "vue-sonner";
 
@@ -223,7 +227,7 @@ const handleUnsaveList = async (list: ProblemList) => {
 // --- Move List to Category ---
 const handleMoveListToCategory = async (
   list: ProblemList,
-  categoryId: string | null
+  categoryId: string | null,
 ) => {
   if (!currentUserId) return;
   try {
@@ -231,7 +235,7 @@ const handleMoveListToCategory = async (
     toast.success(
       categoryId
         ? `Moved "${list.name}" to category`
-        : `Removed "${list.name}" from category`
+        : `Removed "${list.name}" from category`,
     );
     await loadData();
   } catch (e) {
@@ -242,11 +246,52 @@ const handleMoveListToCategory = async (
 
 // All categories for move menu
 const allCategories = computed(() => data.value.categories);
+
+// --- Create List Dialog ---
+const isCreateListOpen = ref(false);
+const isCreatingList = ref(false);
+const createListForm = ref({ name: "", description: "", isPublic: false });
+
+const handleCreateList = async () => {
+  if (!currentUserId) return;
+  if (!createListForm.value.name.trim()) {
+    toast.error("List name is required");
+    return;
+  }
+  isCreatingList.value = true;
+  try {
+    const newList = await createProblemList(currentUserId, {
+      name: createListForm.value.name.trim(),
+      description: createListForm.value.description.trim() || undefined,
+      isPublic: createListForm.value.isPublic,
+    });
+    toast.success("Problem list created successfully");
+    isCreateListOpen.value = false;
+    createListForm.value = { name: "", description: "", isPublic: false };
+    await loadData();
+    // Navigate to the new list
+    window.location.href = `/problemset/list/${newList.id}`;
+  } catch (e) {
+    console.error("Failed to create list", e);
+    toast.error("Failed to create list");
+  } finally {
+    isCreatingList.value = false;
+  }
+};
 </script>
 
 <template>
-  <!-- New Category Button -->
-  <div class="px-4 py-2">
+  <!-- Action Buttons -->
+  <div class="px-4 py-2 space-y-1">
+    <Button
+      variant="ghost"
+      size="sm"
+      class="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+      @click="isCreateListOpen = true"
+    >
+      <ListPlus class="h-4 w-4" />
+      New List
+    </Button>
     <Button
       variant="ghost"
       size="sm"
@@ -627,4 +672,67 @@ const allCategories = computed(() => data.value.categories);
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
+
+  <!-- Create List Dialog -->
+  <Dialog v-model:open="isCreateListOpen">
+    <DialogContent class="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>Create New List</DialogTitle>
+        <DialogDescription>
+          Create a new problem list to organize your practice.
+        </DialogDescription>
+      </DialogHeader>
+      <div class="space-y-4 py-4">
+        <div class="space-y-2">
+          <Label for="new-list-name">Name</Label>
+          <Input
+            id="new-list-name"
+            v-model="createListForm.name"
+            placeholder="My Problem List"
+            @keydown.enter="handleCreateList"
+          />
+        </div>
+        <div class="space-y-2">
+          <Label for="new-list-desc">Description (optional)</Label>
+          <Textarea
+            id="new-list-desc"
+            v-model="createListForm.description"
+            placeholder="A brief description of this list..."
+            rows="3"
+          />
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="space-y-0.5">
+            <Label for="new-list-public">Public</Label>
+            <p class="text-xs text-muted-foreground">
+              {{
+                createListForm.isPublic
+                  ? "Everyone can see this list"
+                  : "Only you can see this list"
+              }}
+            </p>
+          </div>
+          <Switch
+            id="new-list-public"
+            v-model:checked="createListForm.isPublic"
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button
+          variant="outline"
+          @click="isCreateListOpen = false"
+          :disabled="isCreatingList"
+        >
+          Cancel
+        </Button>
+        <Button
+          @click="handleCreateList"
+          :disabled="isCreatingList || !createListForm.name.trim()"
+        >
+          {{ isCreatingList ? "Creating..." : "Create" }}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>

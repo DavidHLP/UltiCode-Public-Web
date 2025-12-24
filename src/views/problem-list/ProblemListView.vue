@@ -16,6 +16,12 @@ import {
   Plus,
   Search,
   Check,
+  Bookmark,
+  BookmarkCheck,
+  Globe,
+  Lock,
+  FolderInput,
+  BookmarkMinus,
 } from "lucide-vue-next";
 import {
   DropdownMenu,
@@ -23,6 +29,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -37,7 +46,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { ProblemListItem } from "@/types/problem-list";
+import type {
+  ProblemListItem,
+  ProblemListCategory,
+} from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
 import {
   fetchProblemListItem,
@@ -47,6 +59,11 @@ import {
   updateProblemList,
   addProblemToList,
   removeProblemFromList,
+  saveList,
+  unsaveList,
+  isListSaved,
+  fetchCategories,
+  moveListToCategory,
 } from "@/api/problem-list";
 import { searchProblems } from "@/api/problem";
 import { fetchCurrentUserId } from "@/utils/auth";
@@ -78,6 +95,10 @@ const isDeleteOpen = ref(false);
 const isAddProblemsOpen = ref(false);
 const isForking = ref(false);
 const isDeleting = ref(false);
+const isSaved = ref(false);
+const isSaving = ref(false);
+const userCategories = ref<ProblemListCategory[]>([]);
+const currentCategoryId = ref<string | null>(null);
 
 // Add problems state
 const searchQuery = ref("");
@@ -96,6 +117,7 @@ async function loadProblemList(id?: string) {
   if (!id) {
     currentList.value = null;
     problems.value = [];
+    isSaved.value = false;
     return;
   }
   const userId = fetchCurrentUserId();
@@ -117,6 +139,24 @@ async function loadProblemList(id?: string) {
   } catch (error) {
     console.error("Failed to load problems for list", error);
     problems.value = [];
+  }
+  // Check if user has saved this list
+  if (userId && currentList.value && currentList.value.authorId !== userId) {
+    try {
+      isSaved.value = await isListSaved(id, userId);
+    } catch {
+      isSaved.value = false;
+    }
+  } else {
+    isSaved.value = false;
+  }
+  // Load user's categories
+  if (userId) {
+    try {
+      userCategories.value = await fetchCategories(userId);
+    } catch {
+      userCategories.value = [];
+    }
   }
 }
 
@@ -233,6 +273,52 @@ const isOwner = computed(() => {
   return !!(currentUser && currentList.value?.authorId === currentUser);
 });
 
+// Can save: user is logged in and not the owner
+const canSave = computed(() => {
+  return !!(
+    currentUser &&
+    currentList.value &&
+    currentList.value.authorId !== currentUser &&
+    currentList.value.isPublic
+  );
+});
+
+// Handle save/unsave
+const handleToggleSave = async () => {
+  if (!currentUser || !currentList.value) return;
+
+  isSaving.value = true;
+  try {
+    if (isSaved.value) {
+      await unsaveList(listId.value, currentUser);
+      isSaved.value = false;
+      currentCategoryId.value = null;
+      toast.success("Removed from saved lists");
+    } else {
+      await saveList(listId.value, currentUser);
+      isSaved.value = true;
+      toast.success("Saved to your lists");
+    }
+  } catch {
+    toast.error(isSaved.value ? "Failed to unsave" : "Failed to save");
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Handle move to category
+const handleMoveToCategory = async (categoryId: string | null) => {
+  if (!currentUser || !isSaved.value) return;
+
+  try {
+    await moveListToCategory(listId.value, currentUser, categoryId);
+    currentCategoryId.value = categoryId;
+    toast.success(categoryId ? "Moved to category" : "Removed from category");
+  } catch {
+    toast.error("Failed to move list");
+  }
+};
+
 // Check if problem is already in the list
 const problemIdsInList = computed(() => {
   return new Set(problems.value.map((p) => p.id));
@@ -323,13 +409,22 @@ const getDifficultyColor = (difficulty: string) => {
             <Badge variant="outline" class="rounded-md px-2.5 py-0.5"
               >List</Badge
             >
-            <span
-              v-if="!currentList?.isPublic"
-              class="text-xs text-muted-foreground flex items-center gap-1"
+            <Badge
+              v-if="currentList?.isPublic"
+              variant="secondary"
+              class="gap-1 text-xs"
             >
-              <span class="w-1.5 h-1.5 rounded-full bg-yellow-500/70"></span>
+              <Globe class="h-3 w-3" />
+              Public
+            </Badge>
+            <Badge
+              v-else
+              variant="outline"
+              class="gap-1 text-xs text-muted-foreground"
+            >
+              <Lock class="h-3 w-3" />
               Private
-            </span>
+            </Badge>
           </div>
           <h1
             class="text-3xl font-bold tracking-tight sm:text-4xl text-foreground/90"
@@ -372,6 +467,19 @@ const getDifficultyColor = (difficulty: string) => {
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
+        <!-- Save Button (for non-owners) -->
+        <Button
+          v-if="canSave"
+          :variant="isSaved ? 'default' : 'outline'"
+          size="sm"
+          class="h-9 gap-2"
+          @click="handleToggleSave"
+          :disabled="isSaving"
+        >
+          <BookmarkCheck v-if="isSaved" class="h-4 w-4" />
+          <Bookmark v-else class="h-4 w-4" />
+          {{ isSaving ? "Saving..." : isSaved ? "Saved" : "Save" }}
+        </Button>
         <Button variant="secondary" size="sm" class="h-9" @click="handleShare">
           <Share2 class="mr-2 h-4 w-4" />
           Share
@@ -402,6 +510,36 @@ const getDifficultyColor = (difficulty: string) => {
                 <Plus class="mr-2 h-4 w-4" />
                 Add Problems
               </DropdownMenuItem>
+            </template>
+            <!-- Actions for saved lists (non-owners) -->
+            <template v-if="canSave && isSaved">
+              <DropdownMenuSub v-if="userCategories.length > 0">
+                <DropdownMenuSubTrigger>
+                  <FolderInput class="mr-2 h-4 w-4" />
+                  Move to Category
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem
+                    v-if="currentCategoryId"
+                    @click="handleMoveToCategory(null)"
+                  >
+                    Remove from Category
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator v-if="currentCategoryId" />
+                  <DropdownMenuItem
+                    v-for="cat in userCategories"
+                    :key="cat.id"
+                    @click="handleMoveToCategory(cat.id)"
+                  >
+                    {{ cat.name }}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem @click="handleToggleSave">
+                <BookmarkMinus class="mr-2 h-4 w-4" />
+                Unsave
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
             </template>
             <DropdownMenuItem @click="handleFork" :disabled="isForking">
               <Copy class="mr-2 h-4 w-4" />
