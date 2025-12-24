@@ -114,6 +114,12 @@ async function handleLogout() {
                 Solutions
               </DropdownMenuItem>
             </RouterLink>
+            <RouterLink to="/personal/problem-lists">
+              <DropdownMenuItem>
+                <FileCode />
+                Problem Lists
+              </DropdownMenuItem>
+            </RouterLink>
             <DropdownMenuItem>
               <Bell />
               Notifications

@@ -110,12 +110,12 @@ export const personalSidebarData: SidebarSection[] = [
     name: "Activity",
     items: [
       {
-        title: "My Submissions",
+        title: "Submissions",
         url: "/personal/submissions",
         icon: FileText,
       },
-      { title: "My Solutions", url: "/personal/solutions", icon: FileText },
-      { title: "My Problem Lists", url: "/personal/problem-lists", icon: List },
+      { title: "Solutions", url: "/personal/solutions", icon: FileText },
+      { title: "Problem Lists", url: "/personal/problem-lists", icon: List },
     ],
   },
 ];

@@ -223,7 +223,7 @@ const handleUnsaveList = async (list: ProblemList) => {
 // --- Move List to Category ---
 const handleMoveListToCategory = async (
   list: ProblemList,
-  categoryId: string | null,
+  categoryId: string | null
 ) => {
   if (!currentUserId) return;
   try {
@@ -231,7 +231,7 @@ const handleMoveListToCategory = async (
     toast.success(
       categoryId
         ? `Moved "${list.name}" to category`
-        : `Removed "${list.name}" from category`,
+        : `Removed "${list.name}" from category`
     );
     await loadData();
   } catch (e) {
@@ -595,7 +595,7 @@ const allCategories = computed(() => data.value.categories);
           >Cancel</AlertDialogCancel
         >
         <AlertDialogAction
-          class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          class="bg-destructive text-white hover:bg-destructive/90"
           @click="handleDeleteCategory"
           :disabled="isDeletingCategory"
         >
@@ -618,7 +618,7 @@ const allCategories = computed(() => data.value.categories);
       <AlertDialogFooter>
         <AlertDialogCancel :disabled="isDeletingList">Cancel</AlertDialogCancel>
         <AlertDialogAction
-          class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          class="bg-destructive text-white hover:bg-destructive/90"
           @click="handleDeleteList"
           :disabled="isDeletingList"
         >

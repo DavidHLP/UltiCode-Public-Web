@@ -136,7 +136,7 @@ const sortedMyLists = computed(() => {
 const sortedSavedLists = computed(() => {
   // Filter out lists that are in categories
   const inCategoryIds = new Set(
-    data.value.categories.flatMap((c) => c.lists.map((l) => l.id)),
+    data.value.categories.flatMap((c) => c.lists.map((l) => l.id))
   );
   return data.value.savedLists.filter((l) => !inCategoryIds.has(l.id));
 });
@@ -219,7 +219,7 @@ const handleUnsaveList = async (list: ProblemList) => {
 // --- Move List to Category ---
 const handleMoveToCategory = async (
   list: ProblemList,
-  categoryId: string | null,
+  categoryId: string | null
 ) => {
   if (!currentUserId) return;
   try {
@@ -227,7 +227,7 @@ const handleMoveToCategory = async (
     toast.success(
       categoryId
         ? `Moved "${list.name}" to category`
-        : `Removed "${list.name}" from category`,
+        : `Removed "${list.name}" from category`
     );
     await loadData();
   } catch (e) {
@@ -527,9 +527,7 @@ onMounted(loadData);
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" class="w-48">
-                          <DropdownMenuSub
-                            v-if="data.categories.length > 0"
-                          >
+                          <DropdownMenuSub v-if="data.categories.length > 0">
                             <DropdownMenuSubTrigger>
                               <FolderInput class="mr-2 h-4 w-4" />
                               Move to Category
@@ -602,9 +600,7 @@ onMounted(loadData);
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      @click="openEditCategoryDialog(category)"
-                    >
+                    <DropdownMenuItem @click="openEditCategoryDialog(category)">
                       <Pencil class="mr-2 h-4 w-4" />
                       Rename
                     </DropdownMenuItem>
@@ -627,10 +623,7 @@ onMounted(loadData);
                 >
                   No lists in this category yet
                 </div>
-                <div
-                  v-else
-                  class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-                >
+                <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <Card
                     v-for="list in category.lists"
                     :key="list.id"
@@ -866,9 +859,11 @@ onMounted(loadData);
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel :disabled="isDeletingList">Cancel</AlertDialogCancel>
+          <AlertDialogCancel :disabled="isDeletingList"
+            >Cancel</AlertDialogCancel
+          >
           <AlertDialogAction
-            class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            class="bg-destructive text-white hover:bg-destructive/90"
             @click="handleDeleteList"
             :disabled="isDeletingList"
           >
@@ -968,7 +963,7 @@ onMounted(loadData);
             >Cancel</AlertDialogCancel
           >
           <AlertDialogAction
-            class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            class="bg-destructive text-white hover:bg-destructive/90"
             @click="handleDeleteCategory"
             :disabled="isDeletingCategory"
           >
