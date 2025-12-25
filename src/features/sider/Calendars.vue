@@ -60,7 +60,7 @@ import { RouterLink } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import { fetchCurrentUserId } from "@/utils/auth";
 import {
-  fetchUserProblemListsData,
+  fetchProblemListsOverview,
   createCategory,
   updateCategory,
   deleteCategory,
@@ -87,7 +87,7 @@ const loadData = async () => {
   if (!currentUserId) return;
   isLoading.value = true;
   try {
-    data.value = await fetchUserProblemListsData(currentUserId);
+    data.value = await fetchProblemListsOverview(currentUserId);
   } catch (e) {
     console.error("Failed to load problem lists", e);
   } finally {

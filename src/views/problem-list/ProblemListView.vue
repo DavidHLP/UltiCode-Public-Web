@@ -47,13 +47,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type {
-  ProblemListItem,
-  ProblemListCategory,
+  ProblemList,
+  ProblemListCategoryOption,
 } from "@/types/problem-list";
 import type { Problem } from "@/types/problem";
 import {
-  fetchProblemListItem,
-  fetchProblemsByListId,
+  fetchProblemListOverview,
   forkProblemList,
   deleteProblemList,
   updateProblemList,
@@ -61,8 +60,6 @@ import {
   removeProblemFromList,
   saveList,
   unsaveList,
-  isListSaved,
-  fetchCategories,
   moveListToCategory,
 } from "@/api/problem-list";
 import { searchProblems } from "@/api/problem";
@@ -84,7 +81,7 @@ const router = useRouter();
 const listId = computed(() => route.params.id as string);
 
 // 获取当前列表的详细信息
-const currentList = ref<ProblemListItem | null>(null);
+const currentList = ref<ProblemList | null>(null);
 const problems = ref<Problem[]>([]);
 const problemsWithStatus = computed(() => problems.value);
 const currentUser = fetchCurrentUserId();
@@ -97,7 +94,7 @@ const isForking = ref(false);
 const isDeleting = ref(false);
 const isSaved = ref(false);
 const isSaving = ref(false);
-const userCategories = ref<ProblemListCategory[]>([]);
+const userCategories = ref<ProblemListCategoryOption[]>([]);
 const currentCategoryId = ref<string | null>(null);
 
 // Add problems state
@@ -122,7 +119,13 @@ async function loadProblemList(id?: string) {
   }
   const userId = fetchCurrentUserId();
   try {
-    currentList.value = await fetchProblemListItem(id);
+    const overview = await fetchProblemListOverview(id, userId ?? undefined);
+    currentList.value = overview.list;
+    problems.value = overview.problems;
+    isSaved.value = overview.viewer?.isSaved ?? false;
+    currentCategoryId.value = overview.viewer?.categoryId ?? null;
+    userCategories.value = overview.categories ?? [];
+
     if (currentList.value) {
       editForm.value = {
         name: currentList.value.name,
@@ -131,32 +134,12 @@ async function loadProblemList(id?: string) {
       };
     }
   } catch (error) {
-    console.error("Failed to load problem list", error);
-    currentList.value = null;
-  }
-  try {
-    problems.value = await fetchProblemsByListId(id, userId ?? undefined);
-  } catch (error) {
-    console.error("Failed to load problems for list", error);
+    console.error("Failed to load problem list overview", error);
     problems.value = [];
-  }
-  // Check if user has saved this list
-  if (userId && currentList.value && currentList.value.authorId !== userId) {
-    try {
-      isSaved.value = await isListSaved(id, userId);
-    } catch {
-      isSaved.value = false;
-    }
-  } else {
+    currentList.value = null;
     isSaved.value = false;
-  }
-  // Load user's categories
-  if (userId) {
-    try {
-      userCategories.value = await fetchCategories(userId);
-    } catch {
-      userCategories.value = [];
-    }
+    currentCategoryId.value = null;
+    userCategories.value = [];
   }
 }
 

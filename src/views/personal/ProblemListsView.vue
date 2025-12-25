@@ -75,7 +75,7 @@ import type {
   UserProblemListsResponse,
 } from "@/types/problem-list";
 import {
-  fetchUserProblemListsData,
+  fetchProblemListsOverview,
   createProblemList,
   deleteProblemList,
   unsaveList,
@@ -161,7 +161,7 @@ const loadData = async () => {
     return;
   }
   try {
-    data.value = await fetchUserProblemListsData(currentUserId);
+    data.value = await fetchProblemListsOverview(currentUserId);
   } catch (e) {
     console.error("Failed to load problem lists", e);
     toast.error("Failed to load your problem lists");
@@ -871,9 +871,7 @@ onMounted(loadData);
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" class="w-48">
-                        <DropdownMenuSub
-                          v-if="data.categories.length > 1"
-                        >
+                        <DropdownMenuSub v-if="data.categories.length > 1">
                           <DropdownMenuSubTrigger>
                             <FolderInput class="mr-2 h-4 w-4" />
                             Move to Another

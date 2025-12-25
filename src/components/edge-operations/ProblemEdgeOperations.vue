@@ -24,7 +24,10 @@ import {
   EdgeOperationTargetType,
   EdgeOperationType,
 } from "@/api/interaction";
-import { fetchProblemLists, addProblemToList } from "@/api/problem-list";
+import {
+  addProblemToList,
+  fetchProblemListsOverview,
+} from "@/api/problem-list";
 import type { ProblemList } from "@/types/problem-list";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId } from "@/utils/auth";
@@ -54,27 +57,28 @@ const isLoadingLists = ref(false);
 const isLoadingInteractions = ref(false);
 
 const loadInteractions = async (problemId: number | string) => {
+  const userId = fetchCurrentUserId();
   isLoadingInteractions.value = true;
   try {
-    const userId = fetchCurrentUserId();
-    const res = await fetchEdgeOperationStatus(
+    const opsRes = await fetchEdgeOperationStatus(
       EdgeOperationTargetType.PROBLEM,
       problemId.toString(),
       userId ?? undefined,
     );
+
     interactionCounts.value = {
-      likes: res.likes,
-      dislikes: res.dislikes,
-      favorites: res.favorites,
+      likes: opsRes.likes,
+      dislikes: opsRes.dislikes,
+      favorites: opsRes.favorites,
     };
     viewerInteraction.value = {
       reaction:
-        res.userOperation === EdgeOperationType.VOTE_UP
+        opsRes.viewer.vote === 1
           ? "like"
-          : res.userOperation === EdgeOperationType.VOTE_DOWN
+          : opsRes.viewer.vote === -1
             ? "dislike"
             : undefined,
-      isFavorite: res.userOperation === EdgeOperationType.FAVORITE,
+      isFavorite: opsRes.viewer.isFavorite,
     };
   } catch (e) {
     console.error("Failed to load interactions", e);
@@ -87,11 +91,10 @@ const loadUserLists = async () => {
   if (userLists.value.length > 0) return;
   isLoadingLists.value = true;
   try {
-    const groups = await fetchProblemLists();
-    const createdGroup = groups.find((g) => g.id === "group-created");
-    if (createdGroup) {
-      userLists.value = createdGroup.lists;
-    }
+    const userId = fetchCurrentUserId();
+    if (!userId) return;
+    const overview = await fetchProblemListsOverview(userId);
+    userLists.value = overview.myLists;
   } catch (error) {
     console.error("Failed to fetch lists", error);
     toast.error("Failed to load your lists");
@@ -159,11 +162,12 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
     interactionCounts.value.dislikes = res.dislikes;
     interactionCounts.value.favorites = res.favorites;
     viewerInteraction.value.reaction =
-      res.userOperation === EdgeOperationType.VOTE_UP
+      res.viewer.vote === 1
         ? "like"
-        : res.userOperation === EdgeOperationType.VOTE_DOWN
+        : res.viewer.vote === -1
           ? "dislike"
           : undefined;
+    viewerInteraction.value.isFavorite = res.viewer.isFavorite;
   } catch (e) {
     console.error("Failed to toggle reaction", e);
   }
@@ -171,6 +175,12 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
 
 const toggleFavorite = async () => {
   if (!props.problem) return;
+  const userId = fetchCurrentUserId();
+  if (!userId) {
+    toast.error("Please login first");
+    return;
+  }
+
   try {
     const res = await operateEdgeOperation(
       EdgeOperationType.FAVORITE,
@@ -180,10 +190,13 @@ const toggleFavorite = async () => {
     interactionCounts.value.likes = res.likes;
     interactionCounts.value.dislikes = res.dislikes;
     interactionCounts.value.favorites = res.favorites;
-    viewerInteraction.value.isFavorite =
-      res.userOperation === EdgeOperationType.FAVORITE;
+    viewerInteraction.value.isFavorite = res.viewer.isFavorite;
+    toast.success(
+      res.viewer.isFavorite ? "Added to Favorites" : "Removed from Favorites",
+    );
   } catch (e) {
     console.error("Failed to toggle favorite", e);
+    toast.error("Failed to update favorites");
   }
 };
 </script>

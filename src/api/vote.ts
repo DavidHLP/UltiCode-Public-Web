@@ -21,11 +21,6 @@ export const vote = async (
   const res = await operateEdgeOperation(operationType, targetType, targetId);
   return {
     ...res,
-    userVote:
-      res.userOperation === EdgeOperationType.VOTE_UP
-        ? 1
-        : res.userOperation === EdgeOperationType.VOTE_DOWN
-          ? -1
-          : 0,
+    userVote: res.viewer.vote,
   };
 };

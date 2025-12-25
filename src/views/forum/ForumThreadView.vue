@@ -12,7 +12,7 @@ import {
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
-import { fetchCurrentUserId } from "@/utils/auth";
+import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 
 const route = useRoute();
 const thread = ref<ForumThread | null>(null);
@@ -55,6 +55,10 @@ async function onSubmitComment(body: string, parentId?: string | null) {
 import { vote, VoteTargetType } from "@/api/vote";
 
 async function handleThreadVote(type: 1 | -1) {
+  if (!isAuthenticated()) {
+    alert("Please log in to vote.");
+    return;
+  }
   if (!thread.value) return;
   try {
     const res = await vote(VoteTargetType.FORUM_POST, thread.value.id, type);
@@ -76,6 +80,10 @@ async function handleThreadVote(type: 1 | -1) {
 }
 
 async function handleCommentVote(commentId: string | number, type: 1 | -1) {
+  if (!isAuthenticated()) {
+    alert("Please log in to vote.");
+    return;
+  }
   if (!thread.value?.comments) return;
   try {
     const res = await vote(

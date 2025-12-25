@@ -5,9 +5,12 @@ export interface ProblemList {
   name: string;
   description?: string;
   problemCount: number;
+  favoritesCount: number;
   authorId?: string;
   isPublic?: boolean;
   isFeatured?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   isSaved?: boolean; // Whether current user saved this list
   categoryId?: string; // User's category for this list
   problems?: Problem[];
@@ -21,20 +24,18 @@ export interface ProblemListCategory {
   lists: ProblemList[];
 }
 
+export interface ProblemListCategoryOption {
+  id: string;
+  name: string;
+  sortOrder: number;
+}
+
 // Response from getUserProblemLists API
 export interface UserProblemListsResponse {
   myLists: ProblemList[]; // Lists created by user
   savedLists: ProblemList[]; // Lists saved by user (from others)
   featured: ProblemList[]; // Featured lists
   categories: ProblemListCategory[]; // User's custom categories
-}
-
-// Legacy: Keep for backward compatibility
-export interface ProblemListGroup {
-  id: string;
-  name: string;
-  sortOrder?: number;
-  lists: ProblemList[];
 }
 
 export interface ProblemListStats {
@@ -57,6 +58,18 @@ export interface ProblemListItem {
   authorId?: string;
   isPublic?: boolean;
   isFeatured?: boolean;
+  favoritesCount?: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ProblemListDetailResponse {
+  list: ProblemList | null;
+  problems: Problem[];
+  stats: ProblemListStats | null;
+  viewer?: {
+    isSaved: boolean;
+    categoryId: string | null;
+  };
+  categories?: ProblemListCategoryOption[];
 }

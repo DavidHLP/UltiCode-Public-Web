@@ -14,13 +14,17 @@ export enum EdgeOperationTargetType {
   FORUM_POST = "FORUM_POST",
   FORUM_COMMENT = "FORUM_COMMENT",
   PROBLEM = "PROBLEM",
+  PROBLEM_LIST = "PROBLEM_LIST",
 }
 
 export interface EdgeOperationResponse {
   likes: number;
   dislikes: number;
   favorites: number;
-  userOperation: EdgeOperationType | null;
+  viewer: {
+    vote: 1 | 0 | -1;
+    isFavorite: boolean;
+  };
 }
 
 export const fetchEdgeOperationStatus = async (

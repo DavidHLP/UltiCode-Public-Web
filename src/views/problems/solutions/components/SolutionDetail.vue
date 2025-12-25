@@ -16,7 +16,7 @@ import { vote, VoteTargetType } from "@/api/vote";
 import { PostActions } from "@/components/edge-operations";
 import "highlight.js/styles/atom-one-dark.css";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
-import { fetchCurrentUserId } from "@/utils/auth";
+import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -82,8 +82,13 @@ const handleCommentSubmit = async (content: string, parentId?: string) => {
 };
 
 const handleSolutionVote = async (voteType: 1 | -1) => {
+  if (!isAuthenticated()) {
+    alert("Please log in to vote.");
+    return;
+  }
   try {
     if (!props.item.id || props.item.id === "follow-up") return;
+
     const res = await vote(VoteTargetType.SOLUTION, props.item.id, voteType);
     localStats.value = { likes: res.likes, dislikes: res.dislikes };
     userVote.value = res.userVote;
@@ -96,6 +101,10 @@ const handleCommentVote = async (
   commentId: string | number,
   voteType: 1 | -1,
 ) => {
+  if (!isAuthenticated()) {
+    alert("Please log in to vote.");
+    return;
+  }
   try {
     const res = await vote(
       VoteTargetType.SOLUTION_COMMENT,

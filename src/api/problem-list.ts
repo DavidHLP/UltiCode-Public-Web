@@ -1,14 +1,13 @@
 import { apiGet, apiPost, apiDelete, apiPatch } from "@/utils/request";
-import type { Problem } from "@/types/problem";
 import { mapProblem } from "@/api/problem";
 import type {
-  ProblemListGroup,
   ProblemListStats,
   ProblemListId,
   ProblemListItem,
   ProblemList,
   ProblemListCategory,
   UserProblemListsResponse,
+  ProblemListDetailResponse,
 } from "@/types/problem-list";
 
 // ============================================================================
@@ -22,16 +21,21 @@ function mapProblemList(input: unknown): ProblemList {
       name: "",
       description: undefined,
       problemCount: 0,
+      favoritesCount: 0,
     };
   }
   const raw = input as Record<string, unknown>;
   const rawCount = raw.problemCount ?? raw.problem_count ?? 0;
+  const rawFavorites = raw.favoritesCount ?? raw.favorites_count ?? 0;
+  const createdRaw = raw.createdAt ?? raw.created_at;
+  const updatedRaw = raw.updatedAt ?? raw.updated_at;
   return {
     id: String(raw.id ?? ""),
     name: String(raw.name ?? ""),
     description:
       typeof raw.description === "string" ? raw.description : undefined,
     problemCount: Number(rawCount) || 0,
+    favoritesCount: Number(rawFavorites) || 0,
     authorId:
       typeof raw.authorId === "string"
         ? raw.authorId
@@ -49,6 +53,18 @@ function mapProblemList(input: unknown): ProblemList {
         ? raw.isFeatured
         : typeof raw.is_featured === "boolean"
           ? raw.is_featured
+          : undefined,
+    createdAt:
+      createdRaw instanceof Date
+        ? createdRaw.toISOString()
+        : typeof createdRaw === "string"
+          ? createdRaw
+          : undefined,
+    updatedAt:
+      updatedRaw instanceof Date
+        ? updatedRaw.toISOString()
+        : typeof updatedRaw === "string"
+          ? updatedRaw
           : undefined,
     isSaved: typeof raw.isSaved === "boolean" ? raw.isSaved : undefined,
     categoryId: typeof raw.categoryId === "string" ? raw.categoryId : undefined,
@@ -125,6 +141,12 @@ function mapProblemListItem(input: unknown): ProblemListItem {
         : typeof raw.is_featured === "boolean"
           ? raw.is_featured
           : undefined,
+    favoritesCount:
+      typeof raw.favoritesCount === "number"
+        ? raw.favoritesCount
+        : typeof raw.favorites_count === "number"
+          ? raw.favorites_count
+          : undefined,
     createdAt:
       createdRaw instanceof Date
         ? createdRaw.toISOString()
@@ -144,96 +166,60 @@ function mapProblemListItem(input: unknown): ProblemListItem {
 // Main API: Get User's Problem Lists
 // ============================================================================
 
-export async function fetchUserProblemListsData(
-  userId: string,
+export async function fetchProblemListsOverview(
+  userId?: string,
 ): Promise<UserProblemListsResponse> {
-  const data = await apiGet<unknown>(`/problem-lists?userId=${userId}`);
+  const query = userId ? `?userId=${userId}` : "";
+  const data = await apiGet<unknown>(`/problem-lists/overview${query}`);
   return mapUserProblemListsResponse(data);
 }
 
-// Legacy: For backward compatibility with old grouped structure
-export async function fetchProblemLists(
-  userId?: string,
-): Promise<ProblemListGroup[]> {
-  const query = userId ? `?userId=${userId}` : "";
-  const data = await apiGet<unknown>(`/problem-lists${query}`);
-
-  // Transform new response format to old grouped format for backward compatibility
-  const response = mapUserProblemListsResponse(data);
-
-  const groups: ProblemListGroup[] = [];
-
-  if (response.myLists.length > 0) {
-    groups.push({
-      id: "my-lists",
-      name: "My Lists",
-      sortOrder: 0,
-      lists: response.myLists,
-    });
-  }
-
-  if (response.savedLists.length > 0) {
-    groups.push({
-      id: "saved-lists",
-      name: "Saved Lists",
-      sortOrder: 1,
-      lists: response.savedLists,
-    });
-  }
-
-  if (response.featured.length > 0) {
-    groups.push({
-      id: "featured",
-      name: "Featured",
-      sortOrder: 2,
-      lists: response.featured,
-    });
-  }
-
-  // Add user categories
-  response.categories.forEach((cat, index) => {
-    groups.push({
-      id: cat.id,
-      name: cat.name,
-      sortOrder: 10 + index,
-      lists: cat.lists,
-    });
-  });
-
-  return groups;
-}
-
-export async function fetchFeaturedLists(): Promise<ProblemList[]> {
-  const data = await apiGet<unknown[]>("/problem-lists/featured");
-  return data.map(mapProblemList);
-}
-
-export async function fetchProblemListItem(
-  id: ProblemListId,
-): Promise<ProblemListItem | null> {
-  const data = await apiGet<unknown>(`/problem-lists/${id}`);
-  if (data === null || data === undefined) {
-    return null;
-  }
-  return mapProblemListItem(data);
-}
-
-export async function fetchProblemListStats(
-  userId?: string,
-): Promise<ProblemListStats[]> {
-  const query = userId ? `?userId=${userId}` : "";
-  return apiGet<ProblemListStats[]>(`/problem-lists/stats${query}`);
-}
-
-export async function fetchProblemsByListId(
+export async function fetchProblemListOverview(
   listId: ProblemListId,
   userId?: string,
-): Promise<Problem[]> {
+): Promise<ProblemListDetailResponse> {
   const query = userId ? `?userId=${userId}` : "";
-  const data = await apiGet<unknown[]>(
-    `/problem-lists/${listId}/problems${query}`,
+  const data = await apiGet<unknown>(
+    `/problem-lists/${listId}/overview${query}`,
   );
-  return data.map(mapProblem);
+  if (!data || typeof data !== "object") {
+    return { list: null, problems: [], stats: null };
+  }
+  const raw = data as Record<string, unknown>;
+  return {
+    list: raw.list ? mapProblemList(raw.list) : null,
+    problems: Array.isArray(raw.problems) ? raw.problems.map(mapProblem) : [],
+    stats:
+      raw.stats && typeof raw.stats === "object"
+        ? (raw.stats as ProblemListStats)
+        : null,
+    viewer:
+      raw.viewer && typeof raw.viewer === "object"
+        ? {
+            isSaved: Boolean((raw.viewer as Record<string, unknown>).isSaved),
+            categoryId:
+              typeof (raw.viewer as Record<string, unknown>).categoryId ===
+              "string"
+                ? String((raw.viewer as Record<string, unknown>).categoryId)
+                : null,
+          }
+        : undefined,
+    categories: Array.isArray(raw.categories)
+      ? raw.categories.map((item) => {
+          const entry = item as Record<string, unknown>;
+          return {
+            id: String(entry.id ?? ""),
+            name: String(entry.name ?? ""),
+            sortOrder:
+              typeof entry.sortOrder === "number"
+                ? entry.sortOrder
+                : typeof entry.sort_order === "number"
+                  ? entry.sort_order
+                  : 0,
+          };
+        })
+      : undefined,
+  };
 }
 
 // ============================================================================
@@ -271,13 +257,6 @@ export async function forkProblemList(
     `/problem-lists/${listId}/fork?userId=${userId}`,
   );
   return res.id;
-}
-
-export async function fetchUserProblemLists(
-  userId: string,
-): Promise<ProblemListItem[]> {
-  const data = await apiGet<unknown[]>(`/problem-lists/user/${userId}`);
-  return data.map(mapProblemListItem);
 }
 
 // ============================================================================
@@ -325,16 +304,6 @@ export async function unsaveList(
   await apiDelete(`/problem-lists/${listId}/save?userId=${userId}`);
 }
 
-export async function isListSaved(
-  listId: string,
-  userId: string,
-): Promise<boolean> {
-  const res = await apiGet<{ saved: boolean }>(
-    `/problem-lists/${listId}/saved?userId=${userId}`,
-  );
-  return res.saved;
-}
-
 export async function moveListToCategory(
   listId: string,
   userId: string,
@@ -348,15 +317,6 @@ export async function moveListToCategory(
 // ============================================================================
 // Category Management
 // ============================================================================
-
-export async function fetchCategories(
-  userId: string,
-): Promise<ProblemListCategory[]> {
-  const data = await apiGet<unknown[]>(
-    `/problem-lists/categories/user/${userId}`,
-  );
-  return data.map(mapCategory);
-}
 
 export async function createCategory(
   userId: string,
@@ -391,55 +351,3 @@ export async function deleteCategory(
 // ============================================================================
 // Legacy APIs - kept for backward compatibility but deprecated
 // ============================================================================
-
-/** @deprecated Use fetchCategories instead */
-export async function fetchProblemListGroups(): Promise<ProblemListGroup[]> {
-  // Redirect to new API
-  return fetchProblemLists();
-}
-
-/** @deprecated Use createCategory instead */
-export async function createProblemListGroup(data: {
-  name: string;
-  sortOrder?: number;
-}): Promise<ProblemListGroup> {
-  // This will fail - groups are now user-specific categories
-  console.warn(
-    "createProblemListGroup is deprecated, use createCategory instead",
-  );
-  return { id: "", name: data.name, lists: [] };
-}
-
-/** @deprecated Use updateCategory instead */
-export async function updateProblemListGroup(
-  groupId: string,
-  data: { name?: string; sortOrder?: number },
-): Promise<ProblemListGroup> {
-  console.warn(
-    "updateProblemListGroup is deprecated, use updateCategory instead",
-  );
-  return { id: groupId, name: data.name ?? "", lists: [] };
-}
-
-/** @deprecated Use deleteCategory instead */
-export async function deleteProblemListGroup(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _groupId: string,
-): Promise<void> {
-  console.warn(
-    "deleteProblemListGroup is deprecated, use deleteCategory instead",
-  );
-  // No-op
-}
-
-/** @deprecated Categories don't have the same moveListToGroup concept */
-export async function moveListToGroup(
-  listId: string,
-  userId: string,
-  _groupId: string,
-): Promise<ProblemListItem> {
-  console.warn("moveListToGroup is deprecated, use moveListToCategory instead");
-  await moveListToCategory(listId, userId, _groupId);
-  const item = await fetchProblemListItem(listId);
-  return item ?? { id: listId, name: "" };
-}
