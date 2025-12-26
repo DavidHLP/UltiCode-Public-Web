@@ -3,7 +3,6 @@ import { apiGet, apiPost } from "@/utils/request";
 export enum EdgeOperationType {
   VOTE_UP = "VOTE_UP",
   VOTE_DOWN = "VOTE_DOWN",
-  FAVORITE = "FAVORITE",
   ANALYZE = "ANALYZE",
 }
 
@@ -19,11 +18,8 @@ export enum EdgeOperationTargetType {
 export interface EdgeOperationResponse {
   likes: number;
   dislikes: number;
-  favorites: number;
   viewer: {
     vote: 1 | 0 | -1;
-    isFavorite: boolean;
-    collections?: string[];
   };
 }
 

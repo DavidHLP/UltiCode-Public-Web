@@ -1,11 +1,13 @@
-export enum CollectionTargetType {
+export enum BookmarkType {
   PROBLEM = "PROBLEM",
   SOLUTION = "SOLUTION",
   FORUM_POST = "FORUM_POST",
   PROBLEM_LIST = "PROBLEM_LIST",
+  SOLUTION_COMMENT = "SOLUTION_COMMENT",
+  FORUM_COMMENT = "FORUM_COMMENT",
 }
 
-export interface Collection {
+export interface BookmarkFolder {
   id: string;
   name: string;
   description: string | null;
@@ -18,27 +20,28 @@ export interface Collection {
   updatedAt: string;
 }
 
-export interface CollectionItem {
+export interface Bookmark {
   id: string;
   targetId: string;
-  targetType: CollectionTargetType;
+  targetType: BookmarkType;
   sortOrder: number;
   note: string | null;
   createdAt: string;
 }
 
-export interface CollectionWithItems extends Omit<Collection, "itemCount"> {
-  items: CollectionItem[];
+export interface BookmarkFolderWithItems
+  extends Omit<BookmarkFolder, "itemCount"> {
+  items: Bookmark[];
 }
 
-export interface CreateCollectionInput {
+export interface CreateFolderInput {
   name: string;
   description?: string;
   icon?: string;
   color?: string;
 }
 
-export interface UpdateCollectionInput {
+export interface UpdateFolderInput {
   name?: string;
   description?: string;
   icon?: string;
@@ -46,13 +49,13 @@ export interface UpdateCollectionInput {
   sortOrder?: number;
 }
 
-export interface AddItemInput {
+export interface AddBookmarkInput {
   targetId: string;
-  targetType: CollectionTargetType;
+  targetType: BookmarkType;
   note?: string;
 }
 
-export interface UpdateItemInput {
+export interface UpdateBookmarkInput {
   note?: string;
   sortOrder?: number;
 }

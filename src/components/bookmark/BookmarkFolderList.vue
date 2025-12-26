@@ -14,21 +14,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import type { Collection } from "@/types/collection";
+import type { BookmarkFolder } from "@/types/bookmark";
 
 const props = defineProps<{
-  collections: Collection[];
+  folders: BookmarkFolder[];
   selectedId?: string;
 }>();
 
 const emit = defineEmits<{
-  select: [collection: Collection];
-  edit: [collection: Collection];
-  delete: [collection: Collection];
+  select: [folder: BookmarkFolder];
+  edit: [folder: BookmarkFolder];
+  delete: [folder: BookmarkFolder];
 }>();
 
-const sortedCollections = computed(() => {
-  return [...props.collections].sort((a, b) => {
+const sortedFolders = computed(() => {
+  return [...props.folders].sort((a, b) => {
     if (a.isDefault && !b.isDefault) return -1;
     if (!a.isDefault && b.isDefault) return 1;
     return a.sortOrder - b.sortOrder;
@@ -39,33 +39,31 @@ const sortedCollections = computed(() => {
 <template>
   <div class="space-y-1">
     <div
-      v-for="collection in sortedCollections"
-      :key="collection.id"
+      v-for="folder in sortedFolders"
+      :key="folder.id"
       class="group flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted cursor-pointer"
-      :class="{ 'bg-muted': selectedId === collection.id }"
-      @click="emit('select', collection)"
+      :class="{ 'bg-muted': selectedId === folder.id }"
+      @click="emit('select', folder)"
     >
       <div class="flex items-center gap-3 min-w-0">
         <component
-          :is="collection.isDefault ? Bookmark : Folder"
+          :is="folder.isDefault ? Bookmark : Folder"
           class="h-4 w-4 flex-shrink-0"
           :class="
-            collection.color
-              ? `text-${collection.color}-500`
-              : 'text-muted-foreground'
+            folder.color ? `text-${folder.color}-500` : 'text-muted-foreground'
           "
         />
         <div class="min-w-0">
           <p class="text-sm font-medium truncate">
-            {{ collection.name }}
+            {{ folder.name }}
           </p>
           <p class="text-xs text-muted-foreground">
-            {{ collection.itemCount }} items
+            {{ folder.itemCount }} items
           </p>
         </div>
       </div>
 
-      <DropdownMenu v-if="!collection.isDefault">
+      <DropdownMenu v-if="!folder.isDefault">
         <DropdownMenuTrigger as-child>
           <Button
             variant="ghost"
@@ -77,13 +75,13 @@ const sortedCollections = computed(() => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem @select="emit('edit', collection)">
+          <DropdownMenuItem @select="emit('edit', folder)">
             <Pencil class="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
           <DropdownMenuItem
             class="text-destructive"
-            @select="emit('delete', collection)"
+            @select="emit('delete', folder)"
           >
             <Trash2 class="mr-2 h-4 w-4" />
             Delete
@@ -93,10 +91,10 @@ const sortedCollections = computed(() => {
     </div>
 
     <div
-      v-if="collections.length === 0"
+      v-if="folders.length === 0"
       class="py-8 text-center text-muted-foreground text-sm"
     >
-      No collections yet
+      No bookmark folders yet
     </div>
   </div>
 </template>

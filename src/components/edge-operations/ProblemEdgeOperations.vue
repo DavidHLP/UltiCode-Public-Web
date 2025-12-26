@@ -15,7 +15,7 @@ import {
   EdgeOperationTargetType,
   EdgeOperationType,
 } from "@/api/interaction";
-import { CollectionTargetType } from "@/types/collection";
+import { BookmarkType } from "@/types/bookmark";
 import ProblemSaveButton from "./ProblemSaveButton.vue";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 
@@ -28,17 +28,12 @@ const props = defineProps<Props>();
 const interactionCounts = ref<ProblemInteractionCounts>({
   likes: 0,
   dislikes: 0,
-  favorites: 0,
 });
 
 const viewerInteraction = ref<{
   reaction: ProblemReactionType | undefined;
-  isFavorite: boolean;
-  collections: string[];
 }>({
   reaction: undefined,
-  isFavorite: false,
-  collections: [],
 });
 
 const isLoadingInteractions = ref(false);
@@ -56,7 +51,6 @@ const loadInteractions = async (problemId: number | string) => {
     interactionCounts.value = {
       likes: opsRes.likes,
       dislikes: opsRes.dislikes,
-      favorites: opsRes.favorites,
     };
     viewerInteraction.value = {
       reaction:
@@ -65,23 +59,12 @@ const loadInteractions = async (problemId: number | string) => {
           : opsRes.viewer.vote === -1
             ? "dislike"
             : undefined,
-      isFavorite: opsRes.viewer.isFavorite,
-      collections: opsRes.viewer.collections ?? [],
     };
   } catch (e) {
     console.error("Failed to load interactions", e);
   } finally {
     isLoadingInteractions.value = false;
   }
-};
-
-const handleSaveChange = (
-  isFavorite: boolean,
-  collections: string[],
-  listIds: string[],
-) => {
-  viewerInteraction.value.isFavorite = isFavorite;
-  viewerInteraction.value.collections = [...collections, ...listIds];
 };
 
 watch(
@@ -93,8 +76,6 @@ watch(
         interactionCounts.value = { ...props.problem.interactions.counts };
         viewerInteraction.value = {
           reaction: props.problem.interactions.viewer?.reaction,
-          isFavorite: !!props.problem.interactions.viewer?.isFavorite,
-          collections: [],
         };
       } else {
         // Otherwise fetch from API
@@ -129,15 +110,12 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
     );
     interactionCounts.value.likes = res.likes;
     interactionCounts.value.dislikes = res.dislikes;
-    interactionCounts.value.favorites = res.favorites;
     viewerInteraction.value.reaction =
       res.viewer.vote === 1
         ? "like"
         : res.viewer.vote === -1
           ? "dislike"
           : undefined;
-    viewerInteraction.value.isFavorite = res.viewer.isFavorite;
-    viewerInteraction.value.collections = res.viewer.collections ?? [];
   } catch (e) {
     console.error("Failed to toggle reaction", e);
   }
@@ -178,8 +156,7 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
 
     <ProblemSaveButton
       :problem-id="problem.id"
-      :target-type="CollectionTargetType.PROBLEM"
-      @change="handleSaveChange"
+      :target-type="BookmarkType.PROBLEM"
     />
 
     <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />

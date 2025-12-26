@@ -17,12 +17,12 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { useCollectionStore } from "@/stores/collection";
+import { useBookmarkStore } from "@/stores/bookmark";
 import {
-  addItemToCollection,
-  removeItemByTarget,
-  getItemCollections,
-} from "@/api/collection";
+  addBookmark,
+  removeBookmarkByTarget,
+  getBookmarkFolders,
+} from "@/api/bookmark";
 import {
   getUserListsForProblem,
   batchAddProblemToLists,
@@ -30,7 +30,7 @@ import {
   createProblemList,
   type ProblemListWithStatus,
 } from "@/api/problem-list";
-import type { CollectionTargetType } from "@/types/collection";
+import type { BookmarkType } from "@/types/bookmark";
 import { toast } from "vue-sonner";
 import { isAuthenticated, fetchCurrentUserId } from "@/utils/auth";
 import {
@@ -46,19 +46,19 @@ import { Label } from "@/components/ui/label";
 
 const props = defineProps<{
   problemId: number;
-  targetType: CollectionTargetType;
+  targetType: BookmarkType;
   variant?: "default" | "ghost" | "outline";
   size?: "default" | "sm" | "icon";
 }>();
 
 const emit = defineEmits<{
-  change: [isFavorite: boolean, collections: string[], listIds: string[]];
+  change: [isFavorite: boolean, folders: string[], listIds: string[]];
 }>();
 
-const collectionStore = useCollectionStore();
+const bookmarkStore = useBookmarkStore();
 
-// Collection state
-const itemCollections = ref<string[]>([]);
+// Bookmark folder state
+const itemFolders = ref<string[]>([]);
 
 // Problem list state
 const userLists = ref<ProblemListWithStatus[]>([]);
@@ -70,10 +70,10 @@ const showCreateDialog = ref(false);
 const newListName = ref("");
 const isCreating = ref(false);
 
-// Check if problem is in default collection (favorited)
+// Check if problem is in default folder (favorited)
 const isFavorited = computed(() => {
-  const defaultId = collectionStore.defaultCollection?.id;
-  return defaultId ? itemCollections.value.includes(defaultId) : false;
+  const defaultId = bookmarkStore.defaultFolder?.id;
+  return defaultId ? itemFolders.value.includes(defaultId) : false;
 });
 
 // Track which lists contain this problem
@@ -81,9 +81,9 @@ const selectedListIds = computed(() =>
   userLists.value.filter((list) => list.containsProblem).map((list) => list.id),
 );
 
-// Combined state: is saved if in any collection or any list
+// Combined state: is saved if in any folder or any list
 const isSaved = computed(
-  () => itemCollections.value.length > 0 || selectedListIds.value.length > 0,
+  () => itemFolders.value.length > 0 || selectedListIds.value.length > 0,
 );
 
 async function loadData() {
@@ -91,7 +91,7 @@ async function loadData() {
 
   isAuthed.value = isAuthenticated();
   if (!isAuthed.value) {
-    itemCollections.value = [];
+    itemFolders.value = [];
     userLists.value = [];
     isLoading.value = false;
     return;
@@ -99,7 +99,7 @@ async function loadData() {
 
   const userId = fetchCurrentUserId();
   if (!userId) {
-    itemCollections.value = [];
+    itemFolders.value = [];
     userLists.value = [];
     isLoading.value = false;
     return;
@@ -107,14 +107,14 @@ async function loadData() {
 
   isLoading.value = true;
   try {
-    // Load collections in parallel
-    await collectionStore.loadCollections();
-    const [collections, lists] = await Promise.all([
-      getItemCollections(props.targetType, props.problemId.toString()),
+    // Load bookmark folders in parallel
+    await bookmarkStore.loadFolders();
+    const [folders, lists] = await Promise.all([
+      getBookmarkFolders(props.targetType, props.problemId.toString()),
       getUserListsForProblem(userId, props.problemId),
     ]);
 
-    itemCollections.value = collections;
+    itemFolders.value = folders;
     userLists.value = lists;
   } catch (error) {
     console.error("Failed to load data:", error);
@@ -124,38 +124,36 @@ async function loadData() {
   }
 }
 
-async function toggleCollection(collectionId: string) {
+async function toggleFolder(folderId: string) {
   if (!isAuthenticated()) {
     toast.error("Please log in to save");
     return;
   }
 
-  const isInCollection = itemCollections.value.includes(collectionId);
+  const isInFolder = itemFolders.value.includes(folderId);
 
   try {
-    if (isInCollection) {
-      await removeItemByTarget(
-        collectionId,
+    if (isInFolder) {
+      await removeBookmarkByTarget(
+        folderId,
         props.targetType,
         props.problemId.toString(),
       );
-      itemCollections.value = itemCollections.value.filter(
-        (id) => id !== collectionId,
-      );
-      collectionStore.updateItemCount(collectionId, -1);
+      itemFolders.value = itemFolders.value.filter((id) => id !== folderId);
+      bookmarkStore.updateItemCount(folderId, -1);
     } else {
-      await addItemToCollection(collectionId, {
+      await addBookmark(folderId, {
         targetId: props.problemId.toString(),
         targetType: props.targetType,
       });
-      itemCollections.value.push(collectionId);
-      collectionStore.updateItemCount(collectionId, 1);
+      itemFolders.value.push(folderId);
+      bookmarkStore.updateItemCount(folderId, 1);
     }
 
     emitChange();
   } catch (error) {
-    console.error("Failed to toggle collection:", error);
-    toast.error("Failed to update collection");
+    console.error("Failed to toggle bookmark folder:", error);
+    toast.error("Failed to update bookmark");
   }
 }
 
@@ -192,12 +190,7 @@ async function toggleList(listId: string) {
 }
 
 function emitChange() {
-  emit(
-    "change",
-    isFavorited.value,
-    itemCollections.value,
-    selectedListIds.value,
-  );
+  emit("change", isFavorited.value, itemFolders.value, selectedListIds.value);
 }
 
 function handleOpenChange(open: boolean) {
@@ -248,7 +241,7 @@ async function handleCreateList() {
 watch(
   () => props.problemId,
   () => {
-    itemCollections.value = [];
+    itemFolders.value = [];
     userLists.value = [];
   },
 );
@@ -286,16 +279,14 @@ watch(
           </div>
         </template>
         <template v-else>
-          <!-- Collections Section -->
-          <div v-if="collectionStore.defaultCollection">
+          <!-- Bookmark Folders Section -->
+          <div v-if="bookmarkStore.defaultFolder">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
               Quick Save
             </DropdownMenuLabel>
             <DropdownMenuCheckboxItem
               :checked="isFavorited"
-              @select.prevent="
-                toggleCollection(collectionStore.defaultCollection.id)
-              "
+              @select.prevent="toggleFolder(bookmarkStore.defaultFolder.id)"
               :class="{
                 'bg-primary/10 border-l-2 border-primary': isFavorited,
               }"
@@ -308,7 +299,7 @@ watch(
                     'font-semibold text-primary': isFavorited,
                   }"
                 >
-                  {{ collectionStore.defaultCollection.name }}
+                  {{ bookmarkStore.defaultFolder.name }}
                 </span>
                 <Check
                   v-if="isFavorited"
@@ -319,38 +310,38 @@ watch(
 
             <DropdownMenuSeparator
               v-if="
-                collectionStore.customCollections.length > 0 ||
-                userLists.length > 0
+                bookmarkStore.customFolders.length > 0 || userLists.length > 0
               "
             />
           </div>
 
-          <!-- Custom Collections -->
-          <div v-if="collectionStore.customCollections.length > 0">
+          <!-- Custom Folders -->
+          <div v-if="bookmarkStore.customFolders.length > 0">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
-              Collections
+              Folders
             </DropdownMenuLabel>
             <DropdownMenuCheckboxItem
-              v-for="collection in collectionStore.customCollections"
-              :key="collection.id"
-              :checked="itemCollections.includes(collection.id)"
-              @select.prevent="toggleCollection(collection.id)"
+              v-for="folder in bookmarkStore.customFolders"
+              :key="folder.id"
+              :checked="itemFolders.includes(folder.id)"
+              @select.prevent="toggleFolder(folder.id)"
               :class="{
-                'bg-primary/10 border-l-2 border-primary':
-                  itemCollections.includes(collection.id),
+                'bg-primary/10 border-l-2 border-primary': itemFolders.includes(
+                  folder.id,
+                ),
               }"
             >
               <span class="flex items-center gap-2 flex-1">
                 <span
                   :class="{
-                    'font-semibold text-primary': itemCollections.includes(
-                      collection.id,
+                    'font-semibold text-primary': itemFolders.includes(
+                      folder.id,
                     ),
                   }"
-                  >{{ collection.name }}</span
+                  >{{ folder.name }}</span
                 >
                 <Check
-                  v-if="itemCollections.includes(collection.id)"
+                  v-if="itemFolders.includes(folder.id)"
                   class="h-3 w-3 text-primary ml-auto"
                 />
               </span>
@@ -409,13 +400,13 @@ watch(
           <!-- Empty State -->
           <div
             v-if="
-              collectionStore.customCollections.length === 0 &&
+              bookmarkStore.customFolders.length === 0 &&
               userLists.length === 0 &&
-              !collectionStore.defaultCollection
+              !bookmarkStore.defaultFolder
             "
             class="px-3 py-4 text-sm text-muted-foreground text-center"
           >
-            <p class="mb-2">No collections or lists yet.</p>
+            <p class="mb-2">No folders or lists yet.</p>
             <p class="text-xs">Create a problem list to get started!</p>
           </div>
 

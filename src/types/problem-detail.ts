@@ -39,7 +39,6 @@ export interface ProblemReaction {
 export interface ProblemInteractionCounts {
   likes: number;
   dislikes: number;
-  favorites: number;
 }
 
 export interface ProblemInteractionSnapshot {
@@ -47,7 +46,6 @@ export interface ProblemInteractionSnapshot {
   counts: ProblemInteractionCounts;
   viewer?: {
     reaction?: ProblemReactionType;
-    isFavorite?: boolean;
   };
 }
 

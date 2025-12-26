@@ -10,37 +10,37 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { useCollectionStore } from "@/stores/collection";
+import { useBookmarkStore } from "@/stores/bookmark";
 import {
-  addItemToCollection,
-  removeItemByTarget,
-  getItemCollections,
-} from "@/api/collection";
-import type { CollectionTargetType } from "@/types/collection";
+  addBookmark,
+  removeBookmarkByTarget,
+  getBookmarkFolders,
+} from "@/api/bookmark";
+import type { BookmarkType } from "@/types/bookmark";
 import { toast } from "vue-sonner";
 import { isAuthenticated } from "@/utils/auth";
 
 const props = defineProps<{
-  targetType: CollectionTargetType;
+  targetType: BookmarkType;
   targetId: string;
   variant?: "default" | "ghost" | "outline";
   size?: "default" | "sm" | "icon";
 }>();
 
 const emit = defineEmits<{
-  change: [isFavorite: boolean, collections: string[]];
-  "create-collection": [];
+  change: [isFavorite: boolean, folders: string[]];
+  "create-folder": [];
 }>();
-const store = useCollectionStore();
+const store = useBookmarkStore();
 
-const itemCollections = ref<string[]>([]);
+const itemFolders = ref<string[]>([]);
 const isLoading = ref(false);
 const isOpen = ref(false);
 const isAuthed = ref(false);
 
 const isFavorited = computed(() => {
-  const defaultId = store.defaultCollection?.id;
-  return defaultId ? itemCollections.value.includes(defaultId) : false;
+  const defaultId = store.defaultFolder?.id;
+  return defaultId ? itemFolders.value.includes(defaultId) : false;
 });
 
 async function loadData() {
@@ -48,53 +48,51 @@ async function loadData() {
 
   isAuthed.value = isAuthenticated();
   if (!isAuthed.value) {
-    itemCollections.value = [];
+    itemFolders.value = [];
     isLoading.value = false;
     return;
   }
 
   isLoading.value = true;
   try {
-    await store.loadCollections();
-    itemCollections.value = await getItemCollections(
+    await store.loadFolders();
+    itemFolders.value = await getBookmarkFolders(
       props.targetType,
       props.targetId,
     );
   } catch (error) {
-    console.error("Failed to load collections:", error);
+    console.error("Failed to load bookmark folders:", error);
   } finally {
     isLoading.value = false;
   }
 }
 
-async function toggleCollection(collectionId: string) {
+async function toggleFolder(folderId: string) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to manage collections");
+    toast.error("Please log in to manage bookmarks");
     return;
   }
 
-  const isInCollection = itemCollections.value.includes(collectionId);
+  const isInFolder = itemFolders.value.includes(folderId);
 
   try {
-    if (isInCollection) {
-      await removeItemByTarget(collectionId, props.targetType, props.targetId);
-      itemCollections.value = itemCollections.value.filter(
-        (id) => id !== collectionId,
-      );
-      store.updateItemCount(collectionId, -1);
+    if (isInFolder) {
+      await removeBookmarkByTarget(folderId, props.targetType, props.targetId);
+      itemFolders.value = itemFolders.value.filter((id) => id !== folderId);
+      store.updateItemCount(folderId, -1);
     } else {
-      await addItemToCollection(collectionId, {
+      await addBookmark(folderId, {
         targetId: props.targetId,
         targetType: props.targetType,
       });
-      itemCollections.value.push(collectionId);
-      store.updateItemCount(collectionId, 1);
+      itemFolders.value.push(folderId);
+      store.updateItemCount(folderId, 1);
     }
 
-    emit("change", isFavorited.value, itemCollections.value);
+    emit("change", isFavorited.value, itemFolders.value);
   } catch (error) {
-    console.error("Failed to toggle collection:", error);
-    toast.error("Failed to update collection");
+    console.error("Failed to toggle bookmark:", error);
+    toast.error("Failed to update bookmark");
   }
 }
 
@@ -108,7 +106,7 @@ function handleOpenChange(open: boolean) {
 watch(
   () => props.targetId,
   () => {
-    itemCollections.value = [];
+    itemFolders.value = [];
   },
 );
 </script>
@@ -136,42 +134,42 @@ watch(
       </template>
       <template v-else-if="!isAuthed">
         <div class="px-3 py-2 text-sm text-muted-foreground">
-          Please log in to manage collections.
+          Please log in to manage bookmarks.
         </div>
       </template>
       <template v-else>
-        <!-- Default Collection -->
+        <!-- Default Folder -->
         <DropdownMenuCheckboxItem
-          v-if="store.defaultCollection"
+          v-if="store.defaultFolder"
           :checked="isFavorited"
-          @select.prevent="toggleCollection(store.defaultCollection.id)"
+          @select.prevent="toggleFolder(store.defaultFolder.id)"
         >
           <span class="flex items-center gap-2">
             <Bookmark class="h-4 w-4" />
-            {{ store.defaultCollection.name }}
+            {{ store.defaultFolder.name }}
           </span>
         </DropdownMenuCheckboxItem>
 
-        <DropdownMenuSeparator v-if="store.customCollections.length > 0" />
+        <DropdownMenuSeparator v-if="store.customFolders.length > 0" />
 
-        <!-- Custom Collections -->
+        <!-- Custom Folders -->
         <DropdownMenuCheckboxItem
-          v-for="collection in store.customCollections"
-          :key="collection.id"
-          :checked="itemCollections.includes(collection.id)"
-          @select.prevent="toggleCollection(collection.id)"
+          v-for="folder in store.customFolders"
+          :key="folder.id"
+          :checked="itemFolders.includes(folder.id)"
+          @select.prevent="toggleFolder(folder.id)"
         >
-          {{ collection.name }}
+          {{ folder.name }}
         </DropdownMenuCheckboxItem>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
           class="cursor-pointer"
-          @select="emit('create-collection')"
+          @select="emit('create-folder')"
         >
           <FolderPlus class="mr-2 h-4 w-4" />
-          Create Collection
+          Create Folder
         </DropdownMenuItem>
       </template>
     </DropdownMenuContent>

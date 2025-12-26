@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,37 +14,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-vue-next";
 import type {
-  Collection,
-  CreateCollectionInput,
-  UpdateCollectionInput,
-} from "@/types/collection";
+  BookmarkFolder,
+  CreateFolderInput,
+  UpdateFolderInput,
+} from "@/types/bookmark";
 
 const props = defineProps<{
   open: boolean;
-  collection?: Collection | null;
+  folder?: BookmarkFolder | null;
 }>();
 
 const emit = defineEmits<{
   "update:open": [value: boolean];
-  create: [data: CreateCollectionInput];
-  update: [id: string, data: UpdateCollectionInput];
+  create: [data: CreateFolderInput];
+  update: [id: string, data: UpdateFolderInput];
 }>();
 
 const name = ref("");
 const description = ref("");
 const isSubmitting = ref(false);
 
-const isEdit = computed(() => !!props.collection);
-const title = computed(() =>
-  isEdit.value ? "Edit Collection" : "Create Collection",
-);
+const isEdit = computed(() => !!props.folder);
+const title = computed(() => (isEdit.value ? "Edit Folder" : "Create Folder"));
 
 watch(
   () => props.open,
   (open) => {
-    if (open && props.collection) {
-      name.value = props.collection.name;
-      description.value = props.collection.description ?? "";
+    if (open && props.folder) {
+      name.value = props.folder.name;
+      description.value = props.folder.description ?? "";
     } else if (open) {
       name.value = "";
       description.value = "";
@@ -56,8 +55,8 @@ async function handleSubmit() {
 
   isSubmitting.value = true;
   try {
-    if (isEdit.value && props.collection) {
-      emit("update", props.collection.id, {
+    if (isEdit.value && props.folder) {
+      emit("update", props.folder.id, {
         name: name.value.trim(),
         description: description.value.trim() || undefined,
       });
@@ -86,8 +85,8 @@ function handleClose() {
         <DialogDescription>
           {{
             isEdit
-              ? "Update your collection details."
-              : "Create a new collection to organize your favorite problems."
+              ? "Update your bookmark folder details."
+              : "Create a new folder to organize your bookmarks."
           }}
         </DialogDescription>
       </DialogHeader>
@@ -98,7 +97,7 @@ function handleClose() {
           <Input
             id="name"
             v-model="name"
-            placeholder="My Collection"
+            placeholder="My Folder"
             :disabled="isSubmitting"
           />
         </div>
