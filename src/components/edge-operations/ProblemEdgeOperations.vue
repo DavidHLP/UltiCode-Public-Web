@@ -16,7 +16,7 @@ import {
   EdgeOperationType,
 } from "@/api/interaction";
 import { CollectionTargetType } from "@/types/collection";
-import AddToCollectionButton from "@/components/collection/AddToCollectionButton.vue";
+import ProblemSaveButton from "./ProblemSaveButton.vue";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 
 interface Props {
@@ -75,9 +75,13 @@ const loadInteractions = async (problemId: number | string) => {
   }
 };
 
-const handleCollectionChange = (isFavorite: boolean, collections: string[]) => {
+const handleSaveChange = (
+  isFavorite: boolean,
+  collections: string[],
+  listIds: string[]
+) => {
   viewerInteraction.value.isFavorite = isFavorite;
-  viewerInteraction.value.collections = collections;
+  viewerInteraction.value.collections = [...collections, ...listIds];
 };
 
 watch(
@@ -172,10 +176,10 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
       <span class="text-xs">{{ reactionCounts.dislikes }}</span>
     </Button>
 
-    <AddToCollectionButton
+    <ProblemSaveButton
+      :problem-id="problem.id"
       :target-type="CollectionTargetType.PROBLEM"
-      :target-id="problem.id.toString()"
-      @change="handleCollectionChange"
+      @change="handleSaveChange"
     />
 
     <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />

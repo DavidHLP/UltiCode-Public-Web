@@ -283,6 +283,52 @@ export async function removeProblemFromList(
   );
 }
 
+export async function batchAddProblemToLists(
+  userId: string,
+  problemId: number,
+  listIds: string[],
+): Promise<void> {
+  await apiPost(
+    `/problem-lists/problems/${problemId}/batch-add?userId=${userId}`,
+    { listIds },
+  );
+}
+
+export async function batchRemoveProblemFromLists(
+  userId: string,
+  problemId: number,
+  listIds: string[],
+): Promise<void> {
+  await apiPost(
+    `/problem-lists/problems/${problemId}/batch-remove?userId=${userId}`,
+    { listIds },
+  );
+}
+
+export interface ProblemListWithStatus extends ProblemList {
+  containsProblem: boolean;
+  canEdit: boolean;
+}
+
+export async function getUserListsForProblem(
+  userId: string,
+  problemId: number,
+): Promise<ProblemListWithStatus[]> {
+  const data = await apiGet<unknown[]>(
+    `/problem-lists/problems/${problemId}/user-lists?userId=${userId}`,
+  );
+  if (!Array.isArray(data)) {
+    return [];
+  }
+  return data.map((item) => ({
+    ...mapProblemList(item),
+    containsProblem: Boolean(
+      (item as Record<string, unknown>).containsProblem,
+    ),
+    canEdit: Boolean((item as Record<string, unknown>).canEdit),
+  }));
+}
+
 // ============================================================================
 // Save/Unsave List
 // ============================================================================
