@@ -4,7 +4,6 @@ export enum EdgeOperationType {
   VOTE_UP = "VOTE_UP",
   VOTE_DOWN = "VOTE_DOWN",
   FAVORITE = "FAVORITE",
-  CHARGE = "CHARGE",
   ANALYZE = "ANALYZE",
 }
 
@@ -24,6 +23,7 @@ export interface EdgeOperationResponse {
   viewer: {
     vote: 1 | 0 | -1;
     isFavorite: boolean;
+    collections?: string[];
   };
 }
 

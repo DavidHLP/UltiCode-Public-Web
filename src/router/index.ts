@@ -163,6 +163,11 @@ const personalRoutes: RouteRecordRaw = {
       name: "personal-problem-lists",
       component: () => import("@/views/personal/ProblemListsView.vue"),
     },
+    {
+      path: "collections",
+      name: "personal-collections",
+      component: () => import("@/views/personal/CollectionsView.vue"),
+    },
   ],
 };
 

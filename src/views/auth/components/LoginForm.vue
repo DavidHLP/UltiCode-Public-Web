@@ -21,8 +21,8 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const email = ref(""); // Using 'username' field on backend but form calls it email. Now using empty default.
-const password = ref("");
+const email = ref("yuki_codes"); // Using 'username' field on backend but form calls it email. Now using empty default.
+const password = ref("password123");
 const loading = ref(false);
 
 async function handleSubmit(e: Event) {

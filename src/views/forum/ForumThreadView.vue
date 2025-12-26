@@ -12,6 +12,7 @@ import {
 import { ref, watch } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
+import { toast } from "vue-sonner";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 
 const route = useRoute();
@@ -38,11 +39,11 @@ watch(
     void loadThread(postId);
     if (postId) {
       recordForumView(postId).catch((e) =>
-        console.error("Failed to record view", e),
+        console.error("Failed to record view", e)
       );
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 async function onSubmitComment(body: string, parentId?: string | null) {
@@ -56,7 +57,7 @@ import { vote, VoteTargetType } from "@/api/vote";
 
 async function handleThreadVote(type: 1 | -1) {
   if (!isAuthenticated()) {
-    alert("Please log in to vote.");
+    toast.error("Please log in to vote.");
     return;
   }
   if (!thread.value) return;
@@ -81,7 +82,7 @@ async function handleThreadVote(type: 1 | -1) {
 
 async function handleCommentVote(commentId: string | number, type: 1 | -1) {
   if (!isAuthenticated()) {
-    alert("Please log in to vote.");
+    toast.error("Please log in to vote.");
     return;
   }
   if (!thread.value?.comments) return;
@@ -89,7 +90,7 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
     const res = await vote(
       VoteTargetType.FORUM_COMMENT,
       String(commentId),
-      type,
+      type
     );
 
     // Find and update comment in the flat list
