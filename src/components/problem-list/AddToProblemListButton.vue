@@ -230,7 +230,9 @@ watch(
                     class="h-3 w-3 text-primary flex-shrink-0"
                   />
                 </div>
-                <div class="flex items-center gap-2 text-xs text-muted-foreground">
+                <div
+                  class="flex items-center gap-2 text-xs text-muted-foreground"
+                >
                   <span>{{ list.problemCount }} problems</span>
                   <span>•</span>
                   <span>{{ list.favoritesCount }} saves</span>

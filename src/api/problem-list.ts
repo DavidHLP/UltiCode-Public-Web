@@ -322,9 +322,7 @@ export async function getUserListsForProblem(
   }
   return data.map((item) => ({
     ...mapProblemList(item),
-    containsProblem: Boolean(
-      (item as Record<string, unknown>).containsProblem,
-    ),
+    containsProblem: Boolean((item as Record<string, unknown>).containsProblem),
     canEdit: Boolean((item as Record<string, unknown>).canEdit),
   }));
 }

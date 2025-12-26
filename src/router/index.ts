@@ -41,6 +41,16 @@ const forumRoutes: RouteRecordRaw = {
       name: "forum-thread",
       component: () => import("@/views/forum/ForumThreadView.vue"),
     },
+    {
+      path: "guidelines",
+      name: "forum-guidelines",
+      component: () => import("@/views/forum/ForumGuidelinesView.vue"),
+    },
+    {
+      path: "feedback",
+      name: "forum-feedback",
+      component: () => import("@/views/forum/ForumFeedbackView.vue"),
+    },
   ],
 };
 

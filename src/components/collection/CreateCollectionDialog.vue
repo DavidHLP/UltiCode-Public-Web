@@ -35,7 +35,7 @@ const isSubmitting = ref(false);
 
 const isEdit = computed(() => !!props.collection);
 const title = computed(() =>
-  isEdit.value ? "Edit Collection" : "Create Collection"
+  isEdit.value ? "Edit Collection" : "Create Collection",
 );
 
 watch(
@@ -48,7 +48,7 @@ watch(
       name.value = "";
       description.value = "";
     }
-  }
+  },
 );
 
 async function handleSubmit() {

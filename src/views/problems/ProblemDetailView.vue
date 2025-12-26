@@ -91,12 +91,12 @@ const ConnectedDescriptionView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(DescriptionView, { problem: problem.value })
+            h(DescriptionView, { problem: problem.value }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -112,12 +112,12 @@ const ConnectedSolutionsView = defineComponent({
             h(ProblemSolutionsView, {
               problemId: problem.value.id,
               followUp: problem.value.followUp ?? "",
-            })
+            }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -130,12 +130,12 @@ const ConnectedSubmissionsView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(SubmissionsView, { problemId: problem.value.id })
+            h(SubmissionsView, { problemId: problem.value.id }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -153,7 +153,7 @@ const ConnectedCodeView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -166,12 +166,12 @@ const ConnectedTestCaseView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(TestCaseView, { testCases: problem.value.testCases ?? [] })
+            h(TestCaseView, { testCases: problem.value.testCases ?? [] }),
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading..."
+            "Loading...",
           );
   },
 });
@@ -183,7 +183,7 @@ const ConnectedTestResultsView = defineComponent({
       h(
         "div",
         { class: "px-1 py-2" },
-        h(TestResultsView, { runResult: runResult.value })
+        h(TestResultsView, { runResult: runResult.value }),
       );
   },
 });
@@ -485,7 +485,7 @@ watch(
         headerStore.setActiveHeader("problem-info", 1);
       }
     }
-  }
+  },
 );
 
 // Sync Store to URL (when user clicks tabs)
@@ -509,7 +509,7 @@ watch(
         });
       }
     }
-  }
+  },
 );
 
 onMounted(() => {

@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import type { ForumFlairType, ForumPost, ForumCommunity } from "@/types/forum";
+import type {
+  ForumFlairType,
+  ForumPost,
+  ForumCommunity,
+  ForumCommunityRule,
+  ForumCommunityLink,
+} from "@/types/forum";
 import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import ForumSidebar from "@/views/forum/components/ForumSidebar.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   fetchForumCommunities,
+  fetchForumCommunity,
+  fetchCommunityPosts,
   fetchForumPosts,
   fetchForumQuickFilters,
 } from "@/api/forum";
@@ -14,28 +22,10 @@ import {
 const posts = ref<ForumPost[]>([]);
 const communities = ref<ForumCommunity[]>([]);
 const quickFilters = ref<Array<{ label: string; value: string }>>([]);
+const currentCommunity = ref<ForumCommunity | null>(null);
+const communityRules = ref<ForumCommunityRule[]>([]);
+const communityLinks = ref<ForumCommunityLink[]>([]);
 const isLoading = ref(true);
-
-onMounted(async () => {
-  isLoading.value = true;
-  try {
-    const [postRows, communityRows, filters] = await Promise.all([
-      fetchForumPosts(),
-      fetchForumCommunities(),
-      fetchForumQuickFilters(),
-    ]);
-    posts.value = postRows;
-    communities.value = communityRows;
-    quickFilters.value = filters;
-  } catch (error) {
-    console.error("Failed to load forum data", error);
-    posts.value = [];
-    communities.value = [];
-    quickFilters.value = [];
-  } finally {
-    isLoading.value = false;
-  }
-});
 
 const props = defineProps<{
   filter?: string;
@@ -47,14 +37,64 @@ const quickFilter = ref(props.filter || "hot");
 const selectedCommunity = ref("all");
 const selectedFlair = ref<"all" | ForumFlairType>("all");
 
-// Check route params for category
+// Load all posts and communities on mount
+async function loadAllPosts() {
+  isLoading.value = true;
+  try {
+    const [postRows, communityRows, filters] = await Promise.all([
+      fetchForumPosts(),
+      fetchForumCommunities(),
+      fetchForumQuickFilters(),
+    ]);
+    posts.value = postRows;
+    communities.value = communityRows;
+    quickFilters.value = filters;
+    currentCommunity.value = null;
+    communityRules.value = [];
+    communityLinks.value = [];
+  } catch (error) {
+    console.error("Failed to load forum data", error);
+    posts.value = [];
+    communities.value = [];
+    quickFilters.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Load posts for a specific community
+async function loadCommunityPosts(slug: string) {
+  isLoading.value = true;
+  try {
+    const [communityPosts, communityData] = await Promise.all([
+      fetchCommunityPosts(slug, {
+        sortBy: quickFilter.value as "hot" | "new" | "top",
+      }),
+      fetchForumCommunity(slug),
+    ]);
+    posts.value = communityPosts;
+    currentCommunity.value = communityData.community;
+    communityRules.value = communityData.rules;
+    communityLinks.value = communityData.links;
+  } catch (error) {
+    console.error("Failed to load community posts", error);
+    posts.value = [];
+    currentCommunity.value = null;
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Watch for category changes in route
 watch(
   () => route.params.category,
-  (newCategory) => {
+  async (newCategory) => {
     if (newCategory) {
       selectedCommunity.value = String(newCategory);
+      await loadCommunityPosts(String(newCategory));
     } else {
       selectedCommunity.value = "all";
+      await loadAllPosts();
     }
   },
   { immediate: true },
@@ -83,19 +123,15 @@ const filteredPosts = computed(() => {
           tag.toLowerCase().includes(normalizedSearch),
         ));
 
-    const matchesCommunity =
-      selectedCommunity.value === "all" ||
-      post.community?.slug === selectedCommunity.value;
-
     const matchesFlair =
       selectedFlair.value === "all" || post.flair?.type === selectedFlair.value;
 
-    return matchesSearch && matchesCommunity && matchesFlair;
+    return matchesSearch && matchesFlair;
   });
 });
 
 const sortedPosts = computed(() => {
-  const posts = [...filteredPosts.value];
+  const postsArray = [...filteredPosts.value];
   const sorters: Record<string, (a: ForumPost, b: ForumPost) => number> = {
     hot: (a, b) => (b.stats?.score ?? 0) - (a.stats?.score ?? 0),
     new: (a, b) =>
@@ -105,10 +141,10 @@ const sortedPosts = computed(() => {
   };
 
   const sorter = sorters[quickFilter.value] ?? sorters.hot;
-  posts.sort(sorter);
+  postsArray.sort(sorter);
 
-  const pinned = posts.filter((post) => post.isPinned);
-  const rest = posts.filter((post) => !post.isPinned);
+  const pinned = postsArray.filter((post) => post.isPinned);
+  const rest = postsArray.filter((post) => !post.isPinned);
 
   return [...pinned, ...rest];
 });
@@ -131,6 +167,10 @@ const sortedPosts = computed(() => {
     </main>
 
     <!-- Right Sidebar -->
-    <ForumSidebar />
+    <ForumSidebar
+      :community="currentCommunity"
+      :rules="communityRules"
+      :links="communityLinks"
+    />
   </div>
 </template>

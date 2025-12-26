@@ -50,7 +50,7 @@ const loadInteractions = async (problemId: number | string) => {
     const opsRes = await fetchEdgeOperationStatus(
       EdgeOperationTargetType.PROBLEM,
       problemId.toString(),
-      userId ?? undefined
+      userId ?? undefined,
     );
 
     interactionCounts.value = {
@@ -78,7 +78,7 @@ const loadInteractions = async (problemId: number | string) => {
 const handleSaveChange = (
   isFavorite: boolean,
   collections: string[],
-  listIds: string[]
+  listIds: string[],
 ) => {
   viewerInteraction.value.isFavorite = isFavorite;
   viewerInteraction.value.collections = [...collections, ...listIds];
@@ -102,13 +102,13 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const reactionCounts = computed(() => interactionCounts.value);
 const isLiked = computed(() => viewerInteraction.value.reaction === "like");
 const isDisliked = computed(
-  () => viewerInteraction.value.reaction === "dislike"
+  () => viewerInteraction.value.reaction === "dislike",
 );
 
 const toggleReaction = async (reaction: "like" | "dislike") => {
@@ -125,7 +125,7 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
     const res = await operateEdgeOperation(
       operationType,
       EdgeOperationTargetType.PROBLEM,
-      props.problem.id.toString()
+      props.problem.id.toString(),
     );
     interactionCounts.value.likes = res.likes;
     interactionCounts.value.dislikes = res.dislikes;

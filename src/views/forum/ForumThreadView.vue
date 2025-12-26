@@ -39,11 +39,11 @@ watch(
     void loadThread(postId);
     if (postId) {
       recordForumView(postId).catch((e) =>
-        console.error("Failed to record view", e)
+        console.error("Failed to record view", e),
       );
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 async function onSubmitComment(body: string, parentId?: string | null) {
@@ -90,7 +90,7 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
     const res = await vote(
       VoteTargetType.FORUM_COMMENT,
       String(commentId),
-      type
+      type,
     );
 
     // Find and update comment in the flat list

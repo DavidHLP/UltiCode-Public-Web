@@ -1,13 +1,51 @@
 import { apiGet, apiPost } from "@/utils/request";
-import type { ForumCommunity, ForumPost, ForumThread } from "@/types/forum";
+import type {
+  ForumCommunity,
+  ForumCommunityRule,
+  ForumCommunityLink,
+  ForumPost,
+  ForumThread,
+  ForumTag,
+} from "@/types/forum";
 import { fetchCurrentUserId } from "@/utils/auth";
 
 export async function fetchForumPosts(): Promise<ForumPost[]> {
   return apiGet<ForumPost[]>("/forum/posts");
 }
 
-export async function fetchForumCommunities(): Promise<ForumCommunity[]> {
-  return apiGet<ForumCommunity[]>("/forum/communities");
+export async function fetchForumCommunities(options?: {
+  featured?: boolean;
+}): Promise<ForumCommunity[]> {
+  const params = options?.featured ? "?featured=true" : "";
+  return apiGet<ForumCommunity[]>(`/forum/communities${params}`);
+}
+
+export async function fetchForumCommunity(slugOrId: string): Promise<{
+  community: ForumCommunity | null;
+  rules: ForumCommunityRule[];
+  links: ForumCommunityLink[];
+}> {
+  return apiGet(`/forum/communities/${slugOrId}`);
+}
+
+export async function fetchCommunityPosts(
+  slug: string,
+  options?: { sortBy?: "hot" | "new" | "top" },
+): Promise<ForumPost[]> {
+  const params = options?.sortBy ? `?sortBy=${options.sortBy}` : "";
+  return apiGet<ForumPost[]>(`/forum/communities/${slug}/posts${params}`);
+}
+
+export async function fetchForumTags(): Promise<ForumTag[]> {
+  return apiGet<ForumTag[]>("/forum/tags");
+}
+
+export async function joinCommunity(communityId: string): Promise<void> {
+  return apiPost(`/forum/communities/${communityId}/join`, {});
+}
+
+export async function leaveCommunity(communityId: string): Promise<void> {
+  return apiPost(`/forum/communities/${communityId}/leave`, {});
 }
 
 export async function fetchForumQuickFilters(): Promise<

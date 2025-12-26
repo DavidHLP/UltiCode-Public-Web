@@ -192,7 +192,12 @@ async function toggleList(listId: string) {
 }
 
 function emitChange() {
-  emit("change", isFavorited.value, itemCollections.value, selectedListIds.value);
+  emit(
+    "change",
+    isFavorited.value,
+    itemCollections.value,
+    selectedListIds.value,
+  );
 }
 
 function handleOpenChange(open: boolean) {

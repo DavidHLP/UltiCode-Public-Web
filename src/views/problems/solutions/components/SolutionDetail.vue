@@ -24,7 +24,7 @@ const props = defineProps<{
 }>();
 
 const authorInitial = computed(
-  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?"
+  () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
 
 const topicLabel = computed(
@@ -32,7 +32,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic"
+    "topic",
 );
 
 const comments = ref<ForumComment[]>([]);
@@ -48,11 +48,11 @@ watch(
     localStats.value = resolveVoteCounts(
       newItem.likes,
       newItem.dislikes,
-      newItem.stats
+      newItem.stats,
     );
     userVote.value = resolveUserVote(newItem.userVote);
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 );
 
 const loadComments = async () => {
@@ -64,7 +64,7 @@ const loadComments = async () => {
     const userId = fetchCurrentUserId();
     comments.value = await fetchSolutionComments(
       props.item.id,
-      userId || undefined
+      userId || undefined,
     );
   } catch (error) {
     console.error("Failed to load comments", error);
@@ -100,7 +100,7 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
 
 const handleCommentVote = async (
   commentId: string | number,
-  voteType: 1 | -1
+  voteType: 1 | -1,
 ) => {
   if (!isAuthenticated()) {
     toast.error("Please log in to vote.");
@@ -110,7 +110,7 @@ const handleCommentVote = async (
     const res = await vote(
       VoteTargetType.SOLUTION_COMMENT,
       String(commentId),
-      voteType
+      voteType,
     );
 
     // Recursive helper to find and update comment
@@ -147,7 +147,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

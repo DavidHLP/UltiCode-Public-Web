@@ -1,21 +1,101 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type {
+  ForumCommunity,
+  ForumCommunityRule,
+  ForumCommunityLink,
+} from "@/types/forum";
+
+defineProps<{
+  community?: ForumCommunity | null;
+  rules?: ForumCommunityRule[];
+  links?: ForumCommunityLink[];
+}>();
+</script>
 
 <template>
   <aside class="hidden w-[312px] flex-none space-y-4 lg:block">
+    <!-- Community Info (when viewing specific community) -->
     <div
+      v-if="community"
+      class="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
+    >
+      <div
+        class="bg-muted/50 p-4 font-medium"
+        :style="{
+          borderLeftColor: community.color || '#6366f1',
+          borderLeftWidth: '4px',
+        }"
+      >
+        About {{ community.name }}
+      </div>
+      <div class="p-4 text-sm">
+        <p class="text-muted-foreground">{{ community.description }}</p>
+
+        <!-- Stats -->
+        <div class="mt-4 space-y-2">
+          <div class="flex justify-between text-xs">
+            <span class="text-muted-foreground">Members</span>
+            <span class="font-medium">{{
+              community.members?.toLocaleString()
+            }}</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-muted-foreground">Online</span>
+            <span class="font-medium text-green-600">{{
+              community.online?.toLocaleString()
+            }}</span>
+          </div>
+          <div v-if="community.postsToday" class="flex justify-between text-xs">
+            <span class="text-muted-foreground">Posts Today</span>
+            <span class="font-medium">{{ community.postsToday }}</span>
+          </div>
+          <div v-if="community.postsWeek" class="flex justify-between text-xs">
+            <span class="text-muted-foreground">Posts This Week</span>
+            <span class="font-medium">{{ community.postsWeek }}</span>
+          </div>
+        </div>
+
+        <!-- Rules -->
+        <div v-if="rules && rules.length > 0" class="mt-4">
+          <h3 class="mb-2 text-sm font-semibold">Community Rules</h3>
+          <ol class="space-y-2 text-xs">
+            <li v-for="rule in rules" :key="rule.id">
+              <strong>{{ rule.sortOrder }}. {{ rule.title }}</strong>
+              <p class="text-muted-foreground">{{ rule.body }}</p>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Links -->
+        <div v-if="links && links.length > 0" class="mt-4">
+          <h3 class="mb-2 text-sm font-semibold">Resources</h3>
+          <ul class="space-y-1 text-xs">
+            <li v-for="link in links" :key="link.id">
+              <a
+                :href="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-primary hover:underline"
+              >
+                {{ link.label }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Default sidebar (when viewing all posts) -->
+    <div
+      v-else
       class="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm"
     >
       <div class="bg-muted/50 p-4 font-medium">About Community</div>
       <div class="p-4 text-sm text-muted-foreground">
         <p>
-          Welcome to the forum! Discuss related topics and share your thoughts.
+          Welcome to the forum! Browse all posts or select a category from the
+          sidebar.
         </p>
-        <div class="mt-4 flex flex-col gap-2">
-          <div class="flex justify-between text-xs">
-            <span>Created</span>
-            <span class="font-medium">Dec 11, 2025</span>
-          </div>
-        </div>
       </div>
     </div>
   </aside>

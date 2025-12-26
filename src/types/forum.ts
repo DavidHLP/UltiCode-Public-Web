@@ -5,23 +5,62 @@ export interface ForumUser {
   karma?: number;
 }
 
+export interface ForumCommunityRule {
+  id: string;
+  title: string;
+  body: string;
+  sortOrder: number;
+}
+
+export interface ForumCommunityLink {
+  id: string;
+  label: string;
+  url: string;
+  description?: string;
+  sortOrder: number;
+}
+
+export interface ForumTag {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  usageCount: number;
+}
+
 export interface ForumCommunity {
   id: string;
   name: string;
+  slug: string;
   description: string;
-  member_count: number;
-  slug?: string;
+
+  // Visual Customization
   icon?: string;
+  color?: string;
   banner?: string;
-  isNew?: boolean;
+
+  // Stats
+  members: number;
+  online: number;
+  postsCount?: number;
+  postsToday?: number;
+  postsWeek?: number;
+
+  // Metadata
   isOfficial?: boolean;
-  members?: number;
-  online?: number;
-  foundedAt?: string;
-  tags?: string[];
-  accentColor?: string;
-  rules?: { id: string; title: string; summary: string }[];
-  links?: { label: string; url: string; description?: string }[];
+  isFeatured?: boolean;
+  sortOrder?: number;
+  visibility?: "PUBLIC" | "RESTRICTED" | "PRIVATE";
+  createdAt?: string;
+
+  // Relations (populated when fetching single community)
+  rules?: ForumCommunityRule[];
+  links?: ForumCommunityLink[];
+
+  // User-specific (when user is logged in)
+  isMember?: boolean;
+  userRole?: "OWNER" | "MODERATOR" | "MEMBER";
 }
 
 export type ForumFlairType =
