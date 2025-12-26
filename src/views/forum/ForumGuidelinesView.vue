@@ -82,8 +82,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
       </CardHeader>
       <CardContent class="space-y-2 text-sm">
         <p>
-          Keep language professional and appropriate. Excessive profanity,
-          NSFW content, or inappropriate jokes are not allowed.
+          Keep language professional and appropriate. Excessive profanity, NSFW
+          content, or inappropriate jokes are not allowed.
         </p>
         <p>Use clear, constructive communication in all interactions.</p>
       </CardContent>

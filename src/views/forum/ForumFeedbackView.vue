@@ -53,7 +53,7 @@ async function submitFeedback() {
     subject.value = "";
     description.value = "";
     feedbackType.value = "bug";
-  } catch (error) {
+  } catch {
     toast({
       title: "Submission Failed",
       description: "Something went wrong. Please try again later.",

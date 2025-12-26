@@ -27,8 +27,15 @@ function mapProblemList(input: unknown): ProblemList {
   const raw = input as Record<string, unknown>;
   const rawCount = raw.problemCount ?? raw.problem_count ?? 0;
   const rawFavorites = raw.favoritesCount ?? raw.favorites_count ?? 0;
+  const rawBannerOrder = raw.bannerOrder ?? raw.banner_order;
   const createdRaw = raw.createdAt ?? raw.created_at;
   const updatedRaw = raw.updatedAt ?? raw.updated_at;
+  const parsedBannerOrder =
+    typeof rawBannerOrder === "number"
+      ? rawBannerOrder
+      : typeof rawBannerOrder === "string"
+        ? Number(rawBannerOrder)
+        : Number.NaN;
   return {
     id: String(raw.id ?? ""),
     name: String(raw.name ?? ""),
@@ -54,6 +61,27 @@ function mapProblemList(input: unknown): ProblemList {
         : typeof raw.is_featured === "boolean"
           ? raw.is_featured
           : undefined,
+    bannerTag:
+      typeof raw.bannerTag === "string"
+        ? raw.bannerTag
+        : typeof raw.banner_tag === "string"
+          ? raw.banner_tag
+          : undefined,
+    bannerIcon:
+      typeof raw.bannerIcon === "string"
+        ? raw.bannerIcon
+        : typeof raw.banner_icon === "string"
+          ? raw.banner_icon
+          : undefined,
+    bannerTheme:
+      typeof raw.bannerTheme === "string"
+        ? raw.bannerTheme
+        : typeof raw.banner_theme === "string"
+          ? raw.banner_theme
+          : undefined,
+    bannerOrder: Number.isFinite(parsedBannerOrder)
+      ? parsedBannerOrder
+      : undefined,
     createdAt:
       createdRaw instanceof Date
         ? createdRaw.toISOString()
@@ -118,6 +146,13 @@ function mapProblemListItem(input: unknown): ProblemListItem {
   const raw = input as Record<string, unknown>;
   const createdRaw = raw.createdAt ?? raw.created_at;
   const updatedRaw = raw.updatedAt ?? raw.updated_at;
+  const rawBannerOrder = raw.bannerOrder ?? raw.banner_order;
+  const parsedBannerOrder =
+    typeof rawBannerOrder === "number"
+      ? rawBannerOrder
+      : typeof rawBannerOrder === "string"
+        ? Number(rawBannerOrder)
+        : Number.NaN;
   return {
     id: String(raw.id ?? ""),
     name: String(raw.name ?? ""),
@@ -141,6 +176,27 @@ function mapProblemListItem(input: unknown): ProblemListItem {
         : typeof raw.is_featured === "boolean"
           ? raw.is_featured
           : undefined,
+    bannerTag:
+      typeof raw.bannerTag === "string"
+        ? raw.bannerTag
+        : typeof raw.banner_tag === "string"
+          ? raw.banner_tag
+          : undefined,
+    bannerIcon:
+      typeof raw.bannerIcon === "string"
+        ? raw.bannerIcon
+        : typeof raw.banner_icon === "string"
+          ? raw.banner_icon
+          : undefined,
+    bannerTheme:
+      typeof raw.bannerTheme === "string"
+        ? raw.bannerTheme
+        : typeof raw.banner_theme === "string"
+          ? raw.banner_theme
+          : undefined,
+    bannerOrder: Number.isFinite(parsedBannerOrder)
+      ? parsedBannerOrder
+      : undefined,
     favoritesCount:
       typeof raw.favoritesCount === "number"
         ? raw.favoritesCount
@@ -172,6 +228,11 @@ export async function fetchProblemListsOverview(
   const query = userId ? `?userId=${userId}` : "";
   const data = await apiGet<unknown>(`/problem-lists/overview${query}`);
   return mapUserProblemListsResponse(data);
+}
+
+export async function fetchFeaturedProblemLists(): Promise<ProblemList[]> {
+  const data = await fetchProblemListsOverview();
+  return data.featured;
 }
 
 export async function fetchProblemListOverview(

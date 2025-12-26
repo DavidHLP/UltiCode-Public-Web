@@ -9,6 +9,10 @@ export interface ProblemList {
   authorId?: string;
   isPublic?: boolean;
   isFeatured?: boolean;
+  bannerTag?: string;
+  bannerIcon?: string;
+  bannerTheme?: string;
+  bannerOrder?: number;
   createdAt?: string;
   updatedAt?: string;
   isSaved?: boolean; // Whether current user saved this list
@@ -58,6 +62,10 @@ export interface ProblemListItem {
   authorId?: string;
   isPublic?: boolean;
   isFeatured?: boolean;
+  bannerTag?: string;
+  bannerIcon?: string;
+  bannerTheme?: string;
+  bannerOrder?: number;
   favoritesCount?: number;
   createdAt?: string;
   updatedAt?: string;
