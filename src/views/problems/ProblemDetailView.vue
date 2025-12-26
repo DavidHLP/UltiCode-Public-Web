@@ -31,7 +31,13 @@ import SubmissionsView from "@/views/problems/submissions/SubmissionsView.vue";
 import CodeView from "./code/CodeView.vue";
 import TestCaseView from "./test/TestCaseView.vue";
 import TestResultsView from "./test/TestResultsView.vue";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import ProblemListDrawer from "@/components/problem/ProblemListDrawer.vue";
 import ProblemNotesDrawer from "@/components/problem/ProblemNotesDrawer.vue";
 import { problemHooks, type ProblemLayout } from "@/hooks/problem-hooks";
@@ -85,12 +91,12 @@ const ConnectedDescriptionView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(DescriptionView, { problem: problem.value }),
+            h(DescriptionView, { problem: problem.value })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -106,12 +112,12 @@ const ConnectedSolutionsView = defineComponent({
             h(ProblemSolutionsView, {
               problemId: problem.value.id,
               followUp: problem.value.followUp ?? "",
-            }),
+            })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -124,12 +130,12 @@ const ConnectedSubmissionsView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(SubmissionsView, { problemId: problem.value.id }),
+            h(SubmissionsView, { problemId: problem.value.id })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -147,7 +153,7 @@ const ConnectedCodeView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -160,12 +166,12 @@ const ConnectedTestCaseView = defineComponent({
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(TestCaseView, { testCases: problem.value.testCases ?? [] }),
+            h(TestCaseView, { testCases: problem.value.testCases ?? [] })
           )
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            "Loading..."
           );
   },
 });
@@ -177,7 +183,7 @@ const ConnectedTestResultsView = defineComponent({
       h(
         "div",
         { class: "px-1 py-2" },
-        h(TestResultsView, { runResult: runResult.value }),
+        h(TestResultsView, { runResult: runResult.value })
       );
   },
 });
@@ -479,7 +485,7 @@ watch(
         headerStore.setActiveHeader("problem-info", 1);
       }
     }
-  },
+  }
 );
 
 // Sync Store to URL (when user clicks tabs)
@@ -503,7 +509,7 @@ watch(
         });
       }
     }
-  },
+  }
 );
 
 onMounted(() => {
@@ -533,6 +539,10 @@ onUnmounted(() => {
   <div class="h-screen flex flex-col bg-[#f0f0f0] antialiased">
     <Sheet v-model:open="isSidePanelOpen">
       <SheetContent side="left" class="p-0 w-[400px] sm:w-[540px]">
+        <SheetHeader class="sr-only">
+          <SheetTitle>Problem List</SheetTitle>
+          <SheetDescription>Navigate through the problem list</SheetDescription>
+        </SheetHeader>
         <ProblemListDrawer
           :current-problem-id="problem?.id"
           @close="isSidePanelOpen = false"
@@ -542,6 +552,12 @@ onUnmounted(() => {
 
     <Sheet :open="isNotesOpen" @update:open="isNotesOpen = $event">
       <SheetContent side="right" class="p-0 w-[400px] sm:w-[500px]">
+        <SheetHeader class="sr-only">
+          <SheetTitle>Problem Notes</SheetTitle>
+          <SheetDescription>
+            View and edit notes for this problem
+          </SheetDescription>
+        </SheetHeader>
         <ProblemNotesDrawer
           v-if="problem"
           :problem-id="Number(problem.id)"

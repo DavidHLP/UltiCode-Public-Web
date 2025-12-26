@@ -50,9 +50,6 @@ async function handleSave() {
   <div class="flex flex-col h-full bg-white">
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="text-lg font-semibold">Problem Notes</h2>
-      <Button variant="ghost" size="icon" @click="emit('close')">
-        <X class="h-4 w-4" />
-      </Button>
     </div>
 
     <div class="flex-1 p-4 overflow-y-auto">

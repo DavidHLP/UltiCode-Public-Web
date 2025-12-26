@@ -11,7 +11,6 @@ import {
   Search,
   ArrowUpDown,
   Filter,
-  X,
   ChevronRight,
 } from "lucide-vue-next";
 import { useRouter } from "vue-router";
@@ -47,7 +46,7 @@ const filteredProblems = computed(() => {
   if (!searchQuery.value) return problems.value;
   const q = searchQuery.value.toLowerCase();
   return problems.value.filter(
-    (p) => p.title.toLowerCase().includes(q) || p.id.toString().includes(q),
+    (p) => p.title.toLowerCase().includes(q) || p.id.toString().includes(q)
   );
 });
 
@@ -66,30 +65,20 @@ const navigateToProblem = (slug: string) => {
           <h2 class="text-base font-medium text-foreground">Problem List</h2>
           <ChevronRight class="h-4 w-4 text-muted-foreground" />
         </div>
-        <div class="flex items-center gap-2">
-          <div class="flex items-center text-xs text-muted-foreground mr-2">
-            <div
-              class="w-3 h-3 rounded-full border border-green-500 mr-1.5 relative"
-            >
-              <div
-                class="absolute inset-0 m-auto w-1.5 h-1.5 rounded-full bg-green-500"
-                v-if="filteredProblems.length > 0"
-              ></div>
-            </div>
-            <span
-              >{{
-                filteredProblems.filter((p) => p.status === "solved").length
-              }}/{{ problems.length }} Solved</span
-            >
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            class="h-6 w-6 text-muted-foreground hover:bg-muted"
-            @click="$emit('close')"
+        <div class="flex items-center text-xs text-muted-foreground">
+          <div
+            class="w-3 h-3 rounded-full border border-green-500 mr-1.5 relative"
           >
-            <X class="h-4 w-4" />
-          </Button>
+            <div
+              class="absolute inset-0 m-auto w-1.5 h-1.5 rounded-full bg-green-500"
+              v-if="filteredProblems.length > 0"
+            ></div>
+          </div>
+          <span
+            >{{
+              filteredProblems.filter((p) => p.status === "solved").length
+            }}/{{ problems.length }} Solved</span
+          >
         </div>
       </div>
 
@@ -155,7 +144,7 @@ const navigateToProblem = (slug: string) => {
               @click="
                 navigateToProblem(
                   problem.slug ||
-                    problem.title.toLowerCase().replace(/\s+/g, '-'),
+                    problem.title.toLowerCase().replace(/\s+/g, '-')
                 )
               "
             >
