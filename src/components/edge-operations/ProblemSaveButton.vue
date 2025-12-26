@@ -291,10 +291,24 @@ watch(
               @select.prevent="
                 toggleCollection(collectionStore.defaultCollection.id)
               "
+              :class="{
+                'bg-primary/10 border-l-2 border-primary': isFavorited,
+              }"
+              class="transition-colors"
             >
-              <span class="flex items-center gap-2">
+              <span class="flex items-center gap-2 flex-1">
                 <Bookmark class="h-4 w-4" />
-                {{ collectionStore.defaultCollection.name }}
+                <span
+                  :class="{
+                    'font-semibold text-primary': isFavorited,
+                  }"
+                >
+                  {{ collectionStore.defaultCollection.name }}
+                </span>
+                <Check
+                  v-if="isFavorited"
+                  class="h-3 w-3 text-primary ml-auto"
+                />
               </span>
             </DropdownMenuCheckboxItem>
 
@@ -316,8 +330,25 @@ watch(
               :key="collection.id"
               :checked="itemCollections.includes(collection.id)"
               @select.prevent="toggleCollection(collection.id)"
+              :class="{
+                'bg-primary/10 border-l-2 border-primary':
+                  itemCollections.includes(collection.id),
+              }"
             >
-              {{ collection.name }}
+              <span class="flex items-center gap-2 flex-1">
+                <span
+                  :class="{
+                    'font-semibold text-primary': itemCollections.includes(
+                      collection.id,
+                    ),
+                  }"
+                  >{{ collection.name }}</span
+                >
+                <Check
+                  v-if="itemCollections.includes(collection.id)"
+                  class="h-3 w-3 text-primary ml-auto"
+                />
+              </span>
             </DropdownMenuCheckboxItem>
             <DropdownMenuSeparator v-if="userLists.length > 0" />
           </div>
@@ -333,18 +364,33 @@ watch(
                 :key="list.id"
                 :checked="list.containsProblem"
                 @select.prevent="toggleList(list.id)"
-                class="flex items-start gap-2 py-2"
+                :class="{
+                  'bg-primary/10 border-l-2 border-primary':
+                    list.containsProblem,
+                }"
+                class="flex items-start gap-2 py-2 transition-colors"
               >
                 <div class="flex flex-col flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium truncate">{{ list.name }}</span>
+                    <span
+                      class="truncate"
+                      :class="{
+                        'font-semibold text-primary': list.containsProblem,
+                        'font-medium': !list.containsProblem,
+                      }"
+                      >{{ list.name }}</span
+                    >
                     <Check
                       v-if="list.containsProblem"
-                      class="h-3 w-3 text-primary flex-shrink-0"
+                      class="h-4 w-4 text-primary flex-shrink-0 ml-auto"
                     />
                   </div>
                   <div
-                    class="flex items-center gap-2 text-xs text-muted-foreground"
+                    class="flex items-center gap-2 text-xs"
+                    :class="{
+                      'text-primary/70': list.containsProblem,
+                      'text-muted-foreground': !list.containsProblem,
+                    }"
                   >
                     <span>{{ list.problemCount }} problems</span>
                     <span>•</span>
