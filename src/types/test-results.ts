@@ -9,6 +9,7 @@ export interface ProblemRunCase {
     | "Wrong Answer"
     | "Time Limit Exceeded"
     | "Runtime Error"
+    | "Compile Error"
     | "Pending";
   runtime: string;
   memory: string;
@@ -30,6 +31,7 @@ export interface ProblemRunResult {
     | "Wrong Answer"
     | "Time Limit Exceeded"
     | "Runtime Error"
+    | "Compile Error"
     | "Pending";
   runtime: string;
   memory: string;

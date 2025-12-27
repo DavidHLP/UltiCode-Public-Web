@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
-import { fetchContestDetail, fetchContestRanking } from "@/api/contest";
-import type { ContestDetail, ContestRankingEntry } from "@/types/contest";
+import { useContestStore } from "@/stores/contest";
+import { fetchContestRanking } from "@/api/contest";
+import type { ContestRankingEntry } from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import VirtualContestTimer from "../components/VirtualContestTimer.vue";
 import {
   Table,
   TableBody,
@@ -30,26 +32,77 @@ import {
 } from "lucide-vue-next";
 
 const route = useRoute();
+const contestStore = useContestStore();
 const contestId = route.params.contestId as string;
 
-const contest = ref<ContestDetail | null>(null);
+const contest = computed(() => contestStore.currentContest);
 const rankings = ref<ContestRankingEntry[]>([]);
-const loading = ref(true);
+const loading = computed(() => contestStore.loading);
+const registering = ref(false);
+const startingVirtual = ref(false);
+
+// Get participation status
+const isRegistered = computed(() => contestStore.isRegistered(contestId));
 
 onMounted(async () => {
   try {
-    const [contestData, rankingRes] = await Promise.all([
-      fetchContestDetail(contestId),
+    const [, rankingRes] = await Promise.all([
+      contestStore.loadContestDetail(contestId),
       fetchContestRanking(contestId),
+      contestStore.loadParticipationStatus(contestId),
     ]);
-    contest.value = contestData;
     rankings.value = rankingRes.items;
   } catch (error) {
     console.error("Failed to load contest detail:", error);
-  } finally {
-    loading.value = false;
   }
 });
+
+// Registration handler
+async function handleRegister() {
+  registering.value = true;
+  try {
+    await contestStore.registerForContest(contestId);
+  } catch (error: unknown) {
+    console.error("Registration failed:", error);
+    alert(getErrorMessage(error, "Failed to register for contest"));
+  } finally {
+    registering.value = false;
+  }
+}
+
+async function handleUnregister() {
+  registering.value = true;
+  try {
+    await contestStore.unregisterFromContest(contestId);
+  } catch (error: unknown) {
+    console.error("Unregister failed:", error);
+    alert(getErrorMessage(error, "Failed to unregister from contest"));
+  } finally {
+    registering.value = false;
+  }
+}
+
+// Virtual contest handler
+async function handleStartVirtual() {
+  startingVirtual.value = true;
+  try {
+    await contestStore.startVirtualContest(contestId);
+    // Reload participation status
+    await contestStore.loadParticipationStatus(contestId);
+  } catch (error: unknown) {
+    console.error("Failed to start virtual contest:", error);
+    alert(getErrorMessage(error, "Failed to start virtual contest"));
+  } finally {
+    startingVirtual.value = false;
+  }
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+}
 
 // Format Date Time
 function formatDateTime(isoString: string): string {
@@ -144,21 +197,45 @@ function getCountryFlag(countryCode: string): string {
               </p>
             </div>
             <div class="flex flex-col gap-2">
-              <Button v-if="contest.canRegister" size="lg" class="gap-2">
+              <Button
+                v-if="!isRegistered && contest.status === 'upcoming'"
+                size="lg"
+                class="gap-2"
+                :disabled="registering"
+                @click="handleRegister"
+              >
                 <Users class="h-4 w-4" />
-                Register Now
+                {{ registering ? "Registering..." : "Register Now" }}
               </Button>
-              <Button v-else-if="contest.canStart" size="lg" class="gap-2">
+              <Button
+                v-else-if="isRegistered && contest.status === 'upcoming'"
+                size="lg"
+                variant="outline"
+                class="gap-2"
+                :disabled="registering"
+                @click="handleUnregister"
+              >
+                <Users class="h-4 w-4" />
+                {{ registering ? "Unregistering..." : "Unregister" }}
+              </Button>
+              <Button
+                v-if="contest.status === 'finished'"
+                size="lg"
+                class="gap-2"
+                :disabled="startingVirtual"
+                @click="handleStartVirtual"
+              >
                 <PlayCircle class="h-4 w-4" />
-                Start Virtual Contest
-              </Button>
-              <Button variant="outline" size="sm" class="gap-2">
-                <Calendar class="h-4 w-4" />
-                Add to Calendar
+                {{ startingVirtual ? "Starting..." : "Start Virtual Contest" }}
               </Button>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Virtual Contest Timer -->
+      <div class="container mx-auto px-4 pt-6">
+        <VirtualContestTimer />
       </div>
 
       <!-- Contest Info Card -->

@@ -2,6 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { GlobalRankingEntry } from "@/types/contest";
+import RatingBadge from "./RatingBadge.vue";
 
 defineProps<{
   rankings: GlobalRankingEntry[];
@@ -50,6 +51,7 @@ defineProps<{
             <p class="text-xs font-medium truncate w-full">
               {{ rankings[1].username }}
             </p>
+            <RatingBadge :rating="rankings[1].rating" size="sm" />
             <div
               class="h-20 w-full bg-gradient-to-t from-slate-200 to-slate-100 rounded-t-lg shadow-sm border-t border-slate-300/50"
             ></div>
@@ -80,6 +82,7 @@ defineProps<{
             >
               {{ rankings[0].username }}
             </p>
+            <RatingBadge :rating="rankings[0].rating" size="sm" />
             <div
               class="h-32 w-full bg-gradient-to-t from-yellow-100 to-yellow-50 rounded-t-lg shadow-md border-t border-yellow-300/50"
             ></div>
@@ -108,6 +111,7 @@ defineProps<{
             <p class="text-xs font-medium truncate w-full">
               {{ rankings[2].username }}
             </p>
+            <RatingBadge :rating="rankings[2].rating" size="sm" />
             <div
               class="h-16 w-full bg-gradient-to-t from-orange-100 to-orange-50 rounded-t-lg shadow-sm border-t border-orange-300/50"
             ></div>
@@ -139,6 +143,7 @@ defineProps<{
                 Attended {{ user.contestsAttended || 0 }} contests
               </p>
             </div>
+            <RatingBadge :rating="user.rating" size="sm" />
           </div>
         </div>
 

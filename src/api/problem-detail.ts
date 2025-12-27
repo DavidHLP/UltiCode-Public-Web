@@ -1,4 +1,8 @@
-import type { ProblemDetail, ProblemTestCase } from "@/types/problem-detail";
+import type {
+  ProblemDetail,
+  ProblemLanguageOption,
+  ProblemTestCase,
+} from "@/types/problem-detail";
 import { apiGet } from "@/utils/request";
 import { mapProblem } from "@/api/problem";
 
@@ -26,6 +30,7 @@ interface BackendProblemDetail {
 interface BackendProblemResponse {
   detail?: BackendProblemDetail | null;
   examples?: BackendExample[] | null;
+  languages?: unknown[] | null;
   summary?: string | null;
   constraints?: string[] | null;
   followUp?: string | null;
@@ -69,6 +74,32 @@ const mapExamplesToDescription = (examples: BackendExample[]) =>
     explanation: ex.explanation,
   }));
 
+const supportedRunLanguages = new Set(["javascript", "typescript"]);
+
+const mapLanguages = (raw: unknown): ProblemLanguageOption[] => {
+  if (!Array.isArray(raw)) return [];
+  const mapped = raw
+    .map((lang) => {
+      const l = lang as Record<string, unknown>;
+      const value = typeof l.value === "string" ? l.value : "";
+      return {
+        id: l.id as ProblemLanguageOption["id"],
+        label: (typeof l.label === "string" && l.label) || value || "Unknown",
+        value,
+        starterCode:
+          (typeof l.starterCode === "string" && l.starterCode) ||
+          (typeof l.starter_code === "string" && l.starter_code) ||
+          "",
+      } as ProblemLanguageOption;
+    })
+    .filter((lang) => lang.value);
+
+  const supported = mapped.filter((lang) =>
+    supportedRunLanguages.has(lang.value.toLowerCase()),
+  );
+  return supported.length > 0 ? supported : mapped;
+};
+
 export function mapProblemDetail(
   response: BackendProblemResponse,
 ): ProblemDetail {
@@ -92,6 +123,7 @@ export function mapProblemDetail(
     followUp: detail.follow_up ?? response.followUp ?? "",
     companies: detail.companies ?? response.companies ?? [],
     starterNotes: detail.hints ?? response.starterNotes ?? [],
+    languages: mapLanguages(response.languages),
     testCases: examples.length > 0 ? mapExamplesToTestCases(examples) : [],
     examples: examples.length > 0 ? mapExamplesToDescription(examples) : [],
   } as ProblemDetail;

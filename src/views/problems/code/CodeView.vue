@@ -21,6 +21,7 @@ import {
   CheckIcon,
 } from "lucide-vue-next";
 import { problemHooks } from "@/hooks/problem-hooks";
+import { useProblemEditorStore } from "@/stores/problemEditorStore";
 
 const props = defineProps<{
   languages: ProblemLanguageOption[];
@@ -30,6 +31,7 @@ const props = defineProps<{
 const activeLanguageValue = ref(props.languages[0]?.value ?? "");
 const code = ref("");
 const prefersDark = usePreferredDark();
+const editorStore = useProblemEditorStore();
 
 const languageMeta = computed(() =>
   props.languages.find((lang) => lang.value === activeLanguageValue.value),
@@ -52,12 +54,23 @@ watch(
     if (target) {
       code.value = target.starterCode;
     }
+    if (value) {
+      editorStore.setLanguage(value);
+    }
     if (previous !== undefined && value !== previous) {
       void problemHooks.emit("problem:code:language:change", {
         from: previous,
         to: value,
       });
     }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => code.value,
+  (value) => {
+    editorStore.setCode(value);
   },
   { immediate: true },
 );

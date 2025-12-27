@@ -11,15 +11,19 @@ import {
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { useBottomPanelStore } from "../test/test";
 import { useHeaderStore } from "@/stores/headerStore";
+import { storeToRefs } from "pinia";
 import { createSubmission } from "@/api/submission";
 import { toast } from "vue-sonner";
 import { ToggleNotesKey } from "../problem-context";
 import { useProblemContext } from "../useProblemContext";
+import { useProblemEditorStore } from "@/stores/problemEditorStore";
 
 const { requestRun } = useBottomPanelStore();
 const headerStore = useHeaderStore();
 const problemContext = useProblemContext();
 const toggleNotes = inject(ToggleNotesKey, () => {});
+const editorStore = useProblemEditorStore();
+const { code, language } = storeToRefs(editorStore);
 
 const isRunning = ref(false);
 const isSubmitting = ref(false);
@@ -44,12 +48,18 @@ async function handleSubmit() {
   const prob = problemContext.problem.value;
   if (!prob) return;
 
-  // For now, we mock the code since the editor logic is complex and handled elsewhere
+  const currentCode = code.value;
+  const currentLanguage = language.value || "typescript";
+  if (!currentCode.trim()) {
+    toast.error("Please enter code before submitting.");
+    return;
+  }
+
   isSubmitting.value = true;
   try {
     const res = await createSubmission(prob.id, {
-      language: "typescript",
-      code: "// Mock code submission\nconsole.log('Hello World');",
+      language: currentLanguage,
+      code: currentCode,
     });
     toast.success(`Submission ${res.status}!`);
     // Navigate to submissions tab

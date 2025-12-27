@@ -1,38 +1,35 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from "vue";
-import {
-  fetchUpcomingContests,
-  fetchPastContests,
-  fetchGlobalRankings,
-} from "@/api/contest";
-import type { ContestListItem, GlobalRankingEntry } from "@/types/contest";
 import { Trophy } from "lucide-vue-next";
 import { useRouter, useRoute } from "vue-router";
+import { useContestStore } from "@/stores/contest";
 import UpcomingContests from "./components/UpcomingContests.vue";
 import GlobalRanking from "./components/GlobalRanking.vue";
 import PastContests from "./components/PastContests.vue";
+import MyContests from "./components/MyContests.vue";
 
 const router = useRouter();
 const route = useRoute();
+const contestStore = useContestStore();
 
 defineProps<{
   tab?: string;
 }>();
 
-// State
-const upcomingContests = ref<ContestListItem[]>([]);
-const pastContests = ref<ContestListItem[]>([]);
-const totalPastContests = ref(0);
-const globalRankings = ref<GlobalRankingEntry[]>([]);
-const loading = ref(true);
-const loadingPast = ref(false);
+// Use store state
+const {
+  upcomingContests,
+  pastContests,
+  pastContestsTotal,
+  globalRankings,
+  loading,
+  loadingContests,
+} = contestStore;
 
 const currentPage = ref(1);
 const pageSize = 10;
 
-const totalPages = computed(() =>
-  Math.ceil(totalPastContests.value / pageSize),
-);
+const totalPages = computed(() => Math.ceil(pastContestsTotal / pageSize));
 
 // Load data
 onMounted(async () => {
@@ -40,35 +37,24 @@ onMounted(async () => {
     const page = Number(route.query.page) || 1;
     currentPage.value = page;
 
-    const [upcoming, pastRes, rankingsRes] = await Promise.all([
-      fetchUpcomingContests(),
-      fetchPastContests(page, pageSize),
-      fetchGlobalRankings(),
+    await Promise.all([
+      contestStore.loadContests(),
+      contestStore.loadPastContests(page, pageSize),
+      contestStore.loadGlobalRankings(),
     ]);
-    upcomingContests.value = upcoming;
-    pastContests.value = pastRes.data;
-    totalPastContests.value = pastRes.total;
-    globalRankings.value = rankingsRes.items;
   } catch (error) {
     console.error("Failed to load contest data:", error);
-  } finally {
-    loading.value = false;
   }
 });
 
 // Watch pagination changes
 watch(currentPage, async (newPage) => {
-  loadingPast.value = true;
   try {
-    const res = await fetchPastContests(newPage, pageSize);
-    pastContests.value = res.data;
-    totalPastContests.value = res.total;
+    await contestStore.loadPastContests(newPage, pageSize);
     // Update URL Query
     router.replace({ query: { ...route.query, page: newPage } });
   } catch (error) {
     console.error("Failed to load past contests:", error);
-  } finally {
-    loadingPast.value = false;
   }
 });
 </script>
@@ -101,7 +87,7 @@ watch(currentPage, async (newPage) => {
           <GlobalRanking :rankings="globalRankings" />
           <PastContests
             :contests="pastContests"
-            :loading="loadingPast"
+            :loading="loadingContests"
             v-model:currentPage="currentPage"
             :totalPages="totalPages"
           />
@@ -112,7 +98,7 @@ watch(currentPage, async (newPage) => {
       <template v-else-if="tab === 'past'">
         <PastContests
           :contests="pastContests"
-          :loading="loadingPast"
+          :loading="loadingContests"
           v-model:currentPage="currentPage"
           :totalPages="totalPages"
           class="lg:col-span-3"
@@ -124,11 +110,9 @@ watch(currentPage, async (newPage) => {
         <GlobalRanking :rankings="globalRankings" class="lg:col-span-3" />
       </template>
 
-      <!-- My Contests View (Placeholder) -->
+      <!-- My Contests View -->
       <template v-else-if="tab === 'my'">
-        <div class="text-center py-20 text-muted-foreground">
-          My Contests feature coming soon.
-        </div>
+        <MyContests />
       </template>
     </div>
   </div>

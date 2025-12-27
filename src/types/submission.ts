@@ -1,6 +1,12 @@
 export interface SubmissionTestRecord {
   id: string;
-  status: "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error";
+  status:
+    | "Accepted"
+    | "Wrong Answer"
+    | "Time Limit Exceeded"
+    | "Runtime Error"
+    | "Compile Error"
+    | "Pending";
   runtime: number;
   memory: number;
 }

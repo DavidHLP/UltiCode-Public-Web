@@ -14,6 +14,7 @@ export type ProblemHookMap = {
   "problem:load:error": { slug: string; error: unknown };
   "problem:run:before": { problemId: number; caseCount: number };
   "problem:run:after": { problemId: number; runResult: ProblemRunResult };
+  "problem:run:error": { problemId: number; error: unknown };
   "problem:layout:change": { layout: ProblemLayout };
   "problem:tab:change": { from: string | null; to: string };
   "problem:submissions:load:before": {

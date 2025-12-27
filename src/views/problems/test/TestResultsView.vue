@@ -62,6 +62,8 @@ const verdictLabel = computed(() => {
       return "Runtime Error";
     case "Time Limit Exceeded":
       return "Time Limit Exceeded";
+    case "Compile Error":
+      return "Compile Error";
     case "Pending":
       return "Pending";
     default:
@@ -81,6 +83,8 @@ const verdictClass = computed(() => {
       return "text-amber-600 dark:text-amber-400";
     case "Time Limit Exceeded":
       return "text-sky-600 dark:text-sky-400";
+    case "Compile Error":
+      return "text-red-600 dark:text-red-400";
     default:
       return "text-muted-foreground";
   }
@@ -96,6 +100,8 @@ const caseStatusIconClass = (status: ProblemCaseResultDetail["status"]) => {
       return "text-amber-500";
     case "Time Limit Exceeded":
       return "text-sky-500";
+    case "Compile Error":
+      return "text-red-500";
     case "Pending":
       return "text-muted-foreground";
     default:
@@ -134,6 +140,16 @@ const selectCase = (label: string) => {
             {{ verdictLabel }}
           </span>
         </div>
+      </div>
+
+      <div
+        v-if="
+          props.runResult?.verdict === 'Compile Error' &&
+          props.runResult.error_message
+        "
+        class="rounded-md bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 p-3 text-xs font-mono text-red-600 dark:text-red-300"
+      >
+        {{ props.runResult.error_message }}
       </div>
 
       <div v-if="cases.length" class="flex flex-col gap-4">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock } from "lucide-vue-next";
@@ -6,29 +7,44 @@ import { useRouter } from "vue-router";
 import type { ContestListItem } from "@/types/contest";
 import { formatDateTime, getDurationMinutes } from "@/utils/date";
 
-defineProps<{
+const props = defineProps<{
   contests: ContestListItem[];
 }>();
 
 const router = useRouter();
+const countdowns = ref<Map<string, string>>(new Map());
+let intervalId: number | null = null;
 
-// Calculate countdown
-function getCountdown(startTime: string): string {
+// Calculate countdown for all contests
+function updateCountdowns() {
   const now = new Date().getTime();
-  const start = new Date(startTime).getTime();
-  const diff = start - now;
 
-  if (diff <= 0) return "Started";
+  props.contests.forEach((contest) => {
+    const start = new Date(contest.start_time).getTime();
+    const diff = start - now;
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    if (diff <= 0) {
+      countdowns.value.set(contest.id, "Started");
+      return;
+    }
 
-  if (days > 0) {
-    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-  }
-  return `${hours}h ${minutes}m ${seconds}s`;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const countdown =
+      days > 0
+        ? `${days}d ${hours}h ${minutes}m ${seconds}s`
+        : `${hours}h ${minutes}m ${seconds}s`;
+
+    countdowns.value.set(contest.id, countdown);
+  });
+}
+
+// Get countdown for specific contest
+function getCountdown(contestId: string): string {
+  return countdowns.value.get(contestId) || "Calculating...";
 }
 
 // Get contest type label
@@ -40,10 +56,32 @@ function getContestTypeLabel(type: string): string {
   };
   return labels[type] || type;
 }
+
+// Watch for contest changes
+watch(
+  () => props.contests,
+  () => {
+    updateCountdowns();
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  // Initial update
+  updateCountdowns();
+  // Start interval to update countdowns every second
+  intervalId = window.setInterval(updateCountdowns, 1000);
+});
+
+onUnmounted(() => {
+  if (intervalId !== null) {
+    clearInterval(intervalId);
+  }
+});
 </script>
 
 <template>
-  <section v-if="contests.length > 0">
+  <section v-if="contests.length > 0" data-contests>
     <div class="grid gap-6 md:grid-cols-2">
       <Card
         v-for="(contest, index) in contests.slice(0, 2)"
@@ -101,7 +139,7 @@ function getContestTypeLabel(type: string): string {
 
             <div class="flex items-center justify-between mt-4">
               <div class="text-sm font-medium opacity-90">
-                Time until start: {{ getCountdown(contest.start_time) }}
+                Time until start: {{ getCountdown(contest.id) }}
               </div>
               <Button
                 variant="secondary"
