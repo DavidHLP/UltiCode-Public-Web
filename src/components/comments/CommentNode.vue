@@ -163,17 +163,37 @@
                   >
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-red-600 hover:bg-red-50"
-                  @click="handleDelete"
-                >
-                  <Trash2 class="h-3.5 w-3.5" />
-                  <span class="text-xs font-semibold hidden sm:inline"
-                    >Delete</span
-                  >
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger as-child>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 class="h-3.5 w-3.5" />
+                      <span class="text-xs font-semibold hidden sm:inline"
+                        >Delete</span
+                      >
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle
+                        >Are you absolutely sure?</AlertDialogTitle
+                      >
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete your comment.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction @click="handleDelete"
+                        >Delete</AlertDialogAction
+                      >
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </template>
             </div>
           </div>
@@ -230,6 +250,17 @@ import type { Comment } from "@/types/comment";
 import CommentForm from "./CommentForm.vue";
 import { Button } from "@/components/ui/button";
 import { VoteControl } from "@/components/edge-operations/vote-control";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { MessageSquare, Share2, Flag, Pencil, Trash2 } from "lucide-vue-next";
 
@@ -281,9 +312,7 @@ const handleEditSubmit = (content: string) => {
 };
 
 const handleDelete = () => {
-  if (confirm("Are you sure you want to delete this comment?")) {
-    emit("delete", props.comment.id);
-  }
+  emit("delete", props.comment.id);
 };
 
 const handleVote = (type: 1 | -1) => {
