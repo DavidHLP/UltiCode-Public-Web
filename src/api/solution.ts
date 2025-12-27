@@ -82,6 +82,27 @@ export async function createSolutionComment(
   });
 }
 
+export async function updateSolutionComment(
+  commentId: string,
+  content: string,
+): Promise<ForumComment> {
+  const userId = fetchCurrentUserId();
+  if (!userId) {
+    throw new Error("User must be logged in to update comments");
+  }
+  return apiPatch<ForumComment>(`/solutions/comments/${commentId}`, {
+    content,
+  });
+}
+
+export async function deleteSolutionComment(commentId: string): Promise<void> {
+  const userId = fetchCurrentUserId();
+  if (!userId) {
+    throw new Error("User must be logged in to delete comments");
+  }
+  return apiDelete<void>(`/solutions/comments/${commentId}`);
+}
+
 export async function voteSolution(
   solutionId: string,
   voteType: 1 | -1 | 0,

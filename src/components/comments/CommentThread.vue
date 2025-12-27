@@ -6,6 +6,7 @@ import { Lock, Image as ImageIcon, FileVideo, Type } from "lucide-vue-next";
 import CommentNode from "./CommentNode.vue";
 import { buildCommentTree } from "./comment-tree-builder";
 import { ref, computed } from "vue";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const props = defineProps<{
   comments: ForumComment[];
@@ -15,6 +16,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "submit", body: string, parentId?: string): void;
   (e: "vote", commentId: number | string, voteType: 1 | -1): void;
+  (e: "edit", commentId: number | string, content: string): void;
+  (e: "delete", commentId: number | string): void;
 }>();
 
 const commentText = ref("");
@@ -33,7 +36,10 @@ function handleReply(commentId: string | number, content: string) {
 }
 
 const commentTree = computed(() => {
-  return buildCommentTree(props.comments);
+  const userId = fetchCurrentUserId();
+  return buildCommentTree(props.comments, {
+    currentUserId: userId || undefined,
+  });
 });
 </script>
 
@@ -133,6 +139,10 @@ const commentTree = computed(() => {
             (id: number | string, content: string) => handleReply(id, content)
           "
           @vote="(id: number | string, type: 1 | -1) => emit('vote', id, type)"
+          @edit="
+            (id: number | string, content: string) => emit('edit', id, content)
+          "
+          @delete="(id: number | string) => emit('delete', id)"
         />
       </div>
     </div>

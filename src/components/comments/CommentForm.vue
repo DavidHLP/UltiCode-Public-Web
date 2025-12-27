@@ -64,6 +64,7 @@ defineOptions({
 
 const props = defineProps<{
   parentId?: number | string;
+  initialContent?: string;
   onCancel?: () => void;
 }>();
 
@@ -71,7 +72,7 @@ const emit = defineEmits<{
   (e: "submit", content: string, parentId?: number | string): void;
 }>();
 
-const content = ref("");
+const content = ref(props.initialContent || "");
 
 const submit = () => {
   if (!content.value.trim()) return;

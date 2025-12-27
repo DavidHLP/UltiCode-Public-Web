@@ -10,6 +10,8 @@ import { CommentThread } from "@/components/comments";
 import {
   fetchSolutionComments,
   createSolutionComment,
+  updateSolutionComment,
+  deleteSolutionComment,
   recordSolutionView,
 } from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
@@ -79,6 +81,31 @@ const handleCommentSubmit = async (content: string, parentId?: string) => {
     await loadComments();
   } catch (error) {
     console.error("Failed to post comment", error);
+  }
+};
+
+const handleCommentEdit = async (
+  commentId: string | number,
+  content: string,
+) => {
+  try {
+    await updateSolutionComment(String(commentId), content);
+    await loadComments();
+    toast.success("Comment updated");
+  } catch (error) {
+    console.error("Failed to update comment", error);
+    toast.error("Failed to update comment");
+  }
+};
+
+const handleCommentDelete = async (commentId: string | number) => {
+  try {
+    await deleteSolutionComment(String(commentId));
+    await loadComments();
+    toast.success("Comment deleted");
+  } catch (error) {
+    console.error("Failed to delete comment", error);
+    toast.error("Failed to delete comment");
   }
 };
 
@@ -261,6 +288,8 @@ watch(
         :is-locked="false"
         @submit="handleCommentSubmit"
         @vote="handleCommentVote"
+        @edit="handleCommentEdit"
+        @delete="handleCommentDelete"
       />
     </div>
   </article>

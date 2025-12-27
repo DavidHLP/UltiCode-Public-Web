@@ -5,6 +5,7 @@ import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 
 interface BuildTreeOptions {
   postAuthorUsername?: string;
+  currentUserId?: string;
 }
 
 const buildAvatar = (username: string, avatar?: string) =>
@@ -31,6 +32,8 @@ const mapToComment = (
     isOp:
       !!options?.postAuthorUsername &&
       input.author.username === options.postAuthorUsername,
+    isOwn:
+      !!options?.currentUserId && input.author.id === options.currentUserId,
     children: [],
   };
 };

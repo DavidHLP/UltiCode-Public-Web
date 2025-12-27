@@ -9,5 +9,6 @@ export interface Comment {
   userVote?: 0 | 1 | -1;
   content: string;
   isOp?: boolean;
+  isOwn?: boolean;
   children?: Comment[];
 }
