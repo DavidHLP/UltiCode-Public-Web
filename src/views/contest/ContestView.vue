@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from "vue";
 import { Trophy } from "lucide-vue-next";
 import { useRouter, useRoute } from "vue-router";
 import { useContestStore } from "@/stores/contest";
+import { storeToRefs } from "pinia";
 import UpcomingContests from "./components/UpcomingContests.vue";
 import GlobalRanking from "./components/GlobalRanking.vue";
 import PastContests from "./components/PastContests.vue";
@@ -24,12 +25,14 @@ const {
   globalRankings,
   loading,
   loadingContests,
-} = contestStore;
+} = storeToRefs(contestStore);
 
 const currentPage = ref(1);
 const pageSize = 10;
 
-const totalPages = computed(() => Math.ceil(pastContestsTotal / pageSize));
+const totalPages = computed(() =>
+  Math.ceil(pastContestsTotal.value / pageSize),
+);
 
 // Load data
 onMounted(async () => {
