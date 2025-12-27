@@ -38,12 +38,12 @@ const loading = ref(true);
 
 onMounted(async () => {
   try {
-    const [contestData, rankingData] = await Promise.all([
+    const [contestData, rankingRes] = await Promise.all([
       fetchContestDetail(contestId),
       fetchContestRanking(contestId),
     ]);
     contest.value = contestData;
-    rankings.value = rankingData;
+    rankings.value = rankingRes.items;
   } catch (error) {
     console.error("Failed to load contest detail:", error);
   } finally {
@@ -60,13 +60,6 @@ function formatDateTime(isoString: string): string {
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${year}-${month}-${day} ${hours}:${minutes}`;
-}
-
-// Calculate Duration
-function getDurationMinutes(startTime: string, endTime: string): number {
-  const start = new Date(startTime).getTime();
-  const end = new Date(endTime).getTime();
-  return Math.floor((end - start) / (1000 * 60));
 }
 
 // Get Difficulty Color
@@ -199,10 +192,7 @@ function getCountryFlag(countryCode: string): string {
                     Duration
                   </p>
                   <p class="text-base font-semibold">
-                    {{
-                      getDurationMinutes(contest.start_time, contest.end_time)
-                    }}
-                    Minutes
+                    {{ contest.duration_minutes }} Minutes
                   </p>
                 </div>
               </div>
@@ -339,7 +329,7 @@ function getCountryFlag(countryCode: string): string {
                           @click="
                             $router.push({
                               name: 'problem-detail',
-                              params: { id: problem.problemId || problem.id },
+                              params: { slug: problem.slug },
                             })
                           "
                         >
@@ -436,13 +426,15 @@ function getCountryFlag(countryCode: string): string {
                         <div class="flex flex-wrap gap-1">
                           <Badge
                             v-for="result in entry.problemResults || []"
-                            :key="result.index"
-                            :variant="result.solved ? 'default' : 'secondary'"
+                            :key="result.problemIndex"
+                            :variant="result.isSolved ? 'default' : 'secondary'"
                             class="min-w-[2rem] justify-center font-mono text-xs"
                           >
-                            {{ result.index }}
-                            <template v-if="result.solved && result.time">
-                              <br />{{ result.time }}
+                            {{ result.problemIndex }}
+                            <template
+                              v-if="result.isSolved && result.solveTime"
+                            >
+                              <br />{{ result.solveTime }}
                             </template>
                           </Badge>
                         </div>

@@ -40,7 +40,7 @@ onMounted(async () => {
     const page = Number(route.query.page) || 1;
     currentPage.value = page;
 
-    const [upcoming, pastRes, rankings] = await Promise.all([
+    const [upcoming, pastRes, rankingsRes] = await Promise.all([
       fetchUpcomingContests(),
       fetchPastContests(page, pageSize),
       fetchGlobalRankings(),
@@ -48,7 +48,7 @@ onMounted(async () => {
     upcomingContests.value = upcoming;
     pastContests.value = pastRes.data;
     totalPastContests.value = pastRes.total;
-    globalRankings.value = rankings;
+    globalRankings.value = rankingsRes.items;
   } catch (error) {
     console.error("Failed to load contest data:", error);
   } finally {
