@@ -3,6 +3,18 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useContestStore } from "@/stores/contest";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "vue-sonner";
 import { Clock, Trophy } from "lucide-vue-next";
 
 const contestStore = useContestStore();
@@ -49,16 +61,11 @@ function updateTimer() {
 async function handleFinish() {
   if (!session.value?.contest_id) return;
 
-  const confirmFinish = confirm(
-    "Are you sure you want to finish this virtual contest early?",
-  );
-  if (!confirmFinish) return;
-
   try {
     await contestStore.finishVirtualContest(session.value.contest_id);
   } catch (error) {
     console.error("Failed to finish virtual contest:", error);
-    alert("Failed to finish virtual contest");
+    toast.error("Failed to finish virtual contest");
   }
 }
 
@@ -88,9 +95,26 @@ onUnmounted(() => {
               </p>
             </div>
           </div>
-          <Button size="sm" variant="outline" @click="handleFinish">
-            Finish Early
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger as-child>
+              <Button size="sm" variant="outline"> Finish Early </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Finish Virtual Contest?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to finish this virtual contest early?
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction @click="handleFinish"
+                  >Confirm</AlertDialogAction
+                >
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <div class="space-y-2">

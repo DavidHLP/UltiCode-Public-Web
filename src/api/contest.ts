@@ -169,3 +169,55 @@ export async function fetchUserRatingHistoryById(
     `/rankings/user/${userId}/rating-history`,
   );
 }
+
+// ============================================================================
+// CONTEST SUBMISSIONS
+// ============================================================================
+
+export interface ContestSubmissionDto {
+  language: string;
+  code: string;
+}
+
+export interface ContestSubmissionResult {
+  id: string;
+  problem_id: number;
+  user_id: string;
+  language: string;
+  status: string;
+  runtime: number | null;
+  memory: number | null;
+  created_at: string;
+  contest_info: {
+    time_from_start: number;
+    problem_index: string;
+    score: number;
+    is_accepted: boolean;
+  };
+}
+
+/**
+ * Submit code for a contest problem
+ */
+export async function submitContestProblem(
+  contestId: string,
+  problemId: number,
+  dto: ContestSubmissionDto,
+): Promise<ContestSubmissionResult> {
+  return apiPost<ContestSubmissionResult>(
+    `/contest/${contestId}/problems/${problemId}/submissions`,
+    dto,
+  );
+}
+
+/**
+ * Get submissions for a specific contest problem
+ */
+export async function fetchContestProblemSubmissions(
+  contestId: string,
+  problemId: number,
+): Promise<ContestSubmissionResult[]> {
+  return apiGet<ContestSubmissionResult[]>(
+    `/contest/${contestId}/problems/${problemId}/submissions`,
+  );
+}

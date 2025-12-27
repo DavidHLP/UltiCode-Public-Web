@@ -7,6 +7,7 @@ import type { ContestRankingEntry } from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "vue-sonner";
 import VirtualContestTimer from "../components/VirtualContestTimer.vue";
 import {
   Table,
@@ -50,6 +51,7 @@ onMounted(async () => {
       contestStore.loadContestDetail(contestId),
       fetchContestRanking(contestId),
       contestStore.loadParticipationStatus(contestId),
+      contestStore.loadVirtualSession(contestId),
     ]);
     rankings.value = rankingRes.items;
   } catch (error) {
@@ -64,7 +66,7 @@ async function handleRegister() {
     await contestStore.registerForContest(contestId);
   } catch (error: unknown) {
     console.error("Registration failed:", error);
-    alert(getErrorMessage(error, "Failed to register for contest"));
+    toast.error(getErrorMessage(error, "Failed to register for contest"));
   } finally {
     registering.value = false;
   }
@@ -76,7 +78,7 @@ async function handleUnregister() {
     await contestStore.unregisterFromContest(contestId);
   } catch (error: unknown) {
     console.error("Unregister failed:", error);
-    alert(getErrorMessage(error, "Failed to unregister from contest"));
+    toast.error(getErrorMessage(error, "Failed to unregister from contest"));
   } finally {
     registering.value = false;
   }
@@ -91,7 +93,7 @@ async function handleStartVirtual() {
     await contestStore.loadParticipationStatus(contestId);
   } catch (error: unknown) {
     console.error("Failed to start virtual contest:", error);
-    alert(getErrorMessage(error, "Failed to start virtual contest"));
+    toast.error(getErrorMessage(error, "Failed to start virtual contest"));
   } finally {
     startingVirtual.value = false;
   }
@@ -218,16 +220,33 @@ function getCountryFlag(countryCode: string): string {
                 <Users class="h-4 w-4" />
                 {{ registering ? "Unregistering..." : "Unregister" }}
               </Button>
-              <Button
-                v-if="contest.status === 'finished'"
-                size="lg"
-                class="gap-2"
-                :disabled="startingVirtual"
-                @click="handleStartVirtual"
-              >
-                <PlayCircle class="h-4 w-4" />
-                {{ startingVirtual ? "Starting..." : "Start Virtual Contest" }}
-              </Button>
+              <template v-if="contest.status === 'finished'">
+                <Button
+                  v-if="
+                    !contestStore.virtualSession ||
+                    contestStore.virtualSession.status !== 'IN_PROGRESS'
+                  "
+                  size="lg"
+                  class="gap-2"
+                  :disabled="startingVirtual"
+                  @click="handleStartVirtual"
+                >
+                  <PlayCircle class="h-4 w-4" />
+                  {{
+                    startingVirtual ? "Starting..." : "Start Virtual Contest"
+                  }}
+                </Button>
+                <Button
+                  v-else
+                  size="lg"
+                  variant="outline"
+                  class="gap-2"
+                  disabled
+                >
+                  <PlayCircle class="h-4 w-4" />
+                  Virtual Contest Active
+                </Button>
+              </template>
             </div>
           </div>
         </div>
