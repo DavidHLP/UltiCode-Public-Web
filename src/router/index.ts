@@ -42,16 +42,6 @@ const forumRoutes: RouteRecordRaw = {
       component: () => import("@/views/forum/ForumThreadView.vue"),
     },
     {
-      path: "create",
-      name: "forum-create",
-      component: () => import("@/views/forum/ForumEditorView.vue"),
-    },
-    {
-      path: "edit/:postId",
-      name: "forum-edit",
-      component: () => import("@/views/forum/ForumEditorView.vue"),
-    },
-    {
       path: "guidelines",
       name: "forum-guidelines",
       component: () => import("@/views/forum/ForumGuidelinesView.vue"),
@@ -154,6 +144,18 @@ const solutionEditRoute: RouteRecordRaw = {
     import("@/views/post-editor/solutions/SolutionsEditView.vue"),
 };
 
+const forumCreateRoute: RouteRecordRaw = {
+  path: "/forum/create",
+  name: "forum-create",
+  component: () => import("@/views/forum/ForumEditorView.vue"),
+};
+
+const forumEditRoute: RouteRecordRaw = {
+  path: "/forum/edit/:postId",
+  name: "forum-edit",
+  component: () => import("@/views/forum/ForumEditorView.vue"),
+};
+
 const personalRoutes: RouteRecordRaw = {
   path: "/personal",
   component: () => import("@/features/sider/AppLayout.vue"),
@@ -200,6 +202,8 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: "/", redirect: { name: "forum-home" } },
+    forumCreateRoute,
+    forumEditRoute,
     forumRoutes,
     contestRoutes,
     problemSetRoute,
