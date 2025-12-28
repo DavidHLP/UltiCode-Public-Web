@@ -10,7 +10,7 @@ import ForumPostCard from "@/views/forum/components/ForumPostCard.vue";
 import ForumPostSkeleton from "@/views/forum/components/ForumPostSkeleton.vue";
 import ForumSidebar from "@/views/forum/components/ForumSidebar.vue";
 import { computed, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   fetchForumCommunities,
   fetchForumCommunity,
@@ -18,6 +18,18 @@ import {
   fetchForumPosts,
   fetchForumQuickFilters,
 } from "@/api/forum";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "vue-sonner";
+import { isAuthenticated } from "@/utils/auth";
+import { vote, VoteTargetType } from "@/api/vote";
 
 const posts = ref<ForumPost[]>([]);
 const communities = ref<ForumCommunity[]>([]);
@@ -32,6 +44,7 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
+const router = useRouter();
 const searchQuery = ref("");
 const quickFilter = ref(props.filter || "hot");
 const selectedCommunity = ref("all");
@@ -148,12 +161,75 @@ const sortedPosts = computed(() => {
 
   return [...pinned, ...rest];
 });
+
+function handleCreatePost() {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to create a post.");
+    return;
+  }
+  router.push({ name: "forum-create" });
+}
+
+async function handlePostVote(postId: string, type: 1 | -1) {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to vote.");
+    return;
+  }
+  try {
+    const res = await vote(VoteTargetType.FORUM_POST, postId, type);
+    const post = posts.value.find((item) => item.id === postId);
+    if (post) {
+      post.likes = res.likes;
+      post.dislikes = res.dislikes;
+      post.userVote = res.userVote;
+      post.voteState =
+        res.userVote === 1
+          ? "upvoted"
+          : res.userVote === -1
+            ? "downvoted"
+            : "neutral";
+      post.stats = {
+        ...(post.stats ?? {}),
+        score: res.likes - res.dislikes,
+      };
+    }
+  } catch (error) {
+    console.error("Failed to vote post", error);
+    toast.error("Failed to vote.");
+  }
+}
 </script>
 
 <template>
   <div class="mx-auto flex w-full max-w-5xl items-start gap-6 px-4 py-8">
     <!-- Main Feed -->
     <main class="w-full min-w-0 flex-1 space-y-4">
+      <div
+        class="flex flex-col gap-3 rounded-xl border border-border/40 bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex flex-1 items-center gap-3">
+          <Input
+            v-model="searchQuery"
+            placeholder="Search posts, tags, or keywords..."
+            class="h-9"
+          />
+          <Select v-model="quickFilter">
+            <SelectTrigger class="h-9 w-40">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem
+                v-for="filter in quickFilters"
+                :key="filter.value"
+                :value="filter.value"
+              >
+                {{ filter.label }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button class="h-9" @click="handleCreatePost">New Post</Button>
+      </div>
       <div v-if="isLoading" class="space-y-4">
         <ForumPostSkeleton v-for="i in 3" :key="i" />
       </div>
@@ -162,6 +238,7 @@ const sortedPosts = computed(() => {
           v-for="post in sortedPosts"
           :key="post.id"
           :post="post"
+          @vote="handlePostVote"
         />
       </div>
     </main>

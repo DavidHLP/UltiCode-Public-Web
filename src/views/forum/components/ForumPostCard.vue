@@ -7,12 +7,18 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Link as LinkIcon } from "lucide-vue-next";
 import { PostActions } from "@/components/edge-operations";
 import { computed } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
+import { toast } from "vue-sonner";
 
 const props = defineProps<{
   post: ForumPost;
+}>();
+
+const router = useRouter();
+const emit = defineEmits<{
+  (e: "vote", postId: string, type: 1 | -1): void;
 }>();
 
 const flairClasses: Record<ForumFlairType, string> = {
@@ -110,6 +116,25 @@ function formatRelativeTime(value: string) {
   }
 
   return "just now";
+}
+
+function handleCommentClick() {
+  router.push({ name: "forum-thread", params: { postId: props.post.id } });
+}
+
+async function handleShare() {
+  const url = `${window.location.origin}/forum/detailed/${props.post.id}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast.success("Link copied to clipboard");
+  } catch (error) {
+    console.error("Failed to copy link", error);
+    toast.error("Failed to copy link");
+  }
+}
+
+function handleSave() {
+  toast.info("Saved posts will be available soon.");
 }
 </script>
 
@@ -284,7 +309,10 @@ function formatRelativeTime(value: string) {
               share: { show: true, text: 'Share' },
               save: { show: true, isSaved: post.isSaved, text: 'Save' },
             }"
-            @vote="(type: 1 | -1) => $emit('vote', post.id, type)"
+            @vote="(type: 1 | -1) => emit('vote', post.id, type)"
+            @comment="handleCommentClick"
+            @share="handleShare"
+            @save="handleSave"
           />
         </div>
       </div>

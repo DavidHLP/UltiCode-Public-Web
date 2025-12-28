@@ -4,6 +4,7 @@ import { useRouter, useRoute } from "vue-router";
 import type { SolutionFeedItem } from "@/types/solution";
 import type { SubmissionRecord } from "@/types/submission";
 import { fetchBestSubmission } from "@/api/submission";
+import { fetchUserSolutions } from "@/api/solution";
 import { toast } from "vue-sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import {
   EmptyHeader,
   EmptyMedia,
 } from "@/components/ui/empty";
+import { fetchCurrentUserId } from "@/utils/auth";
 
 const props = defineProps<{
   problemId?: number;
@@ -50,6 +52,7 @@ const search = ref("");
 const languageFilter = ref("all");
 const sortBy = ref("likes");
 const bestSubmission = ref<SubmissionRecord | null>(null);
+const userSolution = ref<SolutionFeedItem | null>(null);
 
 const sortOptions = computed(() =>
   props.sortOptions.length
@@ -124,15 +127,22 @@ const handleSelect = (item: SolutionFeedItem) => {
 
 const handleCreateSolution = () => {
   const problemId = props.problemId?.toString() || route.params.id || "1";
-  if (bestSubmission.value) {
+  if (userSolution.value) {
     router.push({
-      name: "solution-create",
-      params: { id: problemId },
-      query: { submissionId: bestSubmission.value.id },
+      name: "solution-edit",
+      params: { id: userSolution.value.id },
     });
-  } else {
-    toast.error("You must have an accepted submission to create a solution.");
+    return;
   }
+  if (!bestSubmission.value) {
+    toast.error("You must have an accepted submission to create a solution.");
+    return;
+  }
+  router.push({
+    name: "solution-create",
+    params: { id: problemId },
+    query: { submissionId: bestSubmission.value.id },
+  });
 };
 
 onMounted(async () => {
@@ -142,6 +152,15 @@ onMounted(async () => {
       bestSubmission.value = await fetchBestSubmission(problemId);
     } catch (e) {
       console.error("Failed to fetch best submission", e);
+    }
+    try {
+      const userId = fetchCurrentUserId();
+      if (userId) {
+        const response = await fetchUserSolutions(userId, problemId);
+        userSolution.value = response.items[0] ?? null;
+      }
+    } catch (e) {
+      console.error("Failed to fetch user solutions", e);
     }
   }
 });
@@ -231,7 +250,19 @@ onMounted(async () => {
           class="bg-gray-100 dark:bg-gray-800 flex items-center justify-between gap-2 rounded-lg p-1.5 lc-md:p-1"
         >
           <div class="flex items-center gap-1.5 flex-1 min-w-0">
-            <template v-if="bestSubmission">
+            <template v-if="userSolution">
+              <div
+                class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0"
+              >
+                <Check
+                  class="h-2.5 w-2.5 text-text-primary dark:text-text-primary"
+                />
+              </div>
+              <span class="text-[11px] leading-tight">
+                You've already shared a solution for this problem.
+              </span>
+            </template>
+            <template v-else-if="bestSubmission">
               <div
                 class="rounded-full bg-opacity-100 p-0.5 bg-fill-primary dark:bg-fill-primary flex-shrink-0"
               >
@@ -260,7 +291,7 @@ onMounted(async () => {
             @click="handleCreateSolution"
           >
             <PenLine class="h-2.5 w-2.5" />
-            Write Solution
+            {{ userSolution ? "Edit Solution" : "Write Solution" }}
           </button>
         </div>
       </div>
@@ -281,7 +312,7 @@ onMounted(async () => {
             <Separator v-if="index < sortedItems.length - 1" class="my-2" />
           </div>
         </div>
-        <Empty class="mx-3 bg-muted/30 px-6 py-8">
+        <Empty v-else class="mx-3 bg-muted/30 px-6 py-8">
           <EmptyContent>
             <EmptyMedia variant="icon">
               <Lightbulb class="h-6 w-6 text-muted-foreground" />

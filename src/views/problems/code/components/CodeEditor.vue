@@ -6,6 +6,8 @@ const props = defineProps<{
   modelValue: string;
   language: string;
   theme?: "vs-dark" | "vs-light";
+  wordWrap?: boolean;
+  minimap?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -83,6 +85,18 @@ const disposeEditor = () => {
   }
 };
 
+const formatDocument = async () => {
+  if (!editor) return;
+  const action = editor.getAction("editor.action.formatDocument");
+  if (action) {
+    await action.run();
+  }
+};
+
+defineExpose({
+  formatDocument,
+});
+
 onMounted(async () => {
   if (typeof window === "undefined" || !container.value) return;
 
@@ -92,9 +106,10 @@ onMounted(async () => {
     value: props.modelValue,
     language: props.language,
     automaticLayout: true,
-    minimap: { enabled: false },
+    minimap: { enabled: Boolean(props.minimap) },
     fontSize: 13,
     lineNumbers: "on",
+    wordWrap: props.wordWrap ? "on" : "off",
     theme: props.theme ?? "vs-dark",
   });
 
@@ -136,6 +151,22 @@ watch(
     const monaco = await getMonaco();
     if (!monaco) return;
     monaco.editor.setTheme(theme);
+  },
+);
+
+watch(
+  () => props.wordWrap,
+  (value) => {
+    if (!editor) return;
+    editor.updateOptions({ wordWrap: value ? "on" : "off" });
+  },
+);
+
+watch(
+  () => props.minimap,
+  (value) => {
+    if (!editor) return;
+    editor.updateOptions({ minimap: { enabled: Boolean(value) } });
   },
 );
 

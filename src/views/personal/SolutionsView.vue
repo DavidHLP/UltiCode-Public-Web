@@ -46,7 +46,19 @@ const handleEdit = (solutionId: string) => {
   router.push({ name: "solution-edit", params: { id: solutionId } });
 };
 
+const handleView = (solution: SolutionFeedResponse["items"][number]) => {
+  const slugOrId = solution.problem?.slug || solution.problem_id;
+  router.push({
+    name: "problem-detail",
+    params: { slug: slugOrId, tab: "solution" },
+  });
+};
+
 const handleDelete = async (solutionId: string) => {
+  const confirmed = window.confirm(
+    "Delete this solution? This action cannot be undone.",
+  );
+  if (!confirmed) return;
   try {
     await deleteSolution(solutionId);
     toast.success("Solution deleted successfully");
@@ -111,6 +123,10 @@ onMounted(async () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem @click="handleView(sol)">
+                  <ArrowRight class="mr-2 h-4 w-4" />
+                  View
+                </DropdownMenuItem>
                 <DropdownMenuItem @click="handleEdit(sol.id)">
                   <Pencil class="mr-2 h-4 w-4" />
                   Edit
@@ -125,7 +141,11 @@ onMounted(async () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <CardDescription>Solution</CardDescription>
+          <CardDescription>
+            {{
+              sol.problem?.title ? `Problem: ${sol.problem.title}` : "Solution"
+            }}
+          </CardDescription>
         </CardHeader>
         <CardContent class="flex-1">
           <div class="flex flex-wrap gap-2">
@@ -157,7 +177,12 @@ onMounted(async () => {
                 <span>{{ sol.stats?.comments || 0 }}</span>
               </div>
             </div>
-            <Button variant="ghost" size="icon" class="h-6 w-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-6 w-6"
+              @click="handleView(sol)"
+            >
               <ArrowRight class="h-4 w-4" />
             </Button>
           </div>

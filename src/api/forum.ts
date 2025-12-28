@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "@/utils/request";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/utils/request";
 import type {
   ForumCommunity,
   ForumCommunityRule,
@@ -11,6 +11,10 @@ import { fetchCurrentUserId } from "@/utils/auth";
 
 export async function fetchForumPosts(): Promise<ForumPost[]> {
   return apiGet<ForumPost[]>("/forum/posts");
+}
+
+export async function fetchForumPost(postId: string): Promise<ForumPost> {
+  return apiGet<ForumPost>(`/forum/posts/${postId}`);
 }
 
 export async function fetchForumCommunities(options?: {
@@ -77,8 +81,53 @@ export async function createForumComment(
   });
 }
 
+export async function updateForumComment(
+  commentId: string,
+  body: string,
+): Promise<void> {
+  await apiPatch(`/forum/comments/${commentId}`, { body });
+}
+
+export async function deleteForumComment(commentId: string): Promise<void> {
+  await apiDelete(`/forum/comments/${commentId}`);
+}
+
 export async function recordForumView(postId: string) {
   const userId = fetchCurrentUserId();
   if (!userId) return;
   return apiPost(`/views/forum/${postId}`, { userId });
+}
+
+export async function createForumPost(input: {
+  title: string;
+  excerpt: string;
+  communityId: string;
+  tags?: string[];
+  flairType?: string | null;
+  flairLabel?: string | null;
+}): Promise<ForumPost> {
+  return apiPost<ForumPost>("/forum/posts", input);
+}
+
+export async function updateForumPost(
+  postId: string,
+  input: Partial<{
+    title: string;
+    excerpt: string;
+    tags: string[];
+    flairType: string | null;
+    flairLabel: string | null;
+    isPinned: boolean;
+    isLocked: boolean;
+  }>,
+): Promise<ForumPost> {
+  return apiPatch<ForumPost>(`/forum/posts/${postId}`, input);
+}
+
+export async function deleteForumPost(postId: string): Promise<void> {
+  await apiDelete(`/forum/posts/${postId}`);
+}
+
+export async function fetchMyForumPosts(): Promise<ForumPost[]> {
+  return apiGet<ForumPost[]>("/forum/me/posts");
 }

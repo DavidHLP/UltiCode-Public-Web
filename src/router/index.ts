@@ -42,6 +42,16 @@ const forumRoutes: RouteRecordRaw = {
       component: () => import("@/views/forum/ForumThreadView.vue"),
     },
     {
+      path: "create",
+      name: "forum-create",
+      component: () => import("@/views/forum/ForumEditorView.vue"),
+    },
+    {
+      path: "edit/:postId",
+      name: "forum-edit",
+      component: () => import("@/views/forum/ForumEditorView.vue"),
+    },
+    {
       path: "guidelines",
       name: "forum-guidelines",
       component: () => import("@/views/forum/ForumGuidelinesView.vue"),
@@ -177,6 +187,11 @@ const personalRoutes: RouteRecordRaw = {
       path: "bookmarks",
       name: "personal-bookmarks",
       component: () => import("@/views/personal/BookmarksView.vue"),
+    },
+    {
+      path: "forum-posts",
+      name: "personal-forum-posts",
+      component: () => import("@/views/personal/ForumPostsView.vue"),
     },
   ],
 };

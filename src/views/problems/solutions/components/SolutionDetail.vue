@@ -13,6 +13,7 @@ import {
   updateSolutionComment,
   deleteSolutionComment,
   recordSolutionView,
+  deleteSolution,
 } from "@/api/solution";
 import { vote, VoteTargetType } from "@/api/vote";
 import { PostActions } from "@/components/edge-operations";
@@ -20,10 +21,19 @@ import "highlight.js/styles/atom-one-dark.css";
 import { toast } from "vue-sonner";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "vue-router";
+import { Pencil, Trash2 } from "lucide-vue-next";
 
 const props = defineProps<{
   item: SolutionFeedItem;
 }>();
+
+const emit = defineEmits<{
+  deleted: [id: string];
+}>();
+
+const router = useRouter();
 
 const authorInitial = computed(
   () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
@@ -43,6 +53,14 @@ const localStats = ref<{ likes: number; dislikes: number }>({
   dislikes: 0,
 });
 const userVote = ref<0 | 1 | -1>(0);
+const isOwner = computed(() => {
+  const userId = fetchCurrentUserId();
+  return (
+    Boolean(userId) &&
+    props.item.id !== "follow-up" &&
+    props.item.authorId === userId
+  );
+});
 
 watch(
   () => props.item,
@@ -122,6 +140,28 @@ const handleSolutionVote = async (voteType: 1 | -1) => {
     userVote.value = res.userVote;
   } catch (error) {
     console.error("Failed to vote solution", error);
+  }
+};
+
+const handleEditSolution = () => {
+  if (props.item.id && props.item.id !== "follow-up") {
+    router.push({ name: "solution-edit", params: { id: props.item.id } });
+  }
+};
+
+const handleDeleteSolution = async () => {
+  if (!props.item.id || props.item.id === "follow-up") return;
+  const confirmed = window.confirm(
+    "Delete this solution? This action cannot be undone.",
+  );
+  if (!confirmed) return;
+  try {
+    await deleteSolution(props.item.id);
+    toast.success("Solution deleted");
+    emit("deleted", props.item.id);
+  } catch (error) {
+    console.error("Failed to delete solution", error);
+    toast.error("Failed to delete solution");
   }
 };
 
@@ -210,6 +250,26 @@ watch(
           >
             {{ props.item.flair }}
           </Badge>
+          <div v-if="isOwner" class="ml-auto flex items-center gap-1.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-7 px-2 text-xs"
+              @click="handleEditSolution"
+            >
+              <Pencil class="mr-1 h-3.5 w-3.5" />
+              Edit
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-7 px-2 text-xs text-destructive hover:text-destructive"
+              @click="handleDeleteSolution"
+            >
+              <Trash2 class="mr-1 h-3.5 w-3.5" />
+              Delete
+            </Button>
+          </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">

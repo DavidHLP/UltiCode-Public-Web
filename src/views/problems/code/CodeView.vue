@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { usePreferredDark } from "@vueuse/core";
 import {
   NavigationMenu,
@@ -14,11 +14,11 @@ import CodeEditor from "./components/CodeEditor.vue";
 import type { ProblemLanguageOption } from "@/types/problem-detail";
 import {
   AlignLeft,
-  Bookmark,
   RotateCcw,
   Maximize2,
   Scan,
   CheckIcon,
+  Wand2,
 } from "lucide-vue-next";
 import { problemHooks } from "@/hooks/problem-hooks";
 import { useProblemEditorStore } from "@/stores/problemEditorStore";
@@ -32,6 +32,11 @@ const activeLanguageValue = ref(props.languages[0]?.value ?? "");
 const code = ref("");
 const prefersDark = usePreferredDark();
 const editorStore = useProblemEditorStore();
+const editorContainer = ref<HTMLElement | null>(null);
+const editorRef = ref<InstanceType<typeof CodeEditor> | null>(null);
+const isWordWrapEnabled = ref(false);
+const isMinimapVisible = ref(false);
+const isFullscreen = ref(false);
 
 const languageMeta = computed(() =>
   props.languages.find((lang) => lang.value === activeLanguageValue.value),
@@ -46,6 +51,48 @@ const editorTheme = computed(() =>
 const activeLanguageLabel = computed(
   () => languageMeta.value?.label ?? "Select language",
 );
+const starterCode = computed(() => languageMeta.value?.starterCode ?? "");
+const canReset = computed(() => code.value !== starterCode.value);
+
+const toggleWordWrap = () => {
+  isWordWrapEnabled.value = !isWordWrapEnabled.value;
+};
+
+const toggleMinimap = () => {
+  isMinimapVisible.value = !isMinimapVisible.value;
+};
+
+const handleReset = () => {
+  code.value = starterCode.value;
+};
+
+const handleFormat = async () => {
+  await editorRef.value?.formatDocument?.();
+};
+
+const handleFullscreenToggle = async () => {
+  if (typeof document === "undefined") return;
+  if (!document.fullscreenElement) {
+    await editorContainer.value?.requestFullscreen?.();
+    return;
+  }
+  await document.exitFullscreen?.();
+};
+
+const handleFullscreenChange = () => {
+  if (typeof document === "undefined") return;
+  isFullscreen.value = Boolean(document.fullscreenElement);
+};
+
+onMounted(() => {
+  if (typeof document === "undefined") return;
+  document.addEventListener("fullscreenchange", handleFullscreenChange);
+});
+
+onBeforeUnmount(() => {
+  if (typeof document === "undefined") return;
+  document.removeEventListener("fullscreenchange", handleFullscreenChange);
+});
 
 watch(
   () => activeLanguageValue.value,
@@ -77,7 +124,7 @@ watch(
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col">
+  <div ref="editorContainer" class="h-full w-full flex flex-col">
     <!-- Tab Header -->
     <!-- Tab Header Removed -->
 
@@ -118,28 +165,65 @@ watch(
         </NavigationMenu>
 
         <div class="flex h-full items-center gap-1 text-muted-foreground">
-          <Button variant="ghost" size="icon" class="h-7 w-7">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-7 w-7"
+            :aria-pressed="isWordWrapEnabled"
+            title="Toggle word wrap"
+            @click="toggleWordWrap"
+          >
             <AlignLeft class="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" class="h-7 w-7">
-            <Bookmark class="h-3.5 w-3.5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-7 w-7"
+            title="Format code"
+            @click="handleFormat"
+          >
+            <Wand2 class="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" class="h-7 w-7">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-7 w-7"
+            :disabled="!canReset"
+            title="Reset to starter code"
+            @click="handleReset"
+          >
             <RotateCcw class="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" class="h-7 w-7">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-7 w-7"
+            :aria-pressed="isFullscreen"
+            title="Toggle fullscreen"
+            @click="handleFullscreenToggle"
+          >
             <Maximize2 class="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" class="h-7 w-7">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-7 w-7"
+            :aria-pressed="isMinimapVisible"
+            title="Toggle minimap"
+            @click="toggleMinimap"
+          >
             <Scan class="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
       <CodeEditor
+        ref="editorRef"
         v-model="code"
         :language="editorLanguage"
         :theme="editorTheme"
+        :word-wrap="isWordWrapEnabled"
+        :minimap="isMinimapVisible"
         class="flex-1 min-h-0"
       />
     </main>

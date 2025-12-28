@@ -101,6 +101,16 @@ const handleSelect = (item: SolutionFeedItem) => {
 const resetSelectedSolution = () => {
   selectedSolution.value = null;
 };
+
+const handleSolutionDeleted = (id: string) => {
+  if (!feed.value) return;
+  feed.value = {
+    ...feed.value,
+    items: feed.value.items.filter((item) => item.id !== id),
+    total: Math.max(0, feed.value.total - 1),
+  };
+  selectedSolution.value = null;
+};
 </script>
 
 <template>
@@ -113,7 +123,10 @@ const resetSelectedSolution = () => {
       >
         &larr; Return solution list
       </button>
-      <SolutionDetail :item="selectedSolution" />
+      <SolutionDetail
+        :item="selectedSolution"
+        @deleted="handleSolutionDeleted"
+      />
     </div>
     <SolutionListView
       v-else

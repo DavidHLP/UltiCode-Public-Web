@@ -1,12 +1,18 @@
 export interface SolutionFeedItem {
   id: string;
   problem_id: string;
+  problem?: {
+    id: string;
+    slug: string;
+    title: string;
+  };
   title: string;
   summary: string;
   highlight?: string;
   flair?: string;
   badges?: string[];
   authorId: string;
+  isOwner?: boolean;
   author: {
     id: string;
     username: string;

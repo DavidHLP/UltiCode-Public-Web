@@ -7,17 +7,34 @@ import { CommentThread } from "@/components/comments";
 import {
   fetchForumThread,
   createForumComment,
+  updateForumComment,
+  deleteForumComment,
+  deleteForumPost,
   recordForumView,
 } from "@/api/forum";
 import { ref, watch } from "vue";
-import { useRoute, RouterLink } from "vue-router";
+import { useRoute, RouterLink, useRouter } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const route = useRoute();
+const router = useRouter();
 const thread = ref<ForumThread | null>(null);
 const isLoading = ref(true);
+const deleting = ref(false);
 
 async function loadThread(postId: string) {
   if (!postId) return;
@@ -47,13 +64,75 @@ watch(
 );
 
 async function onSubmitComment(body: string, parentId?: string | null) {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to comment.");
+    return;
+  }
   const postId = route.params.postId as string;
-  await createForumComment(postId, body, parentId);
-  await loadThread(postId);
+  try {
+    await createForumComment(postId, body, parentId);
+    await loadThread(postId);
+  } catch (error) {
+    console.error("Failed to create comment", error);
+    toast.error("Failed to create comment.");
+  }
+}
+
+async function onEditComment(commentId: string | number, body: string) {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to edit comments.");
+    return;
+  }
+  try {
+    await updateForumComment(String(commentId), body);
+    await loadThread(route.params.postId as string);
+  } catch (error) {
+    console.error("Failed to edit comment", error);
+    toast.error("Failed to edit comment.");
+  }
+}
+
+async function onDeleteComment(commentId: string | number) {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to delete comments.");
+    return;
+  }
+  try {
+    await deleteForumComment(String(commentId));
+    await loadThread(route.params.postId as string);
+  } catch (error) {
+    console.error("Failed to delete comment", error);
+    toast.error("Failed to delete comment.");
+  }
+}
+
+async function handleDeleteThread() {
+  if (!thread.value || deleting.value) return;
+  deleting.value = true;
+  try {
+    await deleteForumPost(thread.value.id);
+    toast.success("Post deleted.");
+    await router.push({ name: "forum-home" });
+  } catch (error) {
+    console.error("Failed to delete post", error);
+    toast.error("Failed to delete post.");
+  } finally {
+    deleting.value = false;
+  }
+}
+
+function handleEditThread() {
+  if (!thread.value) return;
+  router.push({ name: "forum-edit", params: { postId: thread.value.id } });
 }
 
 // Vote Handling
 import { vote, VoteTargetType } from "@/api/vote";
+
+const isOwner = () => {
+  const userId = fetchCurrentUserId();
+  return !!userId && thread.value?.author?.id === userId;
+};
 
 async function handleThreadVote(type: 1 | -1) {
   if (!isAuthenticated()) {
@@ -132,6 +211,33 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
           </RouterLink>
 
           <div class="flex-1 min-w-0 bg-card sm:rounded-xl overflow-hidden">
+            <div
+              v-if="isOwner()"
+              class="flex flex-wrap items-center justify-end gap-2 px-4 sm:px-6 pt-4"
+            >
+              <Button variant="outline" size="sm" @click="handleEditThread">
+                Edit Post
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger as-child>
+                  <Button variant="destructive" size="sm">Delete</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction @click="handleDeleteThread">
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
             <ThreadContent :thread="thread" @vote="handleThreadVote" />
             <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
             <CommentThread
@@ -139,6 +245,8 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
               :is-locked="thread.isLocked"
               @submit="onSubmitComment"
               @vote="handleCommentVote"
+              @edit="onEditComment"
+              @delete="onDeleteComment"
             />
           </div>
         </div>

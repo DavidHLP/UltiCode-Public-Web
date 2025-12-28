@@ -141,11 +141,17 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { toast } from "vue-sonner";
 import { fetchSolutionTopics } from "@/api/topic";
-import { createSolution, fetchSolution, updateSolution } from "@/api/solution";
+import {
+  createSolution,
+  fetchSolution,
+  updateSolution,
+  fetchUserSolutions,
+} from "@/api/solution";
 import { fetchProblemById } from "@/api/problem";
 import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import type { SolutionTopic } from "@/types/topic";
+import { fetchCurrentUserId } from "@/utils/auth";
 import "highlight.js/styles/atom-one-dark.css";
 
 import { MarkdownEdit, MarkdownView } from "@/components/markdown";
@@ -433,6 +439,29 @@ const handlePublish = async () => {
     let message = "Failed to publish solution";
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || message;
+    }
+    if (
+      !isEditMode.value &&
+      message.toLowerCase().includes("already exists") &&
+      resolvedProblemId.value
+    ) {
+      const userId = fetchCurrentUserId();
+      if (userId) {
+        try {
+          const response = await fetchUserSolutions(
+            userId,
+            resolvedProblemId.value,
+          );
+          const existing = response.items[0];
+          if (existing) {
+            toast.info("Solution already exists. Redirecting to edit.");
+            router.push({ name: "solution-edit", params: { id: existing.id } });
+            return;
+          }
+        } catch (fetchError) {
+          console.error("Failed to fetch existing solution", fetchError);
+        }
+      }
     }
     toast.error(message);
     isDraftSaved.value = true;

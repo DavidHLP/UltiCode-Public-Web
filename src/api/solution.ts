@@ -53,8 +53,13 @@ export async function fetchSolutionFeed(
 
 export async function fetchUserSolutions(
   userId: string,
+  problemId?: string,
 ): Promise<SolutionFeedResponse> {
-  return apiGet<SolutionFeedResponse>(`/solutions?userId=${userId}`);
+  const params = new URLSearchParams({ userId });
+  if (problemId) {
+    params.set("problemId", problemId);
+  }
+  return apiGet<SolutionFeedResponse>(`/solutions?${params.toString()}`);
 }
 
 export async function fetchSolutionComments(
