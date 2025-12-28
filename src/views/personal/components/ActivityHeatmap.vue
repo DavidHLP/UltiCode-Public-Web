@@ -54,15 +54,15 @@ const activityData = computed(() => {
 const getColorClass = (level: number) => {
   switch (level) {
     case 1:
-      return "bg-green-200 dark:bg-green-900/40";
+      return "bg-emerald-200 dark:bg-emerald-900/30";
     case 2:
-      return "bg-green-400 dark:bg-green-700/60";
+      return "bg-emerald-400 dark:bg-emerald-700/50";
     case 3:
-      return "bg-green-600 dark:bg-green-500/80";
+      return "bg-emerald-500 dark:bg-emerald-600/70";
     case 4:
-      return "bg-green-800 dark:bg-green-400";
+      return "bg-emerald-700 dark:bg-emerald-400";
     default:
-      return "bg-secondary"; // Empty/None
+      return "bg-secondary/60"; // Empty/None
   }
 };
 
@@ -121,18 +121,18 @@ const months = [
       <div class="flex items-center gap-2 text-xs text-muted-foreground">
         <span>Less</span>
         <div class="flex gap-[2px]">
-          <div class="h-3 w-3 rounded-[2px] bg-secondary"></div>
+          <div class="h-3 w-3 rounded-[2px] bg-secondary/60"></div>
           <div
-            class="h-3 w-3 rounded-[2px] bg-green-200 dark:bg-green-900/40"
+            class="h-3 w-3 rounded-[2px] bg-emerald-200 dark:bg-emerald-900/30"
           ></div>
           <div
-            class="h-3 w-3 rounded-[2px] bg-green-400 dark:bg-green-700/60"
+            class="h-3 w-3 rounded-[2px] bg-emerald-400 dark:bg-emerald-700/50"
           ></div>
           <div
-            class="h-3 w-3 rounded-[2px] bg-green-600 dark:bg-green-500/80"
+            class="h-3 w-3 rounded-[2px] bg-emerald-500 dark:bg-emerald-600/70"
           ></div>
           <div
-            class="h-3 w-3 rounded-[2px] bg-green-800 dark:bg-green-400"
+            class="h-3 w-3 rounded-[2px] bg-emerald-700 dark:bg-emerald-400"
           ></div>
         </div>
         <span>More</span>

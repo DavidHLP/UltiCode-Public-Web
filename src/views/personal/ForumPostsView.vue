@@ -72,7 +72,9 @@ onMounted(loadPosts);
 
     <div v-else class="space-y-4">
       <Card v-for="post in posts" :key="post.id">
-        <CardHeader class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader
+          class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+        >
           <div class="space-y-1">
             <CardTitle class="text-base">
               <RouterLink

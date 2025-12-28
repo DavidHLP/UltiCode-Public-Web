@@ -102,18 +102,12 @@ export async function runSubmission(
     testCases: testCases.length > 0 ? testCases : undefined,
   });
 }
-export async function fetchUserProblemStatusMap(
-  userId: string,
-): Promise<
-  Record<
-    number,
-    { status: "solved" | "attempted" | "todo"; completed_time?: string }
-  >
-> {
-  return apiGet<
-    Record<
-      number,
-      { status: "solved" | "attempted" | "todo"; completed_time?: string }
-    >
-  >(`/submissions/status/map?userId=${userId}`);
+export async function fetchDailyActivity(
+  year?: number,
+  userId?: string,
+): Promise<string[]> {
+  const params = new URLSearchParams();
+  if (year) params.append("year", year.toString());
+  if (userId) params.append("userId", userId);
+  return apiGet<string[]>(`/submissions/calendar?${params.toString()}`);
 }

@@ -19,11 +19,14 @@ import {
 } from ".";
 
 const props = defineProps<
-  CalendarRootProps & { class?: HTMLAttributes["class"] }
+  CalendarRootProps & {
+    class?: HTMLAttributes["class"];
+    completedDates?: string[];
+  }
 >();
 const emits = defineEmits<CalendarRootEmits>();
 
-const delegatedProps = reactiveOmit(props, "class");
+const delegatedProps = reactiveOmit(props, "class", "completedDates");
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
@@ -64,7 +67,15 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
               :key="weekDate.toString()"
               :date="weekDate"
             >
-              <CalendarCellTrigger :day="weekDate" :month="month.value" />
+              <CalendarCellTrigger
+                :day="weekDate"
+                :month="month.value"
+                :class="
+                  props.completedDates?.includes(weekDate.toString())
+                    ? 'bg-amber-500/15 text-amber-600 font-bold hover:bg-amber-500/25 dark:bg-amber-500/25 dark:text-amber-400 ring-1 ring-amber-500/30 ring-inset'
+                    : ''
+                "
+              />
             </CalendarCell>
           </CalendarGridRow>
         </CalendarGridBody>
