@@ -92,7 +92,7 @@ async function loadData() {
       }
       applyPost(post);
     } else if (communityRows.length > 0) {
-      communityId.value = communityRows[0].id;
+      communityId.value = communityRows[0]?.id ?? "";
     }
   } catch (error) {
     console.error("Failed to load editor data", error);
