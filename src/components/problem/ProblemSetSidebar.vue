@@ -47,7 +47,9 @@ onMounted(async () => {
               variant="outline"
               class="text-[10px] font-normal h-5 px-1.5 flex gap-1 items-center bg-background/50"
             >
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.4)]"></span>
+              <span
+                class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.4)]"
+              ></span>
               {{ completedDates.length }}
             </Badge>
           </div>

@@ -14,7 +14,6 @@ import {
   Activity,
   GitCommit,
   Edit,
-  Flame,
 } from "lucide-vue-next";
 import { onMounted, ref, computed } from "vue";
 import { RouterLink } from "vue-router";
@@ -366,7 +365,9 @@ onMounted(async () => {
                   <div
                     class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.3)]"
                     :class="
-                      item.status !== 'Accepted' ? 'bg-muted-foreground shadow-none' : ''
+                      item.status !== 'Accepted'
+                        ? 'bg-muted-foreground shadow-none'
+                        : ''
                     "
                   ></div>
                 </div>

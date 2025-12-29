@@ -28,6 +28,7 @@ const props = defineProps<Props>();
 const interactionCounts = ref<ProblemInteractionCounts>({
   likes: 0,
   dislikes: 0,
+  favorites: 0,
 });
 
 const viewerInteraction = ref<{
@@ -51,6 +52,7 @@ const loadInteractions = async (problemId: number | string) => {
     interactionCounts.value = {
       likes: opsRes.likes,
       dislikes: opsRes.dislikes,
+      favorites: opsRes.favorites,
     };
     viewerInteraction.value = {
       reaction:
@@ -110,6 +112,7 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
     );
     interactionCounts.value.likes = res.likes;
     interactionCounts.value.dislikes = res.dislikes;
+    interactionCounts.value.favorites = res.favorites;
     viewerInteraction.value.reaction =
       res.viewer.vote === 1
         ? "like"
@@ -118,6 +121,12 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
           : undefined;
   } catch (e) {
     console.error("Failed to toggle reaction", e);
+  }
+};
+
+const handleSaveChange = () => {
+  if (props.problem) {
+    loadInteractions(props.problem.id);
   }
 };
 </script>
@@ -157,6 +166,8 @@ const toggleReaction = async (reaction: "like" | "dislike") => {
     <ProblemSaveButton
       :problem-id="problem.id"
       :target-type="BookmarkType.PROBLEM"
+      :count="reactionCounts.favorites"
+      @change="handleSaveChange"
     />
 
     <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />

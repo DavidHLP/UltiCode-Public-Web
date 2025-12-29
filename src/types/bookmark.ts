@@ -27,6 +27,8 @@ export interface Bookmark {
   sortOrder: number;
   note: string | null;
   createdAt: string;
+  title?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface BookmarkFolderWithItems

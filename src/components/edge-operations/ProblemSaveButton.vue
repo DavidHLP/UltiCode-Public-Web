@@ -49,6 +49,7 @@ const props = defineProps<{
   targetType: BookmarkType;
   variant?: "default" | "ghost" | "outline";
   size?: "default" | "sm" | "icon";
+  count?: number;
 }>();
 
 const emit = defineEmits<{
@@ -254,14 +255,15 @@ watch(
         <Button
           :variant="variant ?? 'ghost'"
           :size="size ?? 'icon'"
-          class="relative"
+          class="relative flex items-center gap-1 transition-none"
+          :class="[
+            count !== undefined ? 'w-auto px-2' : '',
+            isSaved ? 'text-primary' : 'text-gray-600',
+          ]"
           aria-label="Save problem"
         >
-          <component
-            :is="isSaved ? BookmarkCheck : Bookmark"
-            class="h-4 w-4"
-            :class="{ 'text-primary': isSaved }"
-          />
+          <component :is="isSaved ? BookmarkCheck : Bookmark" class="h-4 w-4" />
+          <span v-if="count !== undefined" class="text-xs">{{ count }}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent class="w-72" align="end">

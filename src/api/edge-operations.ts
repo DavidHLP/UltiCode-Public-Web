@@ -18,6 +18,7 @@ export enum EdgeOperationTargetType {
 export interface EdgeOperationResponse {
   likes: number;
   dislikes: number;
+  favorites: number;
   viewer: {
     vote: 1 | 0 | -1;
   };

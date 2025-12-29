@@ -1,8 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { Plus, Loader2 } from "lucide-vue-next";
+import { ref, onMounted, computed, watch } from "vue";
+import {
+  Plus,
+  Loader2,
+  Trash2,
+  ExternalLink,
+  MessageSquare,
+  FileText,
+  List,
+  CheckCircle2,
+} from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,10 +23,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import BookmarkFolderList from "@/components/bookmark/BookmarkFolderList.vue";
 import CreateFolderDialog from "@/components/bookmark/CreateFolderDialog.vue";
 import { useBookmarkStore } from "@/stores/bookmark";
-import { fetchFolder } from "@/api/bookmark";
+import { fetchFolder, removeBookmark } from "@/api/bookmark";
+import { BookmarkType } from "@/api/bookmark";
 import type {
   BookmarkFolder,
   BookmarkFolderWithItems,
@@ -24,6 +36,7 @@ import type {
   UpdateFolderInput,
 } from "@/types/bookmark";
 import { toast } from "vue-sonner";
+import { RouterLink } from "vue-router";
 
 const store = useBookmarkStore();
 
@@ -36,10 +49,12 @@ const editingFolder = ref<BookmarkFolder | null>(null);
 const showDeleteDialog = ref(false);
 const deletingFolder = ref<BookmarkFolder | null>(null);
 
+// Computed
 const selectedFolder = computed(() =>
   store.folders.find((f) => f.id === selectedFolderId.value),
 );
 
+// Methods
 async function loadFolderDetails(id: string) {
   isLoadingDetails.value = true;
   try {
@@ -53,9 +68,24 @@ async function loadFolderDetails(id: string) {
 }
 
 function handleSelectFolder(folder: BookmarkFolder) {
+  if (selectedFolderId.value === folder.id) return;
   selectedFolderId.value = folder.id;
   loadFolderDetails(folder.id);
 }
+
+// Auto-select first folder if none selected
+watch(
+  () => store.folders,
+  (folders) => {
+    if (folders.length > 0 && !selectedFolderId.value) {
+      const firstFolder = folders[0];
+      if (firstFolder) {
+        handleSelectFolder(firstFolder);
+      }
+    }
+  },
+  { immediate: true },
+);
 
 function handleEditFolder(folder: BookmarkFolder) {
   editingFolder.value = folder;
@@ -110,9 +140,50 @@ async function confirmDelete() {
   }
 }
 
+async function handleRemoveItem(bookmarkId: string) {
+  if (!selectedFolderId.value) return;
+  try {
+    await removeBookmark(selectedFolderId.value, bookmarkId);
+    toast.success("Removed from collection");
+    // Refresh
+    loadFolderDetails(selectedFolderId.value);
+    // Optionally refresh folder list count
+    store.loadFolders();
+  } catch (error) {
+    console.error("Failed to remove item", error);
+    toast.error("Failed to remove item");
+  }
+}
+
 function handleDialogClose() {
   showCreateDialog.value = false;
   editingFolder.value = null;
+}
+
+// Helpers for item display
+function getItemIcon(type: BookmarkType) {
+  switch (type) {
+    case BookmarkType.FORUM_POST:
+      return MessageSquare;
+    case BookmarkType.PROBLEM:
+      return FileText;
+    case BookmarkType.PROBLEM_LIST:
+      return List;
+    case BookmarkType.SOLUTION:
+      return CheckCircle2;
+    default:
+      return FileText;
+  }
+}
+
+function getItemUrl(item: any) {
+  switch (item.targetType) {
+    case BookmarkType.FORUM_POST:
+      return { name: "forum-thread", params: { postId: item.targetId } };
+    // Add other cases as needed
+    default:
+      return "#";
+  }
 }
 
 onMounted(() => {
@@ -121,24 +192,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto py-6">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">My Bookmarks</h1>
-      <Button @click="showCreateDialog = true">
-        <Plus class="mr-2 h-4 w-4" />
-        New Folder
-      </Button>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Folder List -->
-      <Card class="md:col-span-1">
-        <CardHeader>
-          <CardTitle class="text-lg">Folders</CardTitle>
+  <div class="container mx-auto py-6 max-w-7xl">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+      <!-- Sidebar (Folders) -->
+      <Card class="lg:col-span-1 h-fit sticky top-6">
+        <CardHeader class="pb-3 border-b">
+          <div class="flex items-center justify-between">
+            <CardTitle class="text-lg font-semibold">Collections</CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8"
+              @click="showCreateDialog = true"
+            >
+              <Plus class="h-4 w-4" />
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent class="pt-4">
           <div v-if="store.isLoading" class="flex justify-center py-8">
-            <Loader2 class="h-6 w-6 animate-spin" />
+            <Loader2 class="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
           <BookmarkFolderList
             v-else
@@ -151,51 +224,110 @@ onMounted(() => {
         </CardContent>
       </Card>
 
-      <!-- Folder Details -->
-      <Card class="md:col-span-2">
-        <CardHeader>
-          <CardTitle class="text-lg">
-            {{ selectedFolder?.name ?? "Select a folder" }}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div v-if="isLoadingDetails" class="flex justify-center py-8">
-            <Loader2 class="h-6 w-6 animate-spin" />
-          </div>
-          <div
-            v-else-if="!selectedFolderDetails"
-            class="py-8 text-center text-muted-foreground"
-          >
-            Select a folder to view its bookmarks
-          </div>
-          <div
-            v-else-if="selectedFolderDetails.items.length === 0"
-            class="py-8 text-center text-muted-foreground"
-          >
-            This folder is empty
-          </div>
-          <div v-else class="space-y-2">
-            <div
-              v-for="bookmark in selectedFolderDetails.items"
-              :key="bookmark.id"
-              class="flex items-center justify-between p-3 rounded-md border"
-            >
+      <!-- Main Content (Items) -->
+      <div class="lg:col-span-3 space-y-6">
+        <Card>
+          <CardHeader class="pb-3 border-b bg-muted/20">
+            <div class="flex justify-between items-start">
               <div>
-                <p class="text-sm font-medium">{{ bookmark.targetType }}</p>
-                <p class="text-xs text-muted-foreground">
-                  ID: {{ bookmark.targetId }}
-                </p>
+                <CardTitle class="text-xl">
+                  {{ selectedFolder?.name ?? "Select a collection" }}
+                </CardTitle>
                 <p
-                  v-if="bookmark.note"
-                  class="text-xs text-muted-foreground mt-1"
+                  v-if="selectedFolder?.description"
+                  class="text-sm text-muted-foreground mt-1"
                 >
-                  {{ bookmark.note }}
+                  {{ selectedFolder.description }}
                 </p>
               </div>
+              <Badge variant="outline" class="ml-2">
+                {{ selectedFolderDetails?.items.length ?? 0 }} Items
+              </Badge>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+
+          <CardContent class="p-0">
+            <div v-if="isLoadingDetails" class="flex justify-center py-12">
+              <Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+
+            <div
+              v-else-if="!selectedFolderDetails"
+              class="py-12 text-center text-muted-foreground"
+            >
+              Select a collection to view its contents
+            </div>
+
+            <div
+              v-else-if="selectedFolderDetails.items.length === 0"
+              class="flex flex-col items-center justify-center py-16 text-muted-foreground"
+            >
+              <div class="p-4 rounded-full bg-muted mb-3">
+                <FileText class="h-8 w-8 opacity-50" />
+              </div>
+              <p>This collection is empty</p>
+              <p class="text-xs mt-1">
+                Go exploring and save some items here!
+              </p>
+            </div>
+
+            <div v-else class="divide-y">
+              <div
+                v-for="item in selectedFolderDetails.items"
+                :key="item.id"
+                class="group flex items-start gap-4 p-4 hover:bg-muted/30 transition-colors"
+              >
+                <!-- Icon -->
+                <div
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background text-muted-foreground"
+                >
+                  <component :is="getItemIcon(item.targetType)" class="h-5 w-5" />
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0 space-y-1">
+                  <div class="flex items-start justify-between gap-4">
+                    <RouterLink
+                      :to="getItemUrl(item)"
+                      class="text-base font-medium hover:underline decoration-2 decoration-transparent hover:decoration-current transition-all line-clamp-1"
+                    >
+                      {{ item.title ?? `Item ${item.targetId}` }}
+                    </RouterLink>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity -mt-1 -mr-2"
+                      @click="handleRemoveItem(item.id)"
+                    >
+                      <Trash2 class="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <!-- Metadata -->
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <span class="capitalize">{{ item.targetType.toLowerCase().replace('_', ' ') }}</span>
+                    
+                    <template v-if="item.metadata">
+                      <span>•</span>
+                      <div v-if="item.metadata.communityName" class="flex items-center gap-1">
+                         r/{{ item.metadata.communityName }}
+                      </div>
+                      <div v-if="item.metadata.authorName" class="flex items-center gap-1">
+                         <span>•</span>
+                         <span>by {{ item.metadata.authorName }}</span>
+                      </div>
+                    </template>
+                  </div>
+
+                   <p v-if="item.note" class="text-sm text-muted-foreground mt-2 bg-muted/50 p-2 rounded-md italic border border-border/50">
+                    "{{ item.note }}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
 
     <!-- Create/Edit Dialog -->
@@ -214,10 +346,10 @@ onMounted(() => {
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Folder</AlertDialogTitle>
+          <AlertDialogTitle>Delete Collection</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete "{{ deletingFolder?.name }}"? This
-            action cannot be undone.
+            action cannot be undone and all bookmarks inside will be lost.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

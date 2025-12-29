@@ -12,9 +12,17 @@ import { PostActions } from "@/components/edge-operations";
 import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
+import { toggleBookmark, BookmarkType } from "@/api/bookmark";
+import { isAuthenticated } from "@/utils/auth";
+import { toast } from "vue-sonner";
 
 const props = defineProps<{
   thread: ForumThread;
+}>();
+
+const emit = defineEmits<{
+  (e: "vote", type: 1 | -1): void;
+  (e: "save", isSaved: boolean): void;
 }>();
 
 const flairClasses: Record<ForumFlairType, string> = {
@@ -94,6 +102,32 @@ function formatPollWidth(votes: number, totalVotes: number) {
   const percentage = (votes / totalVotes) * 100;
   const minimum = votes > 0 && percentage < 4 ? 4 : percentage;
   return `${Math.min(100, Math.max(minimum, 0)).toFixed(0)}%`;
+}
+
+async function handleSave() {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to save posts.");
+    return;
+  }
+  try {
+    const res = await toggleBookmark(BookmarkType.FORUM_POST, props.thread.id);
+    emit("save", res.isSaved);
+    toast.success(res.isSaved ? "Post saved" : "Post unsaved");
+  } catch (error) {
+    console.error("Failed to toggle save", error);
+    toast.error("Failed to save post");
+  }
+}
+
+async function handleShare() {
+  const url = window.location.href;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast.success("Link copied to clipboard");
+  } catch (error) {
+    console.error("Failed to copy link", error);
+    toast.error("Failed to copy link");
+  }
 }
 </script>
 
@@ -326,6 +360,8 @@ function formatPollWidth(votes: number, totalVotes: number) {
           save: { show: true, isSaved: thread.isSaved, text: 'Save' },
         }"
         @vote="(type: 1 | -1) => $emit('vote', type)"
+        @save="handleSave"
+        @share="handleShare"
       />
     </div>
   </div>

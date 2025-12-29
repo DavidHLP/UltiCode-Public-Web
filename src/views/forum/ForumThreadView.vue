@@ -183,6 +183,12 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
     console.error("Failed to vote comment", error);
   }
 }
+
+function handleThreadSave(isSaved: boolean) {
+  if (thread.value) {
+    thread.value.isSaved = isSaved;
+  }
+}
 </script>
 
 <template>
@@ -238,7 +244,11 @@ async function handleCommentVote(commentId: string | number, type: 1 | -1) {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-            <ThreadContent :thread="thread" @vote="handleThreadVote" />
+            <ThreadContent
+              :thread="thread"
+              @vote="handleThreadVote"
+              @save="handleThreadSave"
+            />
             <div class="px-4 sm:px-6 bg-muted/10 h-2"></div>
             <CommentThread
               :comments="thread.comments"

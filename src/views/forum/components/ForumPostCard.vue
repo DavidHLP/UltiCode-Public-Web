@@ -11,6 +11,8 @@ import { RouterLink, useRouter } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 import { toast } from "vue-sonner";
+import { toggleBookmark, BookmarkType } from "@/api/bookmark";
+import { isAuthenticated } from "@/utils/auth";
 
 const props = defineProps<{
   post: ForumPost;
@@ -19,6 +21,7 @@ const props = defineProps<{
 const router = useRouter();
 const emit = defineEmits<{
   (e: "vote", postId: string, type: 1 | -1): void;
+  (e: "save", postId: string, isSaved: boolean): void;
 }>();
 
 const flairClasses: Record<ForumFlairType, string> = {
@@ -133,8 +136,19 @@ async function handleShare() {
   }
 }
 
-function handleSave() {
-  toast.info("Saved posts will be available soon.");
+async function handleSave() {
+  if (!isAuthenticated()) {
+    toast.error("Please log in to save posts.");
+    return;
+  }
+  try {
+    const res = await toggleBookmark(BookmarkType.FORUM_POST, props.post.id);
+    emit("save", props.post.id, res.isSaved);
+    toast.success(res.isSaved ? "Post saved" : "Post unsaved");
+  } catch (error) {
+    console.error("Failed to toggle save", error);
+    toast.error("Failed to save post");
+  }
 }
 </script>
 

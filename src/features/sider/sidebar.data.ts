@@ -16,6 +16,8 @@ import {
   User,
   Settings,
   List,
+  Bookmark,
+  Star,
 } from "lucide-vue-next";
 
 export interface SidebarItem {
@@ -44,6 +46,14 @@ export const forumSidebarData: SidebarSection[] = [
       { title: "Popular", url: "/forum/popular", icon: TrendingUp },
       { title: "Explore", url: "/forum/explore", icon: Globe },
       { title: "All Posts", url: "/forum/all", icon: LayoutGrid },
+    ],
+  },
+  {
+    name: "My Space",
+    collapsible: true,
+    items: [
+      { title: "My Posts", url: "/personal/forum-posts", icon: MessageSquare },
+      { title: "Saved Posts", url: "/personal/bookmarks", icon: Bookmark },
     ],
   },
   {
@@ -117,6 +127,7 @@ export const personalSidebarData: SidebarSection[] = [
       { title: "Solutions", url: "/personal/solutions", icon: FileText },
       { title: "Problem Lists", url: "/personal/problem-lists", icon: List },
       { title: "Forum Posts", url: "/personal/forum-posts", icon: FileText },
+      { title: "Bookmarks", url: "/personal/bookmarks", icon: Bookmark },
     ],
   },
 ];

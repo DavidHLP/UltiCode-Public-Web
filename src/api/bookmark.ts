@@ -1,36 +1,68 @@
-import { apiGet, apiPost, apiPatch, apiDelete } from "@/utils/request";
-import type {
-  BookmarkFolder,
-  BookmarkFolderWithItems,
-  Bookmark,
-  CreateFolderInput,
-  UpdateFolderInput,
-  AddBookmarkInput,
-  UpdateBookmarkInput,
-  BookmarkType,
-} from "@/types/bookmark";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/utils/request";
 
-export { BookmarkType } from "@/types/bookmark";
+export enum BookmarkType {
+  PROBLEM = "PROBLEM",
+  SOLUTION = "SOLUTION",
+  FORUM_POST = "FORUM_POST",
+  PROBLEM_LIST = "PROBLEM_LIST",
+  SOLUTION_COMMENT = "SOLUTION_COMMENT",
+  FORUM_COMMENT = "FORUM_COMMENT",
+}
+
+export interface BookmarkFolder {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  color: string | null;
+  isDefault: boolean;
+  itemCount: number;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BookmarkItem {
+  id: string;
+  targetId: string;
+  targetType: BookmarkType;
+  sortOrder: number;
+  note: string | null;
+  createdAt: string;
+  title?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface BookmarkFolderDetail extends BookmarkFolder {
+  items: BookmarkItem[];
+}
 
 export async function fetchFolders(): Promise<BookmarkFolder[]> {
   return apiGet<BookmarkFolder[]>("/bookmarks/folders");
 }
 
-export async function fetchFolder(
-  id: string,
-): Promise<BookmarkFolderWithItems> {
-  return apiGet<BookmarkFolderWithItems>(`/bookmarks/folders/${id}`);
+export async function fetchFolder(id: string): Promise<BookmarkFolderDetail> {
+  return apiGet<BookmarkFolderDetail>(`/bookmarks/folders/${id}`);
 }
 
-export async function createFolder(
-  data: CreateFolderInput,
-): Promise<BookmarkFolder> {
+export async function createFolder(data: {
+  name: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+}): Promise<BookmarkFolder> {
   return apiPost<BookmarkFolder>("/bookmarks/folders", data);
 }
 
 export async function updateFolder(
   id: string,
-  data: UpdateFolderInput,
+  data: {
+    name?: string;
+    description?: string;
+    icon?: string;
+    color?: string;
+    sortOrder?: number;
+  },
 ): Promise<BookmarkFolder> {
   return apiPatch<BookmarkFolder>(`/bookmarks/folders/${id}`, data);
 }
@@ -41,9 +73,9 @@ export async function deleteFolder(id: string): Promise<void> {
 
 export async function addBookmark(
   folderId: string,
-  data: AddBookmarkInput,
-): Promise<Bookmark> {
-  return apiPost<Bookmark>(`/bookmarks/folders/${folderId}/items`, data);
+  data: { targetType: BookmarkType; targetId: string; note?: string },
+): Promise<BookmarkItem> {
+  return apiPost<BookmarkItem>(`/bookmarks/folders/${folderId}/items`, data);
 }
 
 export async function removeBookmark(
@@ -63,17 +95,6 @@ export async function removeBookmarkByTarget(
   );
 }
 
-export async function updateBookmark(
-  folderId: string,
-  bookmarkId: string,
-  data: UpdateBookmarkInput,
-): Promise<Bookmark> {
-  return apiPatch<Bookmark>(
-    `/bookmarks/folders/${folderId}/items/${bookmarkId}`,
-    data,
-  );
-}
-
 export async function getBookmarkFolders(
   targetType: BookmarkType,
   targetId: string,
@@ -83,4 +104,18 @@ export async function getBookmarkFolders(
 
 export async function reorderFolders(folderIds: string[]): Promise<void> {
   await apiPost("/bookmarks/folders/reorder", { folderIds });
+}
+
+export interface ToggleBookmarkResponse {
+  isSaved: boolean;
+}
+
+export async function toggleBookmark(
+  targetType: BookmarkType,
+  targetId: string,
+): Promise<ToggleBookmarkResponse> {
+  return apiPost<ToggleBookmarkResponse>("/bookmarks/quick", {
+    targetType,
+    targetId,
+  });
 }

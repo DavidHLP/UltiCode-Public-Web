@@ -198,6 +198,13 @@ async function handlePostVote(postId: string, type: 1 | -1) {
     toast.error("Failed to vote.");
   }
 }
+
+function handlePostSave(postId: string, isSaved: boolean) {
+  const post = posts.value.find((item) => item.id === postId);
+  if (post) {
+    post.isSaved = isSaved;
+  }
+}
 </script>
 
 <template>
@@ -239,6 +246,7 @@ async function handlePostVote(postId: string, type: 1 | -1) {
           :key="post.id"
           :post="post"
           @vote="handlePostVote"
+          @save="handlePostSave"
         />
       </div>
     </main>
