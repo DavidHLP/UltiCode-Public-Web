@@ -28,7 +28,7 @@ export interface Bookmark {
   note: string | null;
   createdAt: string;
   title?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface BookmarkFolderWithItems

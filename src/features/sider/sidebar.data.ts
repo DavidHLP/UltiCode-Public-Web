@@ -17,7 +17,6 @@ import {
   Settings,
   List,
   Bookmark,
-  Star,
 } from "lucide-vue-next";
 
 export interface SidebarItem {

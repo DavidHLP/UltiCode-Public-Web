@@ -30,7 +30,7 @@ export interface BookmarkItem {
   note: string | null;
   createdAt: string;
   title?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface BookmarkFolderDetail extends BookmarkFolder {

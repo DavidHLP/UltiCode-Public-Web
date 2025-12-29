@@ -4,7 +4,6 @@ import {
   Plus,
   Loader2,
   Trash2,
-  ExternalLink,
   MessageSquare,
   FileText,
   List,
@@ -23,7 +22,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import BookmarkFolderList from "@/components/bookmark/BookmarkFolderList.vue";
 import CreateFolderDialog from "@/components/bookmark/CreateFolderDialog.vue";
 import { useBookmarkStore } from "@/stores/bookmark";
@@ -34,9 +32,29 @@ import type {
   BookmarkFolderWithItems,
   CreateFolderInput,
   UpdateFolderInput,
+  Bookmark,
 } from "@/types/bookmark";
 import { toast } from "vue-sonner";
 import { RouterLink } from "vue-router";
+
+// Interfaces for metadata
+interface ProblemMetadata {
+  slug: string;
+  difficulty: string;
+}
+
+interface SolutionMetadata {
+  problemSlug: string;
+  problemTitle: string;
+  authorName: string;
+}
+
+interface ForumMetadata {
+  communityName: string;
+  communitySlug: string;
+  authorName: string;
+  authorAvatar: string;
+}
 
 const store = useBookmarkStore();
 
@@ -176,14 +194,37 @@ function getItemIcon(type: BookmarkType) {
   }
 }
 
-function getItemUrl(item: any) {
+function getItemUrl(item: Bookmark) {
   switch (item.targetType) {
     case BookmarkType.FORUM_POST:
       return { name: "forum-thread", params: { postId: item.targetId } };
-    // Add other cases as needed
+    case BookmarkType.PROBLEM: {
+      const meta = item.metadata as unknown as ProblemMetadata;
+      return {
+        name: "problem-detail",
+        params: { slug: meta?.slug || item.targetId },
+      };
+    }
+    case BookmarkType.PROBLEM_LIST:
+      return { name: "problem-list-detail", params: { id: item.targetId } };
+    case BookmarkType.SOLUTION: {
+      const meta = item.metadata as unknown as SolutionMetadata;
+      if (meta?.problemSlug) {
+        return {
+          name: "problem-detail",
+          params: { slug: meta.problemSlug },
+          query: { solutionId: item.targetId },
+        };
+      }
+      return "#";
+    }
     default:
       return "#";
   }
+}
+
+function getForumMetadata(item: Bookmark): ForumMetadata | undefined {
+  return item.metadata as unknown as ForumMetadata;
 }
 
 onMounted(() => {
@@ -266,9 +307,7 @@ onMounted(() => {
                 <FileText class="h-8 w-8 opacity-50" />
               </div>
               <p>This collection is empty</p>
-              <p class="text-xs mt-1">
-                Go exploring and save some items here!
-              </p>
+              <p class="text-xs mt-1">Go exploring and save some items here!</p>
             </div>
 
             <div v-else class="divide-y">
@@ -281,7 +320,10 @@ onMounted(() => {
                 <div
                   class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background text-muted-foreground"
                 >
-                  <component :is="getItemIcon(item.targetType)" class="h-5 w-5" />
+                  <component
+                    :is="getItemIcon(item.targetType)"
+                    class="h-5 w-5"
+                  />
                 </div>
 
                 <!-- Content -->
@@ -304,22 +346,35 @@ onMounted(() => {
                   </div>
 
                   <!-- Metadata -->
-                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                    <span class="capitalize">{{ item.targetType.toLowerCase().replace('_', ' ') }}</span>
-                    
+                  <div
+                    class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
+                  >
+                    <span class="capitalize">{{
+                      item.targetType.toLowerCase().replace("_", " ")
+                    }}</span>
+
                     <template v-if="item.metadata">
                       <span>•</span>
-                      <div v-if="item.metadata.communityName" class="flex items-center gap-1">
-                         r/{{ item.metadata.communityName }}
+                      <div
+                        v-if="getForumMetadata(item)?.communityName"
+                        class="flex items-center gap-1"
+                      >
+                        r/{{ getForumMetadata(item)?.communityName }}
                       </div>
-                      <div v-if="item.metadata.authorName" class="flex items-center gap-1">
-                         <span>•</span>
-                         <span>by {{ item.metadata.authorName }}</span>
+                      <div
+                        v-if="getForumMetadata(item)?.authorName"
+                        class="flex items-center gap-1"
+                      >
+                        <span>•</span>
+                        <span>by {{ getForumMetadata(item)?.authorName }}</span>
                       </div>
                     </template>
                   </div>
 
-                   <p v-if="item.note" class="text-sm text-muted-foreground mt-2 bg-muted/50 p-2 rounded-md italic border border-border/50">
+                  <p
+                    v-if="item.note"
+                    class="text-sm text-muted-foreground mt-2 bg-muted/50 p-2 rounded-md italic border border-border/50"
+                  >
                     "{{ item.note }}"
                   </p>
                 </div>
