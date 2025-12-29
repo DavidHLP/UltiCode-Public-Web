@@ -67,8 +67,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto space-y-8 pb-10">
-    <div class="flex flex-col gap-2">
+  <div class="max-w-7xl mx-auto space-y-8 pb-10">
+    <div class="flex flex-col space-y-1">
       <h2 class="text-3xl font-bold tracking-tight">Account Settings</h2>
       <p class="text-muted-foreground">
         Manage your personal information, security, and notification

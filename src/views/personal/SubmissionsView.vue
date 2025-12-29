@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -79,25 +80,23 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
-  >
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
-    >
-      <div class="space-y-0.5">
-        <h2 class="text-3xl font-bold tracking-tight">My Submissions</h2>
-        <p class="text-muted-foreground">
-          A historical record of all your problem solving attempts.
-        </p>
+    <div class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <h2 class="text-3xl font-bold tracking-tight">My Submissions</h2>
+          <p class="text-muted-foreground">
+            A historical record of all your problem solving attempts.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" class="gap-2 rounded-full" as-child>
+          <RouterLink to="/problemset">
+            Browse Problems
+            <ExternalLink class="h-3.5 w-3.5" />
+          </RouterLink>
+        </Button>
       </div>
-      <Button variant="outline" size="sm" class="gap-2 rounded-full" as-child>
-        <RouterLink to="/problemset">
-          Browse Problems
-          <ExternalLink class="h-3.5 w-3.5" />
-        </RouterLink>
-      </Button>
-    </div>
+  
+      <Separator />
 
     <div
       v-if="loading"
