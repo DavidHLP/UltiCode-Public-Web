@@ -2,8 +2,9 @@
 import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +16,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  MessageSquare, 
+  Eye, 
+  MoreVertical, 
+  Pencil, 
+  Trash2, 
+  Pin, 
+  Lock, 
+  Plus,
+  Loader2,
+  Calendar,
+} from "lucide-vue-next";
 import { fetchMyForumPosts, deleteForumPost } from "@/api/forum";
 import type { ForumPost } from "@/types/forum";
 import { toast } from "vue-sonner";
@@ -38,7 +57,7 @@ async function handleDelete(postId: string) {
   try {
     await deleteForumPost(postId);
     posts.value = posts.value.filter((post) => post.id !== postId);
-    toast.success("Post deleted.");
+    toast.success("Post deleted successfully.");
   } catch (error) {
     console.error("Failed to delete post", error);
     toast.error("Failed to delete post.");
@@ -49,89 +68,136 @@ onMounted(loadPosts);
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 class="text-2xl font-bold tracking-tight">My Forum Posts</h2>
-        <p class="text-sm text-muted-foreground">
-          Manage your published threads.
+  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h2 class="text-3xl font-bold tracking-tight">My Forum Posts</h2>
+        <p class="text-muted-foreground">
+          View and manage the discussions you've started in the community.
         </p>
       </div>
-      <Button as-child>
-        <RouterLink to="/forum/create">New Post</RouterLink>
+      <Button as-child class="rounded-full gap-2">
+        <RouterLink to="/forum/create">
+          <Plus class="h-4 w-4" />
+          New Post
+        </RouterLink>
       </Button>
     </div>
 
-    <div v-if="isLoading" class="text-sm text-muted-foreground">
-      Loading your posts...
+    <Separator />
+
+    <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+      <Loader2 class="h-10 w-10 animate-spin text-primary" />
+      <p class="text-sm text-muted-foreground">Loading your posts...</p>
     </div>
 
-    <div v-else-if="posts.length === 0" class="text-sm text-muted-foreground">
-      You haven't published any posts yet.
+    <div v-else-if="posts.length === 0" class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center">
+      <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6">
+        <MessageSquare class="h-10 w-10 text-muted-foreground/50" />
+      </div>
+      <h3 class="text-xl font-bold">No posts yet</h3>
+      <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
+        You haven't started any discussions. Share your knowledge or ask a question!
+      </p>
+      <Button as-child class="rounded-full px-8 h-12 text-base font-bold">
+        <RouterLink to="/forum/create">Create Your First Post</RouterLink>
+      </Button>
     </div>
 
-    <div v-else class="space-y-4">
-      <Card v-for="post in posts" :key="post.id">
-        <CardHeader
-          class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div class="space-y-1">
-            <CardTitle class="text-base">
-              <RouterLink
-                :to="{ name: 'forum-thread', params: { postId: post.id } }"
-                class="hover:underline"
-              >
-                {{ post.title }}
-              </RouterLink>
-            </CardTitle>
-            <div class="text-xs text-muted-foreground">
-              {{ post.community?.name ?? "General" }} ·
-              {{ new Date(post.createdAt).toLocaleDateString() }}
+    <div v-else class="grid gap-6">
+      <Card v-for="post in posts" :key="post.id" class="group hover:shadow-md transition-all duration-300 border-muted/60 overflow-hidden">
+        <div class="flex flex-col sm:flex-row">
+          <div class="flex-1 p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <Badge variant="secondary" class="bg-primary/5 text-primary border-primary/10 font-bold hover:bg-primary/10 transition-colors">
+                {{ post.community?.name ?? "General" }}
+              </Badge>
+              <div class="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                <Calendar class="h-3 w-3" />
+                {{ new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) }}
+              </div>
+            </div>
+            
+            <div class="flex items-start justify-between gap-4">
+              <div class="space-y-2 flex-1">
+                <CardTitle class="text-xl font-black group-hover:text-primary transition-colors">
+                  <RouterLink :to="{ name: 'forum-thread', params: { postId: post.id } }">
+                    {{ post.title }}
+                  </RouterLink>
+                </CardTitle>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                  <Badge v-if="post.isPinned" variant="secondary" class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 gap-1 rounded-sm h-5 text-[10px] font-bold">
+                    <Pin class="h-3 w-3" /> PINNED
+                  </Badge>
+                  <Badge v-if="post.isLocked" variant="outline" class="gap-1 rounded-sm h-5 text-[10px] font-bold border-muted-foreground/30 text-muted-foreground">
+                    <Lock class="h-3 w-3" /> LOCKED
+                  </Badge>
+                  <Badge v-if="post.flair" variant="secondary" class="rounded-sm h-5 text-[10px] font-bold uppercase">
+                    {{ post.flair.text }}
+                  </Badge>
+                </div>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full">
+                    <MoreVertical class="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-40">
+                  <DropdownMenuItem as-child class="gap-2">
+                    <RouterLink :to="{ name: 'forum-thread', params: { postId: post.id } }">
+                      <Eye class="h-4 w-4" /> View Post
+                    </RouterLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem as-child class="gap-2">
+                    <RouterLink :to="{ name: 'forum-edit', params: { postId: post.id } }">
+                      <Pencil class="h-4 w-4" /> Edit
+                    </RouterLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <AlertDialog>
+                    <AlertDialogTrigger as-child>
+                      <DropdownMenuItem @select.prevent class="text-destructive focus:text-destructive gap-2">
+                        <Trash2 class="h-4 w-4" /> Delete
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This post and all of its comments will be permanently removed.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction @click="handleDelete(post.id)" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Delete Permanently
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <Badge v-if="post.isPinned" variant="secondary">Pinned</Badge>
-            <Badge v-if="post.isLocked" variant="outline">Locked</Badge>
-            <Badge v-if="post.flair" variant="secondary">
-              {{ post.flair.text }}
-            </Badge>
+          
+          <div class="sm:w-48 bg-muted/30 border-l border-t sm:border-t-0 p-6 flex sm:flex-col justify-around items-center gap-4">
+            <div class="flex flex-col items-center gap-1 group/stat">
+              <MessageSquare class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
+              <span class="text-lg font-black leading-none">{{ post.stats?.comments ?? 0 }}</span>
+              <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Comments</span>
+            </div>
+            <div class="flex flex-col items-center gap-1 group/stat">
+              <Eye class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
+              <span class="text-lg font-black leading-none">{{ post.stats?.views ?? 0 }}</span>
+              <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Views</span>
+            </div>
           </div>
-        </CardHeader>
-        <CardContent class="flex flex-wrap items-center justify-between gap-3">
-          <div class="text-xs text-muted-foreground">
-            {{ post.stats?.comments ?? 0 }} comments ·
-            {{ post.stats?.views ?? 0 }} views
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" as-child>
-              <RouterLink
-                :to="{ name: 'forum-edit', params: { postId: post.id } }"
-              >
-                Edit
-              </RouterLink>
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger as-child>
-                <Button variant="destructive" size="sm">Delete</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete this post?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction @click="handleDelete(post.id)">
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </CardContent>
+        </div>
       </Card>
     </div>
   </div>
 </template>
+

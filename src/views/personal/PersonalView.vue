@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,10 @@ import {
   Activity,
   GitCommit,
   Edit,
+  Trophy,
+  Flame,
+  CheckCircle2,
+  ChevronRight,
 } from "lucide-vue-next";
 import { onMounted, ref, computed } from "vue";
 import { RouterLink } from "vue-router";
@@ -39,16 +43,16 @@ const stats = computed(() => {
       easy: {
         count: 0,
         total: 0,
-        color: "text-green-500",
-        bg: "bg-green-500",
+        color: "text-emerald-500",
+        bg: "bg-emerald-500",
       },
       medium: {
         count: 0,
         total: 0,
-        color: "text-yellow-500",
-        bg: "bg-yellow-500",
+        color: "text-orange-500",
+        bg: "bg-orange-500",
       },
-      hard: { count: 0, total: 0, color: "text-red-500", bg: "bg-red-500" },
+      hard: { count: 0, total: 0, color: "text-rose-500", bg: "bg-rose-500" },
     };
 
   const { stats } = statsData.value;
@@ -56,28 +60,29 @@ const stats = computed(() => {
     easy: {
       count: stats.Easy.count,
       total: stats.Easy.total,
-      color: "text-green-500",
-      bg: "bg-green-500",
+      color: "text-emerald-500",
+      bg: "bg-emerald-500",
     },
     medium: {
       count: stats.Medium.count,
       total: stats.Medium.total,
-      color: "text-yellow-500",
-      bg: "bg-yellow-500",
+      color: "text-orange-500",
+      bg: "bg-orange-500",
     },
     hard: {
       count: stats.Hard.count,
       total: stats.Hard.total,
-      color: "text-red-500",
-      bg: "bg-red-500",
+      color: "text-rose-500",
+      bg: "bg-rose-500",
     },
   };
 });
 
 const recentActivity = computed(() => {
-  return submissions.value.slice(0, 3).map((sub) => ({
+  return submissions.value.slice(0, 5).map((sub) => ({
     action: sub.status === "Accepted" ? "Solved" : "Attempted",
     problem: sub.problem?.title || "Unknown Problem",
+    problemSlug: sub.problem?.slug || "",
     time: new Date(sub.created_at).toLocaleDateString(),
     status: sub.status,
   }));
@@ -105,221 +110,216 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="loading" class="flex h-96 items-center justify-center">
-    <div class="text-muted-foreground">Loading profile...</div>
+  <div v-if="loading" class="flex h-[60vh] items-center justify-center">
+    <div class="flex flex-col items-center gap-2">
+      <div class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+      <p class="text-sm text-muted-foreground animate-pulse">Loading profile...</p>
+    </div>
   </div>
-  <div v-else-if="!user" class="flex h-96 items-center justify-center">
-    <div class="text-muted-foreground">Please log in to view your profile.</div>
+  <div v-else-if="!user" class="flex h-[60vh] items-center justify-center">
+    <Card class="w-full max-w-md border-dashed">
+      <CardContent class="flex flex-col items-center py-10 text-center">
+        <div class="mb-4 rounded-full bg-muted p-3 text-muted-foreground">
+          <Activity class="h-10 w-10" />
+        </div>
+        <h3 class="text-xl font-semibold">Authentication Required</h3>
+        <p class="mb-6 mt-2 text-sm text-muted-foreground">
+          Please log in to view and manage your profile.
+        </p>
+        <Button as-child>
+          <RouterLink to="/login">Sign In</RouterLink>
+        </Button>
+      </CardContent>
+    </Card>
   </div>
   <div
     v-else-if="user"
-    class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+    class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
   >
     <!-- Hero Section -->
-    <div class="flex flex-col gap-8 md:flex-row">
-      <div class="shrink-0">
-        <div class="relative">
-          <Avatar class="h-32 w-32 border-4 border-background shadow-xl">
-            <AvatarImage :src="user.avatar" :alt="user.name" />
-            <AvatarFallback class="text-2xl">{{
-              user.username.substring(0, 2).toUpperCase()
-            }}</AvatarFallback>
-          </Avatar>
-          <div
-            class="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
-            title="Premium Member"
-          >
-            <Zap class="h-4 w-4 fill-current" />
+    <div class="relative overflow-hidden rounded-3xl border bg-card p-6 md:p-10 shadow-sm">
+      <div class="absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 rounded-full bg-primary/10 blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 h-32 w-32 translate-y-8 -translate-x-8 rounded-full bg-primary/5 blur-3xl"></div>
+      
+      <div class="relative flex flex-col gap-8 md:flex-row md:items-center">
+        <div class="shrink-0 flex justify-center md:block">
+          <div class="relative group">
+            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary to-primary/50 opacity-20 blur-sm group-hover:opacity-40 transition duration-500"></div>
+            <Avatar class="h-32 w-32 border-4 border-background shadow-xl relative">
+              <AvatarImage :src="user.avatar" :alt="user.name" />
+              <AvatarFallback class="text-2xl font-bold bg-muted">{{
+                user.username.substring(0, 2).toUpperCase()
+              }}</AvatarFallback>
+            </Avatar>
+            <div
+              class="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg border-4 border-background"
+              title="Premium Member"
+            >
+              <Zap class="h-4 w-4 fill-current" />
+            </div>
           </div>
         </div>
-      </div>
-      <div class="flex flex-1 flex-col justify-center space-y-4">
-        <div class="flex items-start justify-between">
-          <div class="space-y-1">
-            <h1 class="text-3xl font-bold tracking-tight">
-              {{ user.name || user.username }}
-            </h1>
-            <p class="text-muted-foreground">@{{ user.username }}</p>
+        
+        <div class="flex flex-1 flex-col space-y-4 text-center md:text-left">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <h1 class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                {{ user.name || user.username }}
+              </h1>
+              <div class="flex items-center justify-center md:justify-start gap-2">
+                <span class="text-lg font-medium text-muted-foreground">@{{ user.username }}</span>
+                <Badge variant="secondary" class="rounded-full px-2 py-0 h-5 text-[10px] font-bold uppercase tracking-wider">
+                  Pro Member
+                </Badge>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" class="gap-2 self-center md:self-start rounded-full px-5 h-10 border-muted-foreground/20 hover:bg-muted" as-child>
+              <RouterLink to="/personal/account">
+                <Edit class="h-4 w-4" />
+                Edit Profile
+              </RouterLink>
+            </Button>
           </div>
-          <Button variant="outline" size="sm" class="gap-2" as-child>
-            <RouterLink to="/personal/account">
-              <Edit class="h-4 w-4" />
-              Edit Profile
-            </RouterLink>
-          </Button>
-        </div>
-        <p class="max-w-2xl text-base leading-relaxed text-foreground/80">
-          {{ user.bio || "No bio provided." }}
-        </p>
-        <div class="flex flex-wrap gap-4 text-sm text-muted-foreground">
-          <div class="flex items-center gap-1" v-if="user.location">
-            <MapPin class="h-4 w-4" />
-            <span>{{ user.location }}</span>
-          </div>
-          <div class="flex items-center gap-1" v-if="user.website">
-            <LinkIcon class="h-4 w-4" />
-            <a
-              :href="user.website"
-              class="hover:text-primary"
-              target="_blank"
-              >{{ user.website }}</a
-            >
-          </div>
-          <div class="flex items-center gap-1" v-if="user.github">
-            <Github class="h-4 w-4" />
-            <span>{{ user.github }}</span>
-          </div>
-          <div class="flex items-center gap-1" v-if="user.twitter">
-            <Twitter class="h-4 w-4" />
-            <span>{{ user.twitter }}</span>
-          </div>
-          <div class="flex items-center gap-1">
-            <Calendar class="h-4 w-4" />
-            <span
-              >Joined
-              {{
-                user.joined_at
-                  ? new Date(user.joined_at).toLocaleDateString()
-                  : "Recently"
-              }}</span
-            >
+          
+          <p class="max-w-2xl text-base leading-relaxed text-muted-foreground">
+            {{ user.bio || "No bio provided. Write something about yourself!" }}
+          </p>
+          
+          <div class="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-3 text-sm font-medium">
+            <div class="flex items-center gap-1.5 text-muted-foreground" v-if="user.location">
+              <MapPin class="h-4 w-4 text-primary/70" />
+              <span>{{ user.location }}</span>
+            </div>
+            <div class="flex items-center gap-1.5" v-if="user.website">
+              <LinkIcon class="h-4 w-4 text-primary/70" />
+              <a
+                :href="user.website"
+                class="text-primary hover:underline transition-all underline-offset-4"
+                target="_blank"
+                >{{ user.website.replace(/^https?:\/\//, '') }}</a
+              >
+            </div>
+            <div class="flex items-center gap-1.5 text-muted-foreground" v-if="user.github">
+              <Github class="h-4 w-4 text-primary/70" />
+              <span>{{ user.github }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-muted-foreground" v-if="user.twitter">
+              <Twitter class="h-4 w-4 text-primary/70" />
+              <span>{{ user.twitter }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-muted-foreground">
+              <Calendar class="h-4 w-4 text-primary/70" />
+              <span
+                >Joined
+                {{
+                  user.joined_at
+                    ? new Date(user.joined_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+                    : "Recently"
+                }}</span
+              >
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Stats and Activity Grid -->
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <!-- Left Column: Stats -->
-      <div class="space-y-6 lg:col-span-2">
-        <!-- Progress Cards -->
-        <div class="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader class="pb-2">
-              <CardTitle class="text-sm font-medium text-muted-foreground"
-                >Global Ranking</CardTitle
-              >
+    <!-- Stats Dashboard -->
+    <div class="grid gap-6 lg:grid-cols-12">
+      <!-- Left & Center Columns: Stats & Progress -->
+      <div class="space-y-6 lg:col-span-8">
+        <!-- Key Metrics Row -->
+        <div class="grid gap-4 sm:grid-cols-3">
+          <Card class="relative overflow-hidden group">
+            <div class="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-blue-500/5 group-hover:scale-150 transition-transform duration-500"></div>
+            <CardHeader class="pb-2 space-y-0 flex flex-row items-center justify-between">
+              <CardTitle class="text-xs font-bold uppercase tracking-wider text-muted-foreground">Global Rank</CardTitle>
+              <Trophy class="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold">{{
-                  (user.rank || 12403).toLocaleString()
-                }}</span>
-                <span class="text-xs text-muted-foreground">Top 0.5%</span>
-              </div>
-              <div class="mt-2 flex items-center gap-2 text-xs">
-                <Badge
-                  variant="secondary"
-                  class="bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300"
-                >
-                  Diamond
+              <div class="text-3xl font-black">#{{ (user.rank || 12403).toLocaleString() }}</div>
+              <div class="mt-2 flex items-center gap-2">
+                <Badge variant="secondary" class="bg-blue-100 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 rounded-md px-1.5 font-bold">
+                  DIAMOND III
                 </Badge>
+                <span class="text-[10px] text-muted-foreground font-medium uppercase">Top 0.5%</span>
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader class="pb-2">
-              <CardTitle class="text-sm font-medium text-muted-foreground"
-                >Problems Solved</CardTitle
-              >
+          
+          <Card class="relative overflow-hidden group">
+            <div class="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-emerald-500/5 group-hover:scale-150 transition-transform duration-500"></div>
+            <CardHeader class="pb-2 space-y-0 flex flex-row items-center justify-between">
+              <CardTitle class="text-xs font-bold uppercase tracking-wider text-muted-foreground">Solved</CardTitle>
+              <CheckCircle2 class="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div class="flex items-baseline gap-2">
-                ><span class="text-2xl font-bold">{{
-                  statsData?.totalSolved || 0
-                }}</span>
-                <span class="text-xs text-muted-foreground"
-                  >/
-                  {{
-                    (statsData?.stats?.Easy.total || 0) +
-                    (statsData?.stats?.Medium.total || 0) +
-                    (statsData?.stats?.Hard.total || 0)
-                  }}</span
-                >
-              </div>
-              <div
-                class="mt-2 h-2 w-full overflow-hidden rounded-full bg-secondary"
-              >
-                <div
-                  class="h-full bg-primary"
-                  :style="{
-                    width:
-                      ((statsData?.totalSolved || 0) /
-                        ((statsData?.stats?.Easy.total || 0) +
-                          (statsData?.stats?.Medium.total || 0) +
-                          (statsData?.stats?.Hard.total || 0) || 1)) *
-                        100 +
-                      '%',
-                  }"
-                ></div>
+              <div class="text-3xl font-black">{{ statsData?.totalSolved || 0 }}</div>
+              <div class="mt-2 text-[11px] text-muted-foreground font-medium">
+                Total problems completed
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader class="pb-2">
-              <CardTitle class="text-sm font-medium text-muted-foreground"
-                >Current Streak</CardTitle
-              >
+
+          <Card class="relative overflow-hidden group">
+            <div class="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-orange-500/5 group-hover:scale-150 transition-transform duration-500"></div>
+            <CardHeader class="pb-2 space-y-0 flex flex-row items-center justify-between">
+              <CardTitle class="text-xs font-bold uppercase tracking-wider text-muted-foreground">Streak</CardTitle>
+              <Flame class="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-bold">{{
-                  statsData?.streak || 0
-                }}</span>
-                <span class="text-xs text-muted-foreground">Days</span>
-              </div>
+              <div class="text-3xl font-black">{{ statsData?.streak || 0 }}</div>
               <div class="mt-2 flex gap-1">
-                <!-- visual squares -->
                 <div
-                  v-for="i in 5"
+                  v-for="i in 7"
                   :key="i"
-                  class="h-2 w-2 rounded-sm bg-primary/20"
-                  :class="{ 'bg-primary': i <= (statsData?.streak || 0) % 5 }"
-                ></div>
+                  class="h-1.5 flex-1 rounded-full bg-muted overflow-hidden"
+                >
+                  <div 
+                    v-if="i <= (statsData?.streak || 0) % 7"
+                    class="h-full bg-gradient-to-r from-orange-400 to-orange-600 shadow-[0_0_8px_rgba(249,115,22,0.4)]"
+                  ></div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
         <!-- Detailed Problem Stats -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Target class="h-5 w-5" />
-              Problem Solving Stats
-            </CardTitle>
+        <Card class="border-none shadow-none bg-muted/30">
+          <CardHeader class="pb-4">
+            <div class="flex items-center justify-between">
+              <CardTitle class="text-lg font-bold flex items-center gap-2">
+                <Target class="h-5 w-5 text-primary" />
+                Problem Solving Progress
+              </CardTitle>
+              <div class="text-xs font-bold text-muted-foreground">
+                OVERALL {{ (((statsData?.totalSolved || 0) / ((statsData?.stats?.Easy.total || 0) + (statsData?.stats?.Medium.total || 0) + (statsData?.stats?.Hard.total || 0) || 1)) * 100).toFixed(1) }}%
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <div class="space-y-4">
+            <div class="space-y-6">
               <div
                 v-for="(stat, difficulty) in stats"
                 :key="difficulty"
-                class="space-y-1"
+                class="space-y-2"
               >
-                <div class="flex items-center justify-between text-sm">
-                  <span class="capitalize font-medium w-16">{{
-                    difficulty
-                  }}</span>
-                  <div class="flex gap-1 text-xs text-muted-foreground">
-                    <span :class="stat.color" class="font-bold">{{
-                      stat.count
-                    }}</span>
-                    <span>/</span>
-                    <span>{{ stat.total }}</span>
-                    <span
-                      >({{
-                        ((stat.count / stat.total) * 100).toFixed(1)
-                      }}%)</span
-                    >
+                <div class="flex items-end justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold capitalize">{{ difficulty }}</span>
+                    <Badge variant="outline" class="text-[10px] h-4 px-1 border-muted-foreground/30 text-muted-foreground">
+                      {{ stat.count }} / {{ stat.total }}
+                    </Badge>
                   </div>
+                  <span class="text-xs font-black" :class="stat.color">
+                    {{ ((stat.count / (stat.total || 1)) * 100).toFixed(1) }}%
+                  </span>
                 </div>
-                <div
-                  class="h-2 w-full overflow-hidden rounded-full bg-secondary"
-                >
+                <div class="h-3 w-full overflow-hidden rounded-full bg-muted shadow-inner">
                   <div
-                    class="h-full transition-all"
+                    class="h-full transition-all duration-1000 ease-out"
                     :class="stat.bg"
-                    :style="{ width: (stat.count / stat.total) * 100 + '%' }"
+                    :style="{ width: (stat.count / (stat.total || 1)) * 100 + '%' }"
                   ></div>
                 </div>
               </div>
@@ -327,64 +327,84 @@ onMounted(async () => {
           </CardContent>
         </Card>
 
-        <!-- Activity Heatmap Placeholder -->
+        <!-- Activity Heatmap -->
         <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Activity class="h-5 w-5" />
-              Activity Map
+          <CardHeader class="pb-2">
+            <CardTitle class="text-lg font-bold flex items-center gap-2">
+              <Activity class="h-5 w-5 text-primary" />
+              Submission Heatmap
             </CardTitle>
+            <CardDescription>
+              Your activity across the platform over the last year.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent class="pt-2">
             <ActivityHeatmap :data="statsData?.heatmap" />
           </CardContent>
         </Card>
       </div>
 
-      <!-- Right Column: Recent Activity -->
-      <div class="space-y-6">
-        <Card class="h-full">
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <GitCommit class="h-5 w-5" />
+      <!-- Right Column: Recent Activity & Badges -->
+      <div class="space-y-6 lg:col-span-4">
+        <Card class="h-full border-muted/50">
+          <CardHeader class="pb-4 border-b bg-muted/20">
+            <CardTitle class="text-base font-bold flex items-center gap-2">
+              <GitCommit class="h-4 w-4 text-primary" />
               Recent Activity
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div
-              class="relative space-y-8 pl-6 before:absolute before:inset-y-0 before:left-2 before:w-[2px] before:bg-muted"
-            >
+          <CardContent class="p-0">
+            <div v-if="recentActivity.length > 0" class="divide-y divide-border/50">
               <div
                 v-for="(item, index) in recentActivity"
                 :key="index"
-                class="relative"
+                class="group relative flex items-start gap-4 p-4 hover:bg-muted/40 transition-colors"
               >
                 <div
-                  class="absolute -left-[23px] flex h-4 w-4 items-center justify-center rounded-full bg-background ring-2 ring-muted"
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-background group-hover:border-primary/50 transition-colors"
                 >
                   <div
-                    class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.3)]"
-                    :class="
-                      item.status !== 'Accepted'
-                        ? 'bg-muted-foreground shadow-none'
-                        : ''
-                    "
+                    class="h-3 w-3 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+                    :class="item.status === 'Accepted' ? 'bg-emerald-500' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]'"
                   ></div>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <span class="text-sm font-medium leading-none"
-                    >{{ item.action }}
-                    <span class="text-primary">{{ item.problem }}</span></span
-                  >
-                  <span class="text-xs text-muted-foreground">{{
-                    item.time
-                  }}</span>
+                <div class="flex flex-1 flex-col gap-0.5 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-sm font-bold truncate">
+                      {{ item.action }} 
+                      <RouterLink 
+                        :to="`/problems/${item.problemSlug}`" 
+                        class="text-primary hover:underline underline-offset-2 decoration-1"
+                      >
+                        {{ item.problem }}
+                      </RouterLink>
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-medium text-muted-foreground">{{ item.time }}</span>
+                    <Badge variant="outline" class="text-[9px] h-4 px-1 rounded font-bold uppercase tracking-tighter" :class="item.status === 'Accepted' ? 'border-emerald-500/50 text-emerald-600' : 'border-rose-500/50 text-rose-600'">
+                      {{ item.status }}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
+            <div v-else class="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+              <Activity class="h-8 w-8 mb-2 opacity-20" />
+              <p class="text-sm">No recent activity found.</p>
+            </div>
           </CardContent>
+          <div class="p-4 border-t bg-muted/5">
+            <Button variant="ghost" size="sm" class="w-full text-xs font-bold text-muted-foreground hover:text-primary gap-1" as-child>
+              <RouterLink to="/personal/submissions">
+                VIEW ALL SUBMISSIONS
+                <ChevronRight class="h-3 w-3" />
+              </RouterLink>
+            </Button>
+          </div>
         </Card>
       </div>
     </div>
   </div>
 </template>
+

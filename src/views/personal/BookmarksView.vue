@@ -8,10 +8,17 @@ import {
   FileText,
   List,
   CheckCircle2,
+  FolderOpen,
+  MoreVertical,
+  Calendar,
+  ExternalLink,
+  Search,
 } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +29,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import BookmarkFolderList from "@/components/bookmark/BookmarkFolderList.vue";
 import CreateFolderDialog from "@/components/bookmark/CreateFolderDialog.vue";
 import { useBookmarkStore } from "@/stores/bookmark";
@@ -61,6 +74,7 @@ const store = useBookmarkStore();
 const selectedFolderId = ref<string | null>(null);
 const selectedFolderDetails = ref<BookmarkFolderWithItems | null>(null);
 const isLoadingDetails = ref(false);
+const searchQuery = ref("");
 
 const showCreateDialog = ref(false);
 const editingFolder = ref<BookmarkFolder | null>(null);
@@ -71,6 +85,17 @@ const deletingFolder = ref<BookmarkFolder | null>(null);
 const selectedFolder = computed(() =>
   store.folders.find((f) => f.id === selectedFolderId.value),
 );
+
+const filteredItems = computed(() => {
+  if (!selectedFolderDetails.value) return [];
+  if (!searchQuery.value.trim()) return selectedFolderDetails.value.items;
+  
+  const query = searchQuery.value.toLowerCase();
+  return selectedFolderDetails.value.items.filter(item => 
+    item.title?.toLowerCase().includes(query) || 
+    item.note?.toLowerCase().includes(query)
+  );
+});
 
 // Methods
 async function loadFolderDetails(id: string) {
@@ -88,6 +113,7 @@ async function loadFolderDetails(id: string) {
 function handleSelectFolder(folder: BookmarkFolder) {
   if (selectedFolderId.value === folder.id) return;
   selectedFolderId.value = folder.id;
+  searchQuery.value = "";
   loadFolderDetails(folder.id);
 }
 
@@ -233,26 +259,31 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto py-6 max-w-7xl">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+  <div class="max-w-7xl mx-auto space-y-8 pb-10">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h2 class="text-3xl font-bold tracking-tight">Collections</h2>
+        <p class="text-muted-foreground">
+          Organize your saved problems, solutions, and forum discussions.
+        </p>
+      </div>
+      <Button @click="showCreateDialog = true" class="rounded-full gap-2 shadow-sm">
+        <Plus class="h-4 w-4" />
+        New Collection
+      </Button>
+    </div>
+
+    <Separator />
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
       <!-- Sidebar (Folders) -->
-      <Card class="lg:col-span-1 h-fit sticky top-6">
-        <CardHeader class="pb-3 border-b">
-          <div class="flex items-center justify-between">
-            <CardTitle class="text-lg font-semibold">Collections</CardTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="h-8 w-8"
-              @click="showCreateDialog = true"
-            >
-              <Plus class="h-4 w-4" />
-            </Button>
-          </div>
+      <Card class="lg:col-span-1 border-none shadow-none bg-muted/20 sticky top-24 rounded-2xl">
+        <CardHeader class="pb-3 px-4">
+          <CardTitle class="text-sm font-black uppercase tracking-widest text-muted-foreground/70">My Folders</CardTitle>
         </CardHeader>
-        <CardContent class="pt-4">
+        <CardContent class="px-2 pb-4">
           <div v-if="store.isLoading" class="flex justify-center py-8">
-            <Loader2 class="h-6 w-6 animate-spin text-muted-foreground" />
+            <Loader2 class="h-6 w-6 animate-spin text-primary" />
           </div>
           <BookmarkFolderList
             v-else
@@ -267,121 +298,158 @@ onMounted(() => {
 
       <!-- Main Content (Items) -->
       <div class="lg:col-span-3 space-y-6">
-        <Card>
-          <CardHeader class="pb-3 border-b bg-muted/20">
-            <div class="flex justify-between items-start">
-              <div>
-                <CardTitle class="text-xl">
-                  {{ selectedFolder?.name ?? "Select a collection" }}
-                </CardTitle>
-                <p
-                  v-if="selectedFolder?.description"
-                  class="text-sm text-muted-foreground mt-1"
-                >
-                  {{ selectedFolder.description }}
+        <div v-if="selectedFolder" class="flex flex-col gap-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-2xl font-black tracking-tight">{{ selectedFolder.name }}</h3>
+              <p v-if="selectedFolder.description" class="text-sm text-muted-foreground mt-1">
+                {{ selectedFolder.description }}
+              </p>
+            </div>
+            <div class="relative w-full sm:w-64">
+              <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                v-model="searchQuery" 
+                placeholder="Search items..." 
+                class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20" 
+              />
+            </div>
+          </div>
+
+          <Card class="border-none shadow-sm overflow-hidden rounded-2xl">
+            <CardContent class="p-0">
+              <div v-if="isLoadingDetails" class="flex flex-col items-center justify-center py-20 gap-4">
+                <Loader2 class="h-10 w-10 animate-spin text-primary" />
+                <p class="text-sm text-muted-foreground">Loading items...</p>
+              </div>
+
+              <div
+                v-else-if="!selectedFolderDetails"
+                class="py-20 text-center"
+              >
+                <div class="bg-muted/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <FolderOpen class="h-8 w-8 text-muted-foreground/50" />
+                </div>
+                <p class="text-muted-foreground">Select a collection to view its contents</p>
+              </div>
+
+              <div
+                v-else-if="selectedFolderDetails.items.length === 0"
+                class="flex flex-col items-center justify-center py-24 text-center px-6"
+              >
+                <div class="p-5 rounded-3xl bg-muted/50 mb-4">
+                  <FileText class="h-10 w-10 text-muted-foreground/40" />
+                </div>
+                <h4 class="text-lg font-bold">This collection is empty</h4>
+                <p class="text-sm text-muted-foreground mt-1 max-w-[280px]">
+                  Browse the platform and save interesting problems or discussions here.
                 </p>
               </div>
-              <Badge variant="outline" class="ml-2">
-                {{ selectedFolderDetails?.items.length ?? 0 }} Items
-              </Badge>
-            </div>
-          </CardHeader>
 
-          <CardContent class="p-0">
-            <div v-if="isLoadingDetails" class="flex justify-center py-12">
-              <Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-
-            <div
-              v-else-if="!selectedFolderDetails"
-              class="py-12 text-center text-muted-foreground"
-            >
-              Select a collection to view its contents
-            </div>
-
-            <div
-              v-else-if="selectedFolderDetails.items.length === 0"
-              class="flex flex-col items-center justify-center py-16 text-muted-foreground"
-            >
-              <div class="p-4 rounded-full bg-muted mb-3">
-                <FileText class="h-8 w-8 opacity-50" />
-              </div>
-              <p>This collection is empty</p>
-              <p class="text-xs mt-1">Go exploring and save some items here!</p>
-            </div>
-
-            <div v-else class="divide-y">
-              <div
-                v-for="item in selectedFolderDetails.items"
-                :key="item.id"
-                class="group flex items-start gap-4 p-4 hover:bg-muted/30 transition-colors"
-              >
-                <!-- Icon -->
+              <div v-else class="divide-y divide-border/50">
                 <div
-                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-background text-muted-foreground"
+                  v-for="item in filteredItems"
+                  :key="item.id"
+                  class="group flex items-start gap-4 p-5 hover:bg-muted/40 transition-all duration-200"
                 >
-                  <component
-                    :is="getItemIcon(item.targetType)"
-                    class="h-5 w-5"
-                  />
-                </div>
-
-                <!-- Content -->
-                <div class="flex-1 min-w-0 space-y-1">
-                  <div class="flex items-start justify-between gap-4">
-                    <RouterLink
-                      :to="getItemUrl(item)"
-                      class="text-base font-medium hover:underline decoration-2 decoration-transparent hover:decoration-current transition-all line-clamp-1"
-                    >
-                      {{ item.title ?? `Item ${item.targetId}` }}
-                    </RouterLink>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      class="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity -mt-1 -mr-2"
-                      @click="handleRemoveItem(item.id)"
-                    >
-                      <Trash2 class="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <!-- Metadata -->
+                  <!-- Icon -->
                   <div
-                    class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground"
+                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-background group-hover:border-primary/50 group-hover:bg-primary/5 transition-all shadow-sm"
                   >
-                    <span class="capitalize">{{
-                      item.targetType.toLowerCase().replace("_", " ")
-                    }}</span>
-
-                    <template v-if="item.metadata">
-                      <span>•</span>
-                      <div
-                        v-if="getForumMetadata(item)?.communityName"
-                        class="flex items-center gap-1"
-                      >
-                        r/{{ getForumMetadata(item)?.communityName }}
-                      </div>
-                      <div
-                        v-if="getForumMetadata(item)?.authorName"
-                        class="flex items-center gap-1"
-                      >
-                        <span>•</span>
-                        <span>by {{ getForumMetadata(item)?.authorName }}</span>
-                      </div>
-                    </template>
+                    <component
+                      :is="getItemIcon(item.targetType)"
+                      class="h-6 w-6 text-muted-foreground group-hover:text-primary transition-colors"
+                    />
                   </div>
 
-                  <p
-                    v-if="item.note"
-                    class="text-sm text-muted-foreground mt-2 bg-muted/50 p-2 rounded-md italic border border-border/50"
-                  >
-                    "{{ item.note }}"
-                  </p>
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-4">
+                      <div class="space-y-1">
+                        <RouterLink
+                          :to="getItemUrl(item)"
+                          class="text-lg font-black hover:text-primary transition-colors line-clamp-1 flex items-center gap-2"
+                        >
+                          {{ item.title ?? `Item ${item.targetId}` }}
+                          <ExternalLink class="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                        </RouterLink>
+                        
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <Badge variant="secondary" class="text-[9px] font-black uppercase tracking-widest px-1.5 h-4 rounded-sm">
+                            {{ item.targetType.toLowerCase().replace("_", " ") }}
+                          </Badge>
+                          
+                          <template v-if="item.metadata">
+                            <Separator orientation="vertical" class="h-3 bg-muted-foreground/30" />
+                            <div
+                              v-if="getForumMetadata(item)?.communityName"
+                              class="text-[11px] font-bold text-muted-foreground"
+                            >
+                              r/{{ getForumMetadata(item)?.communityName }}
+                            </div>
+                            <div
+                              v-if="getForumMetadata(item)?.authorName"
+                              class="text-[11px] font-medium text-muted-foreground flex items-center gap-1"
+                            >
+                              by <span class="font-bold text-foreground/80">{{ getForumMetadata(item)?.authorName }}</span>
+                            </div>
+                          </template>
+
+                          <div class="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
+                            <Calendar class="h-3 w-3" />
+                            {{ new Date(item.createdAt).toLocaleDateString() }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                          <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreVertical class="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" class="w-48">
+                          <DropdownMenuItem as-child class="gap-2">
+                            <RouterLink :to="getItemUrl(item)">
+                              <ExternalLink class="h-4 w-4" /> Open Item
+                            </RouterLink>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            class="text-destructive focus:text-destructive gap-2"
+                            @click="handleRemoveItem(item.id)"
+                          >
+                            <Trash2 class="h-4 w-4" /> Remove from Collection
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    <div
+                      v-if="item.note"
+                      class="mt-3 relative"
+                    >
+                      <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary/20 rounded-full"></div>
+                      <p class="text-sm text-muted-foreground pl-4 italic py-1">
+                        "{{ item.note }}"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div v-if="filteredItems.length === 0 && searchQuery" class="py-20 text-center">
+                  <p class="text-muted-foreground">No items match your search.</p>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div v-else class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5">
+          <FolderOpen class="h-12 w-12 text-muted-foreground/30 mb-4" />
+          <h3 class="text-xl font-bold">No collection selected</h3>
+          <p class="text-muted-foreground mt-2">Choose a collection from the sidebar to view your bookmarks.</p>
+        </div>
       </div>
     </div>
 
@@ -399,26 +467,27 @@ onMounted(() => {
       :open="showDeleteDialog"
       @update:open="showDeleteDialog = $event"
     >
-      <AlertDialogContent>
+      <AlertDialogContent class="rounded-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Collection</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{{ deletingFolder?.name }}"? This
-            action cannot be undone and all bookmarks inside will be lost.
+            Are you sure you want to delete <span class="font-bold text-foreground">"{{ deletingFolder?.name }}"</span>? 
+            This action cannot be undone and all bookmarks inside will be lost.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel @click="showDeleteDialog = false">
+          <AlertDialogCancel @click="showDeleteDialog = false" class="rounded-full">
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
-            class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full"
             @click="confirmDelete"
           >
-            Delete
+            Delete Permanently
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   </div>
 </template>
+
