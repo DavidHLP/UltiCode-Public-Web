@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -129,10 +135,16 @@ const categoryToDelete = ref<ProblemListCategory | null>(null);
 
 // Computed
 const sortedMyLists = computed(() => {
-  let lists = [...data.value.myLists].sort((a, b) => b.problemCount - a.problemCount);
+  let lists = [...data.value.myLists].sort(
+    (a, b) => b.problemCount - a.problemCount,
+  );
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase();
-    lists = lists.filter(l => l.name.toLowerCase().includes(q) || l.description?.toLowerCase().includes(q));
+    lists = lists.filter(
+      (l) =>
+        l.name.toLowerCase().includes(q) ||
+        l.description?.toLowerCase().includes(q),
+    );
   }
   return lists;
 });
@@ -145,7 +157,7 @@ const sortedSavedLists = computed(() => {
   let lists = data.value.savedLists.filter((l) => !inCategoryIds.has(l.id));
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase();
-    lists = lists.filter(l => l.name.toLowerCase().includes(q));
+    lists = lists.filter((l) => l.name.toLowerCase().includes(q));
   }
   return lists;
 });
@@ -343,9 +355,13 @@ onMounted(loadData);
 </script>
 
 <template>
-  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+  <div
+    class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div class="space-y-1">
         <h1 class="text-3xl font-bold tracking-tight">Problem Lists</h1>
         <p class="text-muted-foreground">
@@ -361,7 +377,10 @@ onMounted(loadData);
           <FolderPlus class="h-4 w-4" />
           <span class="hidden sm:inline">New Category</span>
         </Button>
-        <Button @click="isCreateOpen = true" class="gap-2 rounded-full shadow-sm">
+        <Button
+          @click="isCreateOpen = true"
+          class="gap-2 rounded-full shadow-sm"
+        >
           <Plus class="h-4 w-4" />
           <span>New List</span>
         </Button>
@@ -371,7 +390,10 @@ onMounted(loadData);
     <Separator />
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div
+      v-if="loading"
+      class="flex flex-col items-center justify-center py-20 gap-4"
+    >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
       <p class="text-sm text-muted-foreground">Loading your collections...</p>
     </div>
@@ -381,7 +403,9 @@ onMounted(loadData);
       v-else-if="!currentUserId"
       class="flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-3xl"
     >
-      <div class="bg-muted w-16 h-16 rounded-2xl flex items-center justify-center mb-4">
+      <div
+        class="bg-muted w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+      >
         <Lock class="h-8 w-8 text-muted-foreground/50" />
       </div>
       <h3 class="text-xl font-bold">Authentication Required</h3>
@@ -395,47 +419,79 @@ onMounted(loadData);
 
     <!-- Main Content -->
     <div v-else class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <Tabs v-model="activeTab" class="w-auto">
           <TabsList class="bg-muted/50 p-1 h-11 rounded-full">
-            <TabsTrigger value="my-lists" class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="my-lists"
+              class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               My Lists
-              <Badge variant="secondary" class="ml-2 h-5 min-w-[20px] px-1 rounded-full text-[10px]">{{ data.myLists.length }}</Badge>
+              <Badge
+                variant="secondary"
+                class="ml-2 h-5 min-w-[20px] px-1 rounded-full text-[10px]"
+                >{{ data.myLists.length }}</Badge
+              >
             </TabsTrigger>
-            <TabsTrigger value="saved" class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="saved"
+              class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Saved
-              <Badge variant="secondary" class="ml-2 h-5 min-w-[20px] px-1 rounded-full text-[10px]">{{ totalSavedCount }}</Badge>
+              <Badge
+                variant="secondary"
+                class="ml-2 h-5 min-w-[20px] px-1 rounded-full text-[10px]"
+                >{{ totalSavedCount }}</Badge
+              >
             </TabsTrigger>
-            <TabsTrigger value="categories" class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="categories"
+              class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Categories
             </TabsTrigger>
-            <TabsTrigger value="featured" class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="featured"
+              class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Featured
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
         <div class="relative w-full sm:w-64">
-          <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            v-model="searchQuery" 
-            placeholder="Search lists..." 
-            class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20" 
+          <Search
+            class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
+          <Input
+            v-model="searchQuery"
+            placeholder="Search lists..."
+            class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20"
           />
         </div>
       </div>
 
       <!-- My Lists Tab -->
       <TabsContent value="my-lists" class="mt-0">
-        <div v-if="data.myLists.length === 0" class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed rounded-3xl bg-muted/5">
+        <div
+          v-if="data.myLists.length === 0"
+          class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed rounded-3xl bg-muted/5"
+        >
           <div class="p-5 rounded-3xl bg-muted/50 mb-4">
             <LayoutGrid class="h-10 w-10 text-muted-foreground/40" />
           </div>
           <h4 class="text-xl font-bold">No problem lists yet</h4>
           <p class="text-sm text-muted-foreground mt-1 max-w-[300px] mb-8">
-            Create your first problem list to organize your practice and track your progress.
+            Create your first problem list to organize your practice and track
+            your progress.
           </p>
-          <Button size="lg" @click="isCreateOpen = true" class="rounded-full gap-2 px-8">
+          <Button
+            size="lg"
+            @click="isCreateOpen = true"
+            class="rounded-full gap-2 px-8"
+          >
             <Plus class="h-4 w-4" />
             Create Your First List
           </Button>
@@ -451,21 +507,37 @@ onMounted(loadData);
               <div class="flex items-start justify-between">
                 <div class="space-y-1.5 flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <Badge v-if="list.isPublic" variant="secondary" class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                    <Badge
+                      v-if="list.isPublic"
+                      variant="secondary"
+                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                    >
                       <Globe class="h-3 w-3 mr-1" /> Public
                     </Badge>
-                    <Badge v-else variant="outline" class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-muted-foreground/20">
+                    <Badge
+                      v-else
+                      variant="outline"
+                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-muted-foreground/20"
+                    >
                       <Lock class="h-3 w-3 mr-1" /> Private
                     </Badge>
                   </div>
-                  <CardTitle class="text-xl font-black group-hover:text-primary transition-colors truncate">
-                    <RouterLink :to="`/problemset/list/${list.id}`">{{ list.name }}</RouterLink>
+                  <CardTitle
+                    class="text-xl font-black group-hover:text-primary transition-colors truncate"
+                  >
+                    <RouterLink :to="`/problemset/list/${list.id}`">{{
+                      list.name
+                    }}</RouterLink>
                   </CardTitle>
                 </div>
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger as-child>
-                    <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="h-8 w-8 rounded-full"
+                    >
                       <MoreHorizontal class="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -493,10 +565,14 @@ onMounted(loadData);
               >
                 {{ list.description }}
               </p>
-              <p v-else class="text-sm text-muted-foreground/40 italic">No description provided.</p>
+              <p v-else class="text-sm text-muted-foreground/40 italic">
+                No description provided.
+              </p>
             </CardContent>
             <CardFooter class="bg-muted/20 border-t py-3 px-6">
-              <div class="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+              <div
+                class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
+              >
                 <List class="h-4 w-4 text-primary/70" />
                 {{ list.problemCount }} PROBLEMS
               </div>
@@ -510,7 +586,11 @@ onMounted(loadData);
         <!-- Uncategorized Saved Lists -->
         <div v-if="sortedSavedLists.length > 0">
           <div class="flex items-center gap-3 mb-4">
-            <h3 class="text-lg font-black uppercase tracking-widest text-muted-foreground">Uncategorized</h3>
+            <h3
+              class="text-lg font-black uppercase tracking-widest text-muted-foreground"
+            >
+              Uncategorized
+            </h3>
             <Separator class="flex-1" />
           </div>
           <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -522,17 +602,28 @@ onMounted(loadData);
               <CardHeader class="pb-3">
                 <div class="flex items-start justify-between">
                   <div class="space-y-1.5 flex-1 min-w-0">
-                    <Badge variant="secondary" class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20">
+                    <Badge
+                      variant="secondary"
+                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20"
+                    >
                       SAVED
                     </Badge>
-                    <CardTitle class="text-xl font-black group-hover:text-primary transition-colors truncate">
-                      <RouterLink :to="`/problemset/list/${list.id}`">{{ list.name }}</RouterLink>
+                    <CardTitle
+                      class="text-xl font-black group-hover:text-primary transition-colors truncate"
+                    >
+                      <RouterLink :to="`/problemset/list/${list.id}`">{{
+                        list.name
+                      }}</RouterLink>
                     </CardTitle>
                   </div>
-                  
+
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
-                      <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        class="h-8 w-8 rounded-full"
+                      >
                         <MoreHorizontal class="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -562,12 +653,17 @@ onMounted(loadData);
                 </div>
               </CardHeader>
               <CardContent class="flex-1">
-                <p v-if="list.description" class="text-sm text-muted-foreground line-clamp-2">
+                <p
+                  v-if="list.description"
+                  class="text-sm text-muted-foreground line-clamp-2"
+                >
                   {{ list.description }}
                 </p>
               </CardContent>
               <CardFooter class="bg-muted/20 border-t py-3 px-6">
-                <div class="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                <div
+                  class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
+                >
                   <List class="h-4 w-4 text-primary/70" />
                   {{ list.problemCount }} PROBLEMS
                 </div>
@@ -584,20 +680,37 @@ onMounted(loadData);
         >
           <Collapsible :default-open="true">
             <div class="flex items-center gap-3 mb-2 group/cat">
-              <CollapsibleTrigger class="flex items-center gap-3 hover:text-primary transition-colors">
-                <ChevronRight class="h-5 w-5 transition-transform duration-300 ui-open:rotate-90 text-muted-foreground" />
-                <h3 class="text-lg font-black uppercase tracking-widest">{{ category.name }}</h3>
-                <Badge variant="secondary" class="h-5 px-1.5 rounded-full text-[10px]">{{ category.lists.length }}</Badge>
+              <CollapsibleTrigger
+                class="flex items-center gap-3 hover:text-primary transition-colors"
+              >
+                <ChevronRight
+                  class="h-5 w-5 transition-transform duration-300 ui-open:rotate-90 text-muted-foreground"
+                />
+                <h3 class="text-lg font-black uppercase tracking-widest">
+                  {{ category.name }}
+                </h3>
+                <Badge
+                  variant="secondary"
+                  class="h-5 px-1.5 rounded-full text-[10px]"
+                  >{{ category.lists.length }}</Badge
+                >
               </CollapsibleTrigger>
               <Separator class="flex-1 opacity-50" />
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
-                  <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full opacity-0 group-hover/cat:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-8 w-8 rounded-full opacity-0 group-hover/cat:opacity-100 transition-opacity"
+                  >
                     <MoreVertical class="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem @click="openEditCategoryDialog(category)" class="gap-2">
+                  <DropdownMenuItem
+                    @click="openEditCategoryDialog(category)"
+                    class="gap-2"
+                  >
                     <Pencil class="h-4 w-4" /> Rename Category
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -627,13 +740,21 @@ onMounted(loadData);
                 >
                   <CardHeader class="pb-3">
                     <div class="flex items-start justify-between">
-                      <CardTitle class="text-xl font-black group-hover:text-primary transition-colors truncate">
-                        <RouterLink :to="`/problemset/list/${list.id}`">{{ list.name }}</RouterLink>
+                      <CardTitle
+                        class="text-xl font-black group-hover:text-primary transition-colors truncate"
+                      >
+                        <RouterLink :to="`/problemset/list/${list.id}`">{{
+                          list.name
+                        }}</RouterLink>
                       </CardTitle>
-                      
+
                       <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                          <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            class="h-8 w-8 rounded-full"
+                          >
                             <MoreHorizontal class="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -656,7 +777,9 @@ onMounted(loadData);
                     </div>
                   </CardHeader>
                   <CardFooter class="bg-muted/20 border-t py-3 px-6 mt-auto">
-                    <div class="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                    <div
+                      class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
+                    >
                       <List class="h-4 w-4 text-primary/70" />
                       {{ list.problemCount }} PROBLEMS
                     </div>
@@ -672,7 +795,9 @@ onMounted(loadData);
           v-if="data.savedLists.length === 0 && data.categories.length === 0"
           class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center px-6"
         >
-          <div class="p-5 rounded-3xl bg-muted/50 mb-4 text-muted-foreground/40">
+          <div
+            class="p-5 rounded-3xl bg-muted/50 mb-4 text-muted-foreground/40"
+          >
             <Bookmark class="h-10 w-10" />
           </div>
           <h4 class="text-xl font-bold">No saved lists yet</h4>
@@ -690,32 +815,59 @@ onMounted(loadData);
             :key="category.id"
             class="border-muted/60 hover:shadow-md transition-shadow duration-300 rounded-2xl overflow-hidden"
           >
-            <div class="flex items-center justify-between px-6 py-4 bg-muted/30">
+            <div
+              class="flex items-center justify-between px-6 py-4 bg-muted/30"
+            >
               <div class="flex items-center gap-4">
-                <GripVertical class="h-5 w-5 text-muted-foreground/30 cursor-grab" />
-                <div class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <GripVertical
+                  class="h-5 w-5 text-muted-foreground/30 cursor-grab"
+                />
+                <div
+                  class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"
+                >
                   <Folder class="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h4 class="text-lg font-black tracking-tight">{{ category.name }}</h4>
-                  <p class="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                    {{ category.lists.length }} LIST{{ category.lists.length !== 1 ? 'S' : '' }}
+                  <h4 class="text-lg font-black tracking-tight">
+                    {{ category.name }}
+                  </h4>
+                  <p
+                    class="text-xs font-bold text-muted-foreground uppercase tracking-widest"
+                  >
+                    {{ category.lists.length }} LIST{{
+                      category.lists.length !== 1 ? "S" : ""
+                    }}
                   </p>
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <Button variant="ghost" size="icon" class="rounded-full" @click="openEditCategoryDialog(category)">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  class="rounded-full"
+                  @click="openEditCategoryDialog(category)"
+                >
                   <Pencil class="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" class="rounded-full text-destructive hover:text-destructive" @click="openDeleteCategoryDialog(category)">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  class="rounded-full text-destructive hover:text-destructive"
+                  @click="openDeleteCategoryDialog(category)"
+                >
                   <Trash2 class="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
             <div class="p-4 sm:p-6">
-              <div v-if="category.lists.length === 0" class="text-center py-10 bg-muted/10 rounded-xl border-2 border-dashed">
-                <p class="text-sm text-muted-foreground italic">No lists in this category.</p>
+              <div
+                v-if="category.lists.length === 0"
+                class="text-center py-10 bg-muted/10 rounded-xl border-2 border-dashed"
+              >
+                <p class="text-sm text-muted-foreground italic">
+                  No lists in this category.
+                </p>
               </div>
               <div v-else class="grid gap-3">
                 <div
@@ -723,16 +875,26 @@ onMounted(loadData);
                   :key="list.id"
                   class="flex items-center justify-between p-4 rounded-xl bg-muted/20 hover:bg-muted/40 transition-all group"
                 >
-                  <RouterLink :to="`/problemset/list/${list.id}`" class="flex items-center gap-4 flex-1 min-w-0">
+                  <RouterLink
+                    :to="`/problemset/list/${list.id}`"
+                    class="flex items-center gap-4 flex-1 min-w-0"
+                  >
                     <List class="h-4 w-4 text-primary/60" />
                     <span class="font-bold truncate">{{ list.name }}</span>
-                    <Badge variant="secondary" class="h-5 px-1.5 rounded-full text-[10px]">
+                    <Badge
+                      variant="secondary"
+                      class="h-5 px-1.5 rounded-full text-[10px]"
+                    >
                       {{ list.problemCount }} problems
                     </Badge>
                   </RouterLink>
                   <DropdownMenu>
                     <DropdownMenuTrigger as-child>
-                      <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100"
+                      >
                         <MoreHorizontal class="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -743,7 +905,9 @@ onMounted(loadData);
                         </DropdownMenuSubTrigger>
                         <DropdownMenuSubContent>
                           <DropdownMenuItem
-                            v-for="cat in data.categories.filter(c => c.id !== category.id)"
+                            v-for="cat in data.categories.filter(
+                              (c) => c.id !== category.id,
+                            )"
                             :key="cat.id"
                             @click="handleMoveToCategory(list, cat.id)"
                           >
@@ -751,11 +915,17 @@ onMounted(loadData);
                           </DropdownMenuItem>
                         </DropdownMenuSubContent>
                       </DropdownMenuSub>
-                      <DropdownMenuItem @click="handleMoveToCategory(list, null)" class="gap-2">
+                      <DropdownMenuItem
+                        @click="handleMoveToCategory(list, null)"
+                        class="gap-2"
+                      >
                         <FolderInput class="h-4 w-4" /> Remove from Category
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem @click="handleUnsaveList(list)" class="text-muted-foreground gap-2">
+                      <DropdownMenuItem
+                        @click="handleUnsaveList(list)"
+                        class="text-muted-foreground gap-2"
+                      >
                         <BookmarkMinus class="h-4 w-4" /> Unsave List
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -769,10 +939,15 @@ onMounted(loadData);
 
       <!-- Featured Tab -->
       <TabsContent value="featured" class="mt-0">
-        <div v-if="data.featured.length === 0" class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center">
+        <div
+          v-if="data.featured.length === 0"
+          class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center"
+        >
           <Star class="h-12 w-12 text-muted-foreground/20 mb-4" />
           <h4 class="text-xl font-bold">No featured lists</h4>
-          <p class="text-muted-foreground mt-2">Check back later for curated problem lists.</p>
+          <p class="text-muted-foreground mt-2">
+            Check back later for curated problem lists.
+          </p>
         </div>
 
         <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -785,21 +960,33 @@ onMounted(loadData);
               <div class="flex items-start justify-between">
                 <div class="space-y-1.5 flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <Badge variant="secondary" class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 border-amber-500/20">
+                    <Badge
+                      variant="secondary"
+                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 border-amber-500/20"
+                    >
                       FEATURED
                     </Badge>
-                    <Badge v-if="list.isSaved" variant="secondary" class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20">
+                    <Badge
+                      v-if="list.isSaved"
+                      variant="secondary"
+                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20"
+                    >
                       SAVED
                     </Badge>
                   </div>
-                  <CardTitle class="text-xl font-black group-hover:text-primary transition-colors truncate">
-                    <RouterLink :to="`/problemset/list/${list.id}`" class="flex items-center gap-2">
+                  <CardTitle
+                    class="text-xl font-black group-hover:text-primary transition-colors truncate"
+                  >
+                    <RouterLink
+                      :to="`/problemset/list/${list.id}`"
+                      class="flex items-center gap-2"
+                    >
                       {{ list.name }}
                       <Star class="h-4 w-4 text-amber-500 fill-amber-500" />
                     </RouterLink>
                   </CardTitle>
                 </div>
-                
+
                 <Button
                   v-if="!list.isSaved"
                   variant="outline"
@@ -821,12 +1008,17 @@ onMounted(loadData);
               </div>
             </CardHeader>
             <CardContent class="flex-1">
-              <p v-if="list.description" class="text-sm text-muted-foreground line-clamp-2">
+              <p
+                v-if="list.description"
+                class="text-sm text-muted-foreground line-clamp-2"
+              >
                 {{ list.description }}
               </p>
             </CardContent>
             <CardFooter class="bg-muted/20 border-t py-3 px-6 mt-auto">
-              <div class="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+              <div
+                class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
+              >
                 <List class="h-4 w-4 text-primary/70" />
                 {{ list.problemCount }} PROBLEMS
               </div>
@@ -840,14 +1032,20 @@ onMounted(loadData);
     <Dialog v-model:open="isCreateOpen">
       <DialogContent class="sm:max-w-[425px] rounded-2xl">
         <DialogHeader>
-          <DialogTitle class="text-2xl font-black tracking-tight">Create New List</DialogTitle>
+          <DialogTitle class="text-2xl font-black tracking-tight"
+            >Create New List</DialogTitle
+          >
           <DialogDescription>
             Organize your practice with a custom problem collection.
           </DialogDescription>
         </DialogHeader>
         <div class="space-y-6 py-4">
           <div class="space-y-2">
-            <Label for="create-name" class="text-xs font-bold uppercase tracking-widest text-muted-foreground">List Name</Label>
+            <Label
+              for="create-name"
+              class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
+              >List Name</Label
+            >
             <Input
               id="create-name"
               v-model="createForm.name"
@@ -856,7 +1054,11 @@ onMounted(loadData);
             />
           </div>
           <div class="space-y-2">
-            <Label for="create-description" class="text-xs font-bold uppercase tracking-widest text-muted-foreground">Description</Label>
+            <Label
+              for="create-description"
+              class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
+              >Description</Label
+            >
             <Textarea
               id="create-description"
               v-model="createForm.description"
@@ -864,19 +1066,27 @@ onMounted(loadData);
               class="min-h-[100px] resize-none rounded-lg"
             />
           </div>
-          <div class="flex items-center justify-between p-4 rounded-xl bg-muted/30 border">
+          <div
+            class="flex items-center justify-between p-4 rounded-xl bg-muted/30 border"
+          >
             <div class="space-y-0.5">
-              <Label for="create-public" class="text-sm font-bold">Public List</Label>
-              <p class="text-xs text-muted-foreground">Visible to the community</p>
+              <Label for="create-public" class="text-sm font-bold"
+                >Public List</Label
+              >
+              <p class="text-xs text-muted-foreground">
+                Visible to the community
+              </p>
             </div>
-            <Switch
-              id="create-public"
-              v-model:checked="createForm.isPublic"
-            />
+            <Switch id="create-public" v-model:checked="createForm.isPublic" />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" @click="isCreateOpen = false" class="rounded-full">Cancel</Button>
+          <Button
+            variant="outline"
+            @click="isCreateOpen = false"
+            class="rounded-full"
+            >Cancel</Button
+          >
           <Button
             @click="handleCreateList"
             :disabled="isCreating || !createForm.name.trim()"
@@ -890,18 +1100,23 @@ onMounted(loadData);
 
     <!-- AlertDialogs (Delete List, Create Category, etc.) - Styling updates -->
     <!-- (I'll keep the logic but the template is already significantly improved above) -->
-    
+
     <!-- Delete List Confirmation -->
     <AlertDialog v-model:open="isDeleteListOpen">
       <AlertDialogContent class="rounded-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Problem List</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <span class="font-bold text-foreground">"{{ listToDelete?.name }}"</span>? This action is permanent.
+            Are you sure you want to delete
+            <span class="font-bold text-foreground"
+              >"{{ listToDelete?.name }}"</span
+            >? This action is permanent.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel :disabled="isDeletingList" class="rounded-full">Cancel</AlertDialogCancel>
+          <AlertDialogCancel :disabled="isDeletingList" class="rounded-full"
+            >Cancel</AlertDialogCancel
+          >
           <AlertDialogAction
             class="bg-destructive text-white hover:bg-destructive/90 rounded-full"
             @click="handleDeleteList"
@@ -917,14 +1132,20 @@ onMounted(loadData);
     <Dialog v-model:open="isCreateCategoryOpen">
       <DialogContent class="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle class="text-2xl font-black tracking-tight">New Category</DialogTitle>
+          <DialogTitle class="text-2xl font-black tracking-tight"
+            >New Category</DialogTitle
+          >
           <DialogDescription>
             Group your saved lists to keep them organized.
           </DialogDescription>
         </DialogHeader>
         <div class="space-y-4 py-4">
           <div class="space-y-2">
-            <Label for="category-name" class="text-xs font-bold uppercase tracking-widest text-muted-foreground">Category Name</Label>
+            <Label
+              for="category-name"
+              class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
+              >Category Name</Label
+            >
             <Input
               id="category-name"
               v-model="createCategoryForm.name"
@@ -958,11 +1179,17 @@ onMounted(loadData);
     <Dialog v-model:open="isEditCategoryOpen">
       <DialogContent class="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle class="text-2xl font-black tracking-tight">Rename Category</DialogTitle>
+          <DialogTitle class="text-2xl font-black tracking-tight"
+            >Rename Category</DialogTitle
+          >
         </DialogHeader>
         <div class="space-y-4 py-4">
           <div class="space-y-2">
-            <Label for="edit-category-name" class="text-xs font-bold uppercase tracking-widest text-muted-foreground">New Name</Label>
+            <Label
+              for="edit-category-name"
+              class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
+              >New Name</Label
+            >
             <Input
               id="edit-category-name"
               v-model="editCategoryForm.name"
@@ -997,12 +1224,16 @@ onMounted(loadData);
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Category</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <span class="font-bold text-foreground">"{{ categoryToDelete?.name }}"</span>? 
-            Your saved lists will be moved to the "Uncategorized" section.
+            Are you sure you want to delete
+            <span class="font-bold text-foreground"
+              >"{{ categoryToDelete?.name }}"</span
+            >? Your saved lists will be moved to the "Uncategorized" section.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel :disabled="isDeletingCategory" class="rounded-full">Cancel</AlertDialogCancel>
+          <AlertDialogCancel :disabled="isDeletingCategory" class="rounded-full"
+            >Cancel</AlertDialogCancel
+          >
           <AlertDialogAction
             class="bg-destructive text-white hover:bg-destructive/90 rounded-full"
             @click="handleDeleteCategory"

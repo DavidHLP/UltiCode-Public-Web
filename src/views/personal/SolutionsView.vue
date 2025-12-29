@@ -89,8 +89,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div
+    class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div class="space-y-1">
         <h2 class="text-3xl font-bold tracking-tight">My Solutions</h2>
         <p class="text-muted-foreground">
@@ -107,13 +111,21 @@ onMounted(async () => {
 
     <Separator />
 
-    <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div
+      v-if="loading"
+      class="flex flex-col items-center justify-center py-20 gap-4"
+    >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
       <p class="text-sm text-muted-foreground">Loading your solutions...</p>
     </div>
-    
-    <div v-else-if="!hasUser" class="text-center py-20 border-2 border-dashed rounded-3xl">
-      <p class="text-muted-foreground mb-4">Please log in to view your solutions.</p>
+
+    <div
+      v-else-if="!hasUser"
+      class="text-center py-20 border-2 border-dashed rounded-3xl"
+    >
+      <p class="text-muted-foreground mb-4">
+        Please log in to view your solutions.
+      </p>
       <Button as-child>
         <RouterLink to="/login">Sign In</RouterLink>
       </Button>
@@ -123,32 +135,58 @@ onMounted(async () => {
       v-else-if="solutions.length > 0"
       class="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
     >
-      <Card v-for="sol in solutions" :key="sol.id" class="flex flex-col group hover:shadow-lg transition-all duration-300 border-muted/60">
+      <Card
+        v-for="sol in solutions"
+        :key="sol.id"
+        class="flex flex-col group hover:shadow-lg transition-all duration-300 border-muted/60"
+      >
         <CardHeader class="pb-3">
           <div class="flex items-center justify-between mb-3">
-            <Badge variant="outline" class="font-mono text-[10px] bg-primary/5 text-primary border-primary/20">
+            <Badge
+              variant="outline"
+              class="font-mono text-[10px] bg-primary/5 text-primary border-primary/20"
+            >
               {{ sol.language }}
             </Badge>
-            <div class="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+            <div
+              class="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+            >
               <Calendar class="h-3 w-3" />
-              {{ new Date(sol.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) }}
+              {{
+                new Date(sol.created_at).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              }}
             </div>
           </div>
-          
+
           <div class="flex items-start justify-between gap-2">
             <div class="space-y-1 flex-1 min-w-0">
-              <CardTitle class="line-clamp-2 text-lg font-black group-hover:text-primary transition-colors cursor-pointer" @click="handleView(sol)">
+              <CardTitle
+                class="line-clamp-2 text-lg font-black group-hover:text-primary transition-colors cursor-pointer"
+                @click="handleView(sol)"
+              >
                 {{ sol.title }}
               </CardTitle>
-              <div class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <div
+                class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+              >
                 <Code2 class="h-3.5 w-3.5" />
-                <span class="truncate">Problem: {{ sol.problem?.title || "Unknown" }}</span>
+                <span class="truncate"
+                  >Problem: {{ sol.problem?.title || "Unknown" }}</span
+                >
               </div>
             </div>
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
-                <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  class="h-8 w-8 rounded-full"
+                >
                   <MoreVertical class="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -180,24 +218,42 @@ onMounted(async () => {
             >
               {{ tag }}
             </Badge>
-            <span v-if="!sol.tags || sol.tags.length === 0" class="text-xs text-muted-foreground italic">No tags</span>
+            <span
+              v-if="!sol.tags || sol.tags.length === 0"
+              class="text-xs text-muted-foreground italic"
+              >No tags</span
+            >
           </div>
         </CardContent>
 
         <CardFooter class="border-t bg-muted/10 px-4 py-3">
           <div class="flex w-full items-center justify-between">
             <div class="flex items-center gap-4">
-              <div class="flex items-center gap-1.5 text-muted-foreground group/stat">
-                <ThumbsUp class="h-3.5 w-3.5 group-hover/stat:text-primary transition-colors" />
+              <div
+                class="flex items-center gap-1.5 text-muted-foreground group/stat"
+              >
+                <ThumbsUp
+                  class="h-3.5 w-3.5 group-hover/stat:text-primary transition-colors"
+                />
                 <span class="text-xs font-bold">{{ sol.votes }}</span>
               </div>
-              <div class="flex items-center gap-1.5 text-muted-foreground group/stat">
-                <Eye class="h-3.5 w-3.5 group-hover/stat:text-primary transition-colors" />
+              <div
+                class="flex items-center gap-1.5 text-muted-foreground group/stat"
+              >
+                <Eye
+                  class="h-3.5 w-3.5 group-hover/stat:text-primary transition-colors"
+                />
                 <span class="text-xs font-bold">{{ sol.views }}</span>
               </div>
-              <div class="flex items-center gap-1.5 text-muted-foreground group/stat">
-                <MessageSquare class="h-3.5 w-3.5 group-hover/stat:text-primary transition-colors" />
-                <span class="text-xs font-bold">{{ sol.stats?.comments || 0 }}</span>
+              <div
+                class="flex items-center gap-1.5 text-muted-foreground group/stat"
+              >
+                <MessageSquare
+                  class="h-3.5 w-3.5 group-hover/stat:text-primary transition-colors"
+                />
+                <span class="text-xs font-bold">{{
+                  sol.stats?.comments || 0
+                }}</span>
               </div>
             </div>
             <Button
@@ -213,7 +269,7 @@ onMounted(async () => {
         </CardFooter>
       </Card>
     </div>
-    
+
     <div
       v-else
       class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center"
@@ -225,7 +281,8 @@ onMounted(async () => {
       </div>
       <h3 class="text-xl font-bold">No solutions shared yet</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        Sharing your thought process helps you and others learn better. Post your first solution!
+        Sharing your thought process helps you and others learn better. Post
+        your first solution!
       </p>
       <Button as-child class="rounded-full px-8 h-12 text-base font-bold">
         <RouterLink to="/problemset">Start Coding</RouterLink>
@@ -233,4 +290,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-

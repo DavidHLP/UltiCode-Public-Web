@@ -22,14 +22,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  MessageSquare, 
-  Eye, 
-  MoreVertical, 
-  Pencil, 
-  Trash2, 
-  Pin, 
-  Lock, 
+import {
+  MessageSquare,
+  Eye,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  Pin,
+  Lock,
   Plus,
   Loader2,
   Calendar,
@@ -68,8 +68,12 @@ onMounted(loadPosts);
 </script>
 
 <template>
-  <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div
+    class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div class="space-y-1">
         <h2 class="text-3xl font-bold tracking-tight">My Forum Posts</h2>
         <p class="text-muted-foreground">
@@ -86,18 +90,27 @@ onMounted(loadPosts);
 
     <Separator />
 
-    <div v-if="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div
+      v-if="isLoading"
+      class="flex flex-col items-center justify-center py-20 gap-4"
+    >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
       <p class="text-sm text-muted-foreground">Loading your posts...</p>
     </div>
 
-    <div v-else-if="posts.length === 0" class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center">
-      <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6">
+    <div
+      v-else-if="posts.length === 0"
+      class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center"
+    >
+      <div
+        class="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6"
+      >
         <MessageSquare class="h-10 w-10 text-muted-foreground/50" />
       </div>
       <h3 class="text-xl font-bold">No posts yet</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        You haven't started any discussions. Share your knowledge or ask a question!
+        You haven't started any discussions. Share your knowledge or ask a
+        question!
       </p>
       <Button as-child class="rounded-full px-8 h-12 text-base font-bold">
         <RouterLink to="/forum/create">Create Your First Post</RouterLink>
@@ -105,35 +118,66 @@ onMounted(loadPosts);
     </div>
 
     <div v-else class="grid gap-6">
-      <Card v-for="post in posts" :key="post.id" class="group hover:shadow-md transition-all duration-300 border-muted/60 overflow-hidden">
+      <Card
+        v-for="post in posts"
+        :key="post.id"
+        class="group hover:shadow-md transition-all duration-300 border-muted/60 overflow-hidden"
+      >
         <div class="flex flex-col sm:flex-row">
           <div class="flex-1 p-6">
             <div class="flex items-center gap-2 mb-3">
-              <Badge variant="secondary" class="bg-primary/5 text-primary border-primary/10 font-bold hover:bg-primary/10 transition-colors">
+              <Badge
+                variant="secondary"
+                class="bg-primary/5 text-primary border-primary/10 font-bold hover:bg-primary/10 transition-colors"
+              >
                 {{ post.community?.name ?? "General" }}
               </Badge>
-              <div class="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              <div
+                class="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+              >
                 <Calendar class="h-3 w-3" />
-                {{ new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) }}
+                {{
+                  new Date(post.createdAt).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                }}
               </div>
             </div>
-            
+
             <div class="flex items-start justify-between gap-4">
               <div class="space-y-2 flex-1">
-                <CardTitle class="text-xl font-black group-hover:text-primary transition-colors">
-                  <RouterLink :to="{ name: 'forum-thread', params: { postId: post.id } }">
+                <CardTitle
+                  class="text-xl font-black group-hover:text-primary transition-colors"
+                >
+                  <RouterLink
+                    :to="{ name: 'forum-thread', params: { postId: post.id } }"
+                  >
                     {{ post.title }}
                   </RouterLink>
                 </CardTitle>
-                
+
                 <div class="flex flex-wrap items-center gap-2">
-                  <Badge v-if="post.isPinned" variant="secondary" class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 gap-1 rounded-sm h-5 text-[10px] font-bold">
+                  <Badge
+                    v-if="post.isPinned"
+                    variant="secondary"
+                    class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 gap-1 rounded-sm h-5 text-[10px] font-bold"
+                  >
                     <Pin class="h-3 w-3" /> PINNED
                   </Badge>
-                  <Badge v-if="post.isLocked" variant="outline" class="gap-1 rounded-sm h-5 text-[10px] font-bold border-muted-foreground/30 text-muted-foreground">
+                  <Badge
+                    v-if="post.isLocked"
+                    variant="outline"
+                    class="gap-1 rounded-sm h-5 text-[10px] font-bold border-muted-foreground/30 text-muted-foreground"
+                  >
                     <Lock class="h-3 w-3" /> LOCKED
                   </Badge>
-                  <Badge v-if="post.flair" variant="secondary" class="rounded-sm h-5 text-[10px] font-bold uppercase">
+                  <Badge
+                    v-if="post.flair"
+                    variant="secondary"
+                    class="rounded-sm h-5 text-[10px] font-bold uppercase"
+                  >
                     {{ post.flair.text }}
                   </Badge>
                 </div>
@@ -141,25 +185,39 @@ onMounted(loadPosts);
 
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
-                  <Button variant="ghost" size="icon" class="h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-8 w-8 rounded-full"
+                  >
                     <MoreVertical class="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-40">
                   <DropdownMenuItem as-child class="gap-2">
-                    <RouterLink :to="{ name: 'forum-thread', params: { postId: post.id } }">
+                    <RouterLink
+                      :to="{
+                        name: 'forum-thread',
+                        params: { postId: post.id },
+                      }"
+                    >
                       <Eye class="h-4 w-4" /> View Post
                     </RouterLink>
                   </DropdownMenuItem>
                   <DropdownMenuItem as-child class="gap-2">
-                    <RouterLink :to="{ name: 'forum-edit', params: { postId: post.id } }">
+                    <RouterLink
+                      :to="{ name: 'forum-edit', params: { postId: post.id } }"
+                    >
                       <Pencil class="h-4 w-4" /> Edit
                     </RouterLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <AlertDialog>
                     <AlertDialogTrigger as-child>
-                      <DropdownMenuItem @select.prevent class="text-destructive focus:text-destructive gap-2">
+                      <DropdownMenuItem
+                        @select.prevent
+                        class="text-destructive focus:text-destructive gap-2"
+                      >
                         <Trash2 class="h-4 w-4" /> Delete
                       </DropdownMenuItem>
                     </AlertDialogTrigger>
@@ -167,12 +225,16 @@ onMounted(loadPosts);
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete this post?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This post and all of its comments will be permanently removed.
+                          This action cannot be undone. This post and all of its
+                          comments will be permanently removed.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction @click="handleDelete(post.id)" class="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        <AlertDialogAction
+                          @click="handleDelete(post.id)"
+                          class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
                           Delete Permanently
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -182,17 +244,33 @@ onMounted(loadPosts);
               </DropdownMenu>
             </div>
           </div>
-          
-          <div class="sm:w-48 bg-muted/30 border-l border-t sm:border-t-0 p-6 flex sm:flex-col justify-around items-center gap-4">
+
+          <div
+            class="sm:w-48 bg-muted/30 border-l border-t sm:border-t-0 p-6 flex sm:flex-col justify-around items-center gap-4"
+          >
             <div class="flex flex-col items-center gap-1 group/stat">
-              <MessageSquare class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
-              <span class="text-lg font-black leading-none">{{ post.stats?.comments ?? 0 }}</span>
-              <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Comments</span>
+              <MessageSquare
+                class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors"
+              />
+              <span class="text-lg font-black leading-none">{{
+                post.stats?.comments ?? 0
+              }}</span>
+              <span
+                class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+                >Comments</span
+              >
             </div>
             <div class="flex flex-col items-center gap-1 group/stat">
-              <Eye class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
-              <span class="text-lg font-black leading-none">{{ post.stats?.views ?? 0 }}</span>
-              <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Views</span>
+              <Eye
+                class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors"
+              />
+              <span class="text-lg font-black leading-none">{{
+                post.stats?.views ?? 0
+              }}</span>
+              <span
+                class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+                >Views</span
+              >
             </div>
           </div>
         </div>
@@ -200,4 +278,3 @@ onMounted(loadPosts);
     </div>
   </div>
 </template>
-

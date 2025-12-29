@@ -18,14 +18,14 @@ import {
 import { onMounted, ref } from "vue";
 import { fetchUserSubmissions } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
-import { 
-  ListX, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
+import {
+  ListX,
+  CheckCircle2,
+  XCircle,
+  Clock,
   ChevronRight,
   ExternalLink,
-  Loader2
+  Loader2,
 } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 import { Button } from "@/components/ui/button";
@@ -79,8 +79,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <div
+    class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div class="space-y-0.5">
         <h2 class="text-3xl font-bold tracking-tight">My Submissions</h2>
         <p class="text-muted-foreground">
@@ -95,19 +99,32 @@ onMounted(async () => {
       </Button>
     </div>
 
-    <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div
+      v-if="loading"
+      class="flex flex-col items-center justify-center py-20 gap-4"
+    >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
-      <p class="text-sm text-muted-foreground">Retrieving submission history...</p>
+      <p class="text-sm text-muted-foreground">
+        Retrieving submission history...
+      </p>
     </div>
-    
-    <div v-else-if="!hasUser" class="flex flex-col items-center justify-center py-20 border rounded-2xl border-dashed">
-      <p class="text-muted-foreground mb-4">Please log in to view your submissions.</p>
+
+    <div
+      v-else-if="!hasUser"
+      class="flex flex-col items-center justify-center py-20 border rounded-2xl border-dashed"
+    >
+      <p class="text-muted-foreground mb-4">
+        Please log in to view your submissions.
+      </p>
       <Button as-child>
         <RouterLink to="/login">Sign In</RouterLink>
       </Button>
     </div>
 
-    <Card v-else-if="submissions.length > 0" class="border-none shadow-sm overflow-hidden">
+    <Card
+      v-else-if="submissions.length > 0"
+      class="border-none shadow-sm overflow-hidden"
+    >
       <CardHeader class="pb-2 border-b bg-muted/20">
         <div class="flex items-center justify-between">
           <div>
@@ -136,20 +153,22 @@ onMounted(async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow 
-                v-for="submission in submissions" 
+              <TableRow
+                v-for="submission in submissions"
                 :key="submission.id"
                 class="group cursor-default hover:bg-muted/30 transition-colors"
               >
                 <TableCell>
                   <div class="flex flex-col">
-                    <RouterLink 
-                      :to="`/problems/${submission.problem?.slug || ''}`" 
+                    <RouterLink
+                      :to="`/problems/${submission.problem?.slug || ''}`"
                       class="font-bold text-foreground hover:text-primary transition-colors"
                     >
                       {{ submission.problem?.title || "Unknown Problem" }}
                     </RouterLink>
-                    <span class="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
+                    <span
+                      class="text-[10px] text-muted-foreground uppercase tracking-wider font-medium"
+                    >
                       ID: {{ submission.id.substring(0, 8) }}
                     </span>
                   </div>
@@ -160,34 +179,60 @@ onMounted(async () => {
                     class="gap-1.5 py-1 px-2 font-bold rounded-md border"
                     :class="getStatusColorClass(submission.status)"
                   >
-                    <component :is="getStatusIcon(submission.status)" class="h-3.5 w-3.5" />
+                    <component
+                      :is="getStatusIcon(submission.status)"
+                      class="h-3.5 w-3.5"
+                    />
                     {{ submission.status }}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary" class="font-mono text-[10px] py-0 h-5">
+                  <Badge
+                    variant="secondary"
+                    class="font-mono text-[10px] py-0 h-5"
+                  >
                     {{ submission.language }}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <div class="flex items-center gap-1.5 text-sm font-medium">
-                    {{ submission.runtime }}<span class="text-[10px] text-muted-foreground uppercase">ms</span>
+                    {{ submission.runtime
+                    }}<span class="text-[10px] text-muted-foreground uppercase"
+                      >ms</span
+                    >
                   </div>
                 </TableCell>
                 <TableCell>
                   <div class="flex items-center gap-1.5 text-sm font-medium">
-                    {{ submission.memory }}<span class="text-[10px] text-muted-foreground uppercase">mb</span>
+                    {{ submission.memory
+                    }}<span class="text-[10px] text-muted-foreground uppercase"
+                      >mb</span
+                    >
                   </div>
                 </TableCell>
                 <TableCell class="text-right">
                   <div class="flex flex-col items-end">
-                    <span class="text-sm font-medium">{{ new Date(submission.created_at).toLocaleDateString() }}</span>
-                    <span class="text-[10px] text-muted-foreground">{{ new Date(submission.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
+                    <span class="text-sm font-medium">{{
+                      new Date(submission.created_at).toLocaleDateString()
+                    }}</span>
+                    <span class="text-[10px] text-muted-foreground">{{
+                      new Date(submission.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    }}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" as-child>
-                    <RouterLink :to="`/problems/${submission.problem?.slug || ''}`">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    as-child
+                  >
+                    <RouterLink
+                      :to="`/problems/${submission.problem?.slug || ''}`"
+                    >
                       <ChevronRight class="h-4 w-4" />
                     </RouterLink>
                   </Button>
@@ -210,7 +255,8 @@ onMounted(async () => {
       </div>
       <h3 class="text-xl font-bold">No submissions found</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        You haven't submitted any code yet. Ready to take on your first challenge?
+        You haven't submitted any code yet. Ready to take on your first
+        challenge?
       </p>
       <Button class="rounded-full px-8 h-12 text-base font-bold" as-child>
         <RouterLink to="/problemset">Start Solving Problems</RouterLink>
@@ -218,4 +264,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
