@@ -20,6 +20,7 @@ import {
 } from "@/api/forum";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Search, Plus } from "lucide-vue-next";
 import {
   Select,
   SelectContent,
@@ -208,20 +209,27 @@ function handlePostSave(postId: string, isSaved: boolean) {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-5xl items-start gap-6 px-4 py-8">
+  <div
+    class="mx-auto flex w-full max-w-7xl items-start gap-6 px-4 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+  >
     <!-- Main Feed -->
-    <main class="w-full min-w-0 flex-1 space-y-4">
+    <main class="w-full min-w-0 flex-1 space-y-6">
       <div
-        class="flex flex-col gap-3 rounded-xl border border-border/40 bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col gap-3 rounded-2xl border border-border/40 bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between shadow-sm"
       >
         <div class="flex flex-1 items-center gap-3">
-          <Input
-            v-model="searchQuery"
-            placeholder="Search posts, tags, or keywords..."
-            class="h-9"
-          />
+          <div class="relative flex-1 max-w-md">
+            <Search
+              class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+            />
+            <Input
+              v-model="searchQuery"
+              placeholder="Search posts, tags, or keywords..."
+              class="h-10 pl-10 rounded-full bg-background/50"
+            />
+          </div>
           <Select v-model="quickFilter">
-            <SelectTrigger class="h-9 w-40">
+            <SelectTrigger class="h-10 w-40 rounded-full bg-background/50">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
@@ -235,7 +243,10 @@ function handlePostSave(postId: string, isSaved: boolean) {
             </SelectContent>
           </Select>
         </div>
-        <Button class="h-9" @click="handleCreatePost">New Post</Button>
+        <Button class="h-10 rounded-full px-6 gap-2" @click="handleCreatePost">
+          <Plus class="h-4 w-4" />
+          New Post
+        </Button>
       </div>
       <div v-if="isLoading" class="space-y-4">
         <ForumPostSkeleton v-for="i in 3" :key="i" />
@@ -253,6 +264,7 @@ function handlePostSave(postId: string, isSaved: boolean) {
 
     <!-- Right Sidebar -->
     <ForumSidebar
+      class="sticky top-24"
       :community="currentCommunity"
       :rules="communityRules"
       :links="communityLinks"

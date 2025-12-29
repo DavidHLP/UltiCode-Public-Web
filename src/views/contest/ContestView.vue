@@ -4,6 +4,7 @@ import { Trophy } from "lucide-vue-next";
 import { useRouter, useRoute } from "vue-router";
 import { useContestStore } from "@/stores/contest";
 import { storeToRefs } from "pinia";
+import { Separator } from "@/components/ui/separator";
 import UpcomingContests from "./components/UpcomingContests.vue";
 import GlobalRanking from "./components/GlobalRanking.vue";
 import PastContests from "./components/PastContests.vue";
@@ -63,37 +64,51 @@ watch(currentPage, async (newPage) => {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-[1200px] space-y-8 py-8">
-    <div class="space-y-4 text-center">
-      <div class="flex items-center justify-center gap-3">
-        <Trophy class="h-16 w-16 text-yellow-500" />
-        <h1
-          class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-orange-500"
-        >
-          UltiCode Contest
-        </h1>
+  <div
+    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-3">
+          <Trophy class="h-8 w-8 text-yellow-500" />
+          <h1
+            class="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-orange-600"
+          >
+            UltiCode Contests
+          </h1>
+        </div>
+        <p class="text-muted-foreground">
+          Join weekly challenges, solve problems in real-time, and improve your
+          global ranking.
+        </p>
       </div>
-      <p class="text-lg text-muted-foreground">
-        Join weekly contests and improve your global ranking
-      </p>
     </div>
 
-    <div v-if="loading" class="py-20 text-center">
-      <p class="text-muted-foreground">Loading...</p>
+    <Separator />
+
+    <div v-if="loading" class="flex flex-col items-center justify-center py-20">
+      <div
+        class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+      ></div>
+      <p class="mt-4 text-sm text-muted-foreground">Loading contest data...</p>
     </div>
 
     <div v-else class="space-y-8">
       <!-- Home View -->
       <template v-if="!tab">
         <UpcomingContests :contests="upcomingContests" />
-        <div class="grid gap-8 lg:grid-cols-3">
-          <GlobalRanking :rankings="globalRankings" />
-          <PastContests
-            :contests="pastContests"
-            :loading="loadingContests"
-            v-model:currentPage="currentPage"
-            :totalPages="totalPages"
-          />
+        <div class="grid gap-8 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <GlobalRanking :rankings="globalRankings" />
+          </div>
+          <div class="lg:col-span-8">
+            <PastContests
+              :contests="pastContests"
+              :loading="loadingContests"
+              v-model:currentPage="currentPage"
+              :totalPages="totalPages"
+            />
+          </div>
         </div>
       </template>
 
@@ -104,13 +119,12 @@ watch(currentPage, async (newPage) => {
           :loading="loadingContests"
           v-model:currentPage="currentPage"
           :totalPages="totalPages"
-          class="lg:col-span-3"
         />
       </template>
 
       <!-- Rankings View -->
       <template v-else-if="tab === 'ranking'">
-        <GlobalRanking :rankings="globalRankings" class="lg:col-span-3" />
+        <GlobalRanking :rankings="globalRankings" />
       </template>
 
       <!-- My Contests View -->

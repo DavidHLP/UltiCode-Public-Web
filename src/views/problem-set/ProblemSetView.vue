@@ -13,7 +13,9 @@ const category = computed(() => {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-[1240px] px-4 sm:px-6 py-6 space-y-8">
+  <div
+    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
     <!-- Top Banners -->
     <section>
       <FeaturedBanners />
@@ -27,7 +29,7 @@ const category = computed(() => {
       </main>
 
       <!-- Right Column: Sidebar (3 cols) -->
-      <aside class="hidden lg:block lg:col-span-3 space-y-6 sticky top-6">
+      <aside class="hidden lg:block lg:col-span-3 space-y-6 sticky top-24">
         <ProblemSetSidebar />
       </aside>
     </div>

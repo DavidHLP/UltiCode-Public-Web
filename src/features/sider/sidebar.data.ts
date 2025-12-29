@@ -17,6 +17,7 @@ import {
   Settings,
   List,
   Bookmark,
+  CheckCircle2,
 } from "lucide-vue-next";
 
 export interface SidebarItem {
@@ -121,11 +122,11 @@ export const personalSidebarData: SidebarSection[] = [
       {
         title: "Submissions",
         url: "/personal/submissions",
-        icon: FileText,
+        icon: History,
       },
-      { title: "Solutions", url: "/personal/solutions", icon: FileText },
+      { title: "Solutions", url: "/personal/solutions", icon: CheckCircle2 },
       { title: "Problem Lists", url: "/personal/problem-lists", icon: List },
-      { title: "Forum Posts", url: "/personal/forum-posts", icon: FileText },
+      { title: "Forum Posts", url: "/personal/forum-posts", icon: MessageSquare },
       { title: "Bookmarks", url: "/personal/bookmarks", icon: Bookmark },
     ],
   },

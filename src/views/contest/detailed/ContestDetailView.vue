@@ -146,431 +146,427 @@ function getCountryFlag(countryCode: string): string {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background mx-auto max-w-[60%]">
-    <div v-if="loading" class="flex h-screen items-center justify-center">
-      <p class="text-lg text-muted-foreground">Loading...</p>
+  <div
+    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
+  >
+    <div v-if="loading" class="flex h-[60vh] items-center justify-center">
+      <div
+        class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+      ></div>
+      <p class="ml-4 text-sm text-muted-foreground">Loading contest...</p>
     </div>
 
-    <div v-else-if="contest" class="">
+    <div v-else-if="contest" class="space-y-8">
       <!-- Contest Header -->
-      <div class="border-b bg-card">
-        <div class="container mx-auto px-4 py-6">
-          <!-- Back Button -->
-          <Button
-            variant="ghost"
-            size="sm"
-            class="mb-4 gap-2"
-            @click="$router.push({ name: 'contest-home' })"
-          >
-            <ArrowLeft class="h-4 w-4" />
-            Back to Contest List
-          </Button>
+      <div class="space-y-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          class="gap-2 rounded-full"
+          @click="$router.push({ name: 'contest-home' })"
+        >
+          <ArrowLeft class="h-4 w-4" />
+          Back to Contest List
+        </Button>
 
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1 space-y-3">
-              <div class="flex items-center gap-3">
-                <h1 class="text-3xl font-bold tracking-tight">
-                  {{ contest.title }}
-                </h1>
-                <Badge
-                  :variant="
-                    contest.status === 'running'
-                      ? 'destructive'
-                      : contest.status === 'upcoming'
-                        ? 'default'
-                        : 'secondary'
-                  "
-                  class="text-xs"
-                >
-                  {{
-                    contest.status === "upcoming"
-                      ? "Upcoming"
-                      : contest.status === "running"
-                        ? "Live"
-                        : "Ended"
-                  }}
-                </Badge>
-              </div>
-              <p
-                v-if="contest.description"
-                class="text-base text-muted-foreground"
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2 flex-1">
+            <div class="flex items-center gap-3">
+              <h1 class="text-4xl font-black tracking-tight">
+                {{ contest.title }}
+              </h1>
+              <Badge
+                :variant="
+                  contest.status === 'running'
+                    ? 'destructive'
+                    : contest.status === 'upcoming'
+                      ? 'default'
+                      : 'secondary'
+                "
+                class="rounded-full px-3 h-6 font-bold uppercase text-[10px] tracking-widest"
               >
-                {{ contest.description }}
-              </p>
+                {{
+                  contest.status === "upcoming"
+                    ? "Upcoming"
+                    : contest.status === "running"
+                      ? "Live"
+                      : "Ended"
+                }}
+              </Badge>
             </div>
-            <div class="flex flex-col gap-2">
+            <p v-if="contest.description" class="text-lg text-muted-foreground max-w-3xl leading-relaxed">
+              {{ contest.description }}
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <Button
+              v-if="!isRegistered && contest.status === 'upcoming'"
+              size="lg"
+              class="gap-2 rounded-full h-12 px-8 font-bold shadow-lg shadow-primary/20"
+              :disabled="registering"
+              @click="handleRegister"
+            >
+              <Users class="h-5 w-5" />
+              {{ registering ? "Registering..." : "Register Now" }}
+            </Button>
+            <Button
+              v-else-if="isRegistered && contest.status === 'upcoming'"
+              size="lg"
+              variant="outline"
+              class="gap-2 rounded-full h-12 px-8 font-bold"
+              :disabled="registering"
+              @click="handleUnregister"
+            >
+              <Users class="h-5 w-5" />
+              {{ registering ? "Unregistering..." : "Unregister" }}
+            </Button>
+            <template v-if="contest.status === 'finished'">
               <Button
-                v-if="!isRegistered && contest.status === 'upcoming'"
+                v-if="
+                  !contestStore.virtualSession ||
+                  contestStore.virtualSession.status !== 'IN_PROGRESS'
+                "
                 size="lg"
-                class="gap-2"
-                :disabled="registering"
-                @click="handleRegister"
+                class="gap-2 rounded-full h-12 px-8 font-bold shadow-lg shadow-primary/20"
+                :disabled="startingVirtual"
+                @click="handleStartVirtual"
               >
-                <Users class="h-4 w-4" />
-                {{ registering ? "Registering..." : "Register Now" }}
+                <PlayCircle class="h-5 w-5" />
+                {{
+                  startingVirtual ? "Starting..." : "Start Virtual Contest"
+                }}
               </Button>
               <Button
-                v-else-if="isRegistered && contest.status === 'upcoming'"
+                v-else
                 size="lg"
                 variant="outline"
-                class="gap-2"
-                :disabled="registering"
-                @click="handleUnregister"
+                class="gap-2 rounded-full h-12 px-8 font-bold"
+                disabled
               >
-                <Users class="h-4 w-4" />
-                {{ registering ? "Unregistering..." : "Unregister" }}
+                <PlayCircle class="h-5 w-5" />
+                Virtual Contest Active
               </Button>
-              <template v-if="contest.status === 'finished'">
-                <Button
-                  v-if="
-                    !contestStore.virtualSession ||
-                    contestStore.virtualSession.status !== 'IN_PROGRESS'
-                  "
-                  size="lg"
-                  class="gap-2"
-                  :disabled="startingVirtual"
-                  @click="handleStartVirtual"
-                >
-                  <PlayCircle class="h-4 w-4" />
-                  {{
-                    startingVirtual ? "Starting..." : "Start Virtual Contest"
-                  }}
-                </Button>
-                <Button
-                  v-else
-                  size="lg"
-                  variant="outline"
-                  class="gap-2"
-                  disabled
-                >
-                  <PlayCircle class="h-4 w-4" />
-                  Virtual Contest Active
-                </Button>
-              </template>
-            </div>
+            </template>
           </div>
         </div>
       </div>
 
+      <Separator />
+
       <!-- Virtual Contest Timer -->
-      <div class="container mx-auto px-4 pt-6">
-        <VirtualContestTimer />
-      </div>
+      <VirtualContestTimer />
 
       <!-- Contest Info Card -->
-      <div class="container mx-auto px-4 py-6">
-        <Card>
-          <CardContent class="p-0">
-            <div class="grid divide-x md:grid-cols-4">
-              <div class="flex items-center gap-3 p-6">
-                <div
-                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
-                >
-                  <Calendar class="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-muted-foreground">
-                    Start Time
-                  </p>
-                  <p class="text-base font-semibold">
-                    {{ formatDateTime(contest.start_time) }}
-                  </p>
-                </div>
+      <Card class="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/20">
+        <CardContent class="p-0">
+          <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 border-b md:border-b-0">
+            <div class="flex items-center gap-4 p-6">
+              <div
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm"
+              >
+                <Calendar class="h-6 w-6" />
               </div>
-              <div class="flex items-center gap-3 p-6">
-                <div
-                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
-                >
-                  <Clock class="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-muted-foreground">
-                    Duration
-                  </p>
-                  <p class="text-base font-semibold">
-                    {{ contest.duration_minutes }} Minutes
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 p-6">
-                <div
-                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
-                >
-                  <Users class="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-muted-foreground">
-                    Participants
-                  </p>
-                  <p class="text-base font-semibold">
-                    {{ contest.participant_count }}
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 p-6">
-                <div
-                  class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
-                >
-                  <Trophy class="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-muted-foreground">
-                    Contest Type
-                  </p>
-                  <p class="text-base font-semibold">
-                    {{ contest.isRated ? "Rated" : "Unrated" }}
-                  </p>
-                </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Start Time
+                </p>
+                <p class="text-sm font-bold truncate">
+                  {{ formatDateTime(contest.start_time) }}
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div class="flex items-center gap-4 p-6">
+              <div
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 shadow-sm"
+              >
+                <Clock class="h-6 w-6" />
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Duration
+                </p>
+                <p class="text-sm font-bold truncate">
+                  {{ contest.duration_minutes }} Minutes
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 p-6">
+              <div
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 shadow-sm"
+              >
+                <Users class="h-6 w-6" />
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Participants
+                </p>
+                <p class="text-sm font-bold truncate">
+                  {{ contest.participant_count }}
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 p-6">
+              <div
+                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 shadow-sm"
+              >
+                <Trophy class="h-6 w-6" />
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Contest Type
+                </p>
+                <p class="text-sm font-bold truncate">
+                  {{ contest.isRated ? "Rated" : "Unrated" }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <!-- Main Content Area -->
-      <div class="container mx-auto px-4 pb-8">
-        <Tabs default-value="problems" class="w-full">
-          <TabsList class="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="problems">Problems</TabsTrigger>
-            <TabsTrigger value="ranking">Ranking</TabsTrigger>
+      <Tabs default-value="problems" class="w-full">
+        <div class="flex items-center justify-between mb-6">
+          <TabsList class="bg-muted/50 p-1 h-11 rounded-full">
+            <TabsTrigger value="problems" class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Problems
+            </TabsTrigger>
+            <TabsTrigger value="ranking" class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Ranking
+            </TabsTrigger>
           </TabsList>
+        </div>
 
-          <!-- Problem List -->
-          <TabsContent value="problems" class="space-y-4">
-            <Card>
-              <CardHeader class="pb-3">
-                <CardTitle class="text-xl">Contest Problems</CardTitle>
-              </CardHeader>
-              <CardContent class="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow class="hover:bg-transparent">
-                      <TableHead class="w-20 pl-6">#</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead class="w-24">Difficulty</TableHead>
-                      <TableHead class="w-24 text-center">Score</TableHead>
-                      <TableHead class="w-32 text-center">Acceptance</TableHead>
-                      <TableHead class="w-24 pr-6"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow
-                      v-for="problem in contest.problems"
-                      :key="problem.id"
-                      class="group cursor-pointer hover:bg-muted/50"
-                    >
-                      <TableCell class="pl-6">
-                        <div
-                          class="flex h-10 w-10 items-center justify-center rounded-md bg-muted font-mono text-sm font-bold"
+        <!-- Problem List -->
+        <TabsContent value="problems" class="mt-0">
+          <Card class="border-none shadow-sm overflow-hidden rounded-2xl">
+            <CardHeader class="pb-3 border-b bg-muted/20">
+              <CardTitle class="text-lg font-black uppercase tracking-widest text-muted-foreground">Contest Challenges</CardTitle>
+            </CardHeader>
+            <CardContent class="p-0">
+              <Table>
+                <TableHeader class="bg-muted/50">
+                  <TableRow>
+                    <TableHead class="w-20 pl-6 font-bold">#</TableHead>
+                    <TableHead class="font-bold">Title</TableHead>
+                    <TableHead class="w-32 font-bold">Difficulty</TableHead>
+                    <TableHead class="w-24 text-center font-bold">Score</TableHead>
+                    <TableHead class="w-32 text-center font-bold">Acceptance</TableHead>
+                    <TableHead class="w-20 pr-6"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow
+                    v-for="problem in contest.problems"
+                    :key="problem.id"
+                    class="group cursor-pointer hover:bg-muted/30 transition-colors"
+                  >
+                    <TableCell class="pl-6">
+                      <div
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-muted font-mono text-sm font-black text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                      >
+                        {{ problem.problemIndex || "#" }}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div class="space-y-1">
+                        <router-link
+                          :to="{
+                            name: 'problem-detail',
+                            params: { slug: problem.slug },
+                          }"
+                          class="text-base font-bold hover:text-primary transition-colors"
                         >
-                          {{ problem.problemIndex || "#" }}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div class="space-y-1">
-                          <router-link
-                            :to="{
-                              name: 'problem-detail',
-                              params: { slug: problem.slug },
-                            }"
-                            class="font-semibold hover:text-primary"
+                          {{ problem.title }}
+                        </router-link>
+                        <div
+                          class="flex items-center gap-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+                        >
+                          <span class="flex items-center gap-1">
+                            <Target class="h-3 w-3" />
+                            {{ problem.solvedCount || 0 }} Solved
+                          </span>
+                          <span
+                            >{{
+                              problem.submissionCount || 0
+                            }}
+                            Submissions</span
                           >
-                            {{ problem.title }}
-                          </router-link>
-                          <div
-                            class="flex items-center gap-3 text-sm text-muted-foreground"
-                          >
-                            <span class="flex items-center gap-1">
-                              <Target class="h-3 w-3" />
-                              {{ problem.solvedCount || 0 }} Solved
-                            </span>
-                            <span
-                              >{{
-                                problem.submissionCount || 0
-                              }}
-                              Submissions</span
-                            >
-                          </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        :class="[
+                          getDifficultyColor(problem.difficulty || 'Medium'),
+                          'font-black text-[10px] uppercase h-5 px-2 rounded-sm border-current/20 bg-current/5',
+                        ]"
+                      >
+                        {{ problem.difficulty }}
+                      </Badge>
+                    </TableCell>
+                    <TableCell class="text-center">
+                      <span
+                        class="inline-flex items-center gap-1 font-black text-amber-600"
+                      >
+                        <Award class="h-4 w-4" />
+                        {{ problem.score || 0 }}
+                      </span>
+                    </TableCell>
+                    <TableCell class="text-center">
+                      <span class="text-sm font-bold text-muted-foreground">
+                        {{ problem.acceptanceRate || "0%" }}
+                      </span>
+                    </TableCell>
+                    <TableCell class="pr-6">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        @click="
+                          $router.push({
+                            name: 'problem-detail',
+                            params: { slug: problem.slug },
+                          })
+                        "
+                      >
+                        <ChevronRight class="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <!-- Ranking -->
+        <TabsContent value="ranking" class="mt-0">
+          <Card class="border-none shadow-sm overflow-hidden rounded-2xl">
+            <CardHeader
+              class="flex flex-row items-center justify-between pb-3 border-b bg-muted/20"
+            >
+              <CardTitle class="text-lg font-black uppercase tracking-widest text-muted-foreground">Leaderboard</CardTitle>
+              <Button variant="outline" size="sm" class="rounded-full h-8 font-bold text-[10px]">VIEW ALL</Button>
+            </CardHeader>
+            <CardContent class="p-0">
+              <Table>
+                <TableHeader class="bg-muted/50">
+                  <TableRow>
+                    <TableHead class="w-20 pl-6 font-bold">Rank</TableHead>
+                    <TableHead class="font-bold">User</TableHead>
+                    <TableHead class="w-24 text-center font-bold">Score</TableHead>
+                    <TableHead class="w-32 text-center font-bold">Time</TableHead>
+                    <TableHead class="w-48 font-bold">Problems</TableHead>
+                    <TableHead class="w-32 pr-6 text-right font-bold">Rating</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow
+                    v-for="entry in rankings.slice(0, 20)"
+                    :key="entry.username"
+                    class="group hover:bg-muted/30 transition-colors"
+                  >
+                    <TableCell class="pl-6">
+                      <div
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-xl font-black text-sm transition-all"
+                        :class="{
+                          'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg shadow-yellow-500/20 scale-110':
+                            entry.rank === 1,
+                          'bg-gradient-to-br from-slate-300 to-slate-500 text-white shadow-lg shadow-slate-400/20 scale-105':
+                            entry.rank === 2,
+                          'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/20':
+                            entry.rank === 3,
+                          'bg-muted text-muted-foreground': entry.rank > 3,
+                        }"
+                      >
+                        {{ entry.rank }}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div class="flex items-center gap-3">
+                        <div class="relative">
+                          <img
+                            :src="
+                              entry.avatar ||
+                              'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
+                            "
+                            class="h-10 w-10 rounded-xl border border-border bg-muted shadow-sm"
+                            alt="Avatar"
+                          />
+                          <span class="absolute -bottom-1 -right-1 text-base shadow-sm bg-background rounded-sm">
+                            {{ getCountryFlag(entry.country || "CN") }}
+                          </span>
+                        </div>
+                        <div class="flex flex-col">
+                          <span class="font-black text-sm">{{ entry.username }}</span>
+                          <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                            {{ entry.ratingBefore || 1500 }} → {{ entry.ratingAfter || 1500 }}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell class="text-center">
+                      <span class="text-xl font-black tracking-tight">{{ entry.score }}</span>
+                    </TableCell>
+                    <TableCell class="text-center">
+                      <span class="font-mono text-xs font-bold text-muted-foreground">
+                        {{ entry.finish_time }}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div class="flex flex-wrap gap-1">
                         <Badge
-                          variant="outline"
-                          :class="[
-                            getDifficultyColor(problem.difficulty || 'Medium'),
-                            'font-medium',
-                          ]"
+                          v-for="result in entry.problemResults || []"
+                          :key="result.problemIndex"
+                          :variant="result.isSolved ? 'default' : 'secondary'"
+                          class="min-w-[2rem] justify-center font-mono text-[10px] h-6 rounded px-1.5"
                         >
-                          {{ problem.difficulty }}
+                          {{ result.problemIndex }}
                         </Badge>
-                      </TableCell>
-                      <TableCell class="text-center">
-                        <span
-                          class="inline-flex items-center gap-1 font-semibold"
-                        >
-                          <Award class="h-4 w-4 text-yellow-600" />
-                          {{ problem.score || 0 }}
-                        </span>
-                      </TableCell>
-                      <TableCell class="text-center">
-                        <span class="font-medium">{{
-                          problem.acceptanceRate || "0%"
-                        }}</span>
-                      </TableCell>
-                      <TableCell class="pr-6">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          class="opacity-0 group-hover:opacity-100"
-                          @click="
-                            $router.push({
-                              name: 'problem-detail',
-                              params: { slug: problem.slug },
-                            })
-                          "
-                        >
-                          <ChevronRight class="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <!-- Ranking -->
-          <TabsContent value="ranking" class="space-y-4">
-            <Card>
-              <CardHeader
-                class="flex flex-row items-center justify-between pb-3"
-              >
-                <CardTitle class="text-xl">Ranking</CardTitle>
-                <Button variant="outline" size="sm">View Full Ranking</Button>
-              </CardHeader>
-              <CardContent class="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow class="hover:bg-transparent">
-                      <TableHead class="w-20 pl-6">Rank</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead class="w-24 text-center">Score</TableHead>
-                      <TableHead class="w-32 text-center"
-                        >Finish Time</TableHead
+                      </div>
+                    </TableCell>
+                    <TableCell class="pr-6 text-right">
+                      <div
+                        class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-black shadow-sm"
+                        :class="{
+                          'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20':
+                            (entry.ratingChange || 0) > 0,
+                          'bg-rose-500/10 text-rose-600 border border-rose-500/20':
+                            (entry.ratingChange || 0) < 0,
+                          'bg-muted text-muted-foreground border border-border':
+                            (entry.ratingChange || 0) === 0,
+                        }"
                       >
-                      <TableHead class="w-48">Problem Results</TableHead>
-                      <TableHead class="w-32 pr-6 text-right"
-                        >Rating Change</TableHead
-                      >
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow
-                      v-for="entry in rankings.slice(0, 20)"
-                      :key="entry.username"
-                      class="group"
-                    >
-                      <TableCell class="pl-6">
-                        <div
-                          class="inline-flex h-10 w-10 items-center justify-center rounded-full font-bold"
-                          :class="{
-                            'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-md':
-                              entry.rank === 1,
-                            'bg-gradient-to-br from-gray-300 to-gray-500 text-white shadow-md':
-                              entry.rank === 2,
-                            'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-md':
-                              entry.rank === 3,
-                            'bg-muted text-muted-foreground': entry.rank > 3,
-                          }"
-                        >
-                          {{ entry.rank }}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div class="space-y-1">
-                          <div class="flex items-center gap-2">
-                            <span class="text-lg">{{
-                              getCountryFlag(entry.country || "CN")
-                            }}</span>
-                            <img
-                              :src="
-                                entry.avatar ||
-                                'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
-                              "
-                              class="h-6 w-6 rounded-full border border-border"
-                              alt="Avatar"
-                            />
-                            <span class="font-semibold">{{
-                              entry.username
-                            }}</span>
-                          </div>
-                          <p class="text-sm text-muted-foreground">
-                            {{ entry.ratingBefore || 1500 }} →
-                            {{ entry.ratingAfter || 1500 }}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell class="text-center">
-                        <span class="text-lg font-bold">{{ entry.score }}</span>
-                      </TableCell>
-                      <TableCell class="text-center">
-                        <span class="font-mono text-sm">{{
-                          entry.finish_time
-                        }}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div class="flex flex-wrap gap-1">
-                          <Badge
-                            v-for="result in entry.problemResults || []"
-                            :key="result.problemIndex"
-                            :variant="result.isSolved ? 'default' : 'secondary'"
-                            class="min-w-[2rem] justify-center font-mono text-xs"
-                          >
-                            {{ result.problemIndex }}
-                            <template
-                              v-if="result.isSolved && result.solveTime"
-                            >
-                              <br />{{ result.solveTime }}
-                            </template>
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell class="pr-6 text-right">
-                        <div
-                          class="inline-flex items-center gap-1 rounded-md px-2 py-1 font-semibold"
-                          :class="{
-                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400':
-                              (entry.ratingChange || 0) > 0,
-                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400':
-                              (entry.ratingChange || 0) < 0,
-                            'text-muted-foreground':
-                              (entry.ratingChange || 0) === 0,
-                          }"
-                        >
-                          <TrendingUp
-                            v-if="(entry.ratingChange || 0) > 0"
-                            class="h-4 w-4"
-                          />
-                          <TrendingDown
-                            v-else-if="(entry.ratingChange || 0) < 0"
-                            class="h-4 w-4"
-                          />
-                          {{ (entry.ratingChange || 0) > 0 ? "+" : ""
-                          }}{{ entry.ratingChange || 0 }}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                        <TrendingUp
+                          v-if="(entry.ratingChange || 0) > 0"
+                          class="h-3 w-3"
+                        />
+                        <TrendingDown
+                          v-else-if="(entry.ratingChange || 0) < 0"
+                          class="h-3 w-3"
+                        />
+                        {{ (entry.ratingChange || 0) > 0 ? "+" : "" }}{{ entry.ratingChange || 0 }}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
 
-    <div v-else class="py-20 text-center">
-      <p class="text-muted-foreground">Contest Not Found</p>
+    <div v-else-if="!loading" class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center px-6">
+      <Trophy class="h-16 w-16 text-muted-foreground/20 mb-4" />
+      <h3 class="text-2xl font-black tracking-tight">Contest Not Found</h3>
+      <p class="text-muted-foreground mt-2 max-w-[300px]">The contest you are looking for might have been moved or removed.</p>
+      <Button variant="outline" class="mt-8 rounded-full px-8 h-11 font-bold" @click="$router.push({ name: 'contest-home' })">
+        Return to Contests
+      </Button>
     </div>
   </div>
 </template>

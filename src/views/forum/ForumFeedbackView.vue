@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -29,11 +30,7 @@ const feedbackTypes = [
 
 async function submitFeedback() {
   if (!subject.value.trim() || !description.value.trim()) {
-    toast({
-      title: "Validation Error",
-      description: "Please fill in all required fields.",
-      variant: "destructive",
-    });
+    toast.error("Please fill in all required fields.");
     return;
   }
 
@@ -43,22 +40,14 @@ async function submitFeedback() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    toast({
-      title: "Feedback Submitted",
-      description:
-        "Thank you for your feedback! We'll review it and get back to you if needed.",
-    });
+    toast.success("Feedback submitted. Thank you!");
 
     // Reset form
     subject.value = "";
     description.value = "";
     feedbackType.value = "bug";
   } catch {
-    toast({
-      title: "Submission Failed",
-      description: "Something went wrong. Please try again later.",
-      variant: "destructive",
-    });
+    toast.error("Failed to submit feedback. Please try again.");
   } finally {
     isSubmitting.value = false;
   }
@@ -66,26 +55,30 @@ async function submitFeedback() {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-4xl space-y-6 p-6">
+  <div
+    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 px-4 py-8"
+  >
     <div class="space-y-2">
       <h1 class="text-3xl font-bold tracking-tight">Feedback & Support</h1>
-      <p class="text-muted-foreground">
+      <p class="text-muted-foreground text-lg">
         Help us improve UltiCode by sharing your feedback, reporting bugs, or
         suggesting new features.
       </p>
     </div>
 
-    <div class="grid gap-6 md:grid-cols-3">
-      <Card class="md:col-span-2">
+    <Separator />
+
+    <div class="grid gap-8 md:grid-cols-3">
+      <Card class="md:col-span-2 border-none shadow-sm bg-muted/20">
         <CardHeader>
           <CardTitle>Submit Feedback</CardTitle>
         </CardHeader>
         <CardContent>
-          <form @submit.prevent="submitFeedback" class="space-y-4">
+          <form @submit.prevent="submitFeedback" class="space-y-6">
             <div class="space-y-2">
               <Label for="feedback-type">Feedback Type *</Label>
               <Select v-model="feedbackType">
-                <SelectTrigger id="feedback-type">
+                <SelectTrigger id="feedback-type" class="bg-background">
                   <SelectValue placeholder="Select feedback type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -107,6 +100,7 @@ async function submitFeedback() {
                 v-model="subject"
                 placeholder="Brief description of your feedback"
                 required
+                class="bg-background"
               />
             </div>
 
@@ -118,29 +112,37 @@ async function submitFeedback() {
                 placeholder="Please provide as much detail as possible..."
                 rows="8"
                 required
+                class="bg-background resize-none"
               />
               <p class="text-xs text-muted-foreground">
                 For bug reports, please include steps to reproduce the issue.
               </p>
             </div>
 
-            <Button type="submit" :disabled="isSubmitting" class="w-full">
-              {{ isSubmitting ? "Submitting..." : "Submit Feedback" }}
+            <Button
+              type="submit"
+              :disabled="isSubmitting"
+              class="w-full h-11 rounded-full text-base font-bold"
+            >
+              <span v-if="isSubmitting">Submitting...</span>
+              <span v-else>Submit Feedback</span>
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <div class="space-y-4">
-        <Card>
+      <div class="space-y-6">
+        <Card class="border-none shadow-sm bg-muted/20">
           <CardHeader>
-            <CardTitle class="text-base">Quick Links</CardTitle>
+            <CardTitle class="text-base font-black uppercase tracking-widest"
+              >Quick Links</CardTitle
+            >
           </CardHeader>
-          <CardContent class="space-y-3 text-sm">
-            <div>
+          <CardContent class="space-y-4 text-sm">
+            <div class="group">
               <router-link
                 to="/forum/guidelines"
-                class="text-primary hover:underline"
+                class="text-primary hover:underline font-bold"
               >
                 Community Guidelines
               </router-link>
@@ -148,8 +150,11 @@ async function submitFeedback() {
                 Read our community rules
               </p>
             </div>
-            <div>
-              <router-link to="/forum" class="text-primary hover:underline">
+            <div class="group">
+              <router-link
+                to="/forum"
+                class="text-primary hover:underline font-bold"
+              >
                 Forum Home
               </router-link>
               <p class="mt-1 text-xs text-muted-foreground">
@@ -159,26 +164,28 @@ async function submitFeedback() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card class="border-none shadow-sm bg-muted/20">
           <CardHeader>
-            <CardTitle class="text-base">Common Issues</CardTitle>
+            <CardTitle class="text-base font-black uppercase tracking-widest"
+              >Common Issues</CardTitle
+            >
           </CardHeader>
-          <CardContent class="space-y-2 text-xs">
+          <CardContent class="space-y-4 text-xs">
             <div>
-              <p class="font-medium">Can't submit code?</p>
-              <p class="text-muted-foreground">
+              <p class="font-bold text-foreground/80">Can't submit code?</p>
+              <p class="text-muted-foreground leading-relaxed">
                 Check your code syntax and try refreshing the page.
               </p>
             </div>
-            <div class="mt-3">
-              <p class="font-medium">Login problems?</p>
-              <p class="text-muted-foreground">
+            <div>
+              <p class="font-bold text-foreground/80">Login problems?</p>
+              <p class="text-muted-foreground leading-relaxed">
                 Try clearing your browser cache or resetting your password.
               </p>
             </div>
-            <div class="mt-3">
-              <p class="font-medium">Missing features?</p>
-              <p class="text-muted-foreground">
+            <div>
+              <p class="font-bold text-foreground/80">Missing features?</p>
+              <p class="text-muted-foreground leading-relaxed">
                 Submit a feature request using the form!
               </p>
             </div>

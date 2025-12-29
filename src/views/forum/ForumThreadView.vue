@@ -192,8 +192,10 @@ function handleThreadSave(isSaved: boolean) {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-5xl items-start gap-6 px-4 py-8">
-    <main class="w-full min-w-0 flex-1 space-y-4">
+  <div
+    class="mx-auto flex w-full max-w-7xl items-start gap-6 px-4 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+  >
+    <main class="w-full min-w-0 flex-1 space-y-6">
       <div v-if="isLoading" class="space-y-6">
         <ForumPostSkeleton />
         <div class="space-y-4 pl-4 border-l border-border/40">
