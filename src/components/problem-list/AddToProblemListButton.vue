@@ -183,7 +183,7 @@ watch(
         <Button
           :variant="variant ?? 'ghost'"
           :size="size ?? 'icon'"
-          class="relative"
+          class="relative rounded-full"
           aria-label="Add to problem list"
         >
           <component
@@ -252,7 +252,7 @@ watch(
     </DropdownMenu>
 
     <Dialog v-model:open="showCreateDialog">
-      <DialogContent class="sm:max-w-[425px]">
+      <DialogContent class="sm:max-w-[425px] rounded-2xl">
         <DialogHeader>
           <DialogTitle>Create New Problem List</DialogTitle>
           <DialogDescription>
@@ -266,6 +266,7 @@ watch(
               id="list-name"
               v-model="newListName"
               placeholder="e.g., Dynamic Programming Practice"
+              class="rounded-lg"
               @keyup.enter="handleCreateList"
             />
           </div>
@@ -275,10 +276,15 @@ watch(
             variant="outline"
             @click="showCreateDialog = false"
             :disabled="isCreating"
+            class="rounded-full"
           >
             Cancel
           </Button>
-          <Button @click="handleCreateList" :disabled="isCreating">
+          <Button
+            @click="handleCreateList"
+            :disabled="isCreating"
+            class="rounded-full"
+          >
             <Loader2 v-if="isCreating" class="mr-2 h-4 w-4 animate-spin" />
             Create & Add
           </Button>
