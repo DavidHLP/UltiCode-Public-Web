@@ -33,46 +33,48 @@ defineOptions({
 </script>
 
 <template>
-  <div class="flex items-center rounded-full px-1.5 h-7">
+  <div
+    class="flex items-center rounded-full bg-muted/50 px-1 h-8 border border-transparent hover:border-border/50 transition-colors"
+  >
     <template v-if="!isPreview">
       <!-- Upvote -->
       <Button
         variant="ghost"
         size="icon"
-        class="h-6 w-6 rounded-full -ml-0.5 hover:bg-muted"
+        class="h-7 w-7 rounded-full hover:bg-background/80 hover:text-orange-600 transition-all"
         :class="{
-          'text-orange-600': userVote === 1,
+          'text-orange-600 bg-background shadow-sm': userVote === 1,
           'cursor-default hover:bg-transparent hover:text-inherit': readonly,
         }"
         :disabled="readonly"
         @click.stop="handleVote(1)"
       >
         <ArrowBigUp
-          class="h-4 w-4 transition-colors"
+          class="h-4 w-4 transition-transform active:scale-125"
           :class="{ 'fill-current': userVote === 1 }"
         />
       </Button>
 
       <!-- Likes Count -->
       <span
-        class="text-xs font-medium px-1.5 min-w-[0.5rem] text-center select-none"
+        class="text-[11px] font-bold px-1.5 min-w-[1.5rem] text-center select-none"
         :class="{
-          'text-orange-600 font-bold': userVote === 1,
-          'text-foreground': userVote !== 1,
+          'text-orange-600': userVote === 1,
+          'text-muted-foreground': userVote !== 1,
         }"
       >
         {{ formatCount(likes) }}
       </span>
 
       <!-- Separator -->
-      <div class="h-3 w-px bg-border/50 mx-0.5"></div>
+      <div class="h-3 w-px bg-border/40 mx-0.5"></div>
 
       <!-- Dislikes Count -->
       <span
-        class="text-xs font-medium px-1.5 min-w-[0.5rem] text-center select-none"
+        class="text-[11px] font-bold px-1.5 min-w-[1.5rem] text-center select-none"
         :class="{
-          'text-blue-600 font-bold': userVote === -1,
-          'text-foreground': userVote !== -1,
+          'text-blue-600': userVote === -1,
+          'text-muted-foreground': userVote !== -1,
         }"
       >
         {{ formatCount(dislikes) }}
@@ -82,16 +84,16 @@ defineOptions({
       <Button
         variant="ghost"
         size="icon"
-        class="h-6 w-6 rounded-full -mr-0.5 hover:bg-muted"
+        class="h-7 w-7 rounded-full hover:bg-background/80 hover:text-blue-600 transition-all"
         :class="{
-          'text-blue-600': userVote === -1,
+          'text-blue-600 bg-background shadow-sm': userVote === -1,
           'cursor-default hover:bg-transparent hover:text-inherit': readonly,
         }"
         :disabled="readonly"
         @click.stop="handleVote(-1)"
       >
         <ArrowBigUp
-          class="h-4 w-4 rotate-180 transition-colors"
+          class="h-4 w-4 rotate-180 transition-transform active:scale-125"
           :class="{ 'fill-current': userVote === -1 }"
         />
       </Button>
@@ -99,13 +101,15 @@ defineOptions({
 
     <template v-else>
       <!-- Preview Mode -->
-      <span class="text-xs font-medium text-foreground px-1">
-        {{ formatCount(likes) }}
-      </span>
-      <div class="h-3 w-px bg-border/50 mx-1"></div>
-      <span class="text-xs font-medium text-foreground px-1">
-        {{ formatCount(dislikes) }}
-      </span>
+      <div class="flex items-center gap-1.5 px-2">
+        <span class="text-[11px] font-bold text-muted-foreground/70">
+          {{ formatCount(likes) }}
+        </span>
+        <div class="h-3 w-px bg-border/40 mx-0.5"></div>
+        <span class="text-[11px] font-bold text-muted-foreground/70">
+          {{ formatCount(dislikes) }}
+        </span>
+      </div>
     </template>
   </div>
 </template>

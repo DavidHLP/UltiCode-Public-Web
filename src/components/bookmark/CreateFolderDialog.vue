@@ -32,7 +32,29 @@ const emit = defineEmits<{
 
 const name = ref("");
 const description = ref("");
+const selectedColor = ref<string | null>(null);
 const isSubmitting = ref(false);
+
+const COLORS = [
+  "slate",
+  "red",
+  "orange",
+  "amber",
+  "yellow",
+  "lime",
+  "green",
+  "emerald",
+  "teal",
+  "cyan",
+  "sky",
+  "blue",
+  "indigo",
+  "violet",
+  "purple",
+  "fuchsia",
+  "pink",
+  "rose",
+];
 
 const isEdit = computed(() => !!props.folder);
 const title = computed(() => (isEdit.value ? "Edit Folder" : "Create Folder"));
@@ -43,9 +65,11 @@ watch(
     if (open && props.folder) {
       name.value = props.folder.name;
       description.value = props.folder.description ?? "";
+      selectedColor.value = props.folder.color;
     } else if (open) {
       name.value = "";
       description.value = "";
+      selectedColor.value = null;
     }
   },
 );
@@ -59,11 +83,13 @@ async function handleSubmit() {
       emit("update", props.folder.id, {
         name: name.value.trim(),
         description: description.value.trim() || undefined,
+        color: selectedColor.value || undefined,
       });
     } else {
       emit("create", {
         name: name.value.trim(),
         description: description.value.trim() || undefined,
+        color: selectedColor.value || undefined,
       });
     }
     emit("update:open", false);
@@ -79,10 +105,12 @@ function handleClose() {
 
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="sm:max-w-[425px]">
+    <DialogContent class="sm:max-w-[425px] rounded-3xl">
       <DialogHeader>
-        <DialogTitle>{{ title }}</DialogTitle>
-        <DialogDescription>
+        <DialogTitle class="text-2xl font-black tracking-tight">{{
+          title
+        }}</DialogTitle>
+        <DialogDescription class="text-muted-foreground">
           {{
             isEdit
               ? "Update your bookmark folder details."
@@ -91,35 +119,95 @@ function handleClose() {
         </DialogDescription>
       </DialogHeader>
 
-      <form @submit.prevent="handleSubmit" class="space-y-4">
+      <form @submit.prevent="handleSubmit" class="space-y-6 py-4">
         <div class="space-y-2">
-          <Label for="name">Name</Label>
+          <Label
+            for="name"
+            class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
+            >Name</Label
+          >
           <Input
             id="name"
             v-model="name"
             placeholder="My Folder"
             :disabled="isSubmitting"
+            class="rounded-xl border-muted-foreground/20 focus:ring-primary/20 h-11"
           />
         </div>
 
         <div class="space-y-2">
-          <Label for="description">Description (optional)</Label>
+          <Label
+            for="description"
+            class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
+            >Description (optional)</Label
+          >
           <Textarea
             id="description"
             v-model="description"
             placeholder="A brief description..."
             :disabled="isSubmitting"
             rows="3"
+            class="rounded-xl border-muted-foreground/20 focus:ring-primary/20 resize-none p-3"
           />
         </div>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" @click="handleClose">
+        <div class="space-y-4">
+          <Label
+            class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
+            >Color Appearance</Label
+          >
+          <div class="grid grid-cols-6 gap-3">
+            <button
+              v-for="color in COLORS"
+              :key="color"
+              type="button"
+              class="h-8 w-8 rounded-full border-2 transition-all flex items-center justify-center relative group"
+              :class="[
+                `bg-${color}-500 border-transparent`,
+                selectedColor === color
+                  ? 'border-primary ring-2 ring-primary/20 scale-110'
+                  : 'hover:scale-110 hover:shadow-md',
+              ]"
+              @click="selectedColor = color"
+              :title="color"
+            >
+              <div
+                v-if="selectedColor === color"
+                class="h-2 w-2 rounded-full bg-white shadow-sm"
+              ></div>
+            </button>
+            <button
+              type="button"
+              class="h-8 w-8 rounded-full border-2 border-dashed transition-all bg-muted/50 flex items-center justify-center hover:bg-muted"
+              :class="[
+                !selectedColor
+                  ? 'border-primary ring-2 ring-primary/20 scale-110'
+                  : 'border-muted-foreground/30 hover:scale-110',
+              ]"
+              @click="selectedColor = null"
+              title="No color"
+            >
+              <div class="h-4 w-0.5 bg-muted-foreground/40 rotate-45"></div>
+            </button>
+          </div>
+        </div>
+
+        <DialogFooter class="gap-2 sm:gap-0">
+          <Button
+            type="button"
+            variant="ghost"
+            @click="handleClose"
+            class="rounded-xl font-bold"
+          >
             Cancel
           </Button>
-          <Button type="submit" :disabled="!name.trim() || isSubmitting">
+          <Button
+            type="submit"
+            :disabled="!name.trim() || isSubmitting"
+            class="rounded-xl px-8 font-black shadow-sm"
+          >
             <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
-            {{ isEdit ? "Save" : "Create" }}
+            {{ isEdit ? "Save Changes" : "Create Folder" }}
           </Button>
         </DialogFooter>
       </form>

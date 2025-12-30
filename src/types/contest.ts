@@ -114,6 +114,7 @@ export interface ContestListItem {
   isRated?: boolean;
   durationMinutes?: number;
   registeredCount?: number;
+  participantCount?: number;
   canRegister?: boolean;
   canStart?: boolean;
 }

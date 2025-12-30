@@ -1,20 +1,22 @@
 <template>
   <form @submit.prevent="submit" class="w-full">
     <div
-      class="rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 overflow-hidden"
+      class="rounded-xl border border-muted-foreground/10 bg-background focus-within:ring-1 focus-within:ring-primary/30 transition-all overflow-hidden shadow-sm"
     >
       <Textarea
         v-model="content"
         placeholder="What are your thoughts?"
-        class="min-h-[60px] w-full resize-none border-0 bg-transparent px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+        class="min-h-[100px] w-full resize-none border-0 bg-transparent px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
       />
-      <div class="flex items-center justify-between p-2 bg-muted/20 border-t">
-        <div class="flex items-center gap-1">
+      <div
+        class="flex items-center justify-between px-3 py-2 bg-muted/20 border-t border-muted-foreground/5"
+      >
+        <div class="flex items-center gap-0.5">
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            class="h-8 w-8 text-muted-foreground hover:text-foreground"
+            class="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
           >
             <ImageIcon class="h-4 w-4" />
           </Button>
@@ -22,7 +24,7 @@
             type="button"
             variant="ghost"
             size="icon"
-            class="h-8 w-8 text-muted-foreground hover:text-foreground"
+            class="h-8 w-8 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors"
           >
             <Type class="h-4 w-4" />
           </Button>
@@ -33,7 +35,7 @@
             type="button"
             variant="ghost"
             size="sm"
-            class="rounded-full px-4 h-8 bg-muted hover:bg-muted/80 text-foreground"
+            class="rounded-full px-4 h-8 text-[12px] font-bold text-muted-foreground hover:bg-muted"
             @click="onCancel"
           >
             Cancel
@@ -41,7 +43,7 @@
           <Button
             type="submit"
             size="sm"
-            class="rounded-full px-4 h-8"
+            class="rounded-full px-5 h-8 text-[12px] font-bold shadow-sm"
             :disabled="!content.trim()"
           >
             Comment

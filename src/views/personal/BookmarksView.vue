@@ -49,6 +49,8 @@ import type {
 } from "@/types/bookmark";
 import { toast } from "vue-sonner";
 import { RouterLink } from "vue-router";
+import PersonalPageHeader from "./components/PersonalPageHeader.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 
 // Interfaces for metadata
 interface ProblemMetadata {
@@ -260,26 +262,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto space-y-8 pb-10">
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+  <PersonalPageShell>
+    <PersonalPageHeader
+      title="Collections"
+      description="Organize your saved problems, solutions, and forum discussions."
     >
-      <div class="space-y-1">
-        <h2 class="text-3xl font-bold tracking-tight">Collections</h2>
-        <p class="text-muted-foreground">
-          Organize your saved problems, solutions, and forum discussions.
-        </p>
-      </div>
-      <Button
-        @click="showCreateDialog = true"
-        class="rounded-full gap-2 shadow-sm"
-      >
-        <Plus class="h-4 w-4" />
-        New Collection
-      </Button>
-    </div>
-
-    <Separator />
+      <template #actions>
+        <Button
+          @click="showCreateDialog = true"
+          class="rounded-full gap-2 shadow-sm"
+        >
+          <Plus class="h-4 w-4" />
+          New Collection
+        </Button>
+      </template>
+    </PersonalPageHeader>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
       <!-- Sidebar (Folders) -->
@@ -346,7 +343,7 @@ onMounted(() => {
                 <p class="text-sm text-muted-foreground">Loading items...</p>
               </div>
 
-              <div v-else-if="!selectedFolderDetails" class="py-20 text-center">
+              <div v-else-if="!selectedFolderDetails" class="py-24 text-center">
                 <div
                   class="bg-muted/50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
                 >
@@ -359,10 +356,10 @@ onMounted(() => {
 
               <div
                 v-else-if="selectedFolderDetails.items.length === 0"
-                class="flex flex-col items-center justify-center py-24 text-center px-6"
+                class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 m-4"
               >
-                <div class="p-5 rounded-3xl bg-muted/50 mb-4">
-                  <FileText class="h-10 w-10 text-muted-foreground/40" />
+                <div class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4">
+                  <FileText class="h-8 w-8 text-muted-foreground/50" />
                 </div>
                 <h4 class="text-lg font-bold">This collection is empty</h4>
                 <p class="text-sm text-muted-foreground mt-1 max-w-[280px]">
@@ -393,7 +390,7 @@ onMounted(() => {
                       <div class="space-y-1">
                         <RouterLink
                           :to="getItemUrl(item)"
-                          class="text-lg font-black hover:text-primary transition-colors line-clamp-1 flex items-center gap-2"
+                          class="text-lg font-bold hover:text-primary transition-colors line-clamp-1 flex items-center gap-2"
                         >
                           {{ item.title ?? `Item ${item.targetId}` }}
                           <ExternalLink
@@ -406,7 +403,7 @@ onMounted(() => {
                         >
                           <Badge
                             variant="secondary"
-                            class="text-[9px] font-black uppercase tracking-widest px-1.5 h-4 rounded-sm"
+                            class="text-[9px] font-bold uppercase tracking-widest px-1.5 h-4 rounded-md"
                           >
                             {{
                               item.targetType.toLowerCase().replace("_", " ")
@@ -497,7 +494,7 @@ onMounted(() => {
 
         <div
           v-else
-          class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5"
+          class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-center px-6"
         >
           <FolderOpen class="h-12 w-12 text-muted-foreground/30 mb-4" />
           <h3 class="text-xl font-bold">No collection selected</h3>
@@ -549,5 +546,5 @@ onMounted(() => {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  </div>
+  </PersonalPageShell>
 </template>

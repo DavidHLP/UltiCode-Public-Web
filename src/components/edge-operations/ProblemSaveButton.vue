@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import ActionItem from "./ActionItem.vue";
 import { useBookmarkStore } from "@/stores/bookmark";
 import {
   addBookmark,
@@ -252,22 +253,18 @@ watch(
   <div>
     <DropdownMenu @update:open="handleOpenChange">
       <DropdownMenuTrigger as-child>
-        <Button
-          :variant="variant ?? 'ghost'"
-          :size="size ?? 'icon'"
-          class="relative flex items-center gap-1 transition-none"
-          :class="[
-            count !== undefined ? 'w-auto px-2' : '',
-            isSaved ? 'text-primary' : 'text-gray-600',
-          ]"
+        <ActionItem
+          :icon="isSaved ? BookmarkCheck : Bookmark"
+          :count="count"
+          label="Save"
+          :active="isSaved"
+          class="cursor-pointer"
+          :class="{ 'fill-primary/20': isSaved }"
           aria-label="Save problem"
-        >
-          <component :is="isSaved ? BookmarkCheck : Bookmark" class="h-4 w-4" />
-          <span v-if="count !== undefined" class="text-xs">{{ count }}</span>
-        </Button>
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent class="w-72" align="end">
-        <DropdownMenuLabel>Save Problem</DropdownMenuLabel>
+        <DropdownMenuLabel>Save problem</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <template v-if="isLoading">
@@ -284,7 +281,7 @@ watch(
           <!-- Bookmark Folders Section -->
           <div v-if="bookmarkStore.defaultFolder">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
-              Quick Save
+              Quick save
             </DropdownMenuLabel>
             <DropdownMenuCheckboxItem
               :checked="isFavorited"
@@ -354,7 +351,7 @@ watch(
           <!-- Problem Lists Section -->
           <div v-if="userLists.length > 0">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
-              Problem Lists
+              Problem lists
             </DropdownMenuLabel>
             <div class="max-h-[200px] overflow-y-auto">
               <DropdownMenuCheckboxItem
@@ -417,7 +414,7 @@ watch(
           <!-- Actions -->
           <DropdownMenuItem class="cursor-pointer" @select="openCreateDialog">
             <FolderPlus class="mr-2 h-4 w-4" />
-            Create Problem List
+            Create problem list
           </DropdownMenuItem>
         </template>
       </DropdownMenuContent>
@@ -427,14 +424,14 @@ watch(
     <Dialog v-model:open="showCreateDialog">
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create New Problem List</DialogTitle>
+          <DialogTitle>Create new problem list</DialogTitle>
           <DialogDescription>
             Create a new problem list and add this problem to it.
           </DialogDescription>
         </DialogHeader>
         <div class="grid gap-4 py-4">
           <div class="grid gap-2">
-            <Label for="list-name">List Name</Label>
+            <Label for="list-name">List name</Label>
             <Input
               id="list-name"
               v-model="newListName"
@@ -453,7 +450,7 @@ watch(
           </Button>
           <Button @click="handleCreateList" :disabled="isCreating">
             <Loader2 v-if="isCreating" class="mr-2 h-4 w-4 animate-spin" />
-            Create & Add
+            Create & add
           </Button>
         </DialogFooter>
       </DialogContent>

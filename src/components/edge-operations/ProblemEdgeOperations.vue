@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { toast } from "vue-sonner";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ThumbsUp, ThumbsDown } from "lucide-vue-next";
 import type {
   ProblemDetail,
   ProblemInteractionCounts,
@@ -17,6 +14,7 @@ import {
 } from "@/api/interaction";
 import { BookmarkType } from "@/types/bookmark";
 import ProblemSaveButton from "./ProblemSaveButton.vue";
+import { VoteControl } from "./vote-control";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 
 interface Props {
@@ -89,10 +87,6 @@ watch(
 );
 
 const reactionCounts = computed(() => interactionCounts.value);
-const isLiked = computed(() => viewerInteraction.value.reaction === "like");
-const isDisliked = computed(
-  () => viewerInteraction.value.reaction === "dislike",
-);
 
 const toggleReaction = async (reaction: "like" | "dislike") => {
   if (!props.problem) return;
@@ -132,36 +126,21 @@ const handleSaveChange = () => {
 </script>
 
 <template>
-  <div v-if="problem" class="relative group/actions flex items-center">
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label="Like"
-      :aria-pressed="isLiked"
-      :class="[
-        'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
-        isLiked ? 'text-blue-600' : 'text-gray-600',
-      ]"
-      @click="toggleReaction('like')"
-    >
-      <ThumbsUp class="h-4 w-4" />
-      <span class="text-xs">{{ reactionCounts.likes }}</span>
-    </Button>
-
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label="Dislike"
-      :aria-pressed="isDisliked"
-      :class="[
-        'group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 w-auto px-2 gap-1 focus:outline-none focus:ring-0 focus:ring-offset-0',
-        isDisliked ? 'text-rose-600' : 'text-gray-600',
-      ]"
-      @click="toggleReaction('dislike')"
-    >
-      <ThumbsDown class="h-4 w-4" />
-      <span class="text-xs">{{ reactionCounts.dislikes }}</span>
-    </Button>
+  <div v-if="problem" class="flex items-center gap-3">
+    <VoteControl
+      :likes="reactionCounts.likes"
+      :dislikes="reactionCounts.dislikes"
+      :user-vote="
+        viewerInteraction.reaction === 'like'
+          ? 1
+          : viewerInteraction.reaction === 'dislike'
+            ? -1
+            : 0
+      "
+      @vote="
+        (v) => (v === 1 ? toggleReaction('like') : toggleReaction('dislike'))
+      "
+    />
 
     <ProblemSaveButton
       :problem-id="problem.id"
@@ -169,7 +148,5 @@ const handleSaveChange = () => {
       :count="reactionCounts.favorites"
       @change="handleSaveChange"
     />
-
-    <Separator orientation="vertical" class="h-7 w-px flex-none bg-gray-200" />
   </div>
 </template>

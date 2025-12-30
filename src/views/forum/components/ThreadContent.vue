@@ -9,16 +9,37 @@ import { Badge } from "@/components/ui/badge";
 import { Share2, Pin, Lock } from "lucide-vue-next";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { PostActions } from "@/components/edge-operations";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 import { toggleBookmark, BookmarkType } from "@/api/bookmark";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "vue-sonner";
+import { recordForumShare } from "@/api/forum";
 
 const props = defineProps<{
   thread: ForumThread;
 }>();
+
+const localStats = ref({
+  ...(props.thread.stats || {
+    comments: 0,
+    likes: 0,
+    dislikes: 0,
+    saves: 0,
+    shares: 0,
+    views: 0,
+  }),
+});
+watch(
+  () => props.thread.stats,
+  (newStats) => {
+    if (newStats) {
+      localStats.value = { ...newStats };
+    }
+  },
+  { deep: true },
+);
 
 const emit = defineEmits<{
   (e: "vote", type: 1 | -1): void;
@@ -50,7 +71,11 @@ const media = computed(
 );
 
 const commentsDisplay = computed(() =>
-  props.thread.stats?.comments ? formatCount(props.thread.stats.comments) : "0",
+  localStats.value.comments ? formatCount(localStats.value.comments) : "0",
+);
+
+const savesDisplay = computed(() =>
+  localStats.value.saves ? formatCount(localStats.value.saves) : "0",
 );
 
 const userVote = computed(() =>
@@ -61,7 +86,7 @@ const voteCounts = computed(() =>
   resolveVoteCounts(
     props.thread.likes,
     props.thread.dislikes,
-    props.thread.stats,
+    localStats.value,
   ),
 );
 
@@ -112,6 +137,10 @@ async function handleSave() {
   try {
     const res = await toggleBookmark(BookmarkType.FORUM_POST, props.thread.id);
     emit("save", res.isSaved);
+    localStats.value.saves = Math.max(
+      0,
+      (localStats.value.saves || 0) + (res.isSaved ? 1 : -1),
+    );
     toast.success(res.isSaved ? "Post saved" : "Post unsaved");
   } catch (error) {
     console.error("Failed to toggle save", error);
@@ -123,6 +152,8 @@ async function handleShare() {
   const url = window.location.href;
   try {
     await navigator.clipboard.writeText(url);
+    await recordForumShare(props.thread.id);
+    localStats.value.shares = (localStats.value.shares || 0) + 1;
     toast.success("Link copied to clipboard");
   } catch (error) {
     console.error("Failed to copy link", error);
@@ -357,7 +388,12 @@ async function handleShare() {
             icon: 'message-square',
           },
           share: { show: true, text: 'Share' },
-          save: { show: true, isSaved: thread.isSaved, text: 'Save' },
+          save: {
+            show: true,
+            isSaved: thread.isSaved,
+            count: savesDisplay,
+            text: 'Save',
+          },
         }"
         @vote="(type: 1 | -1) => $emit('vote', type)"
         @save="handleSave"

@@ -11,9 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import PersonalPageHeader from "./components/PersonalPageHeader.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 import { toast } from "vue-sonner";
 import {
   User,
@@ -67,16 +68,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto space-y-8 pb-10">
-    <div class="flex flex-col space-y-1">
-      <h2 class="text-3xl font-bold tracking-tight">Account Settings</h2>
-      <p class="text-muted-foreground">
-        Manage your personal information, security, and notification
-        preferences.
-      </p>
-    </div>
-
-    <Separator />
+  <PersonalPageShell>
+    <PersonalPageHeader
+      title="Account Settings"
+      description="Manage your personal information, security, and notification preferences."
+    />
 
     <div
       v-if="loading"
@@ -102,21 +98,21 @@ onMounted(async () => {
           >
             <TabsTrigger
               value="general"
-              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-lg transition-all"
+              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-xl transition-all"
             >
               <User class="h-4 w-4" />
               <span>General</span>
             </TabsTrigger>
             <TabsTrigger
               value="password"
-              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-lg transition-all"
+              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-xl transition-all"
             >
               <Lock class="h-4 w-4" />
               <span>Security</span>
             </TabsTrigger>
             <TabsTrigger
               value="notifications"
-              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-lg transition-all"
+              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-xl transition-all"
             >
               <Bell class="h-4 w-4" />
               <span>Notifications</span>
@@ -131,7 +127,7 @@ onMounted(async () => {
             class="mt-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
           >
             <!-- Profile Section -->
-            <Card class="border-none shadow-none bg-muted/20">
+            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
                 <CardTitle class="text-lg">Public Profile</CardTitle>
                 <CardDescription>
@@ -237,7 +233,7 @@ onMounted(async () => {
             </Card>
 
             <!-- Social/Links Section -->
-            <Card class="border-none shadow-none bg-muted/20">
+            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
                 <CardTitle class="text-lg">Web Presence</CardTitle>
                 <CardDescription>
@@ -308,7 +304,7 @@ onMounted(async () => {
             value="password"
             class="mt-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <Card class="border-none shadow-none bg-muted/20">
+            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
                 <CardTitle class="text-lg">Change Password</CardTitle>
                 <CardDescription>
@@ -341,7 +337,7 @@ onMounted(async () => {
               </CardFooter>
             </Card>
 
-            <Card class="border-destructive/20 bg-destructive/5">
+            <Card class="border-destructive/20 bg-destructive/5 rounded-2xl">
               <CardHeader>
                 <CardTitle class="text-lg text-destructive"
                   >Danger Zone</CardTitle
@@ -367,7 +363,7 @@ onMounted(async () => {
             value="notifications"
             class="mt-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <Card class="border-none shadow-none bg-muted/20">
+            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
                 <CardTitle class="text-lg">Notification Preferences</CardTitle>
                 <CardDescription>
@@ -443,5 +439,5 @@ onMounted(async () => {
         </div>
       </Tabs>
     </div>
-  </div>
+  </PersonalPageShell>
 </template>

@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -31,6 +30,8 @@ import {
 import { RouterLink } from "vue-router";
 import { Button } from "@/components/ui/button";
 import { fetchCurrentUserId } from "@/utils/auth";
+import PersonalPageHeader from "./components/PersonalPageHeader.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 
 const submissions = ref<SubmissionRecord[]>([]);
 const loading = ref(true);
@@ -80,23 +81,20 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="space-y-1">
-          <h2 class="text-3xl font-bold tracking-tight">My Submissions</h2>
-          <p class="text-muted-foreground">
-            A historical record of all your problem solving attempts.
-          </p>
-        </div>
+  <PersonalPageShell>
+    <PersonalPageHeader
+      title="My Submissions"
+      description="A historical record of all your problem solving attempts."
+    >
+      <template #actions>
         <Button variant="outline" size="sm" class="gap-2 rounded-full" as-child>
           <RouterLink to="/problemset">
             Browse Problems
             <ExternalLink class="h-3.5 w-3.5" />
           </RouterLink>
         </Button>
-      </div>
-  
-      <Separator />
+      </template>
+    </PersonalPageHeader>
 
     <div
       v-if="loading"
@@ -110,24 +108,24 @@ onMounted(async () => {
 
     <div
       v-else-if="!hasUser"
-      class="flex flex-col items-center justify-center py-20 border rounded-2xl border-dashed"
+      class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 bg-muted/5 rounded-2xl"
     >
       <p class="text-muted-foreground mb-4">
         Please log in to view your submissions.
       </p>
-      <Button as-child>
+      <Button as-child class="rounded-full px-6 h-10 font-bold">
         <RouterLink to="/login">Sign In</RouterLink>
       </Button>
     </div>
 
     <Card
       v-else-if="submissions.length > 0"
-      class="border-none shadow-sm overflow-hidden"
+      class="border-none shadow-sm overflow-hidden rounded-2xl"
     >
       <CardHeader class="pb-2 border-b bg-muted/20">
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle class="text-lg">Recent Attempts</CardTitle>
+            <CardTitle class="text-lg font-bold">Recent Attempts</CardTitle>
             <CardDescription>
               Displaying your latest {{ submissions.length }} submissions.
             </CardDescription>
@@ -245,21 +243,21 @@ onMounted(async () => {
 
     <div
       v-else
-      class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center"
+      class="flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed border-muted/50 bg-muted/5 text-center px-6"
     >
       <div
-        class="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6"
+        class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
       >
-        <ListX class="h-10 w-10 text-muted-foreground/50" />
+        <ListX class="h-8 w-8 text-muted-foreground/50" />
       </div>
       <h3 class="text-xl font-bold">No submissions found</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
         You haven't submitted any code yet. Ready to take on your first
         challenge?
       </p>
-      <Button class="rounded-full px-8 h-12 text-base font-bold" as-child>
+      <Button class="rounded-full px-8 h-10 font-bold" as-child>
         <RouterLink to="/problemset">Start Solving Problems</RouterLink>
       </Button>
     </div>
-  </div>
+  </PersonalPageShell>
 </template>

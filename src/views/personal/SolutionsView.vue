@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   ThumbsUp,
   MessageSquare,
@@ -38,6 +37,8 @@ import {
 import { toast } from "vue-sonner";
 import { RouterLink, useRouter } from "vue-router";
 import { fetchCurrentUserId } from "@/utils/auth";
+import PersonalPageHeader from "./components/PersonalPageHeader.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 
 const router = useRouter();
 
@@ -89,25 +90,20 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+  <PersonalPageShell>
+    <PersonalPageHeader
+      title="My Solutions"
+      description="Manage and track the performance of your shared technical solutions."
     >
-      <div class="space-y-1">
-        <h2 class="text-3xl font-bold tracking-tight">My Solutions</h2>
-        <p class="text-muted-foreground">
-          Manage and track the performance of your shared technical solutions.
-        </p>
-      </div>
-      <Button as-child class="rounded-full gap-2">
-        <RouterLink to="/problemset">
-          <Plus class="h-4 w-4" />
-          New Solution
-        </RouterLink>
-      </Button>
-    </div>
-
-    <Separator />
+      <template #actions>
+        <Button as-child class="rounded-full gap-2">
+          <RouterLink to="/problemset">
+            <Plus class="h-4 w-4" />
+            New Solution
+          </RouterLink>
+        </Button>
+      </template>
+    </PersonalPageHeader>
 
     <div
       v-if="loading"
@@ -136,13 +132,13 @@ onMounted(async () => {
       <Card
         v-for="sol in solutions"
         :key="sol.id"
-        class="flex flex-col group hover:shadow-lg transition-all duration-300 border-muted/60"
+        class="flex flex-col group hover:shadow-md transition-all duration-300 border-muted/60 rounded-2xl"
       >
         <CardHeader class="pb-3">
           <div class="flex items-center justify-between mb-3">
             <Badge
               variant="outline"
-              class="font-mono text-[10px] bg-primary/5 text-primary border-primary/20"
+              class="font-mono text-[10px] bg-primary/5 text-primary border-primary/20 rounded-md"
             >
               {{ sol.language }}
             </Badge>
@@ -163,7 +159,7 @@ onMounted(async () => {
           <div class="flex items-start justify-between gap-2">
             <div class="space-y-1 flex-1 min-w-0">
               <CardTitle
-                class="line-clamp-2 text-lg font-black group-hover:text-primary transition-colors cursor-pointer"
+                class="line-clamp-2 text-lg font-bold group-hover:text-primary transition-colors cursor-pointer"
                 @click="handleView(sol)"
               >
                 {{ sol.title }}
@@ -212,7 +208,7 @@ onMounted(async () => {
               v-for="tag in sol.tags"
               :key="tag"
               variant="secondary"
-              class="text-[10px] font-medium py-0 h-5"
+              class="text-[10px] font-medium py-0 h-5 rounded-md"
             >
               {{ tag }}
             </Badge>
@@ -270,21 +266,21 @@ onMounted(async () => {
 
     <div
       v-else
-      class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center"
+      class="flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed border-muted/50 bg-muted/5 text-center px-6"
     >
       <div
-        class="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6"
+        class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
       >
-        <FileCode2 class="h-10 w-10 text-muted-foreground/50" />
+        <FileCode2 class="h-8 w-8 text-muted-foreground/50" />
       </div>
       <h3 class="text-xl font-bold">No solutions shared yet</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
         Sharing your thought process helps you and others learn better. Post
         your first solution!
       </p>
-      <Button as-child class="rounded-full px-8 h-12 text-base font-bold">
+      <Button as-child class="rounded-full px-8 h-10 font-bold">
         <RouterLink to="/problemset">Start Coding</RouterLink>
       </Button>
     </div>
-  </div>
+  </PersonalPageShell>
 </template>

@@ -4,7 +4,6 @@ import { RouterLink } from "vue-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +36,8 @@ import {
 import { fetchMyForumPosts, deleteForumPost } from "@/api/forum";
 import type { ForumPost } from "@/types/forum";
 import { toast } from "vue-sonner";
+import PersonalPageHeader from "./components/PersonalPageHeader.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 
 const isLoading = ref(true);
 const posts = ref<ForumPost[]>([]);
@@ -68,27 +69,20 @@ onMounted(loadPosts);
 </script>
 
 <template>
-  <div
-    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
-  >
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+  <PersonalPageShell>
+    <PersonalPageHeader
+      title="My Forum Posts"
+      description="View and manage the discussions you've started in the community."
     >
-      <div class="space-y-1">
-        <h2 class="text-3xl font-bold tracking-tight">My Forum Posts</h2>
-        <p class="text-muted-foreground">
-          View and manage the discussions you've started in the community.
-        </p>
-      </div>
-      <Button as-child class="rounded-full gap-2">
-        <RouterLink to="/forum/create">
-          <Plus class="h-4 w-4" />
-          New Post
-        </RouterLink>
-      </Button>
-    </div>
-
-    <Separator />
+      <template #actions>
+        <Button as-child class="rounded-full gap-2">
+          <RouterLink to="/forum/create">
+            <Plus class="h-4 w-4" />
+            New Post
+          </RouterLink>
+        </Button>
+      </template>
+    </PersonalPageHeader>
 
     <div
       v-if="isLoading"
@@ -100,19 +94,19 @@ onMounted(loadPosts);
 
     <div
       v-else-if="posts.length === 0"
-      class="flex h-[450px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-muted/10 p-10 text-center"
+      class="flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed border-muted/50 bg-muted/5 text-center px-6"
     >
       <div
-        class="flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6"
+        class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
       >
-        <MessageSquare class="h-10 w-10 text-muted-foreground/50" />
+        <MessageSquare class="h-8 w-8 text-muted-foreground/50" />
       </div>
       <h3 class="text-xl font-bold">No posts yet</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
         You haven't started any discussions. Share your knowledge or ask a
         question!
       </p>
-      <Button as-child class="rounded-full px-8 h-12 text-base font-bold">
+      <Button as-child class="rounded-full px-8 h-10 font-bold">
         <RouterLink to="/forum/create">Create Your First Post</RouterLink>
       </Button>
     </div>
@@ -121,14 +115,14 @@ onMounted(loadPosts);
       <Card
         v-for="post in posts"
         :key="post.id"
-        class="group hover:shadow-md transition-all duration-300 border-muted/60 overflow-hidden"
+        class="group hover:shadow-md transition-all duration-300 border-muted/60 overflow-hidden rounded-2xl"
       >
         <div class="flex flex-col sm:flex-row">
           <div class="flex-1 p-6">
             <div class="flex items-center gap-2 mb-3">
               <Badge
                 variant="secondary"
-                class="bg-primary/5 text-primary border-primary/10 font-bold hover:bg-primary/10 transition-colors"
+                class="bg-primary/5 text-primary border-primary/10 font-bold hover:bg-primary/10 transition-colors rounded-md"
               >
                 {{ post.community?.name ?? "General" }}
               </Badge>
@@ -149,7 +143,7 @@ onMounted(loadPosts);
             <div class="flex items-start justify-between gap-4">
               <div class="space-y-2 flex-1">
                 <CardTitle
-                  class="text-xl font-black group-hover:text-primary transition-colors"
+                  class="text-lg font-bold group-hover:text-primary transition-colors"
                 >
                   <RouterLink
                     :to="{ name: 'forum-thread', params: { postId: post.id } }"
@@ -276,5 +270,5 @@ onMounted(loadPosts);
         </div>
       </Card>
     </div>
-  </div>
+  </PersonalPageShell>
 </template>

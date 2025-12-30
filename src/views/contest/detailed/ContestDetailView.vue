@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useContestStore } from "@/stores/contest";
-import { fetchContestRanking } from "@/api/contest";
+import { fetchContestRanking, fetchLiveRanking } from "@/api/contest";
 import type { ContestRankingEntry } from "@/types/contest";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "vue-sonner";
 import VirtualContestTimer from "../components/VirtualContestTimer.vue";
 import {
@@ -30,6 +31,7 @@ import {
   Award,
   Target,
   ArrowLeft,
+  Lock,
 } from "lucide-vue-next";
 
 const route = useRoute();
@@ -41,21 +43,79 @@ const rankings = ref<ContestRankingEntry[]>([]);
 const loading = computed(() => contestStore.loading);
 const registering = ref(false);
 const startingVirtual = ref(false);
+const statusCountdown = ref("00:00:00");
+const statusLabel = ref("Starts In");
+const statusHint = ref("");
+const statusProgress = ref(0);
+let statusIntervalId: number | null = null;
+let rankingIntervalId: number | null = null;
 
 // Get participation status
 const isRegistered = computed(() => contestStore.isRegistered(contestId));
 
+const statusCardClass = computed(() => {
+  const status = contest.value?.status;
+  if (status === "running") {
+    return "bg-gradient-to-br from-rose-600 via-orange-500 to-amber-500";
+  }
+  if (status === "upcoming") {
+    return "bg-gradient-to-br from-emerald-600 via-teal-500 to-cyan-600";
+  }
+  return "bg-gradient-to-br from-slate-700 to-slate-800";
+});
+
+const contestEndTime = computed(() => {
+  const value = contest.value;
+  if (!value) return "";
+  const endTime = value.end_time ?? value.endTime;
+  if (endTime) return endTime;
+  const startMs = new Date(value.start_time).getTime();
+  const durationMinutes = Number(
+    value.duration_minutes ?? value.durationMinutes ?? 0,
+  );
+  if (Number.isNaN(startMs) || !durationMinutes) return "";
+  return new Date(startMs + durationMinutes * 60 * 1000).toISOString();
+});
+
 onMounted(async () => {
   try {
-    const [, rankingRes] = await Promise.all([
-      contestStore.loadContestDetail(contestId),
-      fetchContestRanking(contestId),
+    await contestStore.loadContestDetail(contestId);
+    await Promise.all([
       contestStore.loadParticipationStatus(contestId),
       contestStore.loadVirtualSession(contestId),
     ]);
-    rankings.value = rankingRes.items;
+    await loadRankings();
   } catch (error) {
     console.error("Failed to load contest detail:", error);
+  }
+});
+
+watch(
+  contest,
+  (value) => {
+    if (!value) return;
+    updateStatusTimer();
+    if (statusIntervalId !== null) {
+      clearInterval(statusIntervalId);
+    }
+    statusIntervalId = window.setInterval(updateStatusTimer, 1000);
+
+    if (rankingIntervalId !== null) {
+      clearInterval(rankingIntervalId);
+    }
+    if (value.status === "running") {
+      rankingIntervalId = window.setInterval(loadRankings, 30000);
+    }
+  },
+  { immediate: true },
+);
+
+onUnmounted(() => {
+  if (statusIntervalId !== null) {
+    clearInterval(statusIntervalId);
+  }
+  if (rankingIntervalId !== null) {
+    clearInterval(rankingIntervalId);
   }
 });
 
@@ -99,11 +159,113 @@ async function handleStartVirtual() {
   }
 }
 
+function scrollToSection(sectionId: string) {
+  const section = document.getElementById(sectionId);
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) {
     return error.message;
   }
   return fallback;
+}
+
+function formatCountdown(totalSeconds: number): string {
+  const seconds = Math.max(0, totalSeconds);
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  if (days > 0) {
+    return `${days}d ${hours}h ${minutes}m`;
+  }
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
+
+function formatPenaltyTime(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  }
+  return `${minutes}:${secs.toString().padStart(2, "0")}`;
+}
+
+function getContestEndTimeMs(): number | null {
+  const value = contest.value;
+  if (!value) return null;
+  const endTime = value.end_time ?? value.endTime;
+  if (endTime) {
+    const endMs = new Date(endTime).getTime();
+    return Number.isNaN(endMs) ? null : endMs;
+  }
+  const startMs = new Date(value.start_time).getTime();
+  if (Number.isNaN(startMs)) return null;
+  const durationMinutes = Number(
+    value.duration_minutes ?? value.durationMinutes ?? 0,
+  );
+  if (!durationMinutes) return null;
+  return startMs + durationMinutes * 60 * 1000;
+}
+
+function updateStatusTimer() {
+  const value = contest.value;
+  if (!value) return;
+  const startMs = new Date(value.start_time).getTime();
+  const endMs = getContestEndTimeMs();
+  const now = Date.now();
+
+  if (value.status === "upcoming") {
+    const remaining = Math.max(0, Math.floor((startMs - now) / 1000));
+    statusLabel.value = "Starts In";
+    statusCountdown.value = formatCountdown(remaining);
+    statusHint.value = isRegistered.value
+      ? "You are registered"
+      : "Registration is open";
+    statusProgress.value = 0;
+    return;
+  }
+
+  if (value.status === "running") {
+    const remaining = Math.max(0, Math.floor(((endMs ?? now) - now) / 1000));
+    const total = Math.max(1, Math.floor(((endMs ?? now) - startMs) / 1000));
+    const elapsed = Math.min(total, Math.max(0, total - remaining));
+    statusLabel.value = "Time Remaining";
+    statusCountdown.value = formatCountdown(remaining);
+    statusHint.value = "Submissions are live";
+    statusProgress.value = Math.min(100, Math.max(0, (elapsed / total) * 100));
+    return;
+  }
+
+  statusLabel.value = "Contest Ended";
+  statusCountdown.value = "Results Published";
+  statusHint.value = "Replay with virtual contest";
+  statusProgress.value = 100;
+}
+
+async function loadRankings() {
+  if (!contest.value) return;
+  try {
+    if (contest.value.status === "running") {
+      rankings.value = await fetchLiveRanking(contestId);
+      return;
+    }
+    const rankingRes = await fetchContestRanking(contestId);
+    rankings.value = rankingRes.items;
+  } catch (error) {
+    console.error("Failed to load contest rankings:", error);
+  }
 }
 
 // Format Date Time
@@ -169,7 +331,9 @@ function getCountryFlag(countryCode: string): string {
           Back to Contest List
         </Button>
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div
+          class="flex flex-col md:flex-row md:items-center justify-between gap-6"
+        >
           <div class="space-y-2 flex-1">
             <div class="flex items-center gap-3">
               <h1 class="text-4xl font-black tracking-tight">
@@ -194,7 +358,10 @@ function getCountryFlag(countryCode: string): string {
                 }}
               </Badge>
             </div>
-            <p v-if="contest.description" class="text-lg text-muted-foreground max-w-3xl leading-relaxed">
+            <p
+              v-if="contest.description"
+              class="text-lg text-muted-foreground max-w-3xl leading-relaxed"
+            >
               {{ contest.description }}
             </p>
           </div>
@@ -221,6 +388,25 @@ function getCountryFlag(countryCode: string): string {
               <Users class="h-5 w-5" />
               {{ registering ? "Unregistering..." : "Unregister" }}
             </Button>
+            <template v-else-if="contest.status === 'running'">
+              <Button
+                size="lg"
+                class="gap-2 rounded-full h-12 px-8 font-bold shadow-lg shadow-primary/20"
+                @click="scrollToSection('contest-problems')"
+              >
+                <PlayCircle class="h-5 w-5" />
+                Enter Contest
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                class="gap-2 rounded-full h-12 px-8 font-bold"
+                @click="scrollToSection('contest-ranking')"
+              >
+                <Trophy class="h-5 w-5" />
+                Live Ranking
+              </Button>
+            </template>
             <template v-if="contest.status === 'finished'">
               <Button
                 v-if="
@@ -233,9 +419,7 @@ function getCountryFlag(countryCode: string): string {
                 @click="handleStartVirtual"
               >
                 <PlayCircle class="h-5 w-5" />
-                {{
-                  startingVirtual ? "Starting..." : "Start Virtual Contest"
-                }}
+                {{ startingVirtual ? "Starting..." : "Start Virtual Contest" }}
               </Button>
               <Button
                 v-else
@@ -252,15 +436,106 @@ function getCountryFlag(countryCode: string): string {
         </div>
       </div>
 
+      <Card
+        class="border-none shadow-lg text-white overflow-hidden rounded-2xl"
+        :class="statusCardClass"
+      >
+        <CardContent class="p-6">
+          <div
+            class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
+          >
+            <div class="space-y-2">
+              <p
+                class="text-[10px] font-black uppercase tracking-[0.2em] text-white/70"
+              >
+                Contest Status
+              </p>
+              <div class="flex items-center gap-3">
+                <span
+                  class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <span
+                    v-if="contest.status === 'running'"
+                    class="h-2 w-2 rounded-full bg-white animate-pulse"
+                  ></span>
+                  {{
+                    contest.status === "running"
+                      ? "Live"
+                      : contest.status === "upcoming"
+                        ? "Upcoming"
+                        : "Ended"
+                  }}
+                </span>
+                <span v-if="statusHint" class="text-xs text-white/80">{{
+                  statusHint
+                }}</span>
+              </div>
+              <p class="text-2xl font-black md:text-3xl">
+                {{ statusLabel }}
+              </p>
+            </div>
+            <div class="text-left md:text-right">
+              <p class="text-xs uppercase tracking-widest text-white/70">
+                {{
+                  contest.status === "running"
+                    ? "Time Remaining"
+                    : contest.status === "upcoming"
+                      ? "Starts In"
+                      : "Status"
+                }}
+              </p>
+              <p
+                class="font-mono text-3xl font-black tracking-tight md:text-4xl"
+              >
+                {{ statusCountdown }}
+              </p>
+              <p v-if="contestEndTime" class="text-xs text-white/70">
+                {{ contest.status === "finished" ? "Ended at" : "Ends at" }}
+                {{ formatDateTime(contestEndTime) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5 h-2 rounded-full bg-white/20 overflow-hidden">
+            <div
+              class="h-full bg-white/80 transition-all duration-500"
+              :style="{ width: `${statusProgress}%` }"
+            ></div>
+          </div>
+
+          <div
+            class="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/80"
+          >
+            <span class="flex items-center gap-2">
+              <Calendar class="h-4 w-4" />
+              {{ formatDateTime(contest.start_time) }}
+            </span>
+            <span v-if="contestEndTime" class="flex items-center gap-2">
+              <Clock class="h-4 w-4" />
+              {{ formatDateTime(contestEndTime) }}
+            </span>
+            <span class="flex items-center gap-2">
+              <Users class="h-4 w-4" />
+              {{ contest.participant_count || contest.participantCount || 0 }}
+              competitors
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
       <Separator />
 
       <!-- Virtual Contest Timer -->
       <VirtualContestTimer />
 
       <!-- Contest Info Card -->
-      <Card class="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/20">
+      <Card
+        class="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/20"
+      >
         <CardContent class="p-0">
-          <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 border-b md:border-b-0">
+          <div
+            class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 border-b md:border-b-0"
+          >
             <div class="flex items-center gap-4 p-6">
               <div
                 class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm"
@@ -268,7 +543,9 @@ function getCountryFlag(countryCode: string): string {
                 <Calendar class="h-6 w-6" />
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <p
+                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                >
                   Start Time
                 </p>
                 <p class="text-sm font-bold truncate">
@@ -283,11 +560,14 @@ function getCountryFlag(countryCode: string): string {
                 <Clock class="h-6 w-6" />
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <p
+                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                >
                   Duration
                 </p>
                 <p class="text-sm font-bold truncate">
-                  {{ contest.duration_minutes }} Minutes
+                  {{ contest.duration_minutes || contest.durationMinutes || 0 }}
+                  Minutes
                 </p>
               </div>
             </div>
@@ -298,11 +578,15 @@ function getCountryFlag(countryCode: string): string {
                 <Users class="h-6 w-6" />
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <p
+                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                >
                   Participants
                 </p>
                 <p class="text-sm font-bold truncate">
-                  {{ contest.participant_count }}
+                  {{
+                    contest.participant_count || contest.participantCount || 0
+                  }}
                 </p>
               </div>
             </div>
@@ -313,11 +597,15 @@ function getCountryFlag(countryCode: string): string {
                 <Trophy class="h-6 w-6" />
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <p
+                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                >
                   Contest Type
                 </p>
                 <p class="text-sm font-bold truncate">
-                  {{ contest.isRated ? "Rated" : "Unrated" }}
+                  {{
+                    (contest.isRated ?? contest.is_rated) ? "Rated" : "Unrated"
+                  }}
                 </p>
               </div>
             </div>
@@ -325,14 +613,39 @@ function getCountryFlag(countryCode: string): string {
         </CardContent>
       </Card>
 
+      <Card
+        v-if="contest.rules"
+        class="border-none shadow-sm overflow-hidden rounded-2xl"
+      >
+        <CardHeader class="pb-3 border-b bg-muted/20">
+          <CardTitle
+            class="text-lg font-black uppercase tracking-widest text-muted-foreground"
+            >Rules & Notes</CardTitle
+          >
+        </CardHeader>
+        <CardContent class="p-6">
+          <p
+            class="text-sm text-muted-foreground whitespace-pre-line leading-relaxed"
+          >
+            {{ contest.rules }}
+          </p>
+        </CardContent>
+      </Card>
+
       <!-- Main Content Area -->
       <Tabs default-value="problems" class="w-full">
         <div class="flex items-center justify-between mb-6">
           <TabsList class="bg-muted/50 p-1 h-11 rounded-full">
-            <TabsTrigger value="problems" class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="problems"
+              class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Problems
             </TabsTrigger>
-            <TabsTrigger value="ranking" class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+            <TabsTrigger
+              value="ranking"
+              class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
               Ranking
             </TabsTrigger>
           </TabsList>
@@ -340,19 +653,55 @@ function getCountryFlag(countryCode: string): string {
 
         <!-- Problem List -->
         <TabsContent value="problems" class="mt-0">
-          <Card class="border-none shadow-sm overflow-hidden rounded-2xl">
+          <Card
+            id="contest-problems"
+            class="border-none shadow-sm overflow-hidden rounded-2xl"
+          >
             <CardHeader class="pb-3 border-b bg-muted/20">
-              <CardTitle class="text-lg font-black uppercase tracking-widest text-muted-foreground">Contest Challenges</CardTitle>
+              <CardTitle
+                class="text-lg font-black uppercase tracking-widest text-muted-foreground"
+                >Contest Challenges</CardTitle
+              >
             </CardHeader>
             <CardContent class="p-0">
-              <Table>
+              <div
+                v-if="contest.status === 'upcoming'"
+                class="flex flex-col items-center justify-center gap-4 px-6 py-12 text-center"
+              >
+                <div
+                  class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground"
+                >
+                  <Lock class="h-7 w-7" />
+                </div>
+                <div class="space-y-2">
+                  <h3 class="text-lg font-black">Problems Locked</h3>
+                  <p class="text-sm text-muted-foreground max-w-sm">
+                    Challenges unlock when the contest begins. Register now so
+                    you're ready at the start time.
+                  </p>
+                </div>
+                <Button
+                  v-if="!isRegistered"
+                  variant="outline"
+                  class="rounded-full px-6"
+                  :disabled="registering"
+                  @click="handleRegister"
+                >
+                  Register for Contest
+                </Button>
+              </div>
+              <Table v-else>
                 <TableHeader class="bg-muted/50">
                   <TableRow>
                     <TableHead class="w-20 pl-6 font-bold">#</TableHead>
                     <TableHead class="font-bold">Title</TableHead>
                     <TableHead class="w-32 font-bold">Difficulty</TableHead>
-                    <TableHead class="w-24 text-center font-bold">Score</TableHead>
-                    <TableHead class="w-32 text-center font-bold">Acceptance</TableHead>
+                    <TableHead class="w-24 text-center font-bold"
+                      >Score</TableHead
+                    >
+                    <TableHead class="w-32 text-center font-bold"
+                      >Acceptance</TableHead
+                    >
                     <TableHead class="w-20 pr-6"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -444,12 +793,23 @@ function getCountryFlag(countryCode: string): string {
 
         <!-- Ranking -->
         <TabsContent value="ranking" class="mt-0">
-          <Card class="border-none shadow-sm overflow-hidden rounded-2xl">
+          <Card
+            id="contest-ranking"
+            class="border-none shadow-sm overflow-hidden rounded-2xl"
+          >
             <CardHeader
               class="flex flex-row items-center justify-between pb-3 border-b bg-muted/20"
             >
-              <CardTitle class="text-lg font-black uppercase tracking-widest text-muted-foreground">Leaderboard</CardTitle>
-              <Button variant="outline" size="sm" class="rounded-full h-8 font-bold text-[10px]">VIEW ALL</Button>
+              <CardTitle
+                class="text-lg font-black uppercase tracking-widest text-muted-foreground"
+                >Leaderboard</CardTitle
+              >
+              <Button
+                variant="outline"
+                size="sm"
+                class="rounded-full h-8 font-bold text-[10px]"
+                >VIEW ALL</Button
+              >
             </CardHeader>
             <CardContent class="p-0">
               <Table>
@@ -457,10 +817,16 @@ function getCountryFlag(countryCode: string): string {
                   <TableRow>
                     <TableHead class="w-20 pl-6 font-bold">Rank</TableHead>
                     <TableHead class="font-bold">User</TableHead>
-                    <TableHead class="w-24 text-center font-bold">Score</TableHead>
-                    <TableHead class="w-32 text-center font-bold">Time</TableHead>
+                    <TableHead class="w-24 text-center font-bold"
+                      >Score</TableHead
+                    >
+                    <TableHead class="w-32 text-center font-bold"
+                      >Time</TableHead
+                    >
                     <TableHead class="w-48 font-bold">Problems</TableHead>
-                    <TableHead class="w-32 pr-6 text-right font-bold">Rating</TableHead>
+                    <TableHead class="w-32 pr-6 text-right font-bold"
+                      >Rating</TableHead
+                    >
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -496,24 +862,38 @@ function getCountryFlag(countryCode: string): string {
                             class="h-10 w-10 rounded-xl border border-border bg-muted shadow-sm"
                             alt="Avatar"
                           />
-                          <span class="absolute -bottom-1 -right-1 text-base shadow-sm bg-background rounded-sm">
+                          <span
+                            class="absolute -bottom-1 -right-1 text-base shadow-sm bg-background rounded-sm"
+                          >
                             {{ getCountryFlag(entry.country || "CN") }}
                           </span>
                         </div>
                         <div class="flex flex-col">
-                          <span class="font-black text-sm">{{ entry.username }}</span>
-                          <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                            {{ entry.ratingBefore || 1500 }} → {{ entry.ratingAfter || 1500 }}
+                          <span class="font-black text-sm">{{
+                            entry.username
+                          }}</span>
+                          <span
+                            class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+                          >
+                            {{ entry.ratingBefore || 1500 }} →
+                            {{ entry.ratingAfter || 1500 }}
                           </span>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell class="text-center">
-                      <span class="text-xl font-black tracking-tight">{{ entry.score }}</span>
+                      <span class="text-xl font-black tracking-tight">{{
+                        entry.totalScore ?? entry.score ?? 0
+                      }}</span>
                     </TableCell>
                     <TableCell class="text-center">
-                      <span class="font-mono text-xs font-bold text-muted-foreground">
-                        {{ entry.finish_time }}
+                      <span
+                        class="font-mono text-xs font-bold text-muted-foreground"
+                      >
+                        {{
+                          entry.finish_time ||
+                          formatPenaltyTime(entry.totalPenalty ?? 0)
+                        }}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -548,7 +928,8 @@ function getCountryFlag(countryCode: string): string {
                           v-else-if="(entry.ratingChange || 0) < 0"
                           class="h-3 w-3"
                         />
-                        {{ (entry.ratingChange || 0) > 0 ? "+" : "" }}{{ entry.ratingChange || 0 }}
+                        {{ (entry.ratingChange || 0) > 0 ? "+" : ""
+                        }}{{ entry.ratingChange || 0 }}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -560,11 +941,20 @@ function getCountryFlag(countryCode: string): string {
       </Tabs>
     </div>
 
-    <div v-else-if="!loading" class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center px-6">
+    <div
+      v-else-if="!loading"
+      class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center px-6"
+    >
       <Trophy class="h-16 w-16 text-muted-foreground/20 mb-4" />
       <h3 class="text-2xl font-black tracking-tight">Contest Not Found</h3>
-      <p class="text-muted-foreground mt-2 max-w-[300px]">The contest you are looking for might have been moved or removed.</p>
-      <Button variant="outline" class="mt-8 rounded-full px-8 h-11 font-bold" @click="$router.push({ name: 'contest-home' })">
+      <p class="text-muted-foreground mt-2 max-w-[300px]">
+        The contest you are looking for might have been moved or removed.
+      </p>
+      <Button
+        variant="outline"
+        class="mt-8 rounded-full px-8 h-11 font-bold"
+        @click="$router.push({ name: 'contest-home' })"
+      >
         Return to Contests
       </Button>
     </div>

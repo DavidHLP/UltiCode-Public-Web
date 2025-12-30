@@ -94,8 +94,14 @@ export async function deleteForumComment(commentId: string): Promise<void> {
 
 export async function recordForumView(postId: string) {
   const userId = fetchCurrentUserId();
-  if (!userId) return;
-  return apiPost(`/views/forum/${postId}`, { userId });
+  // Call the general view recording (with IP/cooldown logic)
+  apiPost(`/views/forum/${postId}`, { userId }).catch(() => {});
+  // Also call the forum-specific view recording to update stats JSON
+  return apiPost(`/forum/posts/${postId}/view`, {});
+}
+
+export async function recordForumShare(postId: string) {
+  return apiPost(`/forum/posts/${postId}/share`, {});
 }
 
 export async function createForumPost(input: {

@@ -126,7 +126,11 @@ export const personalSidebarData: SidebarSection[] = [
       },
       { title: "Solutions", url: "/personal/solutions", icon: CheckCircle2 },
       { title: "Problem Lists", url: "/personal/problem-lists", icon: List },
-      { title: "Forum Posts", url: "/personal/forum-posts", icon: MessageSquare },
+      {
+        title: "Forum Posts",
+        url: "/personal/forum-posts",
+        icon: MessageSquare,
+      },
       { title: "Bookmarks", url: "/personal/bookmarks", icon: Bookmark },
     ],
   },

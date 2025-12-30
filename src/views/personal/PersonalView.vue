@@ -28,6 +28,7 @@ import {
 import { onMounted, ref, computed } from "vue";
 import { RouterLink } from "vue-router";
 import ActivityHeatmap from "./components/ActivityHeatmap.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 import {
   fetchUserProfile,
   fetchUserStats,
@@ -127,7 +128,7 @@ onMounted(async () => {
     </div>
   </div>
   <div v-else-if="!user" class="flex h-[60vh] items-center justify-center">
-    <Card class="w-full max-w-md border-dashed">
+    <Card class="w-full max-w-md border-dashed rounded-2xl">
       <CardContent class="flex flex-col items-center py-10 text-center">
         <div class="mb-4 rounded-full bg-muted p-3 text-muted-foreground">
           <Activity class="h-10 w-10" />
@@ -136,19 +137,16 @@ onMounted(async () => {
         <p class="mb-6 mt-2 text-sm text-muted-foreground">
           Please log in to view and manage your profile.
         </p>
-        <Button as-child>
+        <Button as-child class="rounded-full px-6 font-bold">
           <RouterLink to="/login">Sign In</RouterLink>
         </Button>
       </CardContent>
     </Card>
   </div>
-  <div
-    v-else-if="user"
-    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
-  >
+  <PersonalPageShell v-else-if="user">
     <!-- Hero Section -->
     <div
-      class="relative overflow-hidden rounded-3xl border bg-card p-6 md:p-10 shadow-sm"
+      class="relative overflow-hidden rounded-2xl border bg-card p-6 md:p-10 shadow-sm"
     >
       <div
         class="absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 rounded-full bg-primary/10 blur-3xl"
@@ -279,7 +277,7 @@ onMounted(async () => {
       <div class="space-y-6 lg:col-span-8">
         <!-- Key Metrics Row -->
         <div class="grid gap-4 sm:grid-cols-3">
-          <Card class="relative overflow-hidden group">
+          <Card class="relative overflow-hidden group rounded-2xl">
             <div
               class="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-blue-500/5 group-hover:scale-150 transition-transform duration-500"
             ></div>
@@ -311,7 +309,7 @@ onMounted(async () => {
             </CardContent>
           </Card>
 
-          <Card class="relative overflow-hidden group">
+          <Card class="relative overflow-hidden group rounded-2xl">
             <div
               class="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-emerald-500/5 group-hover:scale-150 transition-transform duration-500"
             ></div>
@@ -334,7 +332,7 @@ onMounted(async () => {
             </CardContent>
           </Card>
 
-          <Card class="relative overflow-hidden group">
+          <Card class="relative overflow-hidden group rounded-2xl">
             <div
               class="absolute -right-2 -top-2 h-16 w-16 rounded-full bg-orange-500/5 group-hover:scale-150 transition-transform duration-500"
             ></div>
@@ -368,7 +366,7 @@ onMounted(async () => {
         </div>
 
         <!-- Detailed Problem Stats -->
-        <Card class="border-none shadow-none bg-muted/30">
+        <Card class="border-none shadow-none bg-muted/30 rounded-2xl">
           <CardHeader class="pb-4">
             <div class="flex items-center justify-between">
               <CardTitle class="text-lg font-bold flex items-center gap-2">
@@ -429,7 +427,7 @@ onMounted(async () => {
         </Card>
 
         <!-- Activity Heatmap -->
-        <Card>
+        <Card class="rounded-2xl">
           <CardHeader class="pb-2">
             <CardTitle class="text-lg font-bold flex items-center gap-2">
               <Activity class="h-5 w-5 text-primary" />
@@ -447,7 +445,7 @@ onMounted(async () => {
 
       <!-- Right Column: Recent Activity & Badges -->
       <div class="space-y-6 lg:col-span-4">
-        <Card class="h-full border-muted/50">
+        <Card class="h-full border-muted/50 rounded-2xl">
           <CardHeader class="pb-4 border-b bg-muted/20">
             <CardTitle class="text-base font-bold flex items-center gap-2">
               <GitCommit class="h-4 w-4 text-primary" />
@@ -532,5 +530,5 @@ onMounted(async () => {
         </Card>
       </div>
     </div>
-  </div>
+  </PersonalPageShell>
 </template>

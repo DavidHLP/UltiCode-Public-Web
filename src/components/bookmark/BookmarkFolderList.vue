@@ -37,27 +37,39 @@ const sortedFolders = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-1">
+  <div class="space-y-1.5">
     <div
       v-for="folder in sortedFolders"
       :key="folder.id"
-      class="group flex items-center justify-between rounded-md px-3 py-2 hover:bg-muted cursor-pointer"
-      :class="{ 'bg-muted': selectedId === folder.id }"
+      class="group flex items-center justify-between rounded-2xl px-3 py-2.5 hover:bg-muted/50 transition-all duration-200 cursor-pointer border border-transparent"
+      :class="{
+        'bg-muted/80 border-muted-foreground/10 shadow-sm':
+          selectedId === folder.id,
+        'hover:border-muted-foreground/5': selectedId !== folder.id,
+      }"
       @click="emit('select', folder)"
     >
-      <div class="flex items-center gap-3 min-w-0">
-        <component
-          :is="folder.isDefault ? Bookmark : Folder"
-          class="h-4 w-4 flex-shrink-0"
-          :class="
-            folder.color ? `text-${folder.color}-500` : 'text-muted-foreground'
-          "
-        />
+      <div class="flex items-center gap-3.5 min-w-0">
+        <div
+          class="flex items-center justify-center h-10 w-10 rounded-xl shrink-0 border transition-colors"
+          :class="[
+            folder.color
+              ? `bg-${folder.color}-500/10 border-${folder.color}-500/20 text-${folder.color}-600`
+              : 'bg-muted-foreground/10 border-muted-foreground/10 text-muted-foreground',
+          ]"
+        >
+          <component
+            :is="folder.isDefault ? Bookmark : Folder"
+            class="h-5 w-5 flex-shrink-0"
+          />
+        </div>
         <div class="min-w-0">
-          <p class="text-sm font-medium truncate">
+          <p class="text-sm font-black tracking-tight truncate">
             {{ folder.name }}
           </p>
-          <p class="text-xs text-muted-foreground">
+          <p
+            class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1"
+          >
             {{ folder.itemCount }} items
           </p>
         </div>
@@ -68,22 +80,22 @@ const sortedFolders = computed(() => {
           <Button
             variant="ghost"
             size="icon"
-            class="h-8 w-8 opacity-0 group-hover:opacity-100"
+            class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-background/80"
             @click.stop
           >
             <MoreHorizontal class="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem @select="emit('edit', folder)">
-            <Pencil class="mr-2 h-4 w-4" />
+        <DropdownMenuContent align="end" class="rounded-xl">
+          <DropdownMenuItem @select="emit('edit', folder)" class="gap-2">
+            <Pencil class="h-4 w-4" />
             Edit
           </DropdownMenuItem>
           <DropdownMenuItem
-            class="text-destructive"
+            class="text-destructive focus:text-destructive gap-2"
             @select="emit('delete', folder)"
           >
-            <Trash2 class="mr-2 h-4 w-4" />
+            <Trash2 class="h-4 w-4" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -92,9 +104,14 @@ const sortedFolders = computed(() => {
 
     <div
       v-if="folders.length === 0"
-      class="py-8 text-center text-muted-foreground text-sm"
+      class="py-12 text-center flex flex-col items-center justify-center"
     >
-      No bookmark folders yet
+      <div class="p-4 rounded-3xl bg-muted/50 mb-3">
+        <Folder class="h-8 w-8 text-muted-foreground/30" />
+      </div>
+      <p class="text-sm font-bold text-muted-foreground/70 tracking-tight">
+        No collections yet
+      </p>
     </div>
   </div>
 </template>

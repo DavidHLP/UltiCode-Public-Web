@@ -6,17 +6,38 @@ import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Link as LinkIcon } from "lucide-vue-next";
 import { PostActions } from "@/components/edge-operations";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { renderMarkdown } from "@/utils/markdown";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
 import { toast } from "vue-sonner";
 import { toggleBookmark, BookmarkType } from "@/api/bookmark";
 import { isAuthenticated } from "@/utils/auth";
+import { recordForumShare } from "@/api/forum";
 
 const props = defineProps<{
   post: ForumPost;
 }>();
+
+const localStats = ref({
+  ...(props.post.stats || {
+    comments: 0,
+    likes: 0,
+    dislikes: 0,
+    saves: 0,
+    shares: 0,
+    views: 0,
+  }),
+});
+watch(
+  () => props.post.stats,
+  (newStats) => {
+    if (newStats) {
+      localStats.value = { ...newStats };
+    }
+  },
+  { deep: true },
+);
 
 const router = useRouter();
 const emit = defineEmits<{
@@ -77,15 +98,17 @@ const media = computed(() => {
 });
 
 const commentsDisplay = computed(() =>
-  formatCount(props.post.stats?.comments ?? 0),
+  formatCount(localStats.value.comments ?? 0),
 );
+
+const savesDisplay = computed(() => formatCount(localStats.value.saves ?? 0));
 
 const userVote = computed(() =>
   resolveUserVote(props.post.userVote, props.post.voteState),
 );
 
 const voteCounts = computed(() =>
-  resolveVoteCounts(props.post.likes, props.post.dislikes, props.post.stats),
+  resolveVoteCounts(props.post.likes, props.post.dislikes, localStats.value),
 );
 
 function formatCount(value: number) {
@@ -129,6 +152,8 @@ async function handleShare() {
   const url = `${window.location.origin}/forum/detailed/${props.post.id}`;
   try {
     await navigator.clipboard.writeText(url);
+    await recordForumShare(props.post.id);
+    localStats.value.shares = (localStats.value.shares || 0) + 1;
     toast.success("Link copied to clipboard");
   } catch (error) {
     console.error("Failed to copy link", error);
@@ -144,6 +169,10 @@ async function handleSave() {
   try {
     const res = await toggleBookmark(BookmarkType.FORUM_POST, props.post.id);
     emit("save", props.post.id, res.isSaved);
+    localStats.value.saves = Math.max(
+      0,
+      (localStats.value.saves || 0) + (res.isSaved ? 1 : -1),
+    );
     toast.success(res.isSaved ? "Post saved" : "Post unsaved");
   } catch (error) {
     console.error("Failed to toggle save", error);
@@ -321,7 +350,12 @@ async function handleSave() {
                 icon: 'message-square',
               },
               share: { show: true, text: 'Share' },
-              save: { show: true, isSaved: post.isSaved, text: 'Save' },
+              save: {
+                show: true,
+                isSaved: post.isSaved,
+                count: savesDisplay,
+                text: 'Save',
+              },
             }"
             @vote="(type: 1 | -1) => emit('vote', post.id, type)"
             @comment="handleCommentClick"

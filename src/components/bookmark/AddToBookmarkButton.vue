@@ -43,6 +43,8 @@ const isFavorited = computed(() => {
   return defaultId ? itemFolders.value.includes(defaultId) : false;
 });
 
+const isBookmarked = computed(() => itemFolders.value.length > 0);
+
 async function loadData() {
   if (!isOpen.value) return;
 
@@ -89,7 +91,7 @@ async function toggleFolder(folderId: string) {
       store.updateItemCount(folderId, 1);
     }
 
-    emit("change", isFavorited.value, itemFolders.value);
+    emit("change", isBookmarked.value, itemFolders.value);
   } catch (error) {
     console.error("Failed to toggle bookmark:", error);
     toast.error("Failed to update bookmark");
@@ -117,40 +119,76 @@ watch(
       <Button
         :variant="variant ?? 'ghost'"
         :size="size ?? 'icon'"
-        class="relative"
+        class="relative rounded-full transition-all"
+        :class="{
+          'bg-primary/10 text-primary hover:bg-primary/20': isBookmarked,
+        }"
       >
         <component
-          :is="isFavorited ? BookmarkCheck : Bookmark"
-          class="h-4 w-4"
-          :class="{ 'text-primary': isFavorited }"
+          :is="isBookmarked ? BookmarkCheck : Bookmark"
+          class="h-5 w-5"
         />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent class="w-56" align="end">
+    <DropdownMenuContent class="w-64 rounded-2xl p-2" align="end">
       <template v-if="isLoading">
-        <div class="flex items-center justify-center py-4">
-          <Loader2 class="h-4 w-4 animate-spin" />
+        <div class="flex items-center justify-center py-8">
+          <Loader2 class="h-6 w-6 animate-spin text-primary/60" />
         </div>
       </template>
       <template v-else-if="!isAuthed">
-        <div class="px-3 py-2 text-sm text-muted-foreground">
-          Please log in to manage bookmarks.
+        <div class="px-4 py-6 text-center">
+          <Bookmark class="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+          <p
+            class="text-xs font-bold text-muted-foreground uppercase tracking-widest"
+          >
+            Please log in
+          </p>
+          <p class="text-[10px] text-muted-foreground mt-1">
+            Sign in to save items to collections
+          </p>
         </div>
       </template>
       <template v-else>
+        <div class="px-2 py-1.5 mb-1">
+          <h4
+            class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
+          >
+            Save to Collection
+          </h4>
+        </div>
+
         <!-- Default Folder -->
         <DropdownMenuCheckboxItem
           v-if="store.defaultFolder"
           :checked="isFavorited"
           @select.prevent="toggleFolder(store.defaultFolder.id)"
+          class="rounded-xl py-2.5 gap-3"
         >
-          <span class="flex items-center gap-2">
+          <div
+            class="flex items-center justify-center h-8 w-8 rounded-lg shrink-0 border"
+            :class="[
+              store.defaultFolder.color
+                ? `bg-${store.defaultFolder.color}-500/10 border-${store.defaultFolder.color}-500/20 text-${store.defaultFolder.color}-600`
+                : 'bg-muted-foreground/10 border-muted-foreground/10 text-muted-foreground',
+            ]"
+          >
             <Bookmark class="h-4 w-4" />
-            {{ store.defaultFolder.name }}
-          </span>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm font-bold truncate">{{
+              store.defaultFolder.name
+            }}</span>
+            <span class="text-[10px] font-bold text-muted-foreground/60"
+              >{{ store.defaultFolder.itemCount }} items</span
+            >
+          </div>
         </DropdownMenuCheckboxItem>
 
-        <DropdownMenuSeparator v-if="store.customFolders.length > 0" />
+        <DropdownMenuSeparator
+          v-if="store.customFolders.length > 0"
+          class="my-1 mx-2"
+        />
 
         <!-- Custom Folders -->
         <DropdownMenuCheckboxItem
@@ -158,18 +196,38 @@ watch(
           :key="folder.id"
           :checked="itemFolders.includes(folder.id)"
           @select.prevent="toggleFolder(folder.id)"
+          class="rounded-xl py-2.5 gap-3"
         >
-          {{ folder.name }}
+          <div
+            class="flex items-center justify-center h-8 w-8 rounded-lg shrink-0 border"
+            :class="[
+              folder.color
+                ? `bg-${folder.color}-500/10 border-${folder.color}-500/20 text-${folder.color}-600`
+                : 'bg-muted-foreground/10 border-muted-foreground/10 text-muted-foreground',
+            ]"
+          >
+            <Folder class="h-4 w-4" />
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm font-bold truncate">{{ folder.name }}</span>
+            <span class="text-[10px] font-bold text-muted-foreground/60"
+              >{{ folder.itemCount }} items</span
+            >
+          </div>
         </DropdownMenuCheckboxItem>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator class="my-1 mx-2" />
 
         <DropdownMenuItem
-          class="cursor-pointer"
+          class="cursor-pointer rounded-xl py-2.5 gap-3 text-primary focus:text-primary"
           @select="emit('create-folder')"
         >
-          <FolderPlus class="mr-2 h-4 w-4" />
-          Create Folder
+          <div
+            class="flex items-center justify-center h-8 w-8 rounded-lg shrink-0 bg-primary/10 border border-primary/20"
+          >
+            <FolderPlus class="h-4 w-4" />
+          </div>
+          <span class="text-sm font-black">Create Folder</span>
         </DropdownMenuItem>
       </template>
     </DropdownMenuContent>

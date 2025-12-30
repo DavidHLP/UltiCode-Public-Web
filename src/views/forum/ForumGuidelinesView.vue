@@ -11,8 +11,8 @@ import { Separator } from "@/components/ui/separator";
       <div class="space-y-2">
         <h1 class="text-3xl font-bold tracking-tight">Community Guidelines</h1>
         <p class="text-muted-foreground text-lg">
-          Please read and follow these guidelines to keep our community welcoming
-          and productive.
+          Please read and follow these guidelines to keep our community
+          welcoming and productive.
         </p>
       </div>
 
@@ -26,7 +26,8 @@ import { Separator } from "@/components/ui/separator";
           <CardContent class="space-y-2 text-base">
             <p>
               Treat all community members with respect. Personal attacks,
-              harassment, discrimination, or hateful language will not be tolerated.
+              harassment, discrimination, or hateful language will not be
+              tolerated.
             </p>
             <p>
               Remember that behind every username is a real person who deserves
@@ -41,13 +42,13 @@ import { Separator } from "@/components/ui/separator";
           </CardHeader>
           <CardContent class="space-y-2 text-base">
             <p>
-              Keep discussions relevant to the category or community you're posting
-              in. Interview experiences belong in Interview, career advice in
-              Career, etc.
+              Keep discussions relevant to the category or community you're
+              posting in. Interview experiences belong in Interview, career
+              advice in Career, etc.
             </p>
             <p>
-              Off-topic posts may be moved or removed to maintain organization and
-              discoverability.
+              Off-topic posts may be moved or removed to maintain organization
+              and discoverability.
             </p>
           </CardContent>
         </Card>
@@ -89,8 +90,8 @@ import { Separator } from "@/components/ui/separator";
           </CardHeader>
           <CardContent class="space-y-2 text-base">
             <p>
-              Keep language professional and appropriate. Excessive profanity, NSFW
-              content, or inappropriate jokes are not allowed.
+              Keep language professional and appropriate. Excessive profanity,
+              NSFW content, or inappropriate jokes are not allowed.
             </p>
             <p>Use clear, constructive communication in all interactions.</p>
           </CardContent>
@@ -106,8 +107,8 @@ import { Separator } from "@/components/ui/separator";
               proper attribution. Plagiarism is not acceptable.
             </p>
             <p>
-              If you're building on someone else's work, acknowledge it and explain
-              your contributions.
+              If you're building on someone else's work, acknowledge it and
+              explain your contributions.
             </p>
           </CardContent>
         </Card>
@@ -138,8 +139,8 @@ import { Separator } from "@/components/ui/separator";
               helpful. Focus on the work, not the person.
             </p>
             <p>
-              If you disagree with someone, explain your reasoning respectfully and
-              be open to discussion.
+              If you disagree with someone, explain your reasoning respectfully
+              and be open to discussion.
             </p>
           </CardContent>
         </Card>
@@ -155,17 +156,25 @@ import { Separator } from "@/components/ui/separator";
               frequency.
             </p>
             <p>
-              The moderation team has final discretion on all enforcement decisions.
+              The moderation team has final discretion on all enforcement
+              decisions.
             </p>
           </CardContent>
         </Card>
 
-        <div class="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-base">
-          <p class="font-bold text-primary">Questions about these guidelines?</p>
+        <div
+          class="rounded-2xl border border-primary/20 bg-primary/5 p-6 text-base"
+        >
+          <p class="font-bold text-primary">
+            Questions about these guidelines?
+          </p>
           <p class="mt-2 text-muted-foreground">
-            If you have questions or concerns about these guidelines, please visit
-            our
-            <router-link to="/forum/feedback" class="text-primary hover:underline font-medium">
+            If you have questions or concerns about these guidelines, please
+            visit our
+            <router-link
+              to="/forum/feedback"
+              class="text-primary hover:underline font-medium"
+            >
               Feedback
             </router-link>
             page or contact the moderation team.

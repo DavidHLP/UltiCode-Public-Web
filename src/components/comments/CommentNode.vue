@@ -1,255 +1,271 @@
 <template>
-  <div class="comment-node relative group">
-    <!-- SVG Thread Lines -->
-    <div v-if="!isRoot" class="lines-svg-container">
-      <svg class="tree-svg" preserveAspectRatio="none">
-        <!-- 1. Vertical Rail -->
-        <line
-          v-if="!isLast"
-          x1="20"
-          y1="0"
-          x2="20"
-          y2="100%"
-          class="svg-path"
-        />
+  <div class="relative flex flex-row">
+    <!-- Left Side: Avatar & Rail -->
+    <div
+      class="flex flex-col items-center mr-2 flex-shrink-0 w-8 relative"
+      ref="containerRef"
+    >
+      <!-- Curve Connector (Child draws this to connect to parent's rail) -->
+      <CommentConnector :depth="depth" :is-active="isParentRailHovered" />
 
-        <!-- 2. Curve -->
-        <path d="M 20,0 L 20,32 Q 20,44 56,44" class="svg-path" />
+      <!-- Parent Rail (I draw this for MY children) -->
+      <CommentRail
+        v-if="!isCollapsed && hasChildren"
+        :height="railHeight"
+        :is-active="isRailHovered"
+        @click="toggleCollapse"
+        @mouseenter="isRailHovered = true"
+        @mouseleave="isRailHovered = false"
+      />
 
-        <!-- 3. Button Group -->
-        <g class="toggle-group" @click.stop="toggleCollapse">
-          <!-- Background Circle -->
-          <circle cx="20" cy="44" r="7" class="toggle-circle" />
-
-          <!-- Minus Icon (Expanded) -->
-          <line
-            v-if="!isCollapsed"
-            x1="15"
-            y1="44"
-            x2="25"
-            y2="44"
-            class="toggle-icon"
-          />
-
-          <!-- Plus Icon (Collapsed) -->
-          <g v-else>
-            <line x1="15" y1="44" x2="25" y2="44" class="toggle-icon" />
-            <line x1="20" y1="39" x2="20" y2="49" class="toggle-icon" />
-          </g>
-        </g>
-      </svg>
-    </div>
-
-    <!-- Content Layer -->
-    <div class="flex relative z-10 pl-1">
-      <!-- Left Column: Avatar -->
+      <!-- Avatar -->
       <div
-        class="flex-shrink-0 mr-3 flex flex-col items-center pt-1 relative w-8 avatar-col"
+        v-if="!isCollapsed"
+        class="w-8 h-8 rounded-full overflow-hidden z-10 cursor-pointer border border-transparent hover:border-foreground/10 transition-all relative bg-background"
       >
         <div
-          class="w-8 h-8 rounded-full overflow-hidden relative cursor-pointer bg-gray-100 ring-1 ring-gray-100 hover:ring-gray-300 transition-all z-20"
-          @click="toggleCollapse"
+          class="w-full h-full flex items-center justify-center text-white font-bold text-xs bg-muted"
         >
           <img
+            v-if="comment.avatar"
             :src="comment.avatar"
+            :alt="comment.author"
             class="w-full h-full object-cover"
-            alt="avatar"
+          />
+          <span v-else>{{ comment.author[0]?.toUpperCase() }}</span>
+        </div>
+      </div>
+
+      <!-- Collapsed State Icon -->
+      <div
+        v-else
+        class="mt-1 cursor-pointer hover:bg-accent p-1 rounded z-10"
+        @click="toggleCollapse"
+      >
+        <Maximize2 class="h-3.5 w-3.5 text-muted-foreground" />
+      </div>
+    </div>
+
+    <!-- Right Side: Content -->
+    <div class="flex-1 min-w-0">
+      <!-- Header -->
+      <div class="flex items-center gap-2 mb-1 text-xs h-8">
+        <span
+          class="font-bold hover:underline cursor-pointer"
+          :class="{ 'text-primary': comment.isOp }"
+          @click="toggleCollapse"
+        >
+          {{ comment.author }}
+        </span>
+        <Badge
+          v-if="comment.isOp"
+          variant="secondary"
+          class="text-[9px] font-black px-1 h-3.5 rounded-sm bg-primary/10 text-primary border-none uppercase"
+        >
+          OP
+        </Badge>
+        <span class="text-muted-foreground">•</span>
+        <span
+          class="text-muted-foreground hover:underline cursor-pointer"
+          @click="toggleCollapse"
+        >
+          {{ comment.time }}
+        </span>
+        <span
+          v-if="isCollapsed"
+          class="text-muted-foreground text-xs italic ml-2 cursor-pointer select-none"
+          @click="toggleCollapse"
+        >
+          (collapsed)
+        </span>
+      </div>
+
+      <div v-if="!isCollapsed">
+        <!-- Content Body -->
+        <div v-if="!isEditing">
+          <div
+            class="text-sm leading-snug break-words pr-4 whitespace-pre-wrap mb-2"
+          >
+            {{ comment.content }}
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 mt-2 -ml-2 select-none">
+            <!-- Vote -->
+            <div class="flex items-center gap-1 px-2">
+              <button
+                @click="handleVote(1)"
+                class="p-1 rounded hover:bg-accent transition-colors"
+                :class="
+                  userVote === 1
+                    ? 'text-orange-600'
+                    : 'text-muted-foreground hover:text-orange-600'
+                "
+              >
+                <ArrowBigUp
+                  class="h-5 w-5"
+                  :class="{ 'fill-current': userVote === 1 }"
+                />
+              </button>
+              <span
+                class="text-xs font-bold w-6 text-center"
+                :class="{
+                  'text-orange-600': userVote === 1,
+                  'text-blue-600': userVote === -1,
+                }"
+              >
+                {{ formatScore(displayScore) }}
+              </span>
+              <button
+                @click="handleVote(-1)"
+                class="p-1 rounded hover:bg-accent transition-colors"
+                :class="
+                  userVote === -1
+                    ? 'text-blue-600'
+                    : 'text-muted-foreground hover:text-blue-600'
+                "
+              >
+                <ArrowBigDown
+                  class="h-5 w-5"
+                  :class="{ 'fill-current': userVote === -1 }"
+                />
+              </button>
+            </div>
+
+            <button
+              class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs font-bold"
+              @click="toggleReply"
+            >
+              <MessageSquare class="h-4.5 w-4.5" /> Reply
+            </button>
+            <button
+              class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs font-bold"
+            >
+              <Share2 class="h-4.5 w-4.5" /> Share
+            </button>
+
+            <DropdownMenu v-if="comment.isOwn">
+              <DropdownMenuTrigger as-child>
+                <button
+                  class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs font-bold"
+                >
+                  <MoreHorizontal class="h-4.5 w-4.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" class="rounded-xl">
+                <DropdownMenuItem
+                  @click="toggleEdit"
+                  class="gap-2 font-bold text-xs"
+                >
+                  <Pencil class="h-3.5 w-3.5" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  class="text-destructive focus:text-destructive gap-2 font-bold text-xs"
+                  @click="handleDeleteClick"
+                >
+                  <Trash2 class="h-3.5 w-3.5" /> Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button
+              v-else
+              class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs font-bold"
+            >
+              <Flag class="h-4.5 w-4.5" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div v-if="isEditing" class="mb-3 mt-2">
+          <CommentForm
+            :parent-id="comment.id"
+            :initial-content="comment.content"
+            :on-cancel="() => (isEditing = false)"
+            @submit="handleEditSubmit"
           />
         </div>
 
-        <!-- Thread Line Parent -->
-        <div
-          v-if="!isCollapsed && hasChildren"
-          class="thread-line-parent"
-        ></div>
-      </div>
+        <!-- Reply Input -->
+        <div v-if="isReplying" class="mt-3 mb-2">
+          <CommentForm
+            :parent-id="comment.id"
+            :on-cancel="() => (isReplying = false)"
+            @submit="handleReplySubmit"
+          />
+        </div>
 
-      <!-- Right Column: Content -->
-      <div class="flex-grow pb-1">
-        <div
-          v-if="isCollapsed"
-          class="py-1 cursor-pointer select-none"
-          @click="toggleCollapse"
-        >
-          <span
-            class="text-xs text-gray-400 italic font-medium hover:text-gray-600"
+        <!-- Children Container -->
+        <div v-if="hasChildren" class="mt-2" ref="childrenContainerRef">
+          <div
+            v-for="(child, index) in comment.children"
+            :key="child.id"
+            :ref="(el) => setLastChildRef(el, index)"
           >
-            Collapsed ({{ comment.children ? comment.children.length : 0 }}
-            children)
-          </span>
-        </div>
-
-        <div v-else class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span
-              class="font-semibold text-sm cursor-pointer hover:underline"
-              :class="{
-                'text-blue-600 bg-blue-50 px-1 rounded': comment.isOp,
-              }"
-            >
-              {{ comment.author }}
-            </span>
-            <span
-              v-if="comment.isOp"
-              class="text-[10px] font-bold text-blue-600 uppercase tracking-wider"
-              >OP</span
-            >
-            <span class="text-xs text-muted-foreground"
-              >· {{ comment.time }}</span
-            >
-          </div>
-
-          <div v-if="!isEditing">
-            <div
-              class="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap break-words mb-2"
-            >
-              {{ comment.content }}
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center gap-2 select-none">
-              <VoteControl
-                :likes="comment.likes || 0"
-                :dislikes="comment.dislikes || 0"
-                :user-vote="comment.userVote ?? 0"
-                class="origin-left"
-                @vote="(type: 1 | -1) => handleVote(type)"
-              />
-
-              <Button
-                variant="ghost"
-                size="sm"
-                class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                @click="toggleReply"
-              >
-                <MessageSquare class="h-3.5 w-3.5" />
-                <span class="text-xs font-semibold hidden sm:inline"
-                  >Reply</span
-                >
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              >
-                <Share2 class="h-3.5 w-3.5" />
-                <span class="text-xs font-semibold hidden sm:inline"
-                  >Share</span
-                >
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-              >
-                <Flag class="h-3.5 w-3.5" />
-                <span class="text-xs font-semibold hidden sm:inline"
-                  >Report</span
-                >
-              </Button>
-
-              <template v-if="comment.isOwn">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  @click="toggleEdit"
-                >
-                  <Pencil class="h-3.5 w-3.5" />
-                  <span class="text-xs font-semibold hidden sm:inline"
-                    >Edit</span
-                  >
-                </Button>
-
-                <AlertDialog>
-                  <AlertDialogTrigger as-child>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      class="gap-1.5 rounded-full h-7 px-2 text-muted-foreground hover:bg-muted/50 hover:text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 class="h-3.5 w-3.5" />
-                      <span class="text-xs font-semibold hidden sm:inline"
-                        >Delete</span
-                      >
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle
-                        >Are you absolutely sure?</AlertDialogTitle
-                      >
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your comment.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction @click="handleDelete"
-                        >Delete</AlertDialogAction
-                      >
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </template>
-            </div>
-          </div>
-
-          <!-- Edit Form -->
-          <div v-if="isEditing" class="mb-2">
-            <CommentForm
-              :parent-id="comment.id"
-              :initial-content="comment.content"
-              :on-cancel="() => (isEditing = false)"
-              @submit="handleEditSubmit"
-            />
-          </div>
-
-          <!-- Reply Input -->
-          <div v-if="isReplying" class="mt-2">
-            <CommentForm
-              :parent-id="comment.id"
-              :on-cancel="() => (isReplying = false)"
-              @submit="handleReplySubmit"
+            <CommentNode
+              :comment="child"
+              :depth="depth + 1"
+              :is-parent-rail-hovered="isRailHovered"
+              @reply="(id, content) => emit('reply', id, content)"
+              @vote="(id, type) => emit('vote', id, type)"
+              @edit="(id, content) => emit('edit', id, content)"
+              @delete="(id) => emit('delete', id)"
             />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Children -->
-    <div
-      v-if="!isCollapsed && hasChildren"
-      class="children-container pl-[36px] relative"
+    <AlertDialog
+      :open="showDeleteDialog"
+      @update:open="showDeleteDialog = $event"
     >
-      <CommentNode
-        v-for="(child, index) in comment.children"
-        :key="child.id"
-        :comment="child"
-        :is-last="index === (comment?.children?.length ?? 0) - 1"
-        :is-root="false"
-        @reply="
-          (id: number | string, content: string) => emit('reply', id, content)
-        "
-        @vote="(id: number | string, type: 1 | -1) => emit('vote', id, type)"
-        @edit="
-          (id: number | string, content: string) => emit('edit', id, content)
-        "
-        @delete="(id: number | string) => emit('delete', id)"
-      />
-    </div>
+      <AlertDialogContent class="rounded-3xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle class="text-xl font-black tracking-tight"
+            >Delete Comment</AlertDialogTitle
+          >
+          <AlertDialogDescription>
+            Are you absolutely sure? This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter class="gap-2 sm:gap-0">
+          <AlertDialogCancel class="rounded-xl font-bold"
+            >Cancel</AlertDialogCancel
+          >
+          <AlertDialogAction
+            @click="confirmDelete"
+            class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-black"
+          >
+            Delete Permanently
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+  watch,
+  type ComponentPublicInstance,
+} from "vue";
 import type { Comment } from "@/types/comment";
+import CommentConnector from "./CommentConnector.vue";
+import CommentRail from "./CommentRail.vue";
 import CommentForm from "./CommentForm.vue";
-import { Button } from "@/components/ui/button";
-import { VoteControl } from "@/components/edge-operations/vote-control";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -259,20 +275,34 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-import { MessageSquare, Share2, Flag, Pencil, Trash2 } from "lucide-vue-next";
+import {
+  ArrowBigUp,
+  ArrowBigDown,
+  MessageSquare,
+  Share2,
+  MoreHorizontal,
+  Maximize2,
+  Flag,
+  Pencil,
+  Trash2,
+} from "lucide-vue-next";
 
 defineOptions({
   name: "CommentNode",
 });
 
-const props = defineProps<{
-  comment: Comment;
-  isLast?: boolean;
-  isRoot?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    comment: Comment;
+    depth?: number;
+    isParentRailHovered?: boolean;
+  }>(),
+  {
+    depth: 0,
+    isParentRailHovered: false,
+  },
+);
 
 const emit = defineEmits<{
   (e: "reply", commentId: number | string, content: string): void;
@@ -282,11 +312,95 @@ const emit = defineEmits<{
 }>();
 
 const isCollapsed = ref(false);
+const isRailHovered = ref(false);
 const isReplying = ref(false);
 const isEditing = ref(false);
+const showDeleteDialog = ref(false);
 
-// Ensure reactivity for children length update
+const containerRef = ref<HTMLElement | null>(null);
+const childrenContainerRef = ref<HTMLElement | null>(null);
+const lastChildEl = ref<HTMLElement | null>(null);
+const railHeight = ref(0);
+
 const hasChildren = computed(() => (props.comment.children?.length ?? 0) > 0);
+const userVote = ref(props.comment.userVote ?? 0);
+const displayScore = ref(props.comment.votes ?? 0); // Simplified score handling
+
+// Update local state if props change (though usually we just rely on parent re-rendering)
+watch(
+  () => props.comment.userVote,
+  (newVal) => {
+    userVote.value = newVal ?? 0;
+  },
+);
+watch(
+  () => props.comment.votes,
+  (newVal) => {
+    displayScore.value = newVal ?? 0;
+  },
+);
+
+const setLastChildRef = (
+  el: ComponentPublicInstance | Element | null,
+  index: number,
+) => {
+  if (index === (props.comment.children?.length ?? 0) - 1) {
+    // If it's a component, get $el, otherwise use el directly
+    lastChildEl.value = (el as ComponentPublicInstance)?.$el ?? el;
+  }
+};
+
+const calculateRailHeight = () => {
+  if (
+    !isCollapsed.value &&
+    hasChildren.value &&
+    containerRef.value &&
+    lastChildEl.value
+  ) {
+    const containerRect = containerRef.value.getBoundingClientRect();
+    const lastChildRect = lastChildEl.value.getBoundingClientRect();
+
+    // We want the line to end where the curve of the last child starts
+    // In React code: lastChildCurveStartY = lastChildRect.top + 4;
+    // The connector top is at child top. The curve starts at roughly 0 relative to child.
+    // Let's match the React logic: `lastChildRect.top + 4 - containerTop`
+
+    // Wait, the connector in React is `absolute -left-6 top-0`.
+    // The curve M moves to `startY`.
+    // The logic in React: `const lastChildCurveStartY = lastChildRect.top + 4;`
+
+    const containerTop = containerRect.top;
+    const lastChildTop = lastChildRect.top;
+
+    // 4px seems to be an arbitrary offset used in the React example for visual alignment
+    const distance = lastChildTop + 4 - containerTop;
+
+    railHeight.value = distance;
+  }
+};
+
+let resizeObserver: ResizeObserver | null = null;
+
+onMounted(() => {
+  calculateRailHeight();
+
+  if (childrenContainerRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+      calculateRailHeight();
+    });
+    resizeObserver.observe(childrenContainerRef.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+});
+
+watch([isCollapsed, hasChildren], () => {
+  nextTick(calculateRailHeight);
+});
 
 const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value;
@@ -311,93 +425,32 @@ const handleEditSubmit = (content: string) => {
   isEditing.value = false;
 };
 
-const handleDelete = () => {
+const handleDeleteClick = () => {
+  showDeleteDialog.value = true;
+};
+
+const confirmDelete = () => {
   emit("delete", props.comment.id);
+  showDeleteDialog.value = false;
 };
 
 const handleVote = (type: 1 | -1) => {
-  emit("vote", props.comment.id, type);
+  // Optimistic update
+  if (userVote.value === type) {
+    // toggle off
+    userVote.value = 0;
+    displayScore.value -= type;
+    emit("vote", props.comment.id, type); // Backend handles toggle logic usually
+  } else {
+    // switch or new vote
+    displayScore.value += type - userVote.value;
+    userVote.value = type;
+    emit("vote", props.comment.id, type);
+  }
+};
+
+const formatScore = (score: number) => {
+  if (score > 1000) return (score / 1000).toFixed(1) + "k";
+  return score;
 };
 </script>
-
-<style scoped>
-:root {
-  --indent-width: 36px;
-  --line-color: #edeff1;
-  --line-color-hover: #8c8c8c;
-  --line-width: 2px;
-}
-
-.lines-svg-container {
-  position: absolute;
-  left: -36px; /* -var(--indent-width) */
-  top: -20px;
-  bottom: 0;
-  width: 36px; /* var(--indent-width) */
-  z-index: 10;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.tree-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.svg-path {
-  fill: none;
-  stroke: #edeff1;
-  stroke-width: 2px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: stroke 0.2s;
-}
-
-.toggle-group {
-  cursor: pointer;
-  pointer-events: auto;
-  transition: transform 0.2s;
-  transform-origin: 20px 44px;
-}
-
-.toggle-circle {
-  fill: white;
-  stroke: #edeff1;
-  stroke-width: 2px;
-  transition:
-    stroke 0.2s,
-    fill 0.2s;
-}
-
-.toggle-icon {
-  stroke: #878a8c;
-  stroke-width: 2px;
-  stroke-linecap: round;
-  transition: stroke 0.2s;
-}
-
-.thread-line-parent {
-  width: 2px;
-  background-color: #edeff1;
-  flex-grow: 1;
-  margin-top: 4px;
-  margin-bottom: 0;
-  margin-left: auto;
-  margin-right: auto;
-  transition: background-color 0.2s;
-}
-
-/* Hover Effects */
-/* Removed line highlights as requested */
-
-.toggle-group:hover {
-  transform: scale(1.1);
-}
-.toggle-group:hover .toggle-circle {
-  stroke: #1a1a1b !important;
-}
-.toggle-group:hover .toggle-icon {
-  stroke: #1a1a1b !important;
-}
-</style>

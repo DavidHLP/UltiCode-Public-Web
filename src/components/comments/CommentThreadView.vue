@@ -1,28 +1,51 @@
 <template>
-  <div class="max-w-4xl mx-auto py-10 px-6">
-    <div class="bg-white">
-      <h2 class="text-xl font-bold mb-8 pb-4 border-b">
-        Comments ({{ totalComments }} total)
-      </h2>
-
-      <div v-if="loading" class="text-center py-8 text-gray-500">
-        Loading comments...
+  <div class="max-w-4xl mx-auto py-12 px-6">
+    <div class="space-y-10">
+      <div
+        class="flex items-center justify-between border-b border-muted-foreground/10 pb-6"
+      >
+        <h2 class="text-2xl font-black tracking-tight">
+          Comments
+          <span class="text-muted-foreground/40 ml-1 font-bold"
+            >({{ totalComments }})</span
+          >
+        </h2>
       </div>
 
-      <div v-else class="space-y-4">
-        <CommentNode
-          v-for="comment in commentTree"
-          :key="comment.id"
-          :comment="comment"
-          :is-last="true"
-          :is-root="true"
-          @reply="handleReply"
-        />
-        <div
-          v-if="commentTree.length === 0"
-          class="text-center py-8 text-gray-400 italic"
+      <div
+        v-if="loading"
+        class="flex flex-col items-center justify-center py-20 gap-4"
+      >
+        <Loader2 class="h-10 w-10 animate-spin text-primary/60" />
+        <p
+          class="text-sm font-bold text-muted-foreground uppercase tracking-widest"
         >
-          No comments yet. Be the first to share your thoughts!
+          Loading thread...
+        </p>
+      </div>
+
+      <div v-else class="space-y-8">
+        <div v-if="commentTree.length > 0" class="space-y-6">
+          <CommentNode
+            v-for="comment in commentTree"
+            :key="comment.id"
+            :comment="comment"
+            @reply="handleReply"
+          />
+        </div>
+
+        <div
+          v-else
+          class="flex flex-col items-center justify-center py-24 text-center"
+        >
+          <div class="p-6 rounded-3xl bg-muted/30 mb-6">
+            <MessageSquare class="h-12 w-12 text-muted-foreground/20" />
+          </div>
+          <h3 class="text-xl font-black tracking-tight">Silence is golden</h3>
+          <p class="text-muted-foreground mt-2 max-w-[320px] font-medium">
+            There are no comments here yet. Why not be the first to start the
+            conversation?
+          </p>
         </div>
       </div>
     </div>
@@ -36,6 +59,7 @@ import type { Comment } from "@/types/comment";
 import type { ForumComment, ForumThread } from "@/types/forum";
 import CommentNode from "./CommentNode.vue";
 import { buildCommentTree, countComments } from "./comment-tree-builder";
+import { Loader2, MessageSquare } from "lucide-vue-next";
 
 defineOptions({
   name: "CommentThreadView",

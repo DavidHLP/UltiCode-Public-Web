@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VoteControl } from "@/components/edge-operations/vote-control";
-import { Button } from "@/components/ui/button";
+import ActionItem from "./ActionItem.vue";
 import {
   MessageCircle,
   Share2,
@@ -30,6 +30,7 @@ export interface PostActionsConfig {
   save?: {
     show: boolean;
     isSaved?: boolean;
+    count?: number | string;
     text?: string;
   };
 }
@@ -63,7 +64,7 @@ const commentIcon = computed(() => {
 <template>
   <div
     :class="[
-      'flex items-center gap-2 text-muted-foreground select-none',
+      'flex items-center gap-2 text-muted-foreground select-none flex-wrap',
       props.class,
     ]"
   >
@@ -71,79 +72,45 @@ const commentIcon = computed(() => {
       :likes="vote.likes"
       :dislikes="vote.dislikes"
       :user-vote="vote.userVote"
-      class="origin-left mr-2"
+      class="origin-left"
       @vote="(t: 1 | -1) => emit('vote', t)"
     />
 
-    <!-- Views (Simple only usually) -->
-    <div
+    <!-- Views -->
+    <ActionItem
       v-if="config.views?.show"
-      class="flex items-center gap-1.5 text-xs ml-2"
-    >
-      <Eye class="h-3.5 w-3.5" />
-      <span>{{ config.views.count }}</span>
-    </div>
+      variant="simple"
+      :icon="Eye"
+      :count="config.views.count"
+    />
 
     <!-- Comments -->
-    <template v-if="config.comments?.show">
-      <Button
-        v-if="config.comments.variant !== 'simple'"
-        variant="ghost"
-        size="sm"
-        class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
-        @click="emit('comment')"
-      >
-        <component :is="commentIcon" class="h-4 w-4" />
-        <span class="text-xs font-medium hidden sm:inline">
-          {{ config.comments.count }} {{ config.comments.text }}
-        </span>
-        <span class="text-xs font-medium sm:hidden">
-          {{ config.comments.count }}
-        </span>
-      </Button>
-      <div
-        v-else
-        class="flex items-center gap-1.5 text-xs cursor-pointer hover:text-foreground transition-colors ml-2"
-        @click="emit('comment')"
-      >
-        <component :is="commentIcon" class="h-3.5 w-3.5" />
-        <span>{{ config.comments.count }}</span>
-      </div>
-    </template>
+    <ActionItem
+      v-if="config.comments?.show"
+      :variant="config.comments.variant || 'button'"
+      :icon="commentIcon"
+      :count="config.comments.count"
+      :label="config.comments.text"
+      @click="emit('comment')"
+    />
 
     <!-- Share -->
-    <Button
+    <ActionItem
       v-if="config.share?.show"
-      variant="ghost"
-      size="sm"
-      class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
+      :icon="Share2"
+      :label="config.share.text"
       @click="emit('share')"
-    >
-      <Share2 class="h-4 w-4" />
-      <span
-        v-if="config.share.text"
-        class="text-xs font-medium hidden sm:inline"
-        >{{ config.share.text }}</span
-      >
-    </Button>
+    />
 
     <!-- Save -->
-    <Button
+    <ActionItem
       v-if="config.save?.show"
-      variant="ghost"
-      size="sm"
-      class="rounded-full bg-muted/50 text-xs font-medium text-muted-foreground hover:bg-muted/80 h-8 px-3 gap-2"
+      :icon="config.save.isSaved ? BookmarkCheck : Bookmark"
+      :count="config.save.count"
+      :label="config.save.text"
+      :active="config.save.isSaved"
+      :class="{ 'fill-primary/20': config.save.isSaved }"
       @click="emit('save')"
-    >
-      <component
-        :is="config.save.isSaved ? BookmarkCheck : Bookmark"
-        class="h-4 w-4"
-      />
-      <span
-        v-if="config.save.text"
-        class="text-xs font-medium hidden sm:inline"
-        >{{ config.save.text }}</span
-      >
-    </Button>
+    />
   </div>
 </template>

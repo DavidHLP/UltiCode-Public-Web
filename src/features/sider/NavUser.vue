@@ -5,7 +5,6 @@ import {
   LogOut,
   User,
   History,
-  FileCode,
   Settings,
   Bookmark,
   MessageSquare,

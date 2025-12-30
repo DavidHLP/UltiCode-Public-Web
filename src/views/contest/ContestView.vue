@@ -6,6 +6,7 @@ import { useContestStore } from "@/stores/contest";
 import { storeToRefs } from "pinia";
 import { Separator } from "@/components/ui/separator";
 import UpcomingContests from "./components/UpcomingContests.vue";
+import RunningContests from "./components/RunningContests.vue";
 import GlobalRanking from "./components/GlobalRanking.vue";
 import PastContests from "./components/PastContests.vue";
 import MyContests from "./components/MyContests.vue";
@@ -21,6 +22,7 @@ defineProps<{
 // Use store state
 const {
   upcomingContests,
+  runningContests,
   pastContests,
   pastContestsTotal,
   globalRankings,
@@ -67,7 +69,9 @@ watch(currentPage, async (newPage) => {
   <div
     class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
   >
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
       <div class="space-y-1">
         <div class="flex items-center gap-3">
           <Trophy class="h-8 w-8 text-yellow-500" />
@@ -96,6 +100,7 @@ watch(currentPage, async (newPage) => {
     <div v-else class="space-y-8">
       <!-- Home View -->
       <template v-if="!tab">
+        <RunningContests :contests="runningContests" />
         <UpcomingContests :contests="upcomingContests" />
         <div class="grid gap-8 lg:grid-cols-12">
           <div class="lg:col-span-4">

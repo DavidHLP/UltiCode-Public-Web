@@ -69,8 +69,11 @@ import {
   Loader2,
   Search,
   LayoutGrid,
+  MoreVertical,
 } from "lucide-vue-next";
 import { toast } from "vue-sonner";
+import PersonalPageHeader from "./components/PersonalPageHeader.vue";
+import PersonalPageShell from "./components/PersonalPageShell.vue";
 import type {
   ProblemList,
   ProblemListCategory,
@@ -355,39 +358,31 @@ onMounted(loadData);
 </script>
 
 <template>
-  <div
-    class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10"
-  >
-    <!-- Header -->
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+  <PersonalPageShell>
+    <PersonalPageHeader
+      title="Problem Lists"
+      description="Curate, organize, and track your practice problem sets."
     >
-      <div class="space-y-1">
-        <h1 class="text-3xl font-bold tracking-tight">Problem Lists</h1>
-        <p class="text-muted-foreground">
-          Curate, organize, and track your practice problem sets.
-        </p>
-      </div>
-      <div class="flex items-center gap-3">
-        <Button
-          variant="outline"
-          @click="isCreateCategoryOpen = true"
-          class="gap-2 rounded-full"
-        >
-          <FolderPlus class="h-4 w-4" />
-          <span class="hidden sm:inline">New Category</span>
-        </Button>
-        <Button
-          @click="isCreateOpen = true"
-          class="gap-2 rounded-full shadow-sm"
-        >
-          <Plus class="h-4 w-4" />
-          <span>New List</span>
-        </Button>
-      </div>
-    </div>
-
-    <Separator />
+      <template #actions>
+        <div class="flex items-center gap-3">
+          <Button
+            variant="outline"
+            @click="isCreateCategoryOpen = true"
+            class="gap-2 rounded-full"
+          >
+            <FolderPlus class="h-4 w-4" />
+            <span class="hidden sm:inline">New Category</span>
+          </Button>
+          <Button
+            @click="isCreateOpen = true"
+            class="gap-2 rounded-full shadow-sm"
+          >
+            <Plus class="h-4 w-4" />
+            <span>New List</span>
+          </Button>
+        </div>
+      </template>
+    </PersonalPageHeader>
 
     <!-- Loading State -->
     <div
@@ -401,10 +396,10 @@ onMounted(loadData);
     <!-- Not Logged In State -->
     <div
       v-else-if="!currentUserId"
-      class="flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-3xl"
+      class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 bg-muted/5 rounded-2xl text-center px-6"
     >
       <div
-        class="bg-muted w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+        class="bg-muted/50 w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
       >
         <Lock class="h-8 w-8 text-muted-foreground/50" />
       </div>
@@ -412,17 +407,17 @@ onMounted(loadData);
       <p class="text-muted-foreground mb-6 text-center max-w-xs mt-2">
         Please log in to view and manage your custom problem lists.
       </p>
-      <Button as-child class="rounded-full px-8">
+      <Button as-child class="rounded-full px-8 h-10 font-bold">
         <RouterLink to="/login">Sign In</RouterLink>
       </Button>
     </div>
 
     <!-- Main Content -->
     <div v-else class="space-y-6">
-      <div
-        class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
-        <Tabs v-model="activeTab" class="w-auto">
+      <Tabs v-model="activeTab" class="w-full">
+        <div
+          class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        >
           <TabsList class="bg-muted/50 p-1 h-11 rounded-full">
             <TabsTrigger
               value="my-lists"
@@ -459,157 +454,70 @@ onMounted(loadData);
               Featured
             </TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <div class="relative w-full sm:w-64">
-          <Search
-            class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-          />
-          <Input
-            v-model="searchQuery"
-            placeholder="Search lists..."
-            class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20"
-          />
-        </div>
-      </div>
-
-      <!-- My Lists Tab -->
-      <TabsContent value="my-lists" class="mt-0">
-        <div
-          v-if="data.myLists.length === 0"
-          class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed rounded-3xl bg-muted/5"
-        >
-          <div class="p-5 rounded-3xl bg-muted/50 mb-4">
-            <LayoutGrid class="h-10 w-10 text-muted-foreground/40" />
+          <div class="relative w-full sm:w-64">
+            <Search
+              class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+            />
+            <Input
+              v-model="searchQuery"
+              placeholder="Search lists..."
+              class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20"
+            />
           </div>
-          <h4 class="text-xl font-bold">No problem lists yet</h4>
-          <p class="text-sm text-muted-foreground mt-1 max-w-[300px] mb-8">
-            Create your first problem list to organize your practice and track
-            your progress.
-          </p>
-          <Button
-            size="lg"
-            @click="isCreateOpen = true"
-            class="rounded-full gap-2 px-8"
-          >
-            <Plus class="h-4 w-4" />
-            Create Your First List
-          </Button>
         </div>
 
-        <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card
-            v-for="list in sortedMyLists"
-            :key="list.id"
-            class="group hover:shadow-lg transition-all duration-300 border-muted/60 overflow-hidden flex flex-col"
+        <!-- My Lists Tab -->
+        <TabsContent value="my-lists" class="mt-0">
+          <div
+            v-if="data.myLists.length === 0"
+            class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5"
           >
-            <CardHeader class="pb-3">
-              <div class="flex items-start justify-between">
-                <div class="space-y-1.5 flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <Badge
-                      v-if="list.isPublic"
-                      variant="secondary"
-                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                    >
-                      <Globe class="h-3 w-3 mr-1" /> Public
-                    </Badge>
-                    <Badge
-                      v-else
-                      variant="outline"
-                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-muted-foreground/20"
-                    >
-                      <Lock class="h-3 w-3 mr-1" /> Private
-                    </Badge>
-                  </div>
-                  <CardTitle
-                    class="text-xl font-black group-hover:text-primary transition-colors truncate"
-                  >
-                    <RouterLink :to="`/problemset/list/${list.id}`">{{
-                      list.name
-                    }}</RouterLink>
-                  </CardTitle>
-                </div>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger as-child>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      class="h-8 w-8 rounded-full"
-                    >
-                      <MoreHorizontal class="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" class="w-48">
-                    <DropdownMenuItem as-child class="gap-2">
-                      <RouterLink :to="`/problemset/list/${list.id}`">
-                        <Pencil class="h-4 w-4" /> Edit List
-                      </RouterLink>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      class="text-destructive focus:text-destructive gap-2"
-                      @click.prevent="openDeleteListDialog(list)"
-                    >
-                      <Trash2 class="h-4 w-4" /> Delete List
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            <CardContent class="flex-1">
-              <p
-                v-if="list.description"
-                class="text-sm text-muted-foreground line-clamp-2 min-h-[40px]"
-              >
-                {{ list.description }}
-              </p>
-              <p v-else class="text-sm text-muted-foreground/40 italic">
-                No description provided.
-              </p>
-            </CardContent>
-            <CardFooter class="bg-muted/20 border-t py-3 px-6">
-              <div
-                class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
-              >
-                <List class="h-4 w-4 text-primary/70" />
-                {{ list.problemCount }} PROBLEMS
-              </div>
-            </CardFooter>
-          </Card>
-        </div>
-      </TabsContent>
-
-      <!-- Saved Lists Tab -->
-      <TabsContent value="saved" class="mt-0 space-y-8">
-        <!-- Uncategorized Saved Lists -->
-        <div v-if="sortedSavedLists.length > 0">
-          <div class="flex items-center gap-3 mb-4">
-            <h3
-              class="text-lg font-black uppercase tracking-widest text-muted-foreground"
+            <div class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4">
+              <LayoutGrid class="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <h4 class="text-xl font-bold">No problem lists yet</h4>
+            <p class="text-sm text-muted-foreground mt-1 max-w-[300px] mb-8">
+              Create your first problem list to organize your practice and track
+              your progress.
+            </p>
+            <Button
+              size="lg"
+              @click="isCreateOpen = true"
+              class="rounded-full gap-2 px-8 h-10 font-bold"
             >
-              Uncategorized
-            </h3>
-            <Separator class="flex-1" />
+              <Plus class="h-4 w-4" />
+              Create Your First List
+            </Button>
           </div>
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+          <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card
-              v-for="list in sortedSavedLists"
+              v-for="list in sortedMyLists"
               :key="list.id"
-              class="group hover:shadow-lg transition-all duration-300 border-muted/60 flex flex-col overflow-hidden"
+              class="group hover:shadow-md transition-all duration-300 border-muted/60 overflow-hidden flex flex-col rounded-2xl"
             >
               <CardHeader class="pb-3">
                 <div class="flex items-start justify-between">
                   <div class="space-y-1.5 flex-1 min-w-0">
-                    <Badge
-                      variant="secondary"
-                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20"
-                    >
-                      SAVED
-                    </Badge>
+                    <div class="flex items-center gap-2">
+                      <Badge
+                        v-if="list.isPublic"
+                        variant="secondary"
+                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20 rounded-md"
+                      >
+                        <Globe class="h-3 w-3 mr-1" /> Public
+                      </Badge>
+                      <Badge
+                        v-else
+                        variant="outline"
+                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground border-muted-foreground/20 rounded-md"
+                      >
+                        <Lock class="h-3 w-3 mr-1" /> Private
+                      </Badge>
+                    </div>
                     <CardTitle
-                      class="text-xl font-black group-hover:text-primary transition-colors truncate"
+                      class="text-lg font-bold group-hover:text-primary transition-colors truncate"
                     >
                       <RouterLink :to="`/problemset/list/${list.id}`">{{
                         list.name
@@ -627,26 +535,18 @@ onMounted(loadData);
                         <MoreHorizontal class="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" class="w-56">
-                      <DropdownMenuSub v-if="data.categories.length > 0">
-                        <DropdownMenuSubTrigger class="gap-2">
-                          <FolderInput class="h-4 w-4" /> Move to Category
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuItem
-                            v-for="cat in data.categories"
-                            :key="cat.id"
-                            @click.prevent="handleMoveToCategory(list, cat.id)"
-                          >
-                            {{ cat.name }}
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
+                    <DropdownMenuContent align="end" class="w-48">
+                      <DropdownMenuItem as-child class="gap-2">
+                        <RouterLink :to="`/problemset/list/${list.id}`">
+                          <Pencil class="h-4 w-4" /> Edit List
+                        </RouterLink>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        @click.prevent="handleUnsaveList(list)"
-                        class="text-muted-foreground gap-2"
+                        class="text-destructive focus:text-destructive gap-2"
+                        @click.prevent="openDeleteListDialog(list)"
                       >
-                        <BookmarkMinus class="h-4 w-4" /> Unsave List
+                        <Trash2 class="h-4 w-4" /> Delete List
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -655,9 +555,12 @@ onMounted(loadData);
               <CardContent class="flex-1">
                 <p
                   v-if="list.description"
-                  class="text-sm text-muted-foreground line-clamp-2"
+                  class="text-sm text-muted-foreground line-clamp-2 min-h-[40px]"
                 >
                   {{ list.description }}
+                </p>
+                <p v-else class="text-sm text-muted-foreground/40 italic">
+                  No description provided.
                 </p>
               </CardContent>
               <CardFooter class="bg-muted/20 border-t py-3 px-6">
@@ -670,362 +573,461 @@ onMounted(loadData);
               </CardFooter>
             </Card>
           </div>
-        </div>
+        </TabsContent>
 
-        <!-- Categories with their lists -->
-        <div
-          v-for="category in data.categories"
-          :key="category.id"
-          class="space-y-4"
-        >
-          <Collapsible :default-open="true">
-            <div class="flex items-center gap-3 mb-2 group/cat">
-              <CollapsibleTrigger
-                class="flex items-center gap-3 hover:text-primary transition-colors"
+        <!-- Saved Lists Tab -->
+        <TabsContent value="saved" class="mt-0 space-y-8">
+          <!-- Uncategorized Saved Lists -->
+          <div v-if="sortedSavedLists.length > 0">
+            <div class="flex items-center gap-3 mb-4">
+              <h3
+                class="text-lg font-black uppercase tracking-widest text-muted-foreground"
               >
-                <ChevronRight
-                  class="h-5 w-5 transition-transform duration-300 ui-open:rotate-90 text-muted-foreground"
-                />
-                <h3 class="text-lg font-black uppercase tracking-widest">
-                  {{ category.name }}
-                </h3>
-                <Badge
-                  variant="secondary"
-                  class="h-5 px-1.5 rounded-full text-[10px]"
-                  >{{ category.lists.length }}</Badge
-                >
-              </CollapsibleTrigger>
-              <Separator class="flex-1 opacity-50" />
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    class="h-8 w-8 rounded-full opacity-0 group-hover/cat:opacity-100 transition-opacity"
-                  >
-                    <MoreVertical class="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    @click="openEditCategoryDialog(category)"
-                    class="gap-2"
-                  >
-                    <Pencil class="h-4 w-4" /> Rename Category
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    class="text-destructive focus:text-destructive gap-2"
-                    @click="openDeleteCategoryDialog(category)"
-                  >
-                    <Trash2 class="h-4 w-4" /> Delete Category
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                Uncategorized
+              </h3>
+              <Separator class="flex-1" />
             </div>
-
-            <CollapsibleContent class="pt-4 pb-8">
-              <div
-                v-if="category.lists.length === 0"
-                class="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-3xl bg-muted/5 text-muted-foreground"
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Card
+                v-for="list in sortedSavedLists"
+                :key="list.id"
+                class="group hover:shadow-md transition-all duration-300 border-muted/60 flex flex-col overflow-hidden rounded-2xl"
               >
-                <FolderInput class="h-10 w-10 opacity-20 mb-3" />
-                <p class="text-sm font-medium">No lists in this category yet</p>
-              </div>
-              <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card
-                  v-for="list in category.lists"
-                  :key="list.id"
-                  class="group hover:shadow-lg transition-all duration-300 border-muted/60 flex flex-col overflow-hidden"
-                >
-                  <CardHeader class="pb-3">
-                    <div class="flex items-start justify-between">
+                <CardHeader class="pb-3">
+                  <div class="flex items-start justify-between">
+                    <div class="space-y-1.5 flex-1 min-w-0">
+                      <Badge
+                        variant="secondary"
+                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20 rounded-md"
+                      >
+                        SAVED
+                      </Badge>
                       <CardTitle
-                        class="text-xl font-black group-hover:text-primary transition-colors truncate"
+                        class="text-lg font-bold group-hover:text-primary transition-colors truncate"
                       >
                         <RouterLink :to="`/problemset/list/${list.id}`">{{
                           list.name
                         }}</RouterLink>
                       </CardTitle>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger as-child>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            class="h-8 w-8 rounded-full"
-                          >
-                            <MoreHorizontal class="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" class="w-56">
-                          <DropdownMenuItem
-                            @click.prevent="handleMoveToCategory(list, null)"
-                            class="gap-2"
-                          >
-                            <FolderInput class="h-4 w-4" /> Remove from Category
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            @click.prevent="handleUnsaveList(list)"
-                            class="text-muted-foreground gap-2"
-                          >
-                            <BookmarkMinus class="h-4 w-4" /> Unsave List
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
-                  </CardHeader>
-                  <CardFooter class="bg-muted/20 border-t py-3 px-6 mt-auto">
-                    <div
-                      class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
-                    >
-                      <List class="h-4 w-4 text-primary/70" />
-                      {{ list.problemCount }} PROBLEMS
-                    </div>
-                  </CardFooter>
-                </Card>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
 
-        <!-- Empty State for Saved -->
-        <div
-          v-if="data.savedLists.length === 0 && data.categories.length === 0"
-          class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center px-6"
-        >
-          <div
-            class="p-5 rounded-3xl bg-muted/50 mb-4 text-muted-foreground/40"
-          >
-            <Bookmark class="h-10 w-10" />
-          </div>
-          <h4 class="text-xl font-bold">No saved lists yet</h4>
-          <p class="text-sm text-muted-foreground mt-1 max-w-[300px]">
-            Save problem lists created by others to keep them organized here.
-          </p>
-        </div>
-      </TabsContent>
-
-      <!-- Categories Tab -->
-      <TabsContent value="categories" class="mt-0 space-y-8">
-        <div class="grid gap-6">
-          <Card
-            v-for="category in sortedCategories"
-            :key="category.id"
-            class="border-muted/60 hover:shadow-md transition-shadow duration-300 rounded-2xl overflow-hidden"
-          >
-            <div
-              class="flex items-center justify-between px-6 py-4 bg-muted/30"
-            >
-              <div class="flex items-center gap-4">
-                <GripVertical
-                  class="h-5 w-5 text-muted-foreground/30 cursor-grab"
-                />
-                <div
-                  class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"
-                >
-                  <Folder class="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h4 class="text-lg font-black tracking-tight">
-                    {{ category.name }}
-                  </h4>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger as-child>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          class="h-8 w-8 rounded-full"
+                        >
+                          <MoreHorizontal class="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" class="w-56">
+                        <DropdownMenuSub v-if="data.categories.length > 0">
+                          <DropdownMenuSubTrigger class="gap-2">
+                            <FolderInput class="h-4 w-4" /> Move to Category
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuItem
+                              v-for="cat in data.categories"
+                              :key="cat.id"
+                              @click.prevent="
+                                handleMoveToCategory(list, cat.id)
+                              "
+                            >
+                              {{ cat.name }}
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                        <DropdownMenuItem
+                          @click.prevent="handleUnsaveList(list)"
+                          class="text-muted-foreground gap-2"
+                        >
+                          <BookmarkMinus class="h-4 w-4" /> Unsave List
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardHeader>
+                <CardContent class="flex-1">
                   <p
-                    class="text-xs font-bold text-muted-foreground uppercase tracking-widest"
+                    v-if="list.description"
+                    class="text-sm text-muted-foreground line-clamp-2"
                   >
-                    {{ category.lists.length }} LIST{{
-                      category.lists.length !== 1 ? "S" : ""
-                    }}
+                    {{ list.description }}
+                  </p>
+                </CardContent>
+                <CardFooter class="bg-muted/20 border-t py-3 px-6">
+                  <div
+                    class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
+                  >
+                    <List class="h-4 w-4 text-primary/70" />
+                    {{ list.problemCount }} PROBLEMS
+                  </div>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+
+          <!-- Categories with their lists -->
+          <div
+            v-for="category in data.categories"
+            :key="category.id"
+            class="space-y-4"
+          >
+            <Collapsible :default-open="true">
+              <div class="flex items-center gap-3 mb-2 group/cat">
+                <CollapsibleTrigger
+                  class="flex items-center gap-3 hover:text-primary transition-colors"
+                >
+                  <ChevronRight
+                    class="h-5 w-5 transition-transform duration-300 ui-open:rotate-90 text-muted-foreground"
+                  />
+                  <h3 class="text-lg font-black uppercase tracking-widest">
+                    {{ category.name }}
+                  </h3>
+                  <Badge
+                    variant="secondary"
+                    class="h-5 px-1.5 rounded-full text-[10px]"
+                    >{{ category.lists.length }}</Badge
+                  >
+                </CollapsibleTrigger>
+                <Separator class="flex-1 opacity-50" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger as-child>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="h-8 w-8 rounded-full opacity-0 group-hover/cat:opacity-100 transition-opacity"
+                    >
+                      <MoreVertical class="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      @click="openEditCategoryDialog(category)"
+                      class="gap-2"
+                    >
+                      <Pencil class="h-4 w-4" /> Rename Category
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      class="text-destructive focus:text-destructive gap-2"
+                      @click="openDeleteCategoryDialog(category)"
+                    >
+                      <Trash2 class="h-4 w-4" /> Delete Category
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <CollapsibleContent class="pt-4 pb-8">
+                <div
+                  v-if="category.lists.length === 0"
+                  class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-muted-foreground"
+                >
+                  <FolderInput class="h-10 w-10 opacity-20 mb-3" />
+                  <p class="text-sm font-medium">
+                    No lists in this category yet
                   </p>
                 </div>
-              </div>
-              <div class="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  class="rounded-full"
-                  @click="openEditCategoryDialog(category)"
-                >
-                  <Pencil class="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  class="rounded-full text-destructive hover:text-destructive"
-                  @click="openDeleteCategoryDialog(category)"
-                >
-                  <Trash2 class="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div class="p-4 sm:p-6">
-              <div
-                v-if="category.lists.length === 0"
-                class="text-center py-10 bg-muted/10 rounded-xl border-2 border-dashed"
-              >
-                <p class="text-sm text-muted-foreground italic">
-                  No lists in this category.
-                </p>
-              </div>
-              <div v-else class="grid gap-3">
-                <div
-                  v-for="list in category.lists"
-                  :key="list.id"
-                  class="flex items-center justify-between p-4 rounded-xl bg-muted/20 hover:bg-muted/40 transition-all group"
-                >
-                  <RouterLink
-                    :to="`/problemset/list/${list.id}`"
-                    class="flex items-center gap-4 flex-1 min-w-0"
+                <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <Card
+                    v-for="list in category.lists"
+                    :key="list.id"
+                    class="group hover:shadow-md transition-all duration-300 border-muted/60 flex flex-col overflow-hidden rounded-2xl"
                   >
-                    <List class="h-4 w-4 text-primary/60" />
-                    <span class="font-bold truncate">{{ list.name }}</span>
-                    <Badge
-                      variant="secondary"
-                      class="h-5 px-1.5 rounded-full text-[10px]"
+                    <CardHeader class="pb-3">
+                      <div class="flex items-start justify-between">
+                        <CardTitle
+                          class="text-lg font-bold group-hover:text-primary transition-colors truncate"
+                        >
+                          <RouterLink :to="`/problemset/list/${list.id}`">{{
+                            list.name
+                          }}</RouterLink>
+                        </CardTitle>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger as-child>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              class="h-8 w-8 rounded-full"
+                            >
+                              <MoreHorizontal class="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" class="w-56">
+                            <DropdownMenuItem
+                              @click.prevent="handleMoveToCategory(list, null)"
+                              class="gap-2"
+                            >
+                              <FolderInput class="h-4 w-4" /> Remove from
+                              Category
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              @click.prevent="handleUnsaveList(list)"
+                              class="text-muted-foreground gap-2"
+                            >
+                              <BookmarkMinus class="h-4 w-4" /> Unsave List
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </CardHeader>
+                    <CardFooter class="bg-muted/20 border-t py-3 px-6 mt-auto">
+                      <div
+                        class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
+                      >
+                        <List class="h-4 w-4 text-primary/70" />
+                        {{ list.problemCount }} PROBLEMS
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+
+          <!-- Empty State for Saved -->
+          <div
+            v-if="data.savedLists.length === 0 && data.categories.length === 0"
+            class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-center px-6"
+          >
+            <div
+              class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4 text-muted-foreground/40"
+            >
+              <Bookmark class="h-8 w-8" />
+            </div>
+            <h4 class="text-xl font-bold">No saved lists yet</h4>
+            <p class="text-sm text-muted-foreground mt-1 max-w-[300px]">
+              Save problem lists created by others to keep them organized here.
+            </p>
+          </div>
+        </TabsContent>
+
+        <!-- Categories Tab -->
+        <TabsContent value="categories" class="mt-0 space-y-8">
+          <div class="grid gap-6">
+            <Card
+              v-for="category in sortedCategories"
+              :key="category.id"
+              class="border-muted/60 hover:shadow-md transition-shadow duration-300 rounded-2xl overflow-hidden"
+            >
+              <div
+                class="flex items-center justify-between px-6 py-4 bg-muted/30"
+              >
+                <div class="flex items-center gap-4">
+                  <GripVertical
+                    class="h-5 w-5 text-muted-foreground/30 cursor-grab"
+                  />
+                  <div
+                    class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center"
+                  >
+                    <Folder class="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-black tracking-tight">
+                      {{ category.name }}
+                    </h4>
+                    <p
+                      class="text-xs font-bold text-muted-foreground uppercase tracking-widest"
                     >
-                      {{ list.problemCount }} problems
-                    </Badge>
-                  </RouterLink>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger as-child>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100"
-                      >
-                        <MoreHorizontal class="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" class="w-56">
-                      <DropdownMenuSub v-if="data.categories.length > 1">
-                        <DropdownMenuSubTrigger class="gap-2">
-                          <FolderInput class="h-4 w-4" /> Move to Another
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuItem
-                            v-for="cat in data.categories.filter(
-                              (c) => c.id !== category.id,
-                            )"
-                            :key="cat.id"
-                            @click="handleMoveToCategory(list, cat.id)"
-                          >
-                            {{ cat.name }}
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      <DropdownMenuItem
-                        @click="handleMoveToCategory(list, null)"
-                        class="gap-2"
-                      >
-                        <FolderInput class="h-4 w-4" /> Remove from Category
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        @click="handleUnsaveList(list)"
-                        class="text-muted-foreground gap-2"
-                      >
-                        <BookmarkMinus class="h-4 w-4" /> Unsave List
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      {{ category.lists.length }} LIST{{
+                        category.lists.length !== 1 ? "S" : ""
+                      }}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="rounded-full"
+                    @click="openEditCategoryDialog(category)"
+                  >
+                    <Pencil class="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="rounded-full text-destructive hover:text-destructive"
+                    @click="openDeleteCategoryDialog(category)"
+                  >
+                    <Trash2 class="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            </div>
-          </Card>
-        </div>
-      </TabsContent>
 
-      <!-- Featured Tab -->
-      <TabsContent value="featured" class="mt-0">
-        <div
-          v-if="data.featured.length === 0"
-          class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center"
-        >
-          <Star class="h-12 w-12 text-muted-foreground/20 mb-4" />
-          <h4 class="text-xl font-bold">No featured lists</h4>
-          <p class="text-muted-foreground mt-2">
-            Check back later for curated problem lists.
-          </p>
-        </div>
-
-        <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card
-            v-for="list in data.featured"
-            :key="list.id"
-            class="group hover:shadow-lg transition-all duration-300 border-muted/60 flex flex-col overflow-hidden"
-          >
-            <CardHeader class="pb-3">
-              <div class="flex items-start justify-between">
-                <div class="space-y-1.5 flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 border-amber-500/20"
-                    >
-                      FEATURED
-                    </Badge>
-                    <Badge
-                      v-if="list.isSaved"
-                      variant="secondary"
-                      class="h-5 px-1.5 text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20"
-                    >
-                      SAVED
-                    </Badge>
-                  </div>
-                  <CardTitle
-                    class="text-xl font-black group-hover:text-primary transition-colors truncate"
+              <div class="p-4 sm:p-6">
+                <div
+                  v-if="category.lists.length === 0"
+                  class="text-center py-10 bg-muted/10 rounded-xl border-2 border-dashed"
+                >
+                  <p class="text-sm text-muted-foreground italic">
+                    No lists in this category.
+                  </p>
+                </div>
+                <div v-else class="grid gap-3">
+                  <div
+                    v-for="list in category.lists"
+                    :key="list.id"
+                    class="flex items-center justify-between p-4 rounded-xl bg-muted/20 hover:bg-muted/40 transition-all group"
                   >
                     <RouterLink
                       :to="`/problemset/list/${list.id}`"
-                      class="flex items-center gap-2"
+                      class="flex items-center gap-4 flex-1 min-w-0"
                     >
-                      {{ list.name }}
-                      <Star class="h-4 w-4 text-amber-500 fill-amber-500" />
+                      <List class="h-4 w-4 text-primary/60" />
+                      <span class="font-bold truncate">{{ list.name }}</span>
+                      <Badge
+                        variant="secondary"
+                        class="h-5 px-1.5 rounded-full text-[10px]"
+                      >
+                        {{ list.problemCount }} problems
+                      </Badge>
                     </RouterLink>
-                  </CardTitle>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger as-child>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          class="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100"
+                        >
+                          <MoreHorizontal class="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" class="w-56">
+                        <DropdownMenuSub v-if="data.categories.length > 1">
+                          <DropdownMenuSubTrigger class="gap-2">
+                            <FolderInput class="h-4 w-4" /> Move to Another
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuItem
+                              v-for="cat in data.categories.filter(
+                                (c) => c.id !== category.id,
+                              )"
+                              :key="cat.id"
+                              @click="handleMoveToCategory(list, cat.id)"
+                            >
+                              {{ cat.name }}
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                        <DropdownMenuItem
+                          @click="handleMoveToCategory(list, null)"
+                          class="gap-2"
+                        >
+                          <FolderInput class="h-4 w-4" /> Remove from Category
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          @click="handleUnsaveList(list)"
+                          class="text-muted-foreground gap-2"
+                        >
+                          <BookmarkMinus class="h-4 w-4" /> Unsave List
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
+              </div>
+            </Card>
+          </div>
+        </TabsContent>
 
-                <Button
-                  v-if="!list.isSaved"
-                  variant="outline"
-                  size="sm"
-                  class="rounded-full gap-1.5 h-8 font-bold text-[10px] opacity-0 group-hover:opacity-100 transition-all"
-                  @click="handleSaveList(list)"
+        <!-- Featured Tab -->
+        <TabsContent value="featured" class="mt-0">
+          <div
+            v-if="data.featured.length === 0"
+            class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-center"
+          >
+            <div class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4 text-muted-foreground/20">
+              <Star class="h-8 w-8" />
+            </div>
+            <h4 class="text-xl font-bold">No featured lists</h4>
+            <p class="text-muted-foreground mt-2">
+              Check back later for curated problem lists.
+            </p>
+          </div>
+
+          <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card
+              v-for="list in data.featured"
+              :key="list.id"
+              class="group hover:shadow-md transition-all duration-300 border-muted/60 flex flex-col overflow-hidden rounded-2xl"
+            >
+              <CardHeader class="pb-3">
+                <div class="flex items-start justify-between">
+                  <div class="space-y-1.5 flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-600 border-amber-500/20 rounded-md"
+                      >
+                        FEATURED
+                      </Badge>
+                      <Badge
+                        v-if="list.isSaved"
+                        variant="secondary"
+                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20 rounded-md"
+                      >
+                        SAVED
+                      </Badge>
+                    </div>
+                    <CardTitle
+                      class="text-lg font-bold group-hover:text-primary transition-colors truncate"
+                    >
+                      <RouterLink
+                        :to="`/problemset/list/${list.id}`"
+                        class="flex items-center gap-2"
+                      >
+                        {{ list.name }}
+                        <Star class="h-4 w-4 text-amber-500 fill-amber-500" />
+                      </RouterLink>
+                    </CardTitle>
+                  </div>
+
+                  <Button
+                    v-if="!list.isSaved"
+                    variant="outline"
+                    size="sm"
+                    class="rounded-full gap-1.5 h-8 font-bold text-[10px] opacity-0 group-hover:opacity-100 transition-all"
+                    @click="handleSaveList(list)"
+                  >
+                    <Save class="h-3.5 w-3.5" /> SAVE
+                  </Button>
+                  <Button
+                    v-else
+                    variant="ghost"
+                    size="sm"
+                    class="rounded-full gap-1.5 h-8 font-bold text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-all"
+                    @click="handleUnsaveList(list)"
+                  >
+                    <BookmarkMinus class="h-3.5 w-3.5" /> UNSAVE
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent class="flex-1">
+                <p
+                  v-if="list.description"
+                  class="text-sm text-muted-foreground line-clamp-2"
                 >
-                  <Save class="h-3.5 w-3.5" /> SAVE
-                </Button>
-                <Button
-                  v-else
-                  variant="ghost"
-                  size="sm"
-                  class="rounded-full gap-1.5 h-8 font-bold text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-all"
-                  @click="handleUnsaveList(list)"
+                  {{ list.description }}
+                </p>
+              </CardContent>
+              <CardFooter class="bg-muted/20 border-t py-3 px-6 mt-auto">
+                <div
+                  class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
                 >
-                  <BookmarkMinus class="h-3.5 w-3.5" /> UNSAVE
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent class="flex-1">
-              <p
-                v-if="list.description"
-                class="text-sm text-muted-foreground line-clamp-2"
-              >
-                {{ list.description }}
-              </p>
-            </CardContent>
-            <CardFooter class="bg-muted/20 border-t py-3 px-6 mt-auto">
-              <div
-                class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
-              >
-                <List class="h-4 w-4 text-primary/70" />
-                {{ list.problemCount }} PROBLEMS
-              </div>
-            </CardFooter>
-          </Card>
-        </div>
-      </TabsContent>
+                  <List class="h-4 w-4 text-primary/70" />
+                  {{ list.problemCount }} PROBLEMS
+                </div>
+              </CardFooter>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
 
     <!-- Create List Dialog -->
@@ -1244,5 +1246,5 @@ onMounted(loadData);
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  </div>
+  </PersonalPageShell>
 </template>

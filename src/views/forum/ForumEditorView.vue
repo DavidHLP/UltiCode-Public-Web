@@ -221,12 +221,16 @@ onMounted(loadData);
             />
 
             <div class="flex flex-wrap gap-3 items-center">
-              <div class="flex items-center gap-2 bg-card rounded-full border p-1 pr-3 shadow-sm hover:border-primary/50 transition-colors">
+              <div
+                class="flex items-center gap-2 bg-card rounded-full border p-1 pr-3 shadow-sm hover:border-primary/50 transition-colors"
+              >
                 <div class="bg-primary/10 text-primary p-1.5 rounded-full">
                   <LayoutGrid class="h-3.5 w-3.5" />
                 </div>
                 <Select v-model="communityId">
-                  <SelectTrigger class="w-[180px] h-7 border-0 bg-transparent shadow-none focus:ring-0 text-xs font-bold uppercase tracking-wider">
+                  <SelectTrigger
+                    class="w-[180px] h-7 border-0 bg-transparent shadow-none focus:ring-0 text-xs font-bold uppercase tracking-wider"
+                  >
                     <SelectValue placeholder="Community" />
                   </SelectTrigger>
                   <SelectContent>
@@ -241,12 +245,16 @@ onMounted(loadData);
                 </Select>
               </div>
 
-              <div class="flex items-center gap-2 bg-card rounded-full border p-1 pr-3 shadow-sm hover:border-primary/50 transition-colors">
+              <div
+                class="flex items-center gap-2 bg-card rounded-full border p-1 pr-3 shadow-sm hover:border-primary/50 transition-colors"
+              >
                 <div class="bg-amber-500/10 text-amber-600 p-1.5 rounded-full">
                   <Tag class="h-3.5 w-3.5" />
                 </div>
                 <Select v-model="flairType">
-                  <SelectTrigger class="w-[140px] h-7 border-0 bg-transparent shadow-none focus:ring-0 text-xs font-bold uppercase tracking-wider">
+                  <SelectTrigger
+                    class="w-[140px] h-7 border-0 bg-transparent shadow-none focus:ring-0 text-xs font-bold uppercase tracking-wider"
+                  >
                     <SelectValue placeholder="Flair" />
                   </SelectTrigger>
                   <SelectContent>
@@ -283,7 +291,11 @@ onMounted(loadData);
                   class="absolute left-0 top-11 z-50 w-64 rounded-xl border border-border bg-popover shadow-xl animate-in zoom-in-95 duration-200"
                 >
                   <div class="border-b border-border px-4 py-3 bg-muted/30">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Select Post Tags</h4>
+                    <h4
+                      class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                    >
+                      Select Post Tags
+                    </h4>
                   </div>
                   <div class="max-h-64 overflow-y-auto p-2 space-y-1">
                     <button
@@ -293,7 +305,9 @@ onMounted(loadData);
                       class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-muted transition-colors"
                       @click="toggleTag(tag.name)"
                     >
-                      <span class="font-medium text-foreground/80">{{ tag.name }}</span>
+                      <span class="font-medium text-foreground/80">{{
+                        tag.name
+                      }}</span>
                       <div class="h-5 w-5 flex items-center justify-center">
                         <Check
                           v-if="selectedTags.includes(tag.name)"
@@ -331,13 +345,25 @@ onMounted(loadData);
 
         <!-- Editor Section -->
         <div class="flex-1 px-6 pb-6 overflow-hidden">
-          <div class="max-w-[1600px] mx-auto h-full grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="flex flex-col h-full overflow-hidden border rounded-2xl bg-card shadow-sm focus-within:border-primary/50 transition-all">
-              <div class="flex items-center border-b bg-muted/30 px-4 h-10 shrink-0">
-                <span class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Editor (Markdown)</span>
+          <div
+            class="max-w-[1600px] mx-auto h-full grid grid-cols-1 lg:grid-cols-2 gap-6"
+          >
+            <div
+              class="flex flex-col h-full overflow-hidden border rounded-2xl bg-card shadow-sm focus-within:border-primary/50 transition-all"
+            >
+              <div
+                class="flex items-center border-b bg-muted/30 px-4 h-10 shrink-0"
+              >
+                <span
+                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                  >Editor (Markdown)</span
+                >
               </div>
               <div class="flex-1 overflow-hidden p-2">
-                <MarkdownEdit v-model="excerpt" :default-value="defaultTemplate" />
+                <MarkdownEdit
+                  v-model="excerpt"
+                  :default-value="defaultTemplate"
+                />
               </div>
             </div>
 
@@ -347,11 +373,16 @@ onMounted(loadData);
               <div
                 class="flex items-center border-b bg-muted/30 px-4 h-10 shrink-0"
               >
-                <span class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Live Preview</span>
+                <span
+                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+                  >Live Preview</span
+                >
               </div>
               <div class="flex-1 overflow-y-auto p-8 scrollbar-thin">
                 <div class="prose prose-sm dark:prose-invert max-w-none">
-                  <h1 class="text-3xl font-black mb-6">{{ title || 'Untilted Post' }}</h1>
+                  <h1 class="text-3xl font-black mb-6">
+                    {{ title || "Untilted Post" }}
+                  </h1>
                   <MarkdownView :content="excerpt || defaultTemplate" />
                 </div>
               </div>
