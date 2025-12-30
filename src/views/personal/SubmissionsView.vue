@@ -140,12 +140,12 @@ onMounted(async () => {
           <Table>
             <TableHeader class="bg-muted/50">
               <TableRow>
-                <TableHead class="w-[300px] font-bold">Problem</TableHead>
-                <TableHead class="font-bold">Status</TableHead>
-                <TableHead class="font-bold">Language</TableHead>
-                <TableHead class="font-bold">Runtime</TableHead>
-                <TableHead class="font-bold">Memory</TableHead>
-                <TableHead class="text-right font-bold">Submitted At</TableHead>
+                <TableHead class="w-[300px] font-semibold text-xs uppercase tracking-wider">Problem</TableHead>
+                <TableHead class="font-semibold text-xs uppercase tracking-wider">Status</TableHead>
+                <TableHead class="font-semibold text-xs uppercase tracking-wider">Language</TableHead>
+                <TableHead class="font-semibold text-xs uppercase tracking-wider">Runtime</TableHead>
+                <TableHead class="font-semibold text-xs uppercase tracking-wider">Memory</TableHead>
+                <TableHead class="text-right font-semibold text-xs uppercase tracking-wider">Submitted At</TableHead>
                 <TableHead class="w-10"></TableHead>
               </TableRow>
             </TableHeader>
@@ -159,7 +159,7 @@ onMounted(async () => {
                   <div class="flex flex-col">
                     <RouterLink
                       :to="`/problems/${submission.problem?.slug || ''}`"
-                      class="font-bold text-foreground hover:text-primary transition-colors"
+                      class="font-medium text-foreground hover:text-primary transition-colors"
                     >
                       {{ submission.problem?.title || "Unknown Problem" }}
                     </RouterLink>
@@ -173,7 +173,7 @@ onMounted(async () => {
                 <TableCell>
                   <Badge
                     variant="outline"
-                    class="gap-1.5 py-1 px-2 font-bold rounded-md border"
+                    class="gap-1.5 py-1 px-2 font-medium rounded-md border"
                     :class="getStatusColorClass(submission.status)"
                   >
                     <component

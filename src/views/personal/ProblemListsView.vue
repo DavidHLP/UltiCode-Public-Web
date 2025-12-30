@@ -504,20 +504,20 @@ onMounted(loadData);
                       <Badge
                         v-if="list.isPublic"
                         variant="secondary"
-                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20 rounded-md"
+                        class="h-5 px-1.5 text-[10px] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20 rounded-md"
                       >
                         <Globe class="h-3 w-3 mr-1" /> Public
                       </Badge>
                       <Badge
                         v-else
                         variant="outline"
-                        class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground border-muted-foreground/20 rounded-md"
+                        class="h-5 px-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground border-muted-foreground/20 rounded-md"
                       >
                         <Lock class="h-3 w-3 mr-1" /> Private
                       </Badge>
                     </div>
                     <CardTitle
-                      class="text-lg font-bold group-hover:text-primary transition-colors truncate"
+                      class="text-lg font-semibold group-hover:text-primary transition-colors truncate"
                     >
                       <RouterLink :to="`/problemset/list/${list.id}`">{{
                         list.name

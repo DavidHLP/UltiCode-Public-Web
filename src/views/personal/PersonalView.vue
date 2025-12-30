@@ -184,7 +184,7 @@ onMounted(async () => {
           >
             <div class="space-y-1">
               <h1
-                class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent"
+                class="text-3xl md:text-4xl font-extrabold tracking-tighter bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent"
               >
                 {{ user.name || user.username }}
               </h1>
@@ -196,7 +196,7 @@ onMounted(async () => {
                 >
                 <Badge
                   variant="secondary"
-                  class="rounded-full px-2 py-0 h-5 text-[10px] font-bold uppercase tracking-wider"
+                  class="rounded-full px-2 py-0 h-5 text-[10px] font-semibold uppercase tracking-wider"
                 >
                   Pro Member
                 </Badge>
@@ -285,13 +285,13 @@ onMounted(async () => {
               class="pb-2 space-y-0 flex flex-row items-center justify-between"
             >
               <CardTitle
-                class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                 >Global Rank</CardTitle
               >
               <Trophy class="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div class="text-3xl font-black">
+              <div class="text-3xl font-bold tracking-tight">
                 #{{ (user.rank || 12403).toLocaleString() }}
               </div>
               <div class="mt-2 flex items-center gap-2">
@@ -317,13 +317,13 @@ onMounted(async () => {
               class="pb-2 space-y-0 flex flex-row items-center justify-between"
             >
               <CardTitle
-                class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                 >Solved</CardTitle
               >
               <CheckCircle2 class="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div class="text-3xl font-black">
+              <div class="text-3xl font-bold tracking-tight">
                 {{ statsData?.totalSolved || 0 }}
               </div>
               <div class="mt-2 text-[11px] text-muted-foreground font-medium">
@@ -340,13 +340,13 @@ onMounted(async () => {
               class="pb-2 space-y-0 flex flex-row items-center justify-between"
             >
               <CardTitle
-                class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                 >Streak</CardTitle
               >
               <Flame class="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div class="text-3xl font-black">
+              <div class="text-3xl font-bold tracking-tight">
                 {{ statsData?.streak || 0 }}
               </div>
               <div class="mt-2 flex gap-1">

@@ -285,7 +285,7 @@ onMounted(() => {
       >
         <CardHeader class="pb-3 px-4">
           <CardTitle
-            class="text-sm font-black uppercase tracking-widest text-muted-foreground/70"
+            class="text-sm font-semibold uppercase tracking-widest text-muted-foreground/70"
             >My Folders</CardTitle
           >
         </CardHeader>
@@ -311,7 +311,7 @@ onMounted(() => {
             class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
           >
             <div>
-              <h3 class="text-2xl font-black tracking-tight">
+              <h3 class="text-2xl font-semibold tracking-tight">
                 {{ selectedFolder.name }}
               </h3>
               <p
@@ -390,7 +390,7 @@ onMounted(() => {
                       <div class="space-y-1">
                         <RouterLink
                           :to="getItemUrl(item)"
-                          class="text-lg font-bold hover:text-primary transition-colors line-clamp-1 flex items-center gap-2"
+                          class="text-base font-semibold hover:text-primary transition-colors line-clamp-1 flex items-center gap-2"
                         >
                           {{ item.title ?? `Item ${item.targetId}` }}
                           <ExternalLink
@@ -403,7 +403,7 @@ onMounted(() => {
                         >
                           <Badge
                             variant="secondary"
-                            class="text-[9px] font-bold uppercase tracking-widest px-1.5 h-4 rounded-md"
+                            class="text-[9px] font-semibold uppercase tracking-widest px-1.5 h-4 rounded-md"
                           >
                             {{
                               item.targetType.toLowerCase().replace("_", " ")
@@ -417,23 +417,23 @@ onMounted(() => {
                             />
                             <div
                               v-if="getForumMetadata(item)?.communityName"
-                              class="text-[11px] font-bold text-muted-foreground"
+                              class="text-xs font-medium text-muted-foreground"
                             >
                               r/{{ getForumMetadata(item)?.communityName }}
                             </div>
                             <div
                               v-if="getForumMetadata(item)?.authorName"
-                              class="text-[11px] font-medium text-muted-foreground flex items-center gap-1"
+                              class="text-xs font-medium text-muted-foreground flex items-center gap-1"
                             >
                               by
-                              <span class="font-bold text-foreground/80">{{
+                              <span class="font-semibold text-foreground/80">{{
                                 getForumMetadata(item)?.authorName
                               }}</span>
                             </div>
                           </template>
 
                           <div
-                            class="text-[11px] font-medium text-muted-foreground flex items-center gap-1"
+                            class="text-xs font-medium text-muted-foreground flex items-center gap-1"
                           >
                             <Calendar class="h-3 w-3" />
                             {{ new Date(item.createdAt).toLocaleDateString() }}

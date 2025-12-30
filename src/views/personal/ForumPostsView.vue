@@ -122,12 +122,12 @@ onMounted(loadPosts);
             <div class="flex items-center gap-2 mb-3">
               <Badge
                 variant="secondary"
-                class="bg-primary/5 text-primary border-primary/10 font-bold hover:bg-primary/10 transition-colors rounded-md"
+                class="bg-primary/5 text-primary border-primary/10 font-semibold hover:bg-primary/10 transition-colors rounded-md"
               >
                 {{ post.community?.name ?? "General" }}
               </Badge>
               <div
-                class="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+                class="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider"
               >
                 <Calendar class="h-3 w-3" />
                 {{
@@ -143,7 +143,7 @@ onMounted(loadPosts);
             <div class="flex items-start justify-between gap-4">
               <div class="space-y-2 flex-1">
                 <CardTitle
-                  class="text-lg font-bold group-hover:text-primary transition-colors"
+                  class="text-lg font-semibold group-hover:text-primary transition-colors"
                 >
                   <RouterLink
                     :to="{ name: 'forum-thread', params: { postId: post.id } }"
@@ -156,21 +156,21 @@ onMounted(loadPosts);
                   <Badge
                     v-if="post.isPinned"
                     variant="secondary"
-                    class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 gap-1 rounded-sm h-5 text-[10px] font-bold"
+                    class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 gap-1 rounded-sm h-5 text-[10px] font-semibold"
                   >
                     <Pin class="h-3 w-3" /> PINNED
                   </Badge>
                   <Badge
                     v-if="post.isLocked"
                     variant="outline"
-                    class="gap-1 rounded-sm h-5 text-[10px] font-bold border-muted-foreground/30 text-muted-foreground"
+                    class="gap-1 rounded-sm h-5 text-[10px] font-semibold border-muted-foreground/30 text-muted-foreground"
                   >
                     <Lock class="h-3 w-3" /> LOCKED
                   </Badge>
                   <Badge
                     v-if="post.flair"
                     variant="secondary"
-                    class="rounded-sm h-5 text-[10px] font-bold uppercase"
+                    class="rounded-sm h-5 text-[10px] font-semibold uppercase"
                   >
                     {{ post.flair.text }}
                   </Badge>
@@ -246,11 +246,11 @@ onMounted(loadPosts);
               <MessageSquare
                 class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors"
               />
-              <span class="text-lg font-black leading-none">{{
+              <span class="text-xl font-bold tracking-tight leading-none">{{
                 post.stats?.comments ?? 0
               }}</span>
               <span
-                class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+                class="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest"
                 >Comments</span
               >
             </div>
@@ -258,11 +258,11 @@ onMounted(loadPosts);
               <Eye
                 class="h-5 w-5 text-muted-foreground group-hover/stat:text-primary transition-colors"
               />
-              <span class="text-lg font-black leading-none">{{
+              <span class="text-xl font-bold tracking-tight leading-none">{{
                 post.stats?.views ?? 0
               }}</span>
               <span
-                class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+                class="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest"
                 >Views</span
               >
             </div>

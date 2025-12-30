@@ -159,7 +159,7 @@ onMounted(async () => {
           <div class="flex items-start justify-between gap-2">
             <div class="space-y-1 flex-1 min-w-0">
               <CardTitle
-                class="line-clamp-2 text-lg font-bold group-hover:text-primary transition-colors cursor-pointer"
+                class="line-clamp-2 text-lg font-semibold group-hover:text-primary transition-colors cursor-pointer"
                 @click="handleView(sol)"
               >
                 {{ sol.title }}

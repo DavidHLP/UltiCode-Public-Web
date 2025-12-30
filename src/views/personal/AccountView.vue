@@ -129,7 +129,7 @@ onMounted(async () => {
             <!-- Profile Section -->
             <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-lg">Public Profile</CardTitle>
+                <CardTitle class="text-xl font-semibold tracking-tight">Public Profile</CardTitle>
                 <CardDescription>
                   This information will be displayed publicly on your profile
                   page.
@@ -140,7 +140,7 @@ onMounted(async () => {
                   <div class="space-y-2">
                     <Label
                       htmlFor="username"
-                      class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                      class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >Username</Label
                     >
                     <div class="relative">
@@ -161,7 +161,7 @@ onMounted(async () => {
                   <div class="space-y-2">
                     <Label
                       htmlFor="name"
-                      class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                      class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >Display Name</Label
                     >
                     <Input
@@ -178,7 +178,7 @@ onMounted(async () => {
                 <div class="space-y-2">
                   <Label
                     htmlFor="bio"
-                    class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                    class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                     >Bio</Label
                   >
                   <Textarea
@@ -196,7 +196,7 @@ onMounted(async () => {
                   <div class="space-y-2">
                     <Label
                       htmlFor="email"
-                      class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                      class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >Email Address</Label
                     >
                     <div class="relative">
@@ -214,7 +214,7 @@ onMounted(async () => {
                   <div class="space-y-2">
                     <Label
                       htmlFor="location"
-                      class="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                      class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >Location</Label
                     >
                     <div class="relative">
@@ -235,7 +235,7 @@ onMounted(async () => {
             <!-- Social/Links Section -->
             <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-lg">Web Presence</CardTitle>
+                <CardTitle class="text-xl font-semibold tracking-tight">Web Presence</CardTitle>
                 <CardDescription>
                   Add links to your professional profiles and personal website.
                 </CardDescription>
