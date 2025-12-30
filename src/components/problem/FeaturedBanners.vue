@@ -30,12 +30,12 @@ type DisplayBanner = ProblemList & {
 };
 
 const CARD_BASE =
-  "relative overflow-hidden border shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 h-full";
+  "relative overflow-hidden border shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 h-full rounded-2xl";
 const CARD_CONTENT_BASE = "p-5 relative z-10 flex flex-col h-full";
 const ICON_BASE =
-  "w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3";
+  "w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3";
 const BADGE_BASE =
-  "px-2 py-0.5 rounded-full text-[10px] font-medium border shadow-sm backdrop-blur";
+  "px-2 py-0.5 rounded-md text-[10px] font-bold border shadow-sm backdrop-blur uppercase tracking-widest";
 const GLOW_BASE =
   "absolute rounded-full blur-3xl transition-transform duration-300";
 
@@ -140,11 +140,11 @@ onMounted(async () => {
       <Card
         v-for="i in 3"
         :key="i"
-        class="relative overflow-hidden border bg-muted/30 h-full"
+        class="relative overflow-hidden border bg-muted/30 h-full rounded-2xl"
       >
         <CardContent class="p-5 animate-pulse space-y-4">
           <div class="flex items-start justify-between">
-            <div class="h-10 w-10 rounded-xl bg-muted/70"></div>
+            <div class="h-10 w-10 rounded-2xl bg-muted/70"></div>
             <div class="h-4 w-16 rounded-full bg-muted/60"></div>
           </div>
           <div class="space-y-2">
@@ -162,14 +162,19 @@ onMounted(async () => {
 
     <template v-else-if="displayBanners.length === 0">
       <div
-        class="col-span-full rounded-xl border border-dashed bg-muted/20 p-6 text-sm text-muted-foreground"
+        class="col-span-full flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed border-muted/50 bg-muted/5 text-center px-6"
       >
-        <p class="text-sm font-medium text-foreground">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
+        >
+          <Sparkles class="h-8 w-8 text-muted-foreground/50" />
+        </div>
+        <p class="text-xl font-bold text-foreground">
           {{
             hasError ? "Unable to load featured lists" : "No featured lists yet"
           }}
         </p>
-        <p class="text-xs text-muted-foreground mt-1">
+        <p class="text-sm text-muted-foreground mt-2 max-w-[300px]">
           {{
             hasError
               ? "Please try again in a moment."

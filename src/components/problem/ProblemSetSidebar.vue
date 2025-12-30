@@ -30,7 +30,7 @@ onMounted(async () => {
 <template>
   <div class="space-y-6">
     <!-- Calendar Widget -->
-    <Card class="border-none shadow-sm bg-card/50">
+    <Card class="border-muted/60 shadow-sm bg-card/50 rounded-2xl">
       <CardHeader class="pb-2 border-b border-border/50 bg-muted/20">
         <CardTitle
           class="text-sm font-medium flex items-center justify-between"
@@ -45,7 +45,7 @@ onMounted(async () => {
             >
             <Badge
               variant="outline"
-              class="text-[10px] font-normal h-5 px-1.5 flex gap-1 items-center bg-background/50"
+              class="text-[10px] font-normal h-5 px-1.5 flex gap-1 items-center bg-background/50 rounded-md"
             >
               <span
                 class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.4)]"

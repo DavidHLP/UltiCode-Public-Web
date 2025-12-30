@@ -125,9 +125,14 @@ const navigateToProblem = (slug: string) => {
         </template>
         <template v-else-if="filteredProblems.length === 0">
           <div
-            class="flex flex-col items-center justify-center p-12 space-y-3 text-muted-foreground"
+            class="flex flex-col items-center justify-center py-12 space-y-3 text-muted-foreground"
           >
-            <span class="text-xs">No problems found.</span>
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/50 mb-2"
+            >
+              <Search class="h-6 w-6 text-muted-foreground/50" />
+            </div>
+            <span class="text-sm font-bold">No problems found.</span>
           </div>
         </template>
         <template v-else>

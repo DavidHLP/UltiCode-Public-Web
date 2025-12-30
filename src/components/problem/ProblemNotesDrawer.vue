@@ -64,17 +64,19 @@ async function handleSave() {
         <Textarea
           v-model="content"
           placeholder="Start writing..."
-          class="min-h-[400px] resize-none focus-visible:ring-1"
+          class="min-h-[400px] resize-none focus-visible:ring-1 rounded-lg"
         />
       </div>
     </div>
 
     <div class="p-4 border-t flex justify-end gap-2">
-      <Button variant="outline" @click="emit('close')">Cancel</Button>
+      <Button variant="outline" @click="emit('close')" class="rounded-full"
+        >Cancel</Button
+      >
       <Button
         :disabled="isSaving || isLoading"
         @click="handleSave"
-        class="gap-2"
+        class="gap-2 rounded-full"
       >
         <Save v-if="!isSaving" class="h-4 w-4" />
         <Loader2 v-else class="h-4 w-4 animate-spin" />

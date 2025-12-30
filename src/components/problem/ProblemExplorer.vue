@@ -327,7 +327,7 @@ function loadMore() {
           <Input
             v-model="searchQuery"
             placeholder="Search problems by title or ID..."
-            class="pl-9 h-10"
+            class="pl-9 h-10 rounded-full"
           />
         </div>
 
@@ -335,7 +335,10 @@ function loadMore() {
         <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button variant="outline" class="h-10 gap-2 border-dashed">
+              <Button
+                variant="outline"
+                class="h-10 gap-2 border-dashed rounded-full"
+              >
                 <ListFilter class="h-4 w-4" />
                 Filters
                 <Badge
@@ -346,7 +349,7 @@ function loadMore() {
                     0
                   "
                   variant="secondary"
-                  class="ml-1 h-5 px-1 text-[10px]"
+                  class="ml-1 h-5 px-1 text-[10px] rounded-full"
                 >
                   {{
                     selectedStatus.length +
@@ -482,7 +485,11 @@ function loadMore() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" class="h-10" @click="pickOne">
+          <Button
+            variant="outline"
+            class="h-10 rounded-full"
+            @click="pickOne"
+          >
             Pick One
           </Button>
 
@@ -496,7 +503,7 @@ function loadMore() {
             "
             variant="ghost"
             size="icon"
-            class="h-10 w-10"
+            class="h-10 w-10 rounded-full"
             @click="clearFilters"
             aria-label="Clear filters"
           >
@@ -512,7 +519,7 @@ function loadMore() {
             v-for="tag in popularTags"
             :key="tag"
             :variant="isTagSelected(tag) ? 'default' : 'outline'"
-            class="cursor-pointer px-3 py-1 hover:bg-primary/80 hover:text-primary-foreground transition-colors"
+            class="cursor-pointer px-3 py-1 hover:bg-primary/80 hover:text-primary-foreground transition-colors rounded-md"
             :class="{
               'bg-primary text-primary-foreground hover:bg-primary/90':
                 isTagSelected(tag),
@@ -525,7 +532,7 @@ function loadMore() {
             <Button
               variant="ghost"
               size="sm"
-              class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground"
+              class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground rounded-full"
             >
               Show more tags
               <ChevronDown class="h-3 w-3" />
@@ -538,7 +545,7 @@ function loadMore() {
               v-for="tag in otherTags"
               :key="tag"
               variant="outline"
-              class="cursor-pointer px-2.5 py-0.5 text-[11px] font-normal border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              class="cursor-pointer px-2.5 py-0.5 text-[11px] font-normal border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors rounded-md"
               :class="{
                 'bg-zinc-900 text-zinc-50 border-zinc-900 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900':
                   isTagSelected(tag),

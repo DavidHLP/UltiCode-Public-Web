@@ -146,7 +146,7 @@ onUnmounted(() => {
             <Button
               variant="ghost"
               size="icon"
-              class="h-8 w-8 text-muted-foreground hover:text-destructive"
+              class="h-8 w-8 text-muted-foreground hover:text-destructive rounded-full"
               @click="(e: MouseEvent) => handleRemove(e, problem)"
             >
               <Trash2 class="h-4 w-4" />
@@ -157,21 +157,19 @@ onUnmounted(() => {
 
       <TableRow v-else>
         <TableCell :colspan="props.editable ? 5 : 4" class="p-0">
-          <Empty class="border-none bg-transparent px-6 py-8">
-            <EmptyContent>
-              <EmptyMedia variant="icon">
-                <SearchX class="h-6 w-6 text-muted-foreground" />
-              </EmptyMedia>
-              <EmptyHeader>
-                <p class="text-base font-semibold text-foreground">
-                  No results found
-                </p>
-                <EmptyDescription>
-                  Try adjusting filters or clearing search to see more problems.
-                </EmptyDescription>
-              </EmptyHeader>
-            </EmptyContent>
-          </Empty>
+          <div
+            class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-center px-6 m-4"
+          >
+            <div
+              class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
+            >
+              <SearchX class="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <p class="text-xl font-bold text-foreground">No results found</p>
+            <p class="text-sm text-muted-foreground mt-2 max-w-[300px]">
+              Try adjusting filters or clearing search to see more problems.
+            </p>
+          </div>
         </TableCell>
       </TableRow>
     </TableBody>
