@@ -74,8 +74,6 @@ const mapExamplesToDescription = (examples: BackendExample[]) =>
     explanation: ex.explanation,
   }));
 
-const supportedRunLanguages = new Set(["javascript", "typescript"]);
-
 const mapLanguages = (raw: unknown): ProblemLanguageOption[] => {
   if (!Array.isArray(raw)) return [];
   const mapped = raw
@@ -86,6 +84,7 @@ const mapLanguages = (raw: unknown): ProblemLanguageOption[] => {
         id: l.id as ProblemLanguageOption["id"],
         label: (typeof l.label === "string" && l.label) || value || "Unknown",
         value,
+        style: typeof l.style === "string" ? l.style : undefined,
         starterCode:
           (typeof l.starterCode === "string" && l.starterCode) ||
           (typeof l.starter_code === "string" && l.starter_code) ||
@@ -94,10 +93,7 @@ const mapLanguages = (raw: unknown): ProblemLanguageOption[] => {
     })
     .filter((lang) => lang.value);
 
-  const supported = mapped.filter((lang) =>
-    supportedRunLanguages.has(lang.value.toLowerCase()),
-  );
-  return supported.length > 0 ? supported : mapped;
+  return mapped;
 };
 
 export function mapProblemDetail(

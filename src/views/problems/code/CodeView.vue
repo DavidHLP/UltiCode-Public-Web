@@ -2,13 +2,11 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { usePreferredDark } from "@vueuse/core";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import CodeEditor from "./components/CodeEditor.vue";
 import type { ProblemLanguageOption } from "@/types/problem-detail";
@@ -19,6 +17,7 @@ import {
   Scan,
   CheckIcon,
   Wand2,
+  ChevronDown,
 } from "lucide-vue-next";
 import { problemHooks } from "@/hooks/problem-hooks";
 import { useProblemEditorStore } from "@/stores/problemEditorStore";
@@ -42,14 +41,6 @@ const isFullscreen = ref(false);
 const languageMeta = computed(() =>
   props.languages.find((lang) => lang.value === activeLanguageValue.value),
 );
-
-// Check if current language has a companion style (e.g. JS if current is TS)
-const companionLanguage = computed(() => {
-  if (!languageMeta.value?.style) return null;
-  const otherStyle =
-    languageMeta.value.style === "typescript" ? "javascript" : "typescript";
-  return props.languages.find((lang) => lang.style === otherStyle);
-});
 
 const editorLanguage = computed(
   () => languageMeta.value?.value ?? "typescript",
@@ -80,13 +71,6 @@ const handleReset = () => {
   code.value = starterCode.value;
 };
 
-const setLanguageByStyle = (style: string) => {
-  const target = props.languages.find((lang) => lang.style === style);
-  if (target) {
-    activeLanguageValue.value = target.value;
-  }
-};
-
 const handleFormat = async () => {
   await editorRef.value?.formatDocument?.();
 };
@@ -115,12 +99,22 @@ onBeforeUnmount(() => {
   document.removeEventListener("fullscreenchange", handleFullscreenChange);
 });
 
+const codeCache = ref<Record<string, string>>({});
+
 watch(
   () => activeLanguageValue.value,
   (value, previous) => {
+    if (previous && code.value) {
+      codeCache.value[previous] = code.value;
+    }
+
     const target = props.languages.find((lang) => lang.value === value);
     if (target) {
-      code.value = target.starterCode;
+      if (codeCache.value[value]) {
+        code.value = codeCache.value[value];
+      } else {
+        code.value = target.starterCode;
+      }
     }
     if (value) {
       editorStore.setLanguage(value);
@@ -153,73 +147,32 @@ watch(
     <main class="flex flex-col gap-1 p-1 flex-1 min-h-0">
       <div class="flex flex-wrap items-center justify-between gap-1">
         <div class="flex items-center gap-1">
-          <NavigationMenu :viewport="false">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger
-                  class="h-8 px-3 py-1 text-xs font-medium"
-                >
-                  {{ activeLanguageLabel }}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul class="grid w-[200px] gap-1 p-2">
-                    <li v-for="language in props.languages" :key="language.id">
-                      <NavigationMenuLink as-child>
-                        <a
-                          href="#"
-                          class="flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium hover:bg-accent"
-                          @click.prevent="activeLanguageValue = language.value"
-                        >
-                          <CheckIcon
-                            class="h-3.5 w-3.5"
-                            :class="
-                              language.value === activeLanguageValue
-                                ? 'opacity-100'
-                                : 'opacity-0'
-                            "
-                          />
-                          {{ language.label }}
-                        </a>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          <!-- TS/JS Style Toggle -->
-          <div
-            v-if="companionLanguage"
-            class="flex items-center bg-muted rounded-md p-0.5 h-8"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              class="h-7 px-2 text-[10px] uppercase font-bold transition-all"
-              :class="
-                languageMeta?.style === 'javascript'
-                  ? 'bg-background shadow-sm text-foreground'
-                  : 'text-muted-foreground'
-              "
-              @click="setLanguageByStyle('javascript')"
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              class="h-8 px-3 py-1 text-xs font-medium flex items-center gap-1 hover:bg-muted rounded-md transition-colors outline-none"
             >
-              JS
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              class="h-7 px-2 text-[10px] uppercase font-bold transition-all"
-              :class="
-                languageMeta?.style === 'typescript'
-                  ? 'bg-background shadow-sm text-foreground'
-                  : 'text-muted-foreground'
-              "
-              @click="setLanguageByStyle('typescript')"
-            >
-              TS
-            </Button>
-          </div>
+              {{ activeLanguageLabel }}
+              <ChevronDown class="h-3 w-3 opacity-50" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" class="w-[200px]">
+              <DropdownMenuItem
+                v-for="language in props.languages"
+                :key="language.id"
+                @select="activeLanguageValue = language.value"
+                class="text-xs cursor-pointer"
+              >
+                <CheckIcon
+                  class="mr-2 h-3.5 w-3.5"
+                  :class="
+                    language.value === activeLanguageValue
+                      ? 'opacity-100'
+                      : 'opacity-0'
+                  "
+                />
+                {{ language.label }}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div class="flex h-full items-center gap-1 text-muted-foreground">

@@ -18,7 +18,7 @@ export interface ProblemTestCase {
 }
 
 export interface ProblemLanguageOption {
-  id: number;
+  id: number | string;
   label: string;
   value: string;
   style?: string;

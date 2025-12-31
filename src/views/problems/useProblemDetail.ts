@@ -9,8 +9,6 @@ import { runSubmission } from "@/api/submission";
 import { useProblemEditorStore } from "@/stores/problemEditorStore";
 import { storeToRefs } from "pinia";
 
-const supportedRunLanguages = new Set(["javascript", "typescript", "js", "ts"]);
-
 export function useProblemDetail(slug: Ref<string | null | undefined>) {
   const problem = ref<ProblemDetail | null>(null);
   const runResult = ref<ProblemRunResult | null>(null);
@@ -67,25 +65,7 @@ export function useProblemDetail(slug: Ref<string | null | undefined>) {
         runResult.value = null;
         return;
       }
-      const normalizedLanguage = currentLanguage.toLowerCase();
-      if (!supportedRunLanguages.has(normalizedLanguage)) {
-        runResult.value = {
-          id: `run-unsupported-${Date.now()}`,
-          submissionId: `run-unsupported-${Date.now()}`,
-          problemId: problem.value.id,
-          userId: "anonymous",
-          verdict: "Compile Error",
-          runtime: "0 ms",
-          memory: "0 MB",
-          cases: [],
-          error_message: `Language ${currentLanguage} is not supported.`,
-        };
-        await problemHooks.emit("problem:run:error", {
-          problemId: problem.value.id,
-          error: new Error(`Unsupported language: ${currentLanguage}`),
-        });
-        return;
-      }
+
       const cases =
         bottomPanelStore.testCases.value.length > 0
           ? bottomPanelStore.testCases.value
