@@ -28,10 +28,11 @@ const props = defineProps<{
   starterNotes: string[];
 }>();
 
-const activeLanguageValue = ref(props.languages[0]?.value ?? "");
-const code = ref("");
 const prefersDark = usePreferredDark();
 const editorStore = useProblemEditorStore();
+
+const activeLanguageValue = ref(props.languages[0]?.value ?? "");
+const code = ref("");
 const editorContainer = ref<HTMLElement | null>(null);
 const editorRef = ref<InstanceType<typeof CodeEditor> | null>(null);
 const isWordWrapEnabled = ref(false);
@@ -42,15 +43,28 @@ const languageMeta = computed(() =>
   props.languages.find((lang) => lang.value === activeLanguageValue.value),
 );
 
+// Check if current language has a companion style (e.g. JS if current is TS)
+const companionLanguage = computed(() => {
+  if (!languageMeta.value?.style) return null;
+  const otherStyle =
+    languageMeta.value.style === "typescript" ? "javascript" : "typescript";
+  return props.languages.find((lang) => lang.style === otherStyle);
+});
+
 const editorLanguage = computed(
   () => languageMeta.value?.value ?? "typescript",
 );
 const editorTheme = computed(() =>
   prefersDark.value ? "vs-dark" : "vs-light",
 );
-const activeLanguageLabel = computed(
-  () => languageMeta.value?.label ?? "Select language",
-);
+const activeLanguageLabel = computed(() => {
+  if (languageMeta.value?.style) {
+    return languageMeta.value.style === "typescript"
+      ? "TypeScript"
+      : "JavaScript";
+  }
+  return languageMeta.value?.label ?? "Select language";
+});
 const starterCode = computed(() => languageMeta.value?.starterCode ?? "");
 const canReset = computed(() => code.value !== starterCode.value);
 
@@ -64,6 +78,13 @@ const toggleMinimap = () => {
 
 const handleReset = () => {
   code.value = starterCode.value;
+};
+
+const setLanguageByStyle = (style: string) => {
+  const target = props.languages.find((lang) => lang.style === style);
+  if (target) {
+    activeLanguageValue.value = target.value;
+  }
 };
 
 const handleFormat = async () => {
@@ -131,38 +152,75 @@ watch(
     <!-- Main Content Area -->
     <main class="flex flex-col gap-1 p-1 flex-1 min-h-0">
       <div class="flex flex-wrap items-center justify-between gap-1">
-        <NavigationMenu :viewport="false">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger class="h-8 px-3 py-1 text-xs font-medium">
-                {{ activeLanguageLabel }}
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul class="grid w-[200px] gap-1 p-2">
-                  <li v-for="language in props.languages" :key="language.id">
-                    <NavigationMenuLink as-child>
-                      <a
-                        href="#"
-                        class="flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium hover:bg-accent"
-                        @click.prevent="activeLanguageValue = language.value"
-                      >
-                        <CheckIcon
-                          class="h-3.5 w-3.5"
-                          :class="
-                            language.value === activeLanguageValue
-                              ? 'opacity-100'
-                              : 'opacity-0'
-                          "
-                        />
-                        {{ language.label }}
-                      </a>
-                    </NavigationMenuLink>
-                  </li>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <div class="flex items-center gap-1">
+          <NavigationMenu :viewport="false">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger
+                  class="h-8 px-3 py-1 text-xs font-medium"
+                >
+                  {{ activeLanguageLabel }}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul class="grid w-[200px] gap-1 p-2">
+                    <li v-for="language in props.languages" :key="language.id">
+                      <NavigationMenuLink as-child>
+                        <a
+                          href="#"
+                          class="flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium hover:bg-accent"
+                          @click.prevent="activeLanguageValue = language.value"
+                        >
+                          <CheckIcon
+                            class="h-3.5 w-3.5"
+                            :class="
+                              language.value === activeLanguageValue
+                                ? 'opacity-100'
+                                : 'opacity-0'
+                            "
+                          />
+                          {{ language.label }}
+                        </a>
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+
+          <!-- TS/JS Style Toggle -->
+          <div
+            v-if="companionLanguage"
+            class="flex items-center bg-muted rounded-md p-0.5 h-8"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-7 px-2 text-[10px] uppercase font-bold transition-all"
+              :class="
+                languageMeta?.style === 'javascript'
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground'
+              "
+              @click="setLanguageByStyle('javascript')"
+            >
+              JS
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-7 px-2 text-[10px] uppercase font-bold transition-all"
+              :class="
+                languageMeta?.style === 'typescript'
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground'
+              "
+              @click="setLanguageByStyle('typescript')"
+            >
+              TS
+            </Button>
+          </div>
+        </div>
 
         <div class="flex h-full items-center gap-1 text-muted-foreground">
           <Button

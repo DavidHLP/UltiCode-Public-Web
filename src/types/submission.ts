@@ -1,12 +1,31 @@
+export type SubmissionStatusKey =
+  | "Accepted"
+  | "Wrong Answer"
+  | "Time Limit Exceeded"
+  | "Memory Limit Exceeded"
+  | "Output Limit Exceeded"
+  | "Runtime Error"
+  | "Compile Error"
+  | "Presentation Error"
+  | "System Error"
+  | "Judging"
+  | "Pending";
+
+export interface SubmissionStatusMeta {
+  key: SubmissionStatusKey;
+  code: string;
+  label: string;
+  description?: string;
+  suggestion?: string;
+  category: "success" | "error" | "warning" | "pending" | "system";
+  severity: "success" | "error" | "warning" | "info";
+  isTerminal: boolean;
+  sortOrder: number;
+}
+
 export interface SubmissionTestRecord {
   id: string;
-  status:
-    | "Accepted"
-    | "Wrong Answer"
-    | "Time Limit Exceeded"
-    | "Runtime Error"
-    | "Compile Error"
-    | "Pending";
+  status: SubmissionStatusKey;
   runtime: number;
   memory: number;
 }
@@ -14,16 +33,12 @@ export interface SubmissionTestRecord {
 export interface SubmissionRecord {
   id: string;
   problem_id: number;
-  status:
-    | "Accepted"
-    | "Wrong Answer"
-    | "Time Limit Exceeded"
-    | "Runtime Error"
-    | "Compile Error";
+  status: SubmissionStatusKey;
   language: string;
   runtime: number;
   memory: number;
   compiler_error?: string;
+  errorDetail?: string;
   input?: string;
   output?: string;
   expected_output?: string;

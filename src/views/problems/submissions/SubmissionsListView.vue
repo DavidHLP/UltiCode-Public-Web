@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { SubmissionRecord } from "@/types/submission";
+import type {
+  SubmissionRecord,
+  SubmissionStatusMeta,
+} from "@/types/submission";
 import { Loader2, Inbox } from "lucide-vue-next";
 import {
   Table,
@@ -22,6 +25,7 @@ import {
 const props = defineProps<{
   submissions: SubmissionRecord[];
   isLoading?: boolean;
+  statusMetaByKey?: Record<string, SubmissionStatusMeta>;
 }>();
 
 const emit = defineEmits<{
@@ -29,16 +33,23 @@ const emit = defineEmits<{
 }>();
 
 const statusClass = (status: SubmissionRecord["status"]) => {
-  switch (status) {
-    case "Accepted":
+  const meta = props.statusMetaByKey?.[status];
+  const severity = meta?.severity ?? meta?.category;
+  switch (severity) {
+    case "success":
       return "text-green-600 dark:text-green-400 font-medium";
-    case "Wrong Answer":
-    case "Runtime Error":
-    case "Time Limit Exceeded":
-    case "Compile Error":
+    case "error":
       return "text-red-600 dark:text-red-400 font-medium";
+    case "warning":
+      return "text-amber-600 dark:text-amber-400 font-medium";
+    case "info":
+      return "text-sky-600 dark:text-sky-400 font-medium";
+    case "pending":
+      return "text-sky-600 dark:text-sky-400 font-medium";
     default:
-      return "text-muted-foreground";
+      return status === "Accepted"
+        ? "text-green-600 dark:text-green-400 font-medium"
+        : "text-red-600 dark:text-red-400 font-medium";
   }
 };
 

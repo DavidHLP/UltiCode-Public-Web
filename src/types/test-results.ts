@@ -1,16 +1,12 @@
+import type { SubmissionStatusKey } from "@/types/submission";
+
 export interface ProblemRunCase {
   id: string;
   runId: string;
   submissionTestId: string;
   testCaseId: string;
   caseLabel: string;
-  status:
-    | "Accepted"
-    | "Wrong Answer"
-    | "Time Limit Exceeded"
-    | "Runtime Error"
-    | "Compile Error"
-    | "Pending";
+  status: SubmissionStatusKey;
   runtime: string;
   memory: string;
   detail?: string;
@@ -26,13 +22,7 @@ export interface ProblemRunResult {
   submissionId: string;
   problemId: number;
   userId: string;
-  verdict:
-    | "Accepted"
-    | "Wrong Answer"
-    | "Time Limit Exceeded"
-    | "Runtime Error"
-    | "Compile Error"
-    | "Pending";
+  verdict: SubmissionStatusKey;
   runtime: string;
   memory: string;
   cases: ProblemRunCase[];

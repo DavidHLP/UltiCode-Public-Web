@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VoteControl } from "@/components/edge-operations/vote-control";
+import { VoteControl } from "./vote-control";
 import ActionItem from "./ActionItem.vue";
 import {
   MessageCircle,

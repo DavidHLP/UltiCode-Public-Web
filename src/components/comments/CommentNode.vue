@@ -91,58 +91,21 @@
 
           <!-- Actions -->
           <div class="flex items-center gap-1 mt-2 -ml-2 select-none">
-            <!-- Vote -->
-            <div class="flex items-center gap-1 px-2">
-              <button
-                @click="handleVote(1)"
-                class="p-1 rounded hover:bg-accent transition-colors"
-                :class="
-                  userVote === 1
-                    ? 'text-orange-600'
-                    : 'text-muted-foreground hover:text-orange-600'
-                "
-              >
-                <ArrowBigUp
-                  class="h-5 w-5"
-                  :class="{ 'fill-current': userVote === 1 }"
-                />
-              </button>
-              <span
-                class="text-xs font-bold w-6 text-center"
-                :class="{
-                  'text-orange-600': userVote === 1,
-                  'text-blue-600': userVote === -1,
-                }"
-              >
-                {{ formatScore(displayScore) }}
-              </span>
-              <button
-                @click="handleVote(-1)"
-                class="p-1 rounded hover:bg-accent transition-colors"
-                :class="
-                  userVote === -1
-                    ? 'text-blue-600'
-                    : 'text-muted-foreground hover:text-blue-600'
-                "
-              >
-                <ArrowBigDown
-                  class="h-5 w-5"
-                  :class="{ 'fill-current': userVote === -1 }"
-                />
-              </button>
-            </div>
+            <VoteControl
+              :likes="likes"
+              :dislikes="dislikes"
+              :user-vote="userVote"
+              class="origin-left"
+              @vote="handleVote"
+            />
 
-            <button
-              class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs font-bold"
+            <ActionItem
+              variant="button"
+              :icon="MessageSquare"
+              label="Reply"
               @click="toggleReply"
-            >
-              <MessageSquare class="h-4.5 w-4.5" /> Reply
-            </button>
-            <button
-              class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors text-xs font-bold"
-            >
-              <Share2 class="h-4.5 w-4.5" /> Share
-            </button>
+            />
+            <ActionItem variant="button" :icon="Share2" label="Share" />
 
             <DropdownMenu v-if="comment.isOwn">
               <DropdownMenuTrigger as-child>
@@ -259,6 +222,7 @@ import type { Comment } from "@/types/comment";
 import CommentConnector from "./CommentConnector.vue";
 import CommentRail from "./CommentRail.vue";
 import CommentForm from "./CommentForm.vue";
+import { ActionItem, VoteControl } from "@/components/edge-operations";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -277,8 +241,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  ArrowBigUp,
-  ArrowBigDown,
   MessageSquare,
   Share2,
   MoreHorizontal,
@@ -324,7 +286,8 @@ const railHeight = ref(0);
 
 const hasChildren = computed(() => (props.comment.children?.length ?? 0) > 0);
 const userVote = ref(props.comment.userVote ?? 0);
-const displayScore = ref(props.comment.votes ?? 0); // Simplified score handling
+const likes = ref(props.comment.likes ?? 0);
+const dislikes = ref(props.comment.dislikes ?? 0);
 
 // Update local state if props change (though usually we just rely on parent re-rendering)
 watch(
@@ -334,9 +297,15 @@ watch(
   },
 );
 watch(
-  () => props.comment.votes,
+  () => props.comment.likes,
   (newVal) => {
-    displayScore.value = newVal ?? 0;
+    likes.value = newVal ?? 0;
+  },
+);
+watch(
+  () => props.comment.dislikes,
+  (newVal) => {
+    dislikes.value = newVal ?? 0;
   },
 );
 
@@ -439,18 +408,26 @@ const handleVote = (type: 1 | -1) => {
   if (userVote.value === type) {
     // toggle off
     userVote.value = 0;
-    displayScore.value -= type;
+    if (type === 1) {
+      likes.value = Math.max(0, likes.value - 1);
+    } else {
+      dislikes.value = Math.max(0, dislikes.value - 1);
+    }
     emit("vote", props.comment.id, type); // Backend handles toggle logic usually
   } else {
     // switch or new vote
-    displayScore.value += type - userVote.value;
+    if (userVote.value === 1) {
+      likes.value = Math.max(0, likes.value - 1);
+    } else if (userVote.value === -1) {
+      dislikes.value = Math.max(0, dislikes.value - 1);
+    }
+    if (type === 1) {
+      likes.value += 1;
+    } else {
+      dislikes.value += 1;
+    }
     userVote.value = type;
     emit("vote", props.comment.id, type);
   }
-};
-
-const formatScore = (score: number) => {
-  if (score > 1000) return (score / 1000).toFixed(1) + "k";
-  return score;
 };
 </script>

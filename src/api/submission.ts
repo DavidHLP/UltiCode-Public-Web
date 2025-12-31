@@ -1,5 +1,8 @@
 import { apiGet, apiPost } from "@/utils/request";
-import type { SubmissionRecord } from "@/types/submission";
+import type {
+  SubmissionRecord,
+  SubmissionStatusMeta,
+} from "@/types/submission";
 import type { ProblemRunResult } from "@/types/test-results";
 
 // Helper to map backend snake_case to frontend camelCase
@@ -8,6 +11,7 @@ function mapSubmission(sub: unknown): SubmissionRecord {
   const s = sub as Record<string, unknown>;
   return {
     ...s,
+    errorDetail: (s.error_detail ?? s.errorDetail) as string | undefined,
     runtimePercentile: (s.runtime_percentile ?? s.runtimePercentile) as
       | number
       | undefined,
@@ -15,6 +19,22 @@ function mapSubmission(sub: unknown): SubmissionRecord {
       | number
       | undefined,
   } as SubmissionRecord;
+}
+
+function mapSubmissionStatus(meta: unknown): SubmissionStatusMeta {
+  if (!meta || typeof meta !== "object") return meta as SubmissionStatusMeta;
+  const m = meta as Record<string, unknown>;
+  return {
+    key: m.key as SubmissionStatusMeta["key"],
+    code: m.code as string,
+    label: m.label as string,
+    description: m.description as string | undefined,
+    suggestion: m.suggestion as string | undefined,
+    category: m.category as SubmissionStatusMeta["category"],
+    severity: m.severity as SubmissionStatusMeta["severity"],
+    isTerminal: Boolean(m.is_terminal ?? m.isTerminal),
+    sortOrder: Number(m.sort_order ?? m.sortOrder ?? 0),
+  } as SubmissionStatusMeta;
 }
 
 export async function fetchProblemSubmissions(
@@ -47,6 +67,13 @@ export async function fetchUserSubmissions(
 ): Promise<SubmissionRecord[]> {
   const data = await apiGet<unknown[]>(`/submissions?userId=${userId}`);
   return data.map(mapSubmission);
+}
+
+export async function fetchSubmissionStatuses(): Promise<
+  SubmissionStatusMeta[]
+> {
+  const data = await apiGet<unknown[]>(`/submissions/statuses`);
+  return data.map(mapSubmissionStatus);
 }
 
 export async function createSubmission(

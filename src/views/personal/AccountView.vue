@@ -129,7 +129,9 @@ onMounted(async () => {
             <!-- Profile Section -->
             <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-xl font-semibold tracking-tight">Public Profile</CardTitle>
+                <CardTitle class="text-xl font-semibold tracking-tight"
+                  >Public Profile</CardTitle
+                >
                 <CardDescription>
                   This information will be displayed publicly on your profile
                   page.
@@ -235,7 +237,9 @@ onMounted(async () => {
             <!-- Social/Links Section -->
             <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-xl font-semibold tracking-tight">Web Presence</CardTitle>
+                <CardTitle class="text-xl font-semibold tracking-tight"
+                  >Web Presence</CardTitle
+                >
                 <CardDescription>
                   Add links to your professional profiles and personal website.
                 </CardDescription>

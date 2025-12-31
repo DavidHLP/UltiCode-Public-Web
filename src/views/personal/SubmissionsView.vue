@@ -37,30 +37,45 @@ const submissions = ref<SubmissionRecord[]>([]);
 const loading = ref(true);
 const hasUser = ref(false);
 
-const getStatusIcon = (status: string) => {
+const getStatusIcon = (status: SubmissionRecord["status"]) => {
   switch (status) {
     case "Accepted":
       return CheckCircle2;
     case "Wrong Answer":
     case "Runtime Error":
     case "Compile Error":
+    case "System Error":
       return XCircle;
     case "Time Limit Exceeded":
     case "Memory Limit Exceeded":
+    case "Output Limit Exceeded":
+    case "Presentation Error":
+      return Clock;
+    case "Judging":
+    case "Pending":
       return Clock;
     default:
       return Clock;
   }
 };
 
-const getStatusColorClass = (status: string) => {
+const getStatusColorClass = (status: SubmissionRecord["status"]) => {
   switch (status) {
     case "Accepted":
       return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
     case "Wrong Answer":
     case "Runtime Error":
     case "Compile Error":
+    case "System Error":
       return "text-rose-500 bg-rose-500/10 border-rose-500/20";
+    case "Time Limit Exceeded":
+    case "Memory Limit Exceeded":
+    case "Output Limit Exceeded":
+    case "Presentation Error":
+      return "text-amber-500 bg-amber-500/10 border-amber-500/20";
+    case "Judging":
+    case "Pending":
+      return "text-sky-500 bg-sky-500/10 border-sky-500/20";
     default:
       return "text-amber-500 bg-amber-500/10 border-amber-500/20";
   }
@@ -140,12 +155,30 @@ onMounted(async () => {
           <Table>
             <TableHeader class="bg-muted/50">
               <TableRow>
-                <TableHead class="w-[300px] font-semibold text-xs uppercase tracking-wider">Problem</TableHead>
-                <TableHead class="font-semibold text-xs uppercase tracking-wider">Status</TableHead>
-                <TableHead class="font-semibold text-xs uppercase tracking-wider">Language</TableHead>
-                <TableHead class="font-semibold text-xs uppercase tracking-wider">Runtime</TableHead>
-                <TableHead class="font-semibold text-xs uppercase tracking-wider">Memory</TableHead>
-                <TableHead class="text-right font-semibold text-xs uppercase tracking-wider">Submitted At</TableHead>
+                <TableHead
+                  class="w-[300px] font-semibold text-xs uppercase tracking-wider"
+                  >Problem</TableHead
+                >
+                <TableHead
+                  class="font-semibold text-xs uppercase tracking-wider"
+                  >Status</TableHead
+                >
+                <TableHead
+                  class="font-semibold text-xs uppercase tracking-wider"
+                  >Language</TableHead
+                >
+                <TableHead
+                  class="font-semibold text-xs uppercase tracking-wider"
+                  >Runtime</TableHead
+                >
+                <TableHead
+                  class="font-semibold text-xs uppercase tracking-wider"
+                  >Memory</TableHead
+                >
+                <TableHead
+                  class="text-right font-semibold text-xs uppercase tracking-wider"
+                  >Submitted At</TableHead
+                >
                 <TableHead class="w-10"></TableHead>
               </TableRow>
             </TableHeader>

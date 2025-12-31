@@ -485,11 +485,7 @@ function loadMore() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button
-            variant="outline"
-            class="h-10 rounded-full"
-            @click="pickOne"
-          >
+          <Button variant="outline" class="h-10 rounded-full" @click="pickOne">
             Pick One
           </Button>
 

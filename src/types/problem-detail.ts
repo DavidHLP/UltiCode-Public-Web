@@ -21,6 +21,7 @@ export interface ProblemLanguageOption {
   id: number;
   label: string;
   value: string;
+  style?: string;
   starterCode: string;
 }
 

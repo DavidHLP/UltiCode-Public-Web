@@ -473,7 +473,9 @@ onMounted(loadData);
             v-if="data.myLists.length === 0"
             class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5"
           >
-            <div class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4">
+            <div
+              class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4"
+            >
               <LayoutGrid class="h-8 w-8 text-muted-foreground/50" />
             </div>
             <h4 class="text-xl font-bold">No problem lists yet</h4>
@@ -942,7 +944,9 @@ onMounted(loadData);
             v-if="data.featured.length === 0"
             class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-center"
           >
-            <div class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4 text-muted-foreground/20">
+            <div
+              class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4 text-muted-foreground/20"
+            >
               <Star class="h-8 w-8" />
             </div>
             <h4 class="text-xl font-bold">No featured lists</h4>

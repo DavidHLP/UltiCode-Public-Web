@@ -358,7 +358,9 @@ onMounted(() => {
                 v-else-if="selectedFolderDetails.items.length === 0"
                 class="flex flex-col items-center justify-center py-24 text-center px-6 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 m-4"
               >
-                <div class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4">
+                <div
+                  class="p-0 flex items-center justify-center w-16 h-16 rounded-2xl bg-muted/50 mb-4"
+                >
                   <FileText class="h-8 w-8 text-muted-foreground/50" />
                 </div>
                 <h4 class="text-lg font-bold">This collection is empty</h4>

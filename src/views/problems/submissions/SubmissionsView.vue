@@ -2,8 +2,14 @@
 import { computed, ref, watch } from "vue";
 import SubmissionsListView from "./SubmissionsListView.vue";
 import SubmissionsDetail from "./SubmissionsDetail.vue";
-import type { SubmissionRecord } from "@/types/submission";
-import { fetchProblemSubmissions } from "@/api/submission";
+import type {
+  SubmissionRecord,
+  SubmissionStatusMeta,
+} from "@/types/submission";
+import {
+  fetchProblemSubmissions,
+  fetchSubmissionStatuses,
+} from "@/api/submission";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { problemHooks } from "@/hooks/problem-hooks";
 
@@ -14,6 +20,7 @@ const props = defineProps<{
 const submissions = ref<SubmissionRecord[]>([]);
 const isLoading = ref(true);
 const selectedSubmissionId = ref<string | null>(null);
+const statusMeta = ref<SubmissionStatusMeta[]>([]);
 
 const selectedSubmission = computed(
   () =>
@@ -21,6 +28,26 @@ const selectedSubmission = computed(
       (submission) => submission.id === selectedSubmissionId.value,
     ) ?? null,
 );
+
+const statusMetaByKey = computed<Record<string, SubmissionStatusMeta>>(() => {
+  return statusMeta.value.reduce(
+    (acc, meta) => {
+      acc[meta.key] = meta;
+      return acc;
+    },
+    {} as Record<string, SubmissionStatusMeta>,
+  );
+});
+
+const loadStatusMeta = async () => {
+  if (statusMeta.value.length) return;
+  try {
+    statusMeta.value = await fetchSubmissionStatuses();
+  } catch (error) {
+    console.error("Failed to load submission statuses", error);
+    statusMeta.value = [];
+  }
+};
 
 const loadSubmissions = async () => {
   isLoading.value = true;
@@ -56,7 +83,7 @@ watch(
   () => props.problemId,
   () => {
     selectedSubmissionId.value = null;
-    void loadSubmissions();
+    void Promise.all([loadStatusMeta(), loadSubmissions()]);
   },
   { immediate: true },
 );
@@ -75,12 +102,14 @@ const handleBack = () => {
     <SubmissionsDetail
       v-if="selectedSubmission"
       :submission="selectedSubmission"
+      :status-meta-by-key="statusMetaByKey"
       @back="handleBack"
     />
     <SubmissionsListView
       v-else
       :submissions="submissions"
       :is-loading="isLoading"
+      :status-meta-by-key="statusMetaByKey"
       @select="handleSelect"
     />
   </div>

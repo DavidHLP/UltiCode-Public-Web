@@ -62,8 +62,18 @@ const verdictLabel = computed(() => {
       return "Runtime Error";
     case "Time Limit Exceeded":
       return "Time Limit Exceeded";
+    case "Memory Limit Exceeded":
+      return "Memory Limit Exceeded";
+    case "Output Limit Exceeded":
+      return "Output Limit Exceeded";
+    case "Presentation Error":
+      return "Presentation Error";
+    case "System Error":
+      return "System Error";
     case "Compile Error":
       return "Compile Error";
+    case "Judging":
+      return "Judging";
     case "Pending":
       return "Pending";
     default:
@@ -83,8 +93,16 @@ const verdictClass = computed(() => {
       return "text-amber-600 dark:text-amber-400";
     case "Time Limit Exceeded":
       return "text-sky-600 dark:text-sky-400";
+    case "Memory Limit Exceeded":
+    case "Output Limit Exceeded":
+    case "Presentation Error":
+      return "text-amber-600 dark:text-amber-400";
     case "Compile Error":
       return "text-red-600 dark:text-red-400";
+    case "System Error":
+      return "text-red-600 dark:text-red-400";
+    case "Judging":
+      return "text-sky-600 dark:text-sky-400";
     default:
       return "text-muted-foreground";
   }
@@ -100,14 +118,33 @@ const caseStatusIconClass = (status: ProblemCaseResultDetail["status"]) => {
       return "text-amber-500";
     case "Time Limit Exceeded":
       return "text-sky-500";
+    case "Memory Limit Exceeded":
+    case "Output Limit Exceeded":
+    case "Presentation Error":
+      return "text-amber-500";
     case "Compile Error":
       return "text-red-500";
+    case "System Error":
+      return "text-red-500";
+    case "Judging":
     case "Pending":
       return "text-muted-foreground";
     default:
       return "text-muted-foreground";
   }
 };
+
+const isFailureStatus = (status: ProblemCaseResultDetail["status"]) =>
+  [
+    "Wrong Answer",
+    "Runtime Error",
+    "Time Limit Exceeded",
+    "Memory Limit Exceeded",
+    "Output Limit Exceeded",
+    "Compile Error",
+    "Presentation Error",
+    "System Error",
+  ].includes(status);
 
 const selectCase = (label: string) => {
   activeCaseLabel.value = label;
@@ -176,7 +213,7 @@ const selectCase = (label: string) => {
                 :class="caseStatusIconClass(result.status)"
               />
               <XCircle
-                v-else-if="result.status === 'Wrong Answer'"
+                v-else-if="isFailureStatus(result.status)"
                 class="h-3 w-3"
                 :class="caseStatusIconClass(result.status)"
               />

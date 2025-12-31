@@ -119,8 +119,11 @@ export const SUBMISSION_STATUS = {
   WRONG_ANSWER: "Wrong Answer",
   TIME_LIMIT_EXCEEDED: "Time Limit Exceeded",
   MEMORY_LIMIT_EXCEEDED: "Memory Limit Exceeded",
+  OUTPUT_LIMIT_EXCEEDED: "Output Limit Exceeded",
   RUNTIME_ERROR: "Runtime Error",
   COMPILE_ERROR: "Compile Error",
+  PRESENTATION_ERROR: "Presentation Error",
+  SYSTEM_ERROR: "System Error",
 } as const;
 
 export type SubmissionStatus =

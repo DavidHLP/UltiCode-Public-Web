@@ -11,13 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-} from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 
 import type { ProblemTableProps } from "./type";

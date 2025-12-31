@@ -3,7 +3,10 @@ import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MarkdownView from "@/components/markdown/MarkdownView.vue";
-import type { SubmissionRecord } from "@/types/submission";
+import type {
+  SubmissionRecord,
+  SubmissionStatusMeta,
+} from "@/types/submission";
 import { Clock, Microchip } from "lucide-vue-next";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
@@ -18,6 +21,10 @@ const props = defineProps({
   submission: {
     type: Object as () => SubmissionRecord,
   } as const,
+  statusMetaByKey: {
+    type: Object as () => Record<string, SubmissionStatusMeta>,
+    default: () => ({}),
+  },
 });
 
 const parseMs = (value: string | number) => {
@@ -28,6 +35,55 @@ const parseMs = (value: string | number) => {
 
 const runtimeMs = computed(() =>
   props.submission ? parseMs(props.submission.runtime) : null,
+);
+
+const statusMeta = computed(() =>
+  props.submission ? props.statusMetaByKey?.[props.submission.status] : null,
+);
+
+const statusLabel = computed(
+  () => statusMeta.value?.label ?? props.submission?.status ?? "",
+);
+
+const statusToneClass = computed(() => {
+  const severity = statusMeta.value?.severity ?? statusMeta.value?.category;
+  switch (severity) {
+    case "success":
+      return "text-green-600 dark:text-green-400";
+    case "error":
+      return "text-red-600 dark:text-red-400";
+    case "warning":
+      return "text-amber-600 dark:text-amber-400";
+    case "info":
+      return "text-sky-600 dark:text-sky-400";
+    default:
+      return props.submission?.status === "Accepted"
+        ? "text-green-600 dark:text-green-400"
+        : "text-red-600 dark:text-red-400";
+  }
+});
+
+const isAccepted = computed(() => props.submission?.status === "Accepted");
+const isCompileError = computed(
+  () => props.submission?.status === "Compile Error",
+);
+const isPending = computed(() =>
+  ["Pending", "Judging"].includes(props.submission?.status ?? ""),
+);
+const showCaseDetails = computed(
+  () => !isAccepted.value && !isCompileError.value && !isPending.value,
+);
+const showVerdictMeta = computed(() => {
+  if (isAccepted.value) return false;
+  return (
+    Boolean(statusMeta.value?.description) ||
+    Boolean(statusMeta.value?.suggestion) ||
+    Boolean(props.submission?.errorDetail)
+  );
+});
+
+const verdictDetail = computed(() =>
+  isCompileError.value ? null : props.submission?.errorDetail,
 );
 
 const distBins = computed<number[]>(
@@ -436,25 +492,17 @@ const handleWriteSolution = () => {
       <div class="flex flex-1 flex-col items-start gap-0.5 overflow-hidden">
         <div
           class="flex flex-1 items-center gap-1.5 text-lg font-medium leading-tight"
-          :class="[
-            props.submission?.status === 'Accepted'
-              ? 'text-green-600 dark:text-green-400'
-              : 'text-red-600 dark:text-red-400',
-          ]"
+          :class="statusToneClass"
         >
-          <span data-e2e-locator="submission-result">{{
-            props.submission?.status
-          }}</span>
+          <span data-e2e-locator="submission-result">{{ statusLabel }}</span>
         </div>
 
         <!-- Test cases info (only if not compile error) -->
         <div
-          v-if="props.submission.status !== 'Compile Error'"
+          v-if="!isCompileError && !isPending"
           class="text-xs font-normal text-muted-foreground"
         >
-          <span v-if="props.submission.status === 'Accepted'">
-            All test cases passed
-          </span>
+          <span v-if="isAccepted"> All test cases passed </span>
           <span v-else>
             {{
               props.submission?.tests?.filter((t) => t.status === "Accepted")
@@ -490,7 +538,7 @@ const handleWriteSolution = () => {
 
       <div class="flex flex-none gap-2">
         <Button
-          v-if="props.submission?.status === 'Accepted'"
+          v-if="isAccepted"
           variant="default"
           size="sm"
           class="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
@@ -502,10 +550,31 @@ const handleWriteSolution = () => {
     </div>
 
     <!-- Content based on Status -->
+    <div
+      v-if="showVerdictMeta"
+      class="rounded-md border border-border bg-muted/40 px-4 py-3 text-xs"
+    >
+      <div class="text-xs font-medium text-muted-foreground">Verdict info</div>
+      <div v-if="statusMeta?.description" class="mt-2 text-sm text-foreground">
+        {{ statusMeta.description }}
+      </div>
+      <div
+        v-if="verdictDetail"
+        class="mt-2 rounded-md bg-muted px-3 py-2 font-mono text-xs text-foreground"
+      >
+        {{ verdictDetail }}
+      </div>
+      <div
+        v-if="statusMeta?.suggestion"
+        class="mt-2 text-xs text-muted-foreground"
+      >
+        Suggestion: {{ statusMeta.suggestion }}
+      </div>
+    </div>
 
     <!-- 1. Compile Error -->
     <div
-      v-if="props.submission.status === 'Compile Error'"
+      v-if="isCompileError"
       class="rounded-md bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 p-4"
     >
       <h3 class="font-medium text-red-700 dark:text-red-400 text-sm mb-2">
@@ -519,15 +588,8 @@ const handleWriteSolution = () => {
       >
     </div>
 
-    <!-- 2. Runtime Error / Wrong Answer / TLE -->
-    <div
-      v-else-if="
-        ['Wrong Answer', 'Runtime Error', 'Time Limit Exceeded'].includes(
-          props.submission.status,
-        )
-      "
-      class="space-y-4"
-    >
+    <!-- 2. Failure details -->
+    <div v-else-if="showCaseDetails" class="space-y-4">
       <div v-if="props.submission.input" class="space-y-1.5">
         <div class="text-xs font-medium text-muted-foreground">Input</div>
         <div
@@ -557,7 +619,7 @@ const handleWriteSolution = () => {
     </div>
 
     <!-- 3. Accepted (Charts) -->
-    <div v-else-if="props.submission.status === 'Accepted'" class="space-y-4">
+    <div v-else-if="isAccepted" class="space-y-4">
       <!-- 分布统计卡片 -->
       <div
         class="flex w-full flex-col gap-1.5 rounded-lg border border-border p-2"
@@ -621,6 +683,13 @@ const handleWriteSolution = () => {
       <div v-if="showMemoryDetail" class="rounded-lg border border-border p-3">
         <div class="h-48 w-full" ref="memoryChartRef"></div>
       </div>
+    </div>
+
+    <div
+      v-else-if="!showVerdictMeta"
+      class="rounded-md border border-dashed border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground"
+    >
+      Details are not available yet.
     </div>
 
     <!-- Code Section -->
