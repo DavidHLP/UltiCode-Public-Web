@@ -93,6 +93,45 @@ const formatDocument = async () => {
   }
 };
 
+const configureLanguageFeatures = (monaco: typeof import("monaco-editor")) => {
+  // TypeScript Configuration
+  // Intention Actions (Code Actions) & Inspections (Diagnostics)
+  const tsDefaults = monaco.languages.typescript.typescriptDefaults;
+  tsDefaults.setCompilerOptions({
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    allowNonTsExtensions: true,
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.CommonJS,
+    noEmit: true,
+    esModuleInterop: true,
+    lib: ["esnext", "dom"],
+  });
+
+  tsDefaults.setDiagnosticsOptions({
+    noSemanticValidation: false,
+    noSyntaxValidation: false,
+  });
+
+  // JavaScript Configuration
+  // Intention Actions (Code Actions) & Inspections (Diagnostics)
+  const jsDefaults = monaco.languages.typescript.javascriptDefaults;
+  jsDefaults.setCompilerOptions({
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    allowNonTsExtensions: true,
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.CommonJS,
+    noEmit: true,
+    esModuleInterop: true,
+    checkJs: true,
+    lib: ["esnext", "dom"],
+  });
+
+  jsDefaults.setDiagnosticsOptions({
+    noSemanticValidation: false,
+    noSyntaxValidation: false,
+  });
+};
+
 defineExpose({
   formatDocument,
 });
@@ -102,6 +141,10 @@ onMounted(async () => {
 
   const monaco = await getMonaco();
   if (!monaco) return;
+
+  // Configure Language Features (Inspections & Intentions)
+  configureLanguageFeatures(monaco);
+
   editor = monaco.editor.create(container.value, {
     value: props.modelValue,
     language: props.language,
@@ -111,6 +154,26 @@ onMounted(async () => {
     lineNumbers: "on",
     wordWrap: props.wordWrap ? "on" : "off",
     theme: props.theme ?? "vs-dark",
+    // IntelliSense and Suggestion Options
+    quickSuggestions: {
+      other: true,
+      comments: true,
+      strings: true,
+    },
+    suggestSelection: "recentlyUsed",
+    parameterHints: {
+      enabled: true,
+    },
+    suggestOnTriggerCharacters: true,
+    acceptSuggestionOnEnter: "on",
+    tabCompletion: "on",
+    folding: true,
+    formatOnPaste: true,
+    formatOnType: true,
+    // Enable Intention Actions (Code Actions)
+    lightbulb: {
+      enabled: monaco.editor.ShowLightbulbIconMode.On,
+    },
   });
 
   editor.onDidChangeModelContent(() => {
