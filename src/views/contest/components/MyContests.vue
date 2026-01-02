@@ -6,10 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Trophy, TrendingUp, TrendingDown } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 const contestStore = useContestStore();
 const router = useRouter();
 const loading = ref(true);
+const { t, locale } = useI18n();
 
 onMounted(async () => {
   try {
@@ -26,7 +28,7 @@ onMounted(async () => {
 
 function formatDate(isoString: string): string {
   const date = new Date(isoString);
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale.value, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -53,36 +55,44 @@ function navigateToContest(contestId: string) {
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold">My Contests</h2>
+        <h2 class="text-2xl font-bold">{{ t("contest.myContests.title") }}</h2>
         <p class="text-muted-foreground">
-          View your registered, participated, and virtual contests
+          {{ t("contest.myContests.subtitle") }}
         </p>
       </div>
     </div>
 
     <div v-if="loading" class="py-20 text-center">
-      <p class="text-muted-foreground">Loading contests...</p>
+      <p class="text-muted-foreground">
+        {{ t("contest.myContests.loading") }}
+      </p>
     </div>
 
     <Tabs v-else default-value="registered" class="w-full">
       <TabsList class="grid w-full max-w-md grid-cols-3">
-        <TabsTrigger value="registered">Registered</TabsTrigger>
-        <TabsTrigger value="participated">Participated</TabsTrigger>
-        <TabsTrigger value="virtual">Virtual</TabsTrigger>
+        <TabsTrigger value="registered">{{
+          t("contest.myContests.tabs.registered")
+        }}</TabsTrigger>
+        <TabsTrigger value="participated">{{
+          t("contest.myContests.tabs.participated")
+        }}</TabsTrigger>
+        <TabsTrigger value="virtual">{{
+          t("contest.myContests.tabs.virtual")
+        }}</TabsTrigger>
       </TabsList>
 
       <!-- Registered Contests -->
       <TabsContent value="registered" class="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Registered Contests</CardTitle>
+            <CardTitle>{{ t("contest.myContests.registeredTitle") }}</CardTitle>
           </CardHeader>
           <CardContent>
             <div
               v-if="contestStore.registeredContests.length === 0"
               class="py-12 text-center text-muted-foreground"
             >
-              No registered contests
+              {{ t("contest.myContests.noRegistered") }}
             </div>
             <div v-else class="space-y-3">
               <div
@@ -100,7 +110,10 @@ function navigateToContest(contestId: string) {
                       <Calendar class="h-3 w-3" />
                       {{ formatDate(contest.start_time) }}
                     </span>
-                    <span>{{ contest.duration_minutes }} min</span>
+                    <span
+                      >{{ contest.duration_minutes }}
+                      {{ t("contest.time.min_short") }}</span
+                    >
                   </div>
                 </div>
                 <Badge :variant="getStatusBadge(contest.status) as any">
@@ -116,14 +129,14 @@ function navigateToContest(contestId: string) {
       <TabsContent value="participated" class="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Contest History</CardTitle>
+            <CardTitle>{{ t("contest.myContests.historyTitle") }}</CardTitle>
           </CardHeader>
           <CardContent>
             <div
               v-if="contestStore.contestHistory.length === 0"
               class="py-12 text-center text-muted-foreground"
             >
-              No participated contests yet
+              {{ t("contest.myContests.noParticipated") }}
             </div>
             <div v-else class="space-y-3">
               <div
@@ -142,15 +155,22 @@ function navigateToContest(contestId: string) {
                     </span>
                     <span class="flex items-center gap-1">
                       <Trophy class="h-3 w-3" />
-                      Rank {{ history.rank }} / {{ history.totalParticipants }}
+                      {{
+                        t("contest.myContests.rank", {
+                          rank: history.rank,
+                          total: history.totalParticipants,
+                        })
+                      }}
                     </span>
-                    <span>Score: {{ history.score }}</span>
+                    <span>{{
+                      t("contest.myContests.score", { score: history.score })
+                    }}</span>
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
-                  <Badge v-if="history.isVirtual" variant="outline"
-                    >Virtual</Badge
-                  >
+                  <Badge v-if="history.isVirtual" variant="outline">{{
+                    t("contest.types.virtual")
+                  }}</Badge>
                   <div
                     class="flex items-center gap-1 rounded-md px-2 py-1 font-semibold"
                     :class="{
@@ -183,14 +203,14 @@ function navigateToContest(contestId: string) {
       <TabsContent value="virtual" class="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Virtual Contests</CardTitle>
+            <CardTitle>{{ t("contest.myContests.virtualTitle") }}</CardTitle>
           </CardHeader>
           <CardContent>
             <div
               v-if="contestStore.virtualContests.length === 0"
               class="py-12 text-center text-muted-foreground"
             >
-              No virtual contests completed
+              {{ t("contest.myContests.noVirtual") }}
             </div>
             <div v-else class="space-y-3">
               <div
@@ -208,10 +228,15 @@ function navigateToContest(contestId: string) {
                       <Calendar class="h-3 w-3" />
                       {{ formatDate(contest.start_time) }}
                     </span>
-                    <span>{{ contest.duration_minutes }} min</span>
+                    <span
+                      >{{ contest.duration_minutes }}
+                      {{ t("contest.time.min_short") }}</span
+                    >
                   </div>
                 </div>
-                <Badge variant="outline">Virtual</Badge>
+                <Badge variant="outline">{{
+                  t("contest.types.virtual")
+                }}</Badge>
               </div>
             </div>
           </CardContent>

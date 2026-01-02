@@ -2,8 +2,8 @@ import { LayoutGrid, Code2, Database, Terminal, Cpu } from "lucide-vue-next";
 
 export const PROBLEM_CATEGORIES = [
   {
-    title: "All Problems",
-    name: "All Topics", // Keep name for pills if we want distinction, or just use title?
+    title: "sidebar.problem.allProblems",
+    name: "sidebar.problem.allTopics", // Keep name for pills if we want distinction, or just use title?
     // Let's rely on title for "All Problems" if we want to align.
     // But user might want "All Topics" in the pill list.
     // The user screenshot has "All Topics" in pills.
@@ -14,32 +14,32 @@ export const PROBLEM_CATEGORIES = [
     icon: LayoutGrid,
   },
   {
-    title: "Algorithms",
-    name: "Algorithms",
+    title: "sidebar.problem.algorithms",
+    name: "sidebar.problem.algorithms",
     value: "algorithms",
     slug: "algorithms",
     url: "/problemset/algorithms",
     icon: Code2,
   },
   {
-    title: "Database",
-    name: "Database",
+    title: "sidebar.problem.database",
+    name: "sidebar.problem.database",
     value: "database",
     slug: "database",
     url: "/problemset/database",
     icon: Database,
   },
   {
-    title: "Shell",
-    name: "Shell",
+    title: "sidebar.problem.shell",
+    name: "sidebar.problem.shell",
     value: "shell",
     slug: "shell",
     url: "/problemset/shell",
     icon: Terminal,
   },
   {
-    title: "Concurrency",
-    name: "Concurrency",
+    title: "sidebar.problem.concurrency",
+    name: "sidebar.problem.concurrency",
     value: "concurrency",
     slug: "concurrency",
     url: "/problemset/concurrency",

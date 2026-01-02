@@ -3,6 +3,7 @@ import { computed } from "vue";
 import type { SolutionFeedItem } from "@/types/solution";
 import { PostActions } from "@/components/edge-operations";
 import { resolveUserVote, resolveVoteCounts } from "@/utils/vote";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -12,12 +13,17 @@ const emit = defineEmits<{
   select: [item: SolutionFeedItem];
 }>();
 
+const { t } = useI18n();
+
 const authorInitial = computed(
   () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
 );
 
 const languageLabel = computed(
-  () => props.item.language || props.item.languageFilter || "language",
+  () =>
+    props.item.language ||
+    props.item.languageFilter ||
+    t("problem.submissions.language"),
 );
 
 const topicLabel = computed(
@@ -25,7 +31,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic",
+    t("forum.post.flair"),
 );
 
 const handleSelect = () => emit("select", props.item);

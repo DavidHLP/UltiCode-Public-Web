@@ -16,12 +16,15 @@ import { BookmarkType } from "@/types/bookmark";
 import ProblemSaveButton from "./ProblemSaveButton.vue";
 import { VoteControl } from "./vote-control";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 interface Props {
   problem?: ProblemDetail | null;
 }
 
 const props = defineProps<Props>();
+
+const { t } = useI18n();
 
 const interactionCounts = ref<ProblemInteractionCounts>({
   likes: 0,
@@ -91,7 +94,7 @@ const reactionCounts = computed(() => interactionCounts.value);
 const toggleReaction = async (reaction: "like" | "dislike") => {
   if (!props.problem) return;
   if (!isAuthenticated()) {
-    toast.error("Please log in to vote.");
+    toast.error(t("problem.save.toast.loginToVote"));
     return;
   }
   const operationType =

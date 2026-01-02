@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
+import { useI18n } from "vue-i18n";
 
 import type { HeaderModel } from "@/stores/headerStore";
 import { PanelComponentMapKey } from "./panel-context";
@@ -9,6 +10,8 @@ const props = defineProps<{
   activeHeader: HeaderModel | null;
   isActive?: boolean; // Whether the current group is active
 }>();
+
+const { t } = useI18n();
 
 // Inject the component map from the parent view (DetailedView)
 const panelComponentMap = inject(PanelComponentMapKey);
@@ -20,7 +23,7 @@ const contentComponent = computed(() => {
 
 const content = computed(() => {
   if (!props.activeHeader) {
-    return "Please select an option";
+    return t("problem.layout.selectOption");
   }
   return props.activeHeader.title;
 });

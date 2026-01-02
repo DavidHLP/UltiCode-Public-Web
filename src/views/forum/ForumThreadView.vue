@@ -18,6 +18,7 @@ import { ArrowLeft } from "lucide-vue-next";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "vue-i18n";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +33,7 @@ import {
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 const thread = ref<ForumThread | null>(null);
 const isLoading = ref(true);
 const deleting = ref(false);
@@ -65,7 +67,7 @@ watch(
 
 async function onSubmitComment(body: string, parentId?: string | null) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to comment.");
+    toast.error(t("forum.messages.loginToComment"));
     return;
   }
   const postId = route.params.postId as string;
@@ -74,13 +76,13 @@ async function onSubmitComment(body: string, parentId?: string | null) {
     await loadThread(postId);
   } catch (error) {
     console.error("Failed to create comment", error);
-    toast.error("Failed to create comment.");
+    toast.error(t("forum.comments.submitFailed"));
   }
 }
 
 async function onEditComment(commentId: string | number, body: string) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to edit comments.");
+    toast.error(t("forum.messages.loginToEdit"));
     return;
   }
   try {
@@ -88,13 +90,13 @@ async function onEditComment(commentId: string | number, body: string) {
     await loadThread(route.params.postId as string);
   } catch (error) {
     console.error("Failed to edit comment", error);
-    toast.error("Failed to edit comment.");
+    toast.error(t("forum.messages.commentEditFailed"));
   }
 }
 
 async function onDeleteComment(commentId: string | number) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to delete comments.");
+    toast.error(t("forum.messages.loginToDelete"));
     return;
   }
   try {
@@ -102,7 +104,7 @@ async function onDeleteComment(commentId: string | number) {
     await loadThread(route.params.postId as string);
   } catch (error) {
     console.error("Failed to delete comment", error);
-    toast.error("Failed to delete comment.");
+    toast.error(t("forum.messages.commentDeleteFailed"));
   }
 }
 
@@ -111,11 +113,11 @@ async function handleDeleteThread() {
   deleting.value = true;
   try {
     await deleteForumPost(thread.value.id);
-    toast.success("Post deleted.");
+    toast.success(t("forum.messages.postDeleted"));
     await router.push({ name: "forum-home" });
   } catch (error) {
     console.error("Failed to delete post", error);
-    toast.error("Failed to delete post.");
+    toast.error(t("forum.messages.deleteFailed"));
   } finally {
     deleting.value = false;
   }
@@ -136,7 +138,7 @@ const isOwner = () => {
 
 async function handleThreadVote(type: 1 | -1) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to vote.");
+    toast.error(t("forum.messages.loginToVote"));
     return;
   }
   if (!thread.value) return;
@@ -161,7 +163,7 @@ async function handleThreadVote(type: 1 | -1) {
 
 async function handleCommentVote(commentId: string | number, type: 1 | -1) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to vote.");
+    toast.error(t("forum.messages.loginToVote"));
     return;
   }
   if (!thread.value?.comments) return;
@@ -224,23 +226,29 @@ function handleThreadSave(isSaved: boolean) {
               class="flex flex-wrap items-center justify-end gap-2 px-4 sm:px-6 pt-4"
             >
               <Button variant="outline" size="sm" @click="handleEditThread">
-                Edit Post
+                {{ t("forum.post.edit") }}
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger as-child>
-                  <Button variant="destructive" size="sm">Delete</Button>
+                  <Button variant="destructive" size="sm">{{
+                    t("forum.post.delete")
+                  }}</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+                    <AlertDialogTitle>{{
+                      t("forum.post.deleteDialog.title")
+                    }}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone.
+                      {{ t("forum.post.deleteDialog.description") }}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{{
+                      t("forum.post.deleteDialog.cancel")
+                    }}</AlertDialogCancel>
                     <AlertDialogAction @click="handleDeleteThread">
-                      Delete
+                      {{ t("forum.post.deleteDialog.confirm") }}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -268,7 +276,7 @@ function handleThreadSave(isSaved: boolean) {
         v-else
         class="rounded-xl border border-dashed border-destructive/40 bg-destructive/5 p-6 text-sm text-destructive"
       >
-        Failed to load thread.
+        {{ t("forum.comments.failedToLoad") }}
       </div>
     </main>
   </div>

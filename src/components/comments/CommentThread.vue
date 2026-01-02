@@ -6,6 +6,7 @@ import CommentForm from "./CommentForm.vue";
 import { buildCommentTree } from "./comment-tree-builder";
 import { ref, computed } from "vue";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   comments: ForumComment[];
@@ -20,6 +21,7 @@ const emit = defineEmits<{
   (e: "delete", commentId: number | string): void;
 }>();
 
+const { t } = useI18n();
 const isCommenting = ref(false);
 
 function handleReply(commentId: string | number, content: string) {
@@ -47,7 +49,9 @@ const commentTree = computed(() => {
         >
           <MessageSquare class="h-4 w-4" />
         </div>
-        <span class="font-bold tracking-tight">Join the conversation...</span>
+        <span class="font-bold tracking-tight">{{
+          t("forum.comments.joinConversation")
+        }}</span>
       </div>
     </div>
 
@@ -66,7 +70,7 @@ const commentTree = computed(() => {
         v-if="isLocked"
         class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
       >
-        <Lock class="h-3 w-3" /> Thread is locked
+        <Lock class="h-3 w-3" /> {{ t("forum.comments.threadLocked") }}
       </div>
     </div>
 
@@ -78,9 +82,11 @@ const commentTree = computed(() => {
         <div class="p-5 rounded-3xl bg-muted/30 mb-4">
           <MessageSquare class="h-10 w-10 text-muted-foreground/30" />
         </div>
-        <h4 class="text-lg font-black tracking-tight">No comments yet</h4>
+        <h4 class="text-lg font-black tracking-tight">
+          {{ t("forum.comments.noComments") }}
+        </h4>
         <p class="text-sm text-muted-foreground mt-1 max-w-[280px]">
-          Be the first to share what you think and start the discussion!
+          {{ t("forum.comments.beFirst") }}
         </p>
       </div>
       <div class="space-y-6">

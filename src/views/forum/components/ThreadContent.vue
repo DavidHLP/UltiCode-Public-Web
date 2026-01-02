@@ -16,10 +16,13 @@ import { toggleBookmark, BookmarkType } from "@/api/bookmark";
 import { isAuthenticated } from "@/utils/auth";
 import { toast } from "vue-sonner";
 import { recordForumShare } from "@/api/forum";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   thread: ForumThread;
 }>();
+
+const { t, locale } = useI18n();
 
 const localStats = ref({
   ...(props.thread.stats || {
@@ -95,9 +98,12 @@ function formatCount(value: number) {
   return value.toString();
 }
 
-const relativeTimeFormatter = new Intl.RelativeTimeFormat("en", {
-  numeric: "auto",
-});
+const relativeTimeFormatter = computed(
+  () =>
+    new Intl.RelativeTimeFormat(locale.value, {
+      numeric: "auto",
+    }),
+);
 function formatRelativeTime(value: string) {
   const date = new Date(value);
   const diffMs = date.getTime() - Date.now();
@@ -112,9 +118,9 @@ function formatRelativeTime(value: string) {
   for (const [unit, amountMs] of ranges) {
     const delta = diffMs / amountMs;
     if (Math.abs(delta) >= 1)
-      return relativeTimeFormatter.format(Math.round(delta), unit);
+      return relativeTimeFormatter.value.format(Math.round(delta), unit);
   }
-  return "just now";
+  return t("common.time.now");
 }
 
 function formatPollPercentage(votes: number, totalVotes: number) {
@@ -131,7 +137,7 @@ function formatPollWidth(votes: number, totalVotes: number) {
 
 async function handleSave() {
   if (!isAuthenticated()) {
-    toast.error("Please log in to save posts.");
+    toast.error(t("forum.messages.loginToSave"));
     return;
   }
   try {
@@ -141,10 +147,12 @@ async function handleSave() {
       0,
       (localStats.value.saves || 0) + (res.isSaved ? 1 : -1),
     );
-    toast.success(res.isSaved ? "Post saved" : "Post unsaved");
+    toast.success(
+      res.isSaved ? t("forum.messages.saved") : t("forum.messages.unsaved"),
+    );
   } catch (error) {
     console.error("Failed to toggle save", error);
-    toast.error("Failed to save post");
+    toast.error(t("forum.messages.saveFailed"));
   }
 }
 
@@ -154,10 +162,10 @@ async function handleShare() {
     await navigator.clipboard.writeText(url);
     await recordForumShare(props.thread.id);
     localStats.value.shares = (localStats.value.shares || 0) + 1;
-    toast.success("Link copied to clipboard");
+    toast.success(t("forum.messages.linkCopied"));
   } catch (error) {
     console.error("Failed to copy link", error);
-    toast.error("Failed to copy link");
+    toast.error(t("forum.messages.copyFailed"));
   }
 }
 </script>
@@ -199,7 +207,9 @@ async function handleShare() {
             </span>
             <span class="text-muted-foreground/60">•</span>
             <span class="hover:underline cursor-pointer"
-              >Posted by u/{{ thread.author.username }}</span
+              >{{ t("forum.post.postedBy") }} u/{{
+                thread.author.username
+              }}</span
             >
           </template>
           <template v-else>
@@ -237,13 +247,13 @@ async function handleShare() {
           variant="outline"
           class="flex items-center gap-1 rounded-full border-dashed px-2 py-0.5 text-[10px] uppercase"
         >
-          <Pin class="h-3 w-3" /> Pinned
+          <Pin class="h-3 w-3" /> {{ t("forum.post.pinned") }}
         </Badge>
         <span
           v-if="thread.isLocked"
           class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600"
         >
-          <Lock class="h-3 w-3" /> Locked
+          <Lock class="h-3 w-3" /> {{ t("forum.post.locked") }}
         </span>
       </div>
     </div>
@@ -299,7 +309,7 @@ async function handleShare() {
                 target="_blank"
                 class="mt-2 text-blue-500 hover:underline text-xs inline-flex items-center gap-1"
               >
-                Open Link <Share2 class="w-3 h-3" />
+                {{ t("forum.actions.copyLink") }} <Share2 class="w-3 h-3" />
               </a>
             </div>
             <div
@@ -335,7 +345,7 @@ async function handleShare() {
               <p
                 class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
               >
-                Community poll
+                {{ t("forum.post.poll.title") }}
               </p>
               <p class="font-medium text-foreground">{{ media.question }}</p>
             </header>
@@ -364,8 +374,10 @@ async function handleShare() {
               </li>
             </ul>
             <p class="text-[11px] text-muted-foreground">
-              {{ media.totalVotes }} votes
-              <span v-if="media.closesAt"> · closes {{ media.closesAt }}</span>
+              {{ media.totalVotes }} {{ t("forum.post.poll.votes") }}
+              <span v-if="media.closesAt">
+                · {{ t("forum.post.poll.closes") }} {{ media.closesAt }}</span
+              >
             </p>
           </div>
         </div>
@@ -384,15 +396,15 @@ async function handleShare() {
           comments: {
             show: true,
             count: commentsDisplay,
-            text: 'Comments',
+            text: t('forum.comments.title'),
             icon: 'message-square',
           },
-          share: { show: true, text: 'Share' },
+          share: { show: true, text: t('forum.actions.share') },
           save: {
             show: true,
             isSaved: thread.isSaved,
             count: savesDisplay,
-            text: 'Save',
+            text: t('forum.actions.save'),
           },
         }"
         @vote="(type: 1 | -1) => $emit('vote', type)"

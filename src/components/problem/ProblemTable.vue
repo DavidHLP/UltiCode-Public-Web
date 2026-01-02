@@ -12,12 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "vue-i18n";
 
 import type { ProblemTableProps } from "./type";
 
 const props = defineProps<ProblemTableProps>();
 
 const router = useRouter();
+const { t } = useI18n();
 
 const emit = defineEmits(["load-more", "remove"]);
 
@@ -72,13 +74,17 @@ onUnmounted(() => {
   <Table>
     <TableHeader>
       <TableRow>
-        <TableHead class="w-[50px]">Status</TableHead>
-        <TableHead>Title</TableHead>
-        <TableHead class="w-[120px] text-center">Acceptance</TableHead>
-        <TableHead class="w-[100px] text-center">Difficulty</TableHead>
-        <TableHead v-if="props.editable" class="w-[80px] text-center"
-          >Actions</TableHead
-        >
+        <TableHead class="w-[50px]">{{ t("problem.table.status") }}</TableHead>
+        <TableHead>{{ t("problem.table.title") }}</TableHead>
+        <TableHead class="w-[120px] text-center">{{
+          t("problem.table.acceptance")
+        }}</TableHead>
+        <TableHead class="w-[100px] text-center">{{
+          t("problem.table.difficulty")
+        }}</TableHead>
+        <TableHead v-if="props.editable" class="w-[80px] text-center">{{
+          t("problem.table.actions")
+        }}</TableHead>
       </TableRow>
     </TableHeader>
 
@@ -132,7 +138,7 @@ onUnmounted(() => {
             :class="difficultyClass(problem.difficulty)"
             class="text-center"
           >
-            {{ problem.difficulty }}
+            {{ t("problem.difficulty." + problem.difficulty.toLowerCase()) }}
           </TableCell>
 
           <TableCell v-if="props.editable" class="text-center">
@@ -158,9 +164,11 @@ onUnmounted(() => {
             >
               <SearchX class="h-8 w-8 text-muted-foreground/50" />
             </div>
-            <p class="text-xl font-bold text-foreground">No results found</p>
+            <p class="text-xl font-bold text-foreground">
+              {{ t("problem.table.noResults") }}
+            </p>
             <p class="text-sm text-muted-foreground mt-2 max-w-[300px]">
-              Try adjusting filters or clearing search to see more problems.
+              {{ t("problem.table.tryAdjusting") }}
             </p>
           </div>
         </TableCell>
@@ -171,6 +179,6 @@ onUnmounted(() => {
     v-if="numProblemsToShow < totalFilteredProblems"
     class="text-center py-4 text-muted-foreground"
   >
-    Loading more...
+    {{ t("problem.table.loadingMore") }}
   </div>
 </template>

@@ -3,12 +3,19 @@ import ProblemExplorer from "@/components/problem/ProblemExplorer.vue";
 import ProblemSetSidebar from "@/components/problem/ProblemSetSidebar.vue";
 import FeaturedBanners from "@/components/problem/FeaturedBanners.vue";
 import { useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
+const { t } = useI18n();
+
 const category = computed(() => {
   const c = route.params.category;
   return Array.isArray(c) ? c[0] : c;
+});
+
+onMounted(() => {
+  document.title = `${t("problem.list.title")} - UltiCode`;
 });
 </script>
 

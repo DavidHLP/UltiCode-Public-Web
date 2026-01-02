@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import type { BookmarkFolder } from "@/types/bookmark";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   folders: BookmarkFolder[];
@@ -26,6 +27,8 @@ const emit = defineEmits<{
   edit: [folder: BookmarkFolder];
   delete: [folder: BookmarkFolder];
 }>();
+
+const { t } = useI18n();
 
 const sortedFolders = computed(() => {
   return [...props.folders].sort((a, b) => {
@@ -65,12 +68,12 @@ const sortedFolders = computed(() => {
         </div>
         <div class="min-w-0">
           <p class="text-sm font-black tracking-tight truncate">
-            {{ folder.name }}
+            {{ folder.isDefault ? t("bookmark.defaultFolder") : folder.name }}
           </p>
           <p
             class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1"
           >
-            {{ folder.itemCount }} items
+            {{ folder.itemCount }} {{ t("bookmark.items") }}
           </p>
         </div>
       </div>
@@ -89,14 +92,14 @@ const sortedFolders = computed(() => {
         <DropdownMenuContent align="end" class="rounded-xl">
           <DropdownMenuItem @select="emit('edit', folder)" class="gap-2">
             <Pencil class="h-4 w-4" />
-            Edit
+            {{ t("bookmark.actions.edit") }}
           </DropdownMenuItem>
           <DropdownMenuItem
             class="text-destructive focus:text-destructive gap-2"
             @select="emit('delete', folder)"
           >
             <Trash2 class="h-4 w-4" />
-            Delete
+            {{ t("bookmark.actions.delete") }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -110,7 +113,7 @@ const sortedFolders = computed(() => {
         <Folder class="h-8 w-8 text-muted-foreground/30" />
       </div>
       <p class="text-sm font-bold text-muted-foreground/70 tracking-tight">
-        No collections yet
+        {{ t("bookmark.noCollections") }}
       </p>
     </div>
   </div>

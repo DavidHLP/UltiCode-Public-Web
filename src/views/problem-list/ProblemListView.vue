@@ -75,9 +75,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "vue-sonner";
 import ProblemListAnalytics from "./ProblemListAnalytics.vue";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
+const { t, locale } = useI18n();
 const listId = computed(() => route.params.id as string);
 
 // 获取当前列表的详细信息
@@ -155,7 +157,7 @@ watch(
 const formatDate = (date?: Date | string) => {
   if (!date) return "";
   const d = typeof date === "string" ? new Date(date) : date;
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(locale.value, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -166,19 +168,15 @@ const formatDate = (date?: Date | string) => {
 const handleShare = async () => {
   const url = window.location.href;
   await navigator.clipboard.writeText(url);
-  toast({
-    title: "Link copied",
-    description:
-      "The link to this problem list has been copied to your clipboard.",
+  toast.success(t("problem.problemList.messages.linkCopied"), {
+    description: t("problem.problemList.messages.linkCopiedDesc"),
   });
 };
 
 const handleFork = async () => {
   if (!currentUser) {
-    toast({
-      title: "Authentication required",
-      description: "Please sign in to fork this list.",
-      variant: "destructive",
+    toast.error(t("problem.problemList.messages.authRequired"), {
+      description: t("problem.problemList.messages.signInToFork"),
     });
     return;
   }
@@ -186,17 +184,12 @@ const handleFork = async () => {
   isForking.value = true;
   try {
     const newListId = await forkProblemList(listId.value, currentUser);
-    toast({
-      title: "List forked",
-      description: "You have successfully forked this problem list.",
+    toast.success(t("problem.problemList.messages.forkSuccess"), {
+      description: t("problem.problemList.messages.forkSuccessDesc"),
     });
     router.push(`/problemset/list/${newListId}`);
   } catch {
-    toast({
-      title: "Failed to fork list",
-      description: "An error occurred while forking the list.",
-      variant: "destructive",
-    });
+    toast.error(t("problem.problemList.messages.forkFailed"));
   } finally {
     isForking.value = false;
   }
@@ -208,17 +201,12 @@ const handleDelete = async () => {
   isDeleting.value = true;
   try {
     await deleteProblemList(listId.value, currentUser);
-    toast({
-      title: "List deleted",
-      description: "The problem list has been permanently deleted.",
+    toast.success(t("problem.problemList.messages.deleteSuccess"), {
+      description: t("problem.problemList.messages.deleteSuccessDesc"),
     });
     router.push("/problemset"); // Redirect to main problem set or lists page
   } catch {
-    toast({
-      title: "Failed to delete list",
-      description: "An error occurred while deleting the list.",
-      variant: "destructive",
-    });
+    toast.error(t("problem.problemList.messages.deleteFailed"));
   } finally {
     isDeleting.value = false;
     isDeleteOpen.value = false;
@@ -238,17 +226,12 @@ const handleSaveEdit = async () => {
     // Refresh list data
     await loadProblemList(listId.value);
 
-    toast({
-      title: "List updated",
-      description: "Problem list details have been updated.",
+    toast.success(t("problem.problemList.messages.updateSuccess"), {
+      description: t("problem.problemList.messages.updateSuccessDesc"),
     });
     isEditOpen.value = false;
   } catch {
-    toast({
-      title: "Failed to update list",
-      description: "An error occurred while updating the list.",
-      variant: "destructive",
-    });
+    toast.error(t("problem.problemList.messages.updateFailed"));
   }
 };
 
@@ -276,14 +259,18 @@ const handleToggleSave = async () => {
       await unsaveList(listId.value, currentUser);
       isSaved.value = false;
       currentCategoryId.value = null;
-      toast.success("Removed from saved lists");
+      toast.success(t("problem.problemList.messages.unsaveSuccess"));
     } else {
       await saveList(listId.value, currentUser);
       isSaved.value = true;
-      toast.success("Saved to your lists");
+      toast.success(t("problem.problemList.messages.saveSuccess"));
     }
   } catch {
-    toast.error(isSaved.value ? "Failed to unsave" : "Failed to save");
+    toast.error(
+      isSaved.value
+        ? t("problem.problemList.messages.unsaveFailed")
+        : t("problem.problemList.messages.saveFailed"),
+    );
   } finally {
     isSaving.value = false;
   }
@@ -296,9 +283,13 @@ const handleMoveToCategory = async (categoryId: string | null) => {
   try {
     await moveListToCategory(listId.value, currentUser, categoryId);
     currentCategoryId.value = categoryId;
-    toast.success(categoryId ? "Moved to category" : "Removed from category");
+    toast.success(
+      categoryId
+        ? t("problem.problemList.messages.moveSuccess")
+        : t("problem.problemList.messages.removeCategorySuccess"),
+    );
   } catch {
-    toast.error("Failed to move list");
+    toast.error(t("problem.problemList.messages.moveFailed"));
   }
 };
 
@@ -336,10 +327,12 @@ const handleAddProblem = async (problem: Problem) => {
     await addProblemToList(listId.value, currentUser, problem.id);
     // Add to local list
     problems.value = [...problems.value, problem];
-    toast.success(`Added "${problem.title}" to the list`);
+    toast.success(
+      t("problem.problemList.messages.addSuccess", { title: problem.title }),
+    );
   } catch (e) {
     console.error("Failed to add problem", e);
-    toast.error("Failed to add problem to the list");
+    toast.error(t("problem.problemList.messages.addFailed"));
   } finally {
     addingProblemIds.value.delete(problem.id);
   }
@@ -351,10 +344,12 @@ const handleRemoveProblem = async (problem: Problem) => {
   try {
     await removeProblemFromList(listId.value, currentUser, problem.id);
     problems.value = problems.value.filter((p) => p.id !== problem.id);
-    toast.success(`Removed "${problem.title}" from the list`);
+    toast.success(
+      t("problem.problemList.messages.removeSuccess", { title: problem.title }),
+    );
   } catch (e) {
     console.error("Failed to remove problem", e);
-    toast.error("Failed to remove problem from the list");
+    toast.error(t("problem.problemList.messages.removeFailed"));
   }
 };
 
@@ -389,16 +384,16 @@ const getDifficultyColor = (difficulty: string) => {
       <div class="space-y-4 max-w-3xl">
         <div class="space-y-2">
           <div class="flex items-center gap-3">
-            <Badge variant="outline" class="rounded-md px-2.5 py-0.5"
-              >List</Badge
-            >
+            <Badge variant="outline" class="rounded-md px-2.5 py-0.5">{{
+              t("problem.problemList.detail.listBadge")
+            }}</Badge>
             <Badge
               v-if="currentList?.isPublic"
               variant="secondary"
               class="gap-1 text-xs"
             >
               <Globe class="h-3 w-3" />
-              Public
+              {{ t("problem.problemList.listCard.public") }}
             </Badge>
             <Badge
               v-else
@@ -406,13 +401,13 @@ const getDifficultyColor = (difficulty: string) => {
               class="gap-1 text-xs text-muted-foreground"
             >
               <Lock class="h-3 w-3" />
-              Private
+              {{ t("problem.problemList.listCard.private") }}
             </Badge>
           </div>
           <h1
             class="text-3xl font-bold tracking-tight sm:text-4xl text-foreground/90"
           >
-            {{ currentList?.name || "Problem List" }}
+            {{ currentList?.name || t("problem.problemList.detail.listBadge") }}
           </h1>
         </div>
 
@@ -432,19 +427,21 @@ const getDifficultyColor = (difficulty: string) => {
             >
               {{ currentList?.authorId?.slice(0, 2).toUpperCase() || "U" }}
             </div>
-            <span>Author</span>
+            <span>{{ t("problem.problemList.detail.author") }}</span>
           </div>
 
           <Separator orientation="vertical" class="h-4" />
 
           <span v-if="currentList?.createdAt" class="flex items-center gap-1.5">
             <CalendarDays class="w-4 h-4" />
-            Created {{ formatDate(currentList.createdAt) }}
+            {{ t("problem.problemList.detail.created") }}
+            {{ formatDate(currentList.createdAt) }}
           </span>
 
           <span v-if="currentList?.updatedAt" class="flex items-center gap-1.5">
             <Clock class="w-4 h-4" />
-            Updated {{ formatDate(currentList.updatedAt) }}
+            {{ t("problem.problemList.detail.updated") }}
+            {{ formatDate(currentList.updatedAt) }}
           </span>
         </div>
       </div>
@@ -461,11 +458,17 @@ const getDifficultyColor = (difficulty: string) => {
         >
           <BookmarkCheck v-if="isSaved" class="h-4 w-4" />
           <Bookmark v-else class="h-4 w-4" />
-          {{ isSaving ? "Saving..." : isSaved ? "Saved" : "Save" }}
+          {{
+            isSaving
+              ? t("problem.problemList.detail.saving")
+              : isSaved
+                ? t("problem.problemList.detail.saved")
+                : t("problem.problemList.detail.save")
+          }}
         </Button>
         <Button variant="secondary" size="sm" class="h-9" @click="handleShare">
           <Share2 class="mr-2 h-4 w-4" />
-          Share
+          {{ t("problem.problemList.detail.share") }}
         </Button>
         <Button
           variant="outline"
@@ -475,7 +478,11 @@ const getDifficultyColor = (difficulty: string) => {
           :disabled="isForking"
         >
           <GitFork class="mr-2 h-4 w-4" />
-          {{ isForking ? "Forking..." : "Fork" }}
+          {{
+            isForking
+              ? t("problem.problemList.detail.forking")
+              : t("problem.problemList.detail.fork")
+          }}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
@@ -487,11 +494,11 @@ const getDifficultyColor = (difficulty: string) => {
             <template v-if="isOwner">
               <DropdownMenuItem @click="isEditOpen = true">
                 <Pencil class="mr-2 h-4 w-4" />
-                Edit List Details
+                {{ t("problem.problemList.detail.editDetails") }}
               </DropdownMenuItem>
               <DropdownMenuItem @click="openAddProblemsDialog">
                 <Plus class="mr-2 h-4 w-4" />
-                Add Problems
+                {{ t("problem.problemList.detail.addProblems") }}
               </DropdownMenuItem>
             </template>
             <!-- Actions for saved lists (non-owners) -->
@@ -499,14 +506,14 @@ const getDifficultyColor = (difficulty: string) => {
               <DropdownMenuSub v-if="userCategories.length > 0">
                 <DropdownMenuSubTrigger>
                   <FolderInput class="mr-2 h-4 w-4" />
-                  Move to Category
+                  {{ t("problem.problemList.detail.moveToCategory") }}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuItem
                     v-if="currentCategoryId"
                     @click="handleMoveToCategory(null)"
                   >
-                    Remove from Category
+                    {{ t("problem.problemList.detail.removeFromCategory") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator v-if="currentCategoryId" />
                   <DropdownMenuItem
@@ -520,13 +527,13 @@ const getDifficultyColor = (difficulty: string) => {
               </DropdownMenuSub>
               <DropdownMenuItem @click="handleToggleSave">
                 <BookmarkMinus class="mr-2 h-4 w-4" />
-                Unsave
+                {{ t("problem.problemList.detail.unsave") }}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </template>
             <DropdownMenuItem @click="handleFork" :disabled="isForking">
               <Copy class="mr-2 h-4 w-4" />
-              Duplicate List
+              {{ t("problem.problemList.detail.duplicate") }}
             </DropdownMenuItem>
             <template v-if="isOwner">
               <DropdownMenuSeparator />
@@ -535,7 +542,7 @@ const getDifficultyColor = (difficulty: string) => {
                 @click="isDeleteOpen = true"
               >
                 <Trash2 class="mr-2 h-4 w-4" />
-                Delete List
+                {{ t("problem.problemList.actions.deleteList") }}
               </DropdownMenuItem>
             </template>
           </DropdownMenuContent>
@@ -547,18 +554,24 @@ const getDifficultyColor = (difficulty: string) => {
     <Dialog v-model:open="isEditOpen">
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit List Details</DialogTitle>
+          <DialogTitle>{{
+            t("problem.problemList.detail.editDetails")
+          }}</DialogTitle>
           <DialogDescription>
-            Make changes to your problem list here. Click save when you're done.
+            {{ t("problem.problemList.detail.editDescription") }}
           </DialogDescription>
         </DialogHeader>
         <div class="grid gap-4 py-4">
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="name" class="text-right">Name</Label>
+            <Label for="name" class="text-right">{{
+              t("problem.problemList.dialogs.listName")
+            }}</Label>
             <Input id="name" v-model="editForm.name" class="col-span-3" />
           </div>
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="description" class="text-right">Description</Label>
+            <Label for="description" class="text-right">{{
+              t("problem.problemList.dialogs.description")
+            }}</Label>
             <Textarea
               id="description"
               v-model="editForm.description"
@@ -566,19 +579,23 @@ const getDifficultyColor = (difficulty: string) => {
             />
           </div>
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="public" class="text-right">Public</Label>
+            <Label for="public" class="text-right">{{
+              t("problem.problemList.dialogs.publicList")
+            }}</Label>
             <div class="col-span-3 flex items-center space-x-2">
               <Switch id="public" v-model:checked="editForm.isPublic" />
               <span class="text-sm text-muted-foreground">{{
                 editForm.isPublic
-                  ? "Everyone can see this list"
-                  : "Only you can see this list"
+                  ? t("problem.problemList.detail.publicHint")
+                  : t("problem.problemList.detail.privateHint")
               }}</span>
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" @click="handleSaveEdit">Save changes</Button>
+          <Button type="submit" @click="handleSaveEdit">{{
+            t("common.actions.save")
+          }}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -587,23 +604,31 @@ const getDifficultyColor = (difficulty: string) => {
     <Dialog v-model:open="isDeleteOpen">
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>{{
+            t("problem.problemList.detail.deleteConfirmTitle")
+          }}</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the
-            problem list "<strong>{{ currentList?.name }}</strong
-            >".
+            {{
+              t("problem.problemList.detail.deleteConfirmDesc", {
+                name: currentList?.name,
+              })
+            }}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter class="gap-2 sm:gap-0">
-          <Button variant="outline" @click="isDeleteOpen = false"
-            >Cancel</Button
-          >
+          <Button variant="outline" @click="isDeleteOpen = false">{{
+            t("common.actions.cancel")
+          }}</Button>
           <Button
             variant="destructive"
             @click="handleDelete"
             :disabled="isDeleting"
           >
-            {{ isDeleting ? "Deleting..." : "Delete List" }}
+            {{
+              isDeleting
+                ? t("common.status.saving")
+                : t("problem.problemList.actions.deleteList")
+            }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -613,9 +638,11 @@ const getDifficultyColor = (difficulty: string) => {
     <Dialog v-model:open="isAddProblemsOpen">
       <DialogContent class="sm:max-w-[650px] max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Add Problems</DialogTitle>
+          <DialogTitle>{{
+            t("problem.problemList.detail.addProblems")
+          }}</DialogTitle>
           <DialogDescription>
-            Search for problems to add to your list.
+            {{ t("problem.problemList.detail.editDescription") }}
           </DialogDescription>
         </DialogHeader>
         <div class="flex-1 space-y-4 py-4 overflow-hidden">
@@ -626,7 +653,7 @@ const getDifficultyColor = (difficulty: string) => {
             />
             <Input
               v-model="searchQuery"
-              placeholder="Search by problem title or ID..."
+              :placeholder="t('problem.problemList.detail.searchPlaceholder')"
               class="pl-10"
               @input="handleSearch"
             />
@@ -638,21 +665,25 @@ const getDifficultyColor = (difficulty: string) => {
               v-if="isSearching"
               class="flex items-center justify-center py-12"
             >
-              <span class="text-muted-foreground">Searching...</span>
+              <span class="text-muted-foreground">{{
+                t("problem.problemList.detail.searching")
+              }}</span>
             </div>
             <div
               v-else-if="searchQuery && searchResults.length === 0"
               class="flex items-center justify-center py-12"
             >
-              <span class="text-muted-foreground">No problems found</span>
+              <span class="text-muted-foreground">{{
+                t("problem.problemList.detail.noProblemsFound")
+              }}</span>
             </div>
             <div
               v-else-if="!searchQuery"
               class="flex items-center justify-center py-12"
             >
-              <span class="text-muted-foreground"
-                >Enter a search term to find problems</span
-              >
+              <span class="text-muted-foreground">{{
+                t("problem.problemList.detail.enterSearchTerm")
+              }}</span>
             </div>
             <ScrollArea v-else class="h-[320px]">
               <div class="divide-y">
@@ -674,7 +705,11 @@ const getDifficultyColor = (difficulty: string) => {
                       :class="getDifficultyColor(problem.difficulty)"
                       class="text-xs shrink-0"
                     >
-                      {{ problem.difficulty }}
+                      {{
+                        t(
+                          `problem.difficulty.${problem.difficulty.toLowerCase()}`,
+                        )
+                      }}
                     </Badge>
                   </div>
                   <div class="shrink-0 ml-3">
@@ -685,7 +720,7 @@ const getDifficultyColor = (difficulty: string) => {
                       class="text-green-600 gap-1 pointer-events-none"
                     >
                       <Check class="h-4 w-4" />
-                      Added
+                      {{ t("problem.problemList.detail.added") }}
                     </Button>
                     <Button
                       v-else
@@ -697,7 +732,9 @@ const getDifficultyColor = (difficulty: string) => {
                     >
                       <Plus class="h-4 w-4" />
                       {{
-                        addingProblemIds.has(problem.id) ? "Adding..." : "Add"
+                        addingProblemIds.has(problem.id)
+                          ? t("problem.problemList.detail.adding")
+                          : t("problem.problemList.detail.add")
                       }}
                     </Button>
                   </div>
@@ -707,9 +744,9 @@ const getDifficultyColor = (difficulty: string) => {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" @click="isAddProblemsOpen = false"
-            >Done</Button
-          >
+          <Button variant="outline" @click="isAddProblemsOpen = false">{{
+            t("problem.problemList.detail.done")
+          }}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -727,11 +764,10 @@ const getDifficultyColor = (difficulty: string) => {
           </EmptyMedia>
           <EmptyHeader>
             <h3 class="text-xl font-semibold text-foreground mb-1">
-              No problems in this list
+              {{ t("problem.problemList.detail.emptyTitle") }}
             </h3>
             <EmptyDescription class="text-base">
-              This list is currently empty. Add problems to start tracking your
-              progress.
+              {{ t("problem.problemList.detail.emptyDesc") }}
             </EmptyDescription>
           </EmptyHeader>
           <Button
@@ -739,11 +775,11 @@ const getDifficultyColor = (difficulty: string) => {
             size="lg"
             @click="openAddProblemsDialog"
             v-if="isOwner"
-            >Add Problems</Button
+            >{{ t("problem.problemList.detail.addProblems") }}</Button
           >
-          <Button class="mt-6" size="lg" @click="handleFork" v-else
-            >Fork and Add Problems</Button
-          >
+          <Button class="mt-6" size="lg" @click="handleFork" v-else>{{
+            t("problem.problemList.detail.forkAndAdd")
+          }}</Button>
         </EmptyContent>
       </Empty>
     </div>

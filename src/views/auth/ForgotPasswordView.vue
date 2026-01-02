@@ -7,8 +7,10 @@ import { useRouter } from "vue-router";
 import { forgotPassword } from "@/api/auth";
 import { toast } from "vue-sonner";
 import { GalleryVerticalEnd } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 const email = ref("");
 const loading = ref(false);
 
@@ -17,11 +19,11 @@ async function handleReset(e: Event) {
   loading.value = true;
   try {
     await forgotPassword(email.value);
-    toast.success("If an account exists, a reset link has been sent.");
+    toast.success(t("auth.forgotPassword.successMessage"));
     router.push("/login");
   } catch (error) {
     console.error(error);
-    toast.error("Failed to process request");
+    toast.error(t("auth.messages.requestFailed"));
   } finally {
     loading.value = false;
   }
@@ -45,27 +47,35 @@ async function handleReset(e: Event) {
         <div class="w-full max-w-xs">
           <form class="flex flex-col gap-6" @submit="handleReset">
             <div class="flex flex-col items-center gap-1 text-center">
-              <h1 class="text-2xl font-bold">Forgot Password</h1>
+              <h1 class="text-2xl font-bold">
+                {{ t("auth.forgotPassword.title") }}
+              </h1>
               <p class="text-muted-foreground text-sm text-balance">
-                Enter your email to receive a reset link
+                {{ t("auth.forgotPassword.subtitle") }}
               </p>
             </div>
             <div class="grid gap-2">
-              <Label for="email">Email</Label>
+              <Label for="email">{{ t("auth.forgotPassword.email") }}</Label>
               <Input
                 id="email"
                 type="email"
                 v-model="email"
-                placeholder="m@example.com"
+                :placeholder="t('auth.forgotPassword.emailPlaceholder')"
                 required
               />
             </div>
             <Button type="submit" :disabled="loading">
-              {{ loading ? "Sending..." : "Send Reset Link" }}
+              {{
+                loading
+                  ? t("auth.forgotPassword.submitting")
+                  : t("auth.forgotPassword.submit")
+              }}
             </Button>
             <div class="text-center text-sm">
-              Remember your password?
-              <a href="/login" class="underline underline-offset-4">Login</a>
+              {{ t("auth.forgotPassword.rememberPassword") }}
+              <a href="/login" class="underline underline-offset-4">{{
+                t("auth.register.login")
+              }}</a>
             </div>
           </form>
         </div>

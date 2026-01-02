@@ -36,9 +36,11 @@ import {
 import { fetchMyForumPosts, deleteForumPost } from "@/api/forum";
 import type { ForumPost } from "@/types/forum";
 import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
 import PersonalPageHeader from "./components/PersonalPageHeader.vue";
 import PersonalPageShell from "./components/PersonalPageShell.vue";
 
+const { t, locale } = useI18n();
 const isLoading = ref(true);
 const posts = ref<ForumPost[]>([]);
 
@@ -48,7 +50,7 @@ async function loadPosts() {
     posts.value = await fetchMyForumPosts();
   } catch (error) {
     console.error("Failed to load forum posts", error);
-    toast.error("Failed to load forum posts");
+    toast.error(t("personal.messages.loadFailed"));
   } finally {
     isLoading.value = false;
   }
@@ -58,10 +60,10 @@ async function handleDelete(postId: string) {
   try {
     await deleteForumPost(postId);
     posts.value = posts.value.filter((post) => post.id !== postId);
-    toast.success("Post deleted successfully.");
+    toast.success(t("forum.messages.postDeleted"));
   } catch (error) {
     console.error("Failed to delete post", error);
-    toast.error("Failed to delete post.");
+    toast.error(t("forum.messages.deleteFailed"));
   }
 }
 
@@ -71,14 +73,14 @@ onMounted(loadPosts);
 <template>
   <PersonalPageShell>
     <PersonalPageHeader
-      title="My Forum Posts"
-      description="View and manage the discussions you've started in the community."
+      :title="t('personal.forumPosts.title')"
+      :description="t('personal.forumPosts.subtitle')"
     >
       <template #actions>
         <Button as-child class="rounded-full gap-2">
           <RouterLink to="/forum/create">
             <Plus class="h-4 w-4" />
-            New Post
+            {{ t("personal.forumPosts.newPost") }}
           </RouterLink>
         </Button>
       </template>
@@ -89,7 +91,9 @@ onMounted(loadPosts);
       class="flex flex-col items-center justify-center py-20 gap-4"
     >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
-      <p class="text-sm text-muted-foreground">Loading your posts...</p>
+      <p class="text-sm text-muted-foreground">
+        {{ t("personal.forumPosts.loadingPosts") }}
+      </p>
     </div>
 
     <div
@@ -101,13 +105,14 @@ onMounted(loadPosts);
       >
         <MessageSquare class="h-8 w-8 text-muted-foreground/50" />
       </div>
-      <h3 class="text-xl font-bold">No posts yet</h3>
+      <h3 class="text-xl font-bold">{{ t("personal.forumPosts.noPosts") }}</h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        You haven't started any discussions. Share your knowledge or ask a
-        question!
+        {{ t("personal.forumPosts.noPostsDesc") }}
       </p>
       <Button as-child class="rounded-full px-8 h-10 font-bold">
-        <RouterLink to="/forum/create">Create Your First Post</RouterLink>
+        <RouterLink to="/forum/create">{{
+          t("personal.forumPosts.createFirst")
+        }}</RouterLink>
       </Button>
     </div>
 
@@ -131,7 +136,7 @@ onMounted(loadPosts);
               >
                 <Calendar class="h-3 w-3" />
                 {{
-                  new Date(post.createdAt).toLocaleDateString(undefined, {
+                  new Date(post.createdAt).toLocaleDateString(locale, {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
@@ -158,14 +163,16 @@ onMounted(loadPosts);
                     variant="secondary"
                     class="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 gap-1 rounded-sm h-5 text-[10px] font-semibold"
                   >
-                    <Pin class="h-3 w-3" /> PINNED
+                    <Pin class="h-3 w-3" />
+                    {{ t("personal.forumPosts.pinned") }}
                   </Badge>
                   <Badge
                     v-if="post.isLocked"
                     variant="outline"
                     class="gap-1 rounded-sm h-5 text-[10px] font-semibold border-muted-foreground/30 text-muted-foreground"
                   >
-                    <Lock class="h-3 w-3" /> LOCKED
+                    <Lock class="h-3 w-3" />
+                    {{ t("personal.forumPosts.locked") }}
                   </Badge>
                   <Badge
                     v-if="post.flair"
@@ -195,14 +202,16 @@ onMounted(loadPosts);
                         params: { postId: post.id },
                       }"
                     >
-                      <Eye class="h-4 w-4" /> View Post
+                      <Eye class="h-4 w-4" />
+                      {{ t("personal.forumPosts.viewPost") }}
                     </RouterLink>
                   </DropdownMenuItem>
                   <DropdownMenuItem as-child class="gap-2">
                     <RouterLink
                       :to="{ name: 'forum-edit', params: { postId: post.id } }"
                     >
-                      <Pencil class="h-4 w-4" /> Edit
+                      <Pencil class="h-4 w-4" />
+                      {{ t("personal.forumPosts.edit") }}
                     </RouterLink>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -212,24 +221,30 @@ onMounted(loadPosts);
                         @select.prevent
                         class="text-destructive focus:text-destructive gap-2"
                       >
-                        <Trash2 class="h-4 w-4" /> Delete
+                        <Trash2 class="h-4 w-4" />
+                        {{ t("personal.forumPosts.delete") }}
                       </DropdownMenuItem>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+                        <AlertDialogTitle>{{
+                          t("personal.forumPosts.deleteDialog.title")
+                        }}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This action cannot be undone. This post and all of its
-                          comments will be permanently removed.
+                          {{
+                            t("personal.forumPosts.deleteDialog.description")
+                          }}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{{
+                          t("common.actions.cancel")
+                        }}</AlertDialogCancel>
                         <AlertDialogAction
                           @click="handleDelete(post.id)"
                           class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          Delete Permanently
+                          {{ t("common.actions.delete") }}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -251,7 +266,7 @@ onMounted(loadPosts);
               }}</span>
               <span
                 class="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest"
-                >Comments</span
+                >{{ t("personal.forumPosts.stats.comments") }}</span
               >
             </div>
             <div class="flex flex-col items-center gap-1 group/stat">
@@ -263,7 +278,7 @@ onMounted(loadPosts);
               }}</span>
               <span
                 class="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest"
-                >Views</span
+                >{{ t("personal.forumPosts.stats.views") }}</span
               >
             </div>
           </div>

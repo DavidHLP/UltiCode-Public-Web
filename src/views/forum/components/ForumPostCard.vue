@@ -14,10 +14,13 @@ import { toast } from "vue-sonner";
 import { toggleBookmark, BookmarkType } from "@/api/bookmark";
 import { isAuthenticated } from "@/utils/auth";
 import { recordForumShare } from "@/api/forum";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   post: ForumPost;
 }>();
+
+const { t, locale } = useI18n();
 
 const localStats = ref({
   ...(props.post.stats || {
@@ -118,9 +121,12 @@ function formatCount(value: number) {
   return value.toString();
 }
 
-const relativeTimeFormatter = new Intl.RelativeTimeFormat("en", {
-  numeric: "auto",
-});
+const relativeTimeFormatter = computed(
+  () =>
+    new Intl.RelativeTimeFormat(locale.value, {
+      numeric: "auto",
+    }),
+);
 
 function formatRelativeTime(value: string) {
   const date = new Date(value);
@@ -137,11 +143,11 @@ function formatRelativeTime(value: string) {
   for (const [unit, amountMs] of ranges) {
     const delta = diffMs / amountMs;
     if (Math.abs(delta) >= 1) {
-      return relativeTimeFormatter.format(Math.round(delta), unit);
+      return relativeTimeFormatter.value.format(Math.round(delta), unit);
     }
   }
 
-  return "just now";
+  return t("common.time.now");
 }
 
 function handleCommentClick() {
@@ -154,16 +160,16 @@ async function handleShare() {
     await navigator.clipboard.writeText(url);
     await recordForumShare(props.post.id);
     localStats.value.shares = (localStats.value.shares || 0) + 1;
-    toast.success("Link copied to clipboard");
+    toast.success(t("forum.messages.linkCopied"));
   } catch (error) {
     console.error("Failed to copy link", error);
-    toast.error("Failed to copy link");
+    toast.error(t("forum.messages.copyFailed"));
   }
 }
 
 async function handleSave() {
   if (!isAuthenticated()) {
-    toast.error("Please log in to save posts.");
+    toast.error(t("forum.messages.loginToSave"));
     return;
   }
   try {
@@ -173,10 +179,12 @@ async function handleSave() {
       0,
       (localStats.value.saves || 0) + (res.isSaved ? 1 : -1),
     );
-    toast.success(res.isSaved ? "Post saved" : "Post unsaved");
+    toast.success(
+      res.isSaved ? t("forum.messages.saved") : t("forum.messages.unsaved"),
+    );
   } catch (error) {
     console.error("Failed to toggle save", error);
-    toast.error("Failed to save post");
+    toast.error(t("forum.messages.saveFailed"));
   }
 }
 </script>
@@ -230,7 +238,7 @@ async function handleSave() {
               >•</span
             >
             <span v-if="post.community"
-              >Posted by u/{{ post.author.username }}</span
+              >{{ t("forum.post.postedBy") }} u/{{ post.author.username }}</span
             >
           </span>
           <Badge
@@ -346,15 +354,15 @@ async function handleSave() {
               comments: {
                 show: true,
                 count: commentsDisplay,
-                text: 'comments',
+                text: t('forum.comments.title'),
                 icon: 'message-square',
               },
-              share: { show: true, text: 'Share' },
+              share: { show: true, text: t('forum.actions.share') },
               save: {
                 show: true,
                 isSaved: post.isSaved,
                 count: savesDisplay,
-                text: 'Save',
+                text: t('forum.actions.save'),
               },
             }"
             @vote="(type: 1 | -1) => emit('vote', post.id, type)"

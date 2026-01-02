@@ -18,6 +18,7 @@ import {
   List,
   Bookmark,
   CheckCircle2,
+  Bell,
 } from "lucide-vue-next";
 
 export interface SidebarItem {
@@ -40,42 +41,74 @@ export interface SidebarSection {
 
 export const forumSidebarData: SidebarSection[] = [
   {
-    name: "Platform",
+    name: "sidebar.forum.platform",
     items: [
-      { title: "Home", url: "/forum", icon: Home },
-      { title: "Popular", url: "/forum/popular", icon: TrendingUp },
-      { title: "Explore", url: "/forum/explore", icon: Globe },
-      { title: "All Posts", url: "/forum/all", icon: LayoutGrid },
+      { title: "sidebar.forum.home", url: "/forum", icon: Home },
+      {
+        title: "sidebar.forum.popular",
+        url: "/forum/popular",
+        icon: TrendingUp,
+      },
+      { title: "sidebar.forum.explore", url: "/forum/explore", icon: Globe },
+      { title: "sidebar.forum.allPosts", url: "/forum/all", icon: LayoutGrid },
     ],
   },
   {
-    name: "My Space",
-    collapsible: true,
-    items: [
-      { title: "My Posts", url: "/personal/forum-posts", icon: MessageSquare },
-      { title: "Saved Posts", url: "/personal/bookmarks", icon: Bookmark },
-    ],
-  },
-  {
-    name: "Categories",
+    name: "sidebar.forum.mySpace",
     collapsible: true,
     items: [
       {
-        title: "Interview Experience",
-        url: "/forum/c/interview",
+        title: "sidebar.forum.myPosts",
+        url: "/personal/forum-posts",
         icon: MessageSquare,
       },
-      { title: "Career", url: "/forum/c/career", icon: Briefcase },
-      { title: "Compensation", url: "/forum/c/compensation", icon: DollarSign },
-      { title: "Technology", url: "/forum/c/technology", icon: Cpu },
+      {
+        title: "sidebar.forum.savedPosts",
+        url: "/personal/bookmarks",
+        icon: Bookmark,
+      },
     ],
   },
   {
-    name: "Resources",
+    name: "sidebar.forum.categories",
     collapsible: true,
     items: [
-      { title: "Guidelines", url: "/forum/guidelines", icon: FileText },
-      { title: "Feedback", url: "/forum/feedback", icon: HelpCircle },
+      {
+        title: "sidebar.forum.interviewExperience",
+        url: "/forum/c/interview",
+        icon: MessageSquare,
+      },
+      {
+        title: "sidebar.forum.career",
+        url: "/forum/c/career",
+        icon: Briefcase,
+      },
+      {
+        title: "sidebar.forum.compensation",
+        url: "/forum/c/compensation",
+        icon: DollarSign,
+      },
+      {
+        title: "sidebar.forum.technology",
+        url: "/forum/c/technology",
+        icon: Cpu,
+      },
+    ],
+  },
+  {
+    name: "sidebar.forum.resources",
+    collapsible: true,
+    items: [
+      {
+        title: "sidebar.forum.guidelines",
+        url: "/forum/guidelines",
+        icon: FileText,
+      },
+      {
+        title: "sidebar.forum.feedback",
+        url: "/forum/feedback",
+        icon: HelpCircle,
+      },
     ],
   },
 ];
@@ -84,54 +117,87 @@ import { PROBLEM_CATEGORIES } from "@/constants/problem-categories";
 
 export const problemSidebarData: SidebarSection[] = [
   {
-    name: "Problem Set",
+    name: "sidebar.problem.problemSet",
     items: [...PROBLEM_CATEGORIES] as unknown as SidebarItem[],
   },
 ];
 
 export const contestSidebarData: SidebarSection[] = [
   {
-    name: "Contest",
+    name: "sidebar.contest.contestSection",
     items: [
-      { title: "Contest Home", url: "/contest", icon: Home },
-      { title: "Past Contests", url: "/contest/past", icon: History },
-      { title: "My Contests", url: "/contest/my", icon: Trophy },
+      { title: "sidebar.contest.contestHome", url: "/contest", icon: Home },
+      {
+        title: "sidebar.contest.pastContests",
+        url: "/contest/past",
+        icon: History,
+      },
+      { title: "sidebar.contest.myContests", url: "/contest/my", icon: Trophy },
     ],
   },
   {
-    name: "Ranking",
+    name: "sidebar.contest.ranking",
     collapsible: true,
     items: [
-      { title: "Global Ranking", url: "/contest/global-ranking", icon: Globe },
-      { title: "Local Ranking", url: "/contest/local-ranking", icon: Flame },
+      {
+        title: "sidebar.contest.globalRanking",
+        url: "/contest/global-ranking",
+        icon: Globe,
+      },
+      {
+        title: "sidebar.contest.localRanking",
+        url: "/contest/local-ranking",
+        icon: Flame,
+      },
     ],
   },
 ];
 
 export const personalSidebarData: SidebarSection[] = [
   {
-    name: "Account",
+    name: "sidebar.personal.account",
     items: [
-      { title: "Profile", url: "/personal", icon: User },
-      { title: "Account", url: "/personal/account", icon: Settings },
+      { title: "sidebar.personal.profile", url: "/personal", icon: User },
+      {
+        title: "sidebar.personal.accountSettings",
+        url: "/personal/account",
+        icon: Settings,
+      },
+      {
+        title: "sidebar.personal.notifications",
+        url: "/personal/notifications",
+        icon: Bell,
+      },
     ],
   },
   {
-    name: "Activity",
+    name: "sidebar.personal.activity",
     items: [
       {
-        title: "Submissions",
+        title: "sidebar.personal.submissions",
         url: "/personal/submissions",
         icon: History,
       },
-      { title: "Solutions", url: "/personal/solutions", icon: CheckCircle2 },
-      { title: "Problem Lists", url: "/personal/problem-lists", icon: List },
       {
-        title: "Forum Posts",
+        title: "sidebar.personal.solutions",
+        url: "/personal/solutions",
+        icon: CheckCircle2,
+      },
+      {
+        title: "sidebar.personal.problemLists",
+        url: "/personal/problem-lists",
+        icon: List,
+      },
+      {
+        title: "sidebar.personal.forumPosts",
         url: "/personal/forum-posts",
         icon: MessageSquare,
       },
-      { title: "Bookmarks", url: "/personal/bookmarks", icon: Bookmark },
+      {
+        title: "sidebar.personal.bookmarks",
+        url: "/personal/bookmarks",
+        icon: Bookmark,
+      },
     ],
   },
 ];

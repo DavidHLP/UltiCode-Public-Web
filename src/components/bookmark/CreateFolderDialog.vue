@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 import type {
   BookmarkFolder,
   CreateFolderInput,
@@ -29,6 +30,8 @@ const emit = defineEmits<{
   create: [data: CreateFolderInput];
   update: [id: string, data: UpdateFolderInput];
 }>();
+
+const { t } = useI18n();
 
 const name = ref("");
 const description = ref("");
@@ -57,7 +60,9 @@ const COLORS = [
 ];
 
 const isEdit = computed(() => !!props.folder);
-const title = computed(() => (isEdit.value ? "Edit Folder" : "Create Folder"));
+const title = computed(() =>
+  isEdit.value ? t("bookmark.editFolder") : t("bookmark.createFolder"),
+);
 
 watch(
   () => props.open,
@@ -113,8 +118,8 @@ function handleClose() {
         <DialogDescription class="text-muted-foreground">
           {{
             isEdit
-              ? "Update your bookmark folder details."
-              : "Create a new folder to organize your bookmarks."
+              ? t("bookmark.updateDetails")
+              : t("bookmark.createDescription")
           }}
         </DialogDescription>
       </DialogHeader>
@@ -124,12 +129,12 @@ function handleClose() {
           <Label
             for="name"
             class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
-            >Name</Label
+            >{{ t("bookmark.name") }}</Label
           >
           <Input
             id="name"
             v-model="name"
-            placeholder="My Folder"
+            :placeholder="t('bookmark.placeholders.folderName')"
             :disabled="isSubmitting"
             class="rounded-xl border-muted-foreground/20 focus:ring-primary/20 h-11"
           />
@@ -139,12 +144,12 @@ function handleClose() {
           <Label
             for="description"
             class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
-            >Description (optional)</Label
+            >{{ t("bookmark.description") }}</Label
           >
           <Textarea
             id="description"
             v-model="description"
-            placeholder="A brief description..."
+            :placeholder="t('bookmark.placeholders.description')"
             :disabled="isSubmitting"
             rows="3"
             class="rounded-xl border-muted-foreground/20 focus:ring-primary/20 resize-none p-3"
@@ -154,7 +159,7 @@ function handleClose() {
         <div class="space-y-4">
           <Label
             class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
-            >Color Appearance</Label
+            >{{ t("bookmark.colorAppearance") }}</Label
           >
           <div class="grid grid-cols-6 gap-3">
             <button
@@ -169,7 +174,7 @@ function handleClose() {
                   : 'hover:scale-110 hover:shadow-md',
               ]"
               @click="selectedColor = color"
-              :title="color"
+              :title="t(`bookmark.colors.${color}`)"
             >
               <div
                 v-if="selectedColor === color"
@@ -185,7 +190,7 @@ function handleClose() {
                   : 'border-muted-foreground/30 hover:scale-110',
               ]"
               @click="selectedColor = null"
-              title="No color"
+              :title="t('bookmark.noColor')"
             >
               <div class="h-4 w-0.5 bg-muted-foreground/40 rotate-45"></div>
             </button>
@@ -199,7 +204,7 @@ function handleClose() {
             @click="handleClose"
             class="rounded-xl font-bold"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </Button>
           <Button
             type="submit"
@@ -207,7 +212,9 @@ function handleClose() {
             class="rounded-xl px-8 font-black shadow-sm"
           >
             <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
-            {{ isEdit ? "Save Changes" : "Create Folder" }}
+            {{
+              isEdit ? t("bookmark.saveChanges") : t("bookmark.createFolder")
+            }}
           </Button>
         </DialogFooter>
       </form>

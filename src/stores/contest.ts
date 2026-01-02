@@ -23,7 +23,7 @@ import {
   fetchUserContests as apiFetchUserContests,
   fetchUserContestHistory,
   fetchUserRatingHistory,
-  fetchGlobalRankingsLegacy,
+  fetchGlobalRankings,
 } from "@/api/contest";
 
 export const useContestStore = defineStore("contest", () => {
@@ -123,7 +123,8 @@ export const useContestStore = defineStore("contest", () => {
   async function loadGlobalRankings() {
     loadingRankings.value = true;
     try {
-      globalRankings.value = await fetchGlobalRankingsLegacy();
+      const result = await fetchGlobalRankings({ page: 1, limit: 10 });
+      globalRankings.value = result.items;
     } finally {
       loadingRankings.value = false;
     }

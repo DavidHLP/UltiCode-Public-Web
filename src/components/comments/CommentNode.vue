@@ -62,7 +62,7 @@
           variant="secondary"
           class="text-[9px] font-black px-1 h-3.5 rounded-sm bg-primary/10 text-primary border-none uppercase"
         >
-          OP
+          {{ t("forum.author.op") }}
         </Badge>
         <span class="text-muted-foreground">•</span>
         <span
@@ -76,7 +76,7 @@
           class="text-muted-foreground text-xs italic ml-2 cursor-pointer select-none"
           @click="toggleCollapse"
         >
-          (collapsed)
+          {{ t("forum.comments.collapsed") }}
         </span>
       </div>
 
@@ -102,10 +102,14 @@
             <ActionItem
               variant="button"
               :icon="MessageSquare"
-              label="Reply"
+              :label="t('common.actions.reply')"
               @click="toggleReply"
             />
-            <ActionItem variant="button" :icon="Share2" label="Share" />
+            <ActionItem
+              variant="button"
+              :icon="Share2"
+              :label="t('common.actions.share')"
+            />
 
             <DropdownMenu v-if="comment.isOwn">
               <DropdownMenuTrigger as-child>
@@ -120,13 +124,14 @@
                   @click="toggleEdit"
                   class="gap-2 font-bold text-xs"
                 >
-                  <Pencil class="h-3.5 w-3.5" /> Edit
+                  <Pencil class="h-3.5 w-3.5" /> {{ t("common.actions.edit") }}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   class="text-destructive focus:text-destructive gap-2 font-bold text-xs"
                   @click="handleDeleteClick"
                 >
-                  <Trash2 class="h-3.5 w-3.5" /> Delete
+                  <Trash2 class="h-3.5 w-3.5" />
+                  {{ t("common.actions.delete") }}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -185,22 +190,22 @@
     >
       <AlertDialogContent class="rounded-3xl">
         <AlertDialogHeader>
-          <AlertDialogTitle class="text-xl font-black tracking-tight"
-            >Delete Comment</AlertDialogTitle
-          >
+          <AlertDialogTitle class="text-xl font-black tracking-tight">{{
+            t("forum.comments.deleteDialog.title")
+          }}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you absolutely sure? This action cannot be undone.
+            {{ t("forum.comments.deleteDialog.description") }}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter class="gap-2 sm:gap-0">
-          <AlertDialogCancel class="rounded-xl font-bold"
-            >Cancel</AlertDialogCancel
-          >
+          <AlertDialogCancel class="rounded-xl font-bold">{{
+            t("forum.comments.deleteDialog.cancel")
+          }}</AlertDialogCancel>
           <AlertDialogAction
             @click="confirmDelete"
             class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-black"
           >
-            Delete Permanently
+            {{ t("forum.comments.deleteDialog.confirm") }}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -249,6 +254,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 defineOptions({
   name: "CommentNode",
@@ -272,6 +278,8 @@ const emit = defineEmits<{
   (e: "edit", commentId: number | string, content: string): void;
   (e: "delete", commentId: number | string): void;
 }>();
+
+const { t } = useI18n();
 
 const isCollapsed = ref(false);
 const isRailHovered = ref(false);

@@ -4,6 +4,7 @@ import { X } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useBottomPanelStore } from "./test";
+import { useI18n } from "vue-i18n";
 import type {
   ProblemTestCase,
   ProblemTestCaseInput,
@@ -13,6 +14,7 @@ const props = defineProps<{
   testCases: ProblemTestCase[];
 }>();
 
+const { t } = useI18n();
 const activeId = ref("");
 const localCases = ref<ProblemTestCase[]>([]);
 
@@ -93,7 +95,7 @@ const activeCase = computed(() => {
 const caseTabs = computed(() =>
   localCases.value.map((testCase, index) => ({
     ...testCase,
-    displayLabel: `Case ${index + 1}`,
+    displayLabel: `${t("common.labels.example")} ${index + 1}`,
   })),
 );
 
@@ -187,7 +189,7 @@ const removeCase = (id: string) => {
           </div>
         </template>
         <p v-else class="text-muted-foreground">
-          No predefined inputs for this case.
+          {{ t("problem.layout.noPredefinedInputs") }}
         </p>
       </div>
     </div>

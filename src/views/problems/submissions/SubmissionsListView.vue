@@ -21,6 +21,7 @@ import {
   EmptyHeader,
   EmptyMedia,
 } from "@/components/ui/empty";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   submissions: SubmissionRecord[];
@@ -31,6 +32,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [submission: SubmissionRecord];
 }>();
+
+const { t, locale } = useI18n();
 
 const statusClass = (status: SubmissionRecord["status"]) => {
   const meta = props.statusMetaByKey?.[status];
@@ -53,14 +56,20 @@ const statusClass = (status: SubmissionRecord["status"]) => {
   }
 };
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
+const dateFormatter = computed(
+  () =>
+    new Intl.DateTimeFormat(locale.value, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
+);
 
-const relativeFormatter = new Intl.RelativeTimeFormat(undefined, {
-  numeric: "auto",
-});
+const relativeFormatter = computed(
+  () =>
+    new Intl.RelativeTimeFormat(locale.value, {
+      numeric: "auto",
+    }),
+);
 
 const normalizeTimestamp = (value: string) => {
   const timestamp = Date.parse(value);
@@ -68,7 +77,7 @@ const normalizeTimestamp = (value: string) => {
 };
 
 const formatRelativeTime = (timestamp: number | null) => {
-  if (!timestamp) return "time unknown";
+  if (!timestamp) return t("problem.submissions.timeUnknown");
   const diffSeconds = Math.round((timestamp - Date.now()) / 1000);
   const absoluteDiff = Math.abs(diffSeconds);
   const thresholds: [Intl.RelativeTimeFormatUnit, number][] = [
@@ -81,10 +90,13 @@ const formatRelativeTime = (timestamp: number | null) => {
   ];
   for (const [unit, seconds] of thresholds) {
     if (absoluteDiff >= seconds) {
-      return relativeFormatter.format(Math.round(diffSeconds / seconds), unit);
+      return relativeFormatter.value.format(
+        Math.round(diffSeconds / seconds),
+        unit,
+      );
     }
   }
-  return "just now";
+  return t("common.time.now");
 };
 
 const sortedSubmissions = computed(() =>
@@ -103,7 +115,7 @@ const decoratedSubmissions = computed(() =>
     return {
       ...submission,
       formattedSubmitted: timestamp
-        ? dateFormatter.format(timestamp)
+        ? dateFormatter.value.format(timestamp)
         : submission.submittedAt,
       relativeSubmitted: formatRelativeTime(timestamp),
     };
@@ -121,18 +133,26 @@ const handleSelect = (submission: SubmissionRecord) =>
       class="flex items-center justify-center py-10 text-muted-foreground"
     >
       <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-      Loading submissions...
+      {{ t("problem.submissions.loading") }}
     </div>
 
     <template v-else>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead class="w-[140px]">Status</TableHead>
-            <TableHead class="w-[140px]">Language</TableHead>
-            <TableHead class="w-[120px] text-center">Runtime</TableHead>
-            <TableHead class="w-[120px] text-center">Memory</TableHead>
-            <TableHead>Notes</TableHead>
+            <TableHead class="w-[140px]">{{
+              t("problem.submissions.status")
+            }}</TableHead>
+            <TableHead class="w-[140px]">{{
+              t("problem.submissions.language")
+            }}</TableHead>
+            <TableHead class="w-[120px] text-center">{{
+              t("problem.submissions.runtime")
+            }}</TableHead>
+            <TableHead class="w-[120px] text-center">{{
+              t("problem.submissions.memory")
+            }}</TableHead>
+            <TableHead>{{ t("problem.submissions.notes") }}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -169,10 +189,10 @@ const handleSelect = (submission: SubmissionRecord) =>
                   </EmptyMedia>
                   <EmptyHeader>
                     <p class="text-base font-semibold text-foreground">
-                      No submissions yet
+                      {{ t("problem.submissions.noSubmissionsTitle") }}
                     </p>
                     <EmptyDescription>
-                      Run or submit your solution to populate this list.
+                      {{ t("problem.submissions.noSubmissionsDesc") }}
                     </EmptyDescription>
                   </EmptyHeader>
                 </EmptyContent>

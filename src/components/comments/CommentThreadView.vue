@@ -5,7 +5,7 @@
         class="flex items-center justify-between border-b border-muted-foreground/10 pb-6"
       >
         <h2 class="text-2xl font-black tracking-tight">
-          Comments
+          {{ t("forum.comments.title") }}
           <span class="text-muted-foreground/40 ml-1 font-bold"
             >({{ totalComments }})</span
           >
@@ -20,7 +20,7 @@
         <p
           class="text-sm font-bold text-muted-foreground uppercase tracking-widest"
         >
-          Loading thread...
+          {{ t("forum.comments.loading") }}
         </p>
       </div>
 
@@ -41,10 +41,11 @@
           <div class="p-6 rounded-3xl bg-muted/30 mb-6">
             <MessageSquare class="h-12 w-12 text-muted-foreground/20" />
           </div>
-          <h3 class="text-xl font-black tracking-tight">Silence is golden</h3>
+          <h3 class="text-xl font-black tracking-tight">
+            {{ t("forum.comments.silence") }}
+          </h3>
           <p class="text-muted-foreground mt-2 max-w-[320px] font-medium">
-            There are no comments here yet. Why not be the first to start the
-            conversation?
+            {{ t("forum.comments.noCommentsDesc") }}
           </p>
         </div>
       </div>
@@ -60,12 +61,14 @@ import type { ForumComment, ForumThread } from "@/types/forum";
 import CommentNode from "./CommentNode.vue";
 import { buildCommentTree, countComments } from "./comment-tree-builder";
 import { Loader2, MessageSquare } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 defineOptions({
   name: "CommentThreadView",
 });
 
 const route = useRoute();
+const { t } = useI18n();
 const commentTree = ref<Comment[]>([]);
 const loading = ref(true);
 const threadAuthor = ref<string | undefined>();

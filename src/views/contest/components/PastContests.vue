@@ -11,6 +11,7 @@ import {
 import { useRouter } from "vue-router";
 import type { ContestListItem } from "@/types/contest";
 import { formatDateTime, getDurationMinutes } from "@/utils/date";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   contests: ContestListItem[];
@@ -24,6 +25,7 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const { t } = useI18n();
 
 // Simple pagination logic
 const visiblePages = computed(() => {
@@ -57,16 +59,18 @@ const visiblePages = computed(() => {
     <!-- Header -->
     <div class="flex items-end justify-between">
       <div class="space-y-1">
-        <h2 class="text-2xl font-bold tracking-tight">Past Contests</h2>
+        <h2 class="text-2xl font-bold tracking-tight">
+          {{ t("contest.list.past") }}
+        </h2>
         <p class="text-sm text-muted-foreground">
-          Join virtual contests to prepare for the ranking contest
+          {{ t("contest.list.pastSubtitle") }}
         </p>
       </div>
       <div
         class="flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-600 transition-colors hover:bg-yellow-100 cursor-pointer"
       >
         <Trophy class="h-3.5 w-3.5" />
-        Contest Partner
+        {{ t("contest.list.partner") }}
       </div>
     </div>
 
@@ -109,7 +113,7 @@ const visiblePages = computed(() => {
               <span class="flex items-center gap-1">
                 <Clock class="h-3 w-3" />
                 {{ getDurationMinutes(contest.start_time, contest.end_time) }}
-                min
+                {{ t("contest.time.min_short") }}
               </span>
             </div>
           </div>
@@ -122,7 +126,7 @@ const visiblePages = computed(() => {
           class="h-7 px-3 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10"
           @click.stop
         >
-          Virtual
+          {{ t("contest.types.virtual") }}
         </Button>
       </div>
     </div>
@@ -132,7 +136,7 @@ const visiblePages = computed(() => {
       v-if="loading && contests.length === 0"
       class="py-10 text-center text-muted-foreground"
     >
-      Loading...
+      {{ t("common.status.loading") }}
     </div>
 
     <!-- Pagination -->

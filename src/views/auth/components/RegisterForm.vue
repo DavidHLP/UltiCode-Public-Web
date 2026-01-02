@@ -15,11 +15,13 @@ import { useRouter } from "vue-router";
 import { register } from "@/api/auth";
 import { setToken, setUserId } from "@/utils/auth";
 import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   class?: HTMLAttributes["class"];
 }>();
 
+const { t } = useI18n();
 const router = useRouter();
 const username = ref("");
 const email = ref("");
@@ -37,11 +39,11 @@ async function handleSubmit(e: Event) {
     });
     setToken(res.access_token);
     setUserId(res.user.id);
-    toast.success("Account created successfully");
+    toast.success(t("auth.messages.registerSuccess"));
     router.push("/");
   } catch (error) {
     console.error(error);
-    toast.error("Registration failed");
+    toast.error(t("auth.messages.registerFailed"));
   } finally {
     loading.value = false;
   }
@@ -56,41 +58,53 @@ function handleGithubLogin() {
   <form :class="cn('flex flex-col gap-6', props.class)" @submit="handleSubmit">
     <FieldGroup>
       <div class="flex flex-col items-center gap-1 text-center">
-        <h1 class="text-2xl font-bold">Create an account</h1>
+        <h1 class="text-2xl font-bold">{{ t("auth.register.title") }}</h1>
         <p class="text-muted-foreground text-sm text-balance">
-          Enter your details below to create your account
+          {{ t("auth.register.subtitle") }}
         </p>
       </div>
       <Field>
-        <FieldLabel for="username"> Username </FieldLabel>
+        <FieldLabel for="username">
+          {{ t("auth.register.username") }}
+        </FieldLabel>
         <Input
           id="username"
           type="text"
           v-model="username"
-          placeholder="Enter your username"
+          :placeholder="t('auth.register.usernamePlaceholder')"
           required
         />
       </Field>
       <Field>
-        <FieldLabel for="email"> Email </FieldLabel>
+        <FieldLabel for="email"> {{ t("auth.register.email") }} </FieldLabel>
         <Input
           id="email"
           type="email"
           v-model="email"
-          placeholder="you@example.com"
+          :placeholder="t('auth.register.emailPlaceholder')"
           required
         />
       </Field>
       <Field>
-        <FieldLabel for="password"> Password </FieldLabel>
-        <Input id="password" type="password" v-model="password" required />
+        <FieldLabel for="password">
+          {{ t("auth.register.password") }}
+        </FieldLabel>
+        <Input
+          id="password"
+          type="password"
+          v-model="password"
+          :placeholder="t('auth.register.passwordPlaceholder')"
+          required
+        />
       </Field>
       <Field>
         <Button type="submit" :disabled="loading">
-          {{ loading ? "Creating account..." : "Sign up" }}
+          {{
+            loading ? t("auth.register.submitting") : t("auth.register.submit")
+          }}
         </Button>
       </Field>
-      <FieldSeparator>Or continue with</FieldSeparator>
+      <FieldSeparator>{{ t("auth.login.orContinueWith") }}</FieldSeparator>
       <Field>
         <Button variant="outline" type="button" @click="handleGithubLogin">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -99,11 +113,11 @@ function handleGithubLogin() {
               fill="currentColor"
             />
           </svg>
-          Sign up with GitHub
+          {{ t("auth.login.loginWithGithub") }}
         </Button>
         <FieldDescription class="text-center">
-          Already have an account?
-          <a href="/login">Login</a>
+          {{ t("auth.register.hasAccount") }}
+          <a href="/login">{{ t("auth.register.login") }}</a>
         </FieldDescription>
       </Field>
     </FieldGroup>

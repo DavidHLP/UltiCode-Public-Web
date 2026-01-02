@@ -33,22 +33,59 @@ import {
   updateUserProfile,
   type UserProfile,
 } from "@/api/user";
+import {
+  fetchNotificationPreferences,
+  updateNotificationPreferences,
+} from "@/api/notification";
+import type { NotificationPreferences } from "@/types/notification";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const loading = ref(true);
 const saving = ref(false);
 const user = ref<UserProfile | null>(null);
+const notificationPreferences = ref<NotificationPreferences | null>(null);
+const preferencesSaving = ref(false);
+
+async function handlePreferenceChange(
+  key: keyof NotificationPreferences,
+  value: boolean,
+) {
+  if (!notificationPreferences.value || preferencesSaving.value) return;
+  const previous = notificationPreferences.value[key];
+  notificationPreferences.value = {
+    ...notificationPreferences.value,
+    [key]: value,
+  };
+  preferencesSaving.value = true;
+  try {
+    notificationPreferences.value = await updateNotificationPreferences({
+      [key]: value,
+    });
+    toast.success(t("personal.messages.notificationsUpdated"));
+  } catch (error) {
+    console.error("Failed to update notification preferences", error);
+    notificationPreferences.value = {
+      ...notificationPreferences.value,
+      [key]: previous,
+    };
+    toast.error(t("common.status.error"));
+  } finally {
+    preferencesSaving.value = false;
+  }
+}
 
 const saveProfile = async () => {
   if (!user.value) return;
   saving.value = true;
   try {
     await updateUserProfile(user.value.id, user.value);
-    toast.success("Profile updated successfully");
+    toast.success(t("personal.messages.profileUpdated"));
   } catch (error) {
     console.error("Failed to update profile", error);
-    toast.error("Failed to update profile");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     saving.value = false;
   }
@@ -59,6 +96,11 @@ onMounted(async () => {
     const userId = fetchCurrentUserId();
     if (!userId) return;
     user.value = await fetchUserProfile(userId);
+    try {
+      notificationPreferences.value = await fetchNotificationPreferences();
+    } catch (error) {
+      console.error("Failed to load notification preferences", error);
+    }
   } catch (error) {
     console.error("Failed to load user profile", error);
   } finally {
@@ -70,8 +112,8 @@ onMounted(async () => {
 <template>
   <PersonalPageShell>
     <PersonalPageHeader
-      title="Account Settings"
-      description="Manage your personal information, security, and notification preferences."
+      :title="t('personal.account.title')"
+      :description="t('personal.account.subtitle')"
     />
 
     <div
@@ -79,11 +121,15 @@ onMounted(async () => {
       class="flex flex-col items-center justify-center py-20 gap-4"
     >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
-      <p class="text-sm text-muted-foreground">Loading your settings...</p>
+      <p class="text-sm text-muted-foreground">
+        {{ t("personal.account.loadingSettings") }}
+      </p>
     </div>
 
     <div v-else-if="!user" class="text-center py-20">
-      <p class="text-muted-foreground">Please log in to manage your account.</p>
+      <p class="text-muted-foreground">
+        {{ t("personal.account.loginToManage") }}
+      </p>
     </div>
 
     <div v-else class="flex flex-col lg:flex-row gap-8">
@@ -94,28 +140,34 @@ onMounted(async () => {
       >
         <aside class="lg:w-1/4">
           <TabsList
-            class="flex flex-row lg:flex-col h-auto bg-transparent gap-1 p-0 justify-start overflow-x-auto lg:overflow-x-visible"
+            class="flex flex-row lg:flex-col h-auto bg-transparent gap-2 p-0 justify-start overflow-x-auto lg:overflow-x-visible"
           >
             <TabsTrigger
               value="general"
-              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-xl transition-all"
+              class="flex items-center gap-3 px-4 py-3 justify-start w-full text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary/50 data-[state=active]:shadow-none hover:bg-muted/50 rounded-xl transition-all"
             >
               <User class="h-4 w-4" />
-              <span>General</span>
+              <span class="font-medium">{{
+                t("personal.account.tabs.general")
+              }}</span>
             </TabsTrigger>
             <TabsTrigger
               value="password"
-              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-xl transition-all"
+              class="flex items-center gap-3 px-4 py-3 justify-start w-full text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary/50 data-[state=active]:shadow-none hover:bg-muted/50 rounded-xl transition-all"
             >
               <Lock class="h-4 w-4" />
-              <span>Security</span>
+              <span class="font-medium">{{
+                t("personal.account.tabs.security")
+              }}</span>
             </TabsTrigger>
             <TabsTrigger
               value="notifications"
-              class="flex items-center gap-3 px-4 py-3 justify-start w-full data-[state=active]:bg-muted/60 data-[state=active]:shadow-none rounded-xl transition-all"
+              class="flex items-center gap-3 px-4 py-3 justify-start w-full text-muted-foreground data-[state=active]:text-foreground data-[state=active]:bg-secondary/50 data-[state=active]:shadow-none hover:bg-muted/50 rounded-xl transition-all"
             >
               <Bell class="h-4 w-4" />
-              <span>Notifications</span>
+              <span class="font-medium">{{
+                t("personal.account.tabs.notifications")
+              }}</span>
             </TabsTrigger>
           </TabsList>
         </aside>
@@ -127,14 +179,13 @@ onMounted(async () => {
             class="mt-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
           >
             <!-- Profile Section -->
-            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
+            <Card class="border shadow-sm bg-card rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-xl font-semibold tracking-tight"
-                  >Public Profile</CardTitle
-                >
+                <CardTitle class="text-xl font-semibold tracking-tight">{{
+                  t("personal.account.sections.publicProfile")
+                }}</CardTitle>
                 <CardDescription>
-                  This information will be displayed publicly on your profile
-                  page.
+                  {{ t("personal.account.sections.publicProfileDesc") }}
                 </CardDescription>
               </CardHeader>
               <CardContent class="space-y-6">
@@ -143,7 +194,7 @@ onMounted(async () => {
                     <Label
                       htmlFor="username"
                       class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                      >Username</Label
+                      >{{ t("personal.profile.username") }}</Label
                     >
                     <div class="relative">
                       <Input
@@ -157,14 +208,14 @@ onMounted(async () => {
                       />
                     </div>
                     <p class="text-[0.7rem] text-muted-foreground italic">
-                      Usernames are unique and cannot be changed.
+                      {{ t("personal.account.usernameUnique") }}
                     </p>
                   </div>
                   <div class="space-y-2">
                     <Label
                       htmlFor="name"
                       class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                      >Display Name</Label
+                      >{{ t("personal.profile.displayName") }}</Label
                     >
                     <Input
                       id="name"
@@ -172,7 +223,7 @@ onMounted(async () => {
                       placeholder="John Doe"
                     />
                     <p class="text-[0.7rem] text-muted-foreground">
-                      Your full name or a nickname.
+                      {{ t("personal.profile.displayName") }}
                     </p>
                   </div>
                 </div>
@@ -181,16 +232,16 @@ onMounted(async () => {
                   <Label
                     htmlFor="bio"
                     class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                    >Bio</Label
+                    >{{ t("personal.profile.bio") }}</Label
                   >
                   <Textarea
                     id="bio"
                     v-model="user.bio"
-                    placeholder="Tell us a bit about yourself..."
+                    :placeholder="t('personal.profile.bioPlaceholder')"
                     class="min-h-[120px] resize-none"
                   />
                   <p class="text-[0.7rem] text-muted-foreground">
-                    Brief description for your profile. Max 250 characters.
+                    {{ t("personal.profile.bioPlaceholder") }}
                   </p>
                 </div>
 
@@ -199,7 +250,7 @@ onMounted(async () => {
                     <Label
                       htmlFor="email"
                       class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                      >Email Address</Label
+                      >{{ t("personal.account.email") }}</Label
                     >
                     <div class="relative">
                       <Input
@@ -217,13 +268,13 @@ onMounted(async () => {
                     <Label
                       htmlFor="location"
                       class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                      >Location</Label
+                      >{{ t("personal.profile.location") }}</Label
                     >
                     <div class="relative">
                       <Input
                         id="location"
                         v-model="user.location"
-                        placeholder="San Francisco, CA"
+                        :placeholder="t('personal.profile.locationPlaceholder')"
                       />
                       <MapPin
                         class="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground"
@@ -235,34 +286,34 @@ onMounted(async () => {
             </Card>
 
             <!-- Social/Links Section -->
-            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
+            <Card class="border shadow-sm bg-card rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-xl font-semibold tracking-tight"
-                  >Web Presence</CardTitle
-                >
+                <CardTitle class="text-xl font-semibold tracking-tight">{{
+                  t("personal.account.sections.webPresence")
+                }}</CardTitle>
                 <CardDescription>
-                  Add links to your professional profiles and personal website.
+                  {{ t("personal.account.sections.webPresenceDesc") }}
                 </CardDescription>
               </CardHeader>
               <CardContent class="space-y-4">
                 <div class="space-y-4">
                   <div class="flex items-center gap-3">
                     <div
-                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-background border"
+                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-muted"
                     >
                       <Globe class="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div class="flex-1">
                       <Input
                         v-model="user.website"
-                        placeholder="Website URL (https://...)"
+                        :placeholder="t('personal.profile.websitePlaceholder')"
                         class="h-9"
                       />
                     </div>
                   </div>
                   <div class="flex items-center gap-3">
                     <div
-                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-background border"
+                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-muted"
                     >
                       <Twitter class="h-4 w-4 text-muted-foreground" />
                     </div>
@@ -276,7 +327,7 @@ onMounted(async () => {
                   </div>
                   <div class="flex items-center gap-3">
                     <div
-                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-background border"
+                      class="flex h-9 w-9 items-center justify-center rounded-lg bg-muted"
                     >
                       <Github class="h-4 w-4 text-muted-foreground" />
                     </div>
@@ -290,14 +341,14 @@ onMounted(async () => {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter class="bg-muted/10 border-t justify-end py-4">
+              <CardFooter class="bg-muted/5 border-t justify-end py-4">
                 <Button
                   @click="saveProfile"
                   :disabled="saving"
                   class="rounded-full px-8"
                 >
                   <Loader2 v-if="saving" class="mr-2 h-4 w-4 animate-spin" />
-                  Save All Changes
+                  {{ t("personal.account.saveChanges") }}
                 </Button>
               </CardFooter>
             </Card>
@@ -308,56 +359,58 @@ onMounted(async () => {
             value="password"
             class="mt-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
+            <Card class="border shadow-sm bg-card rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-lg">Change Password</CardTitle>
+                <CardTitle class="text-lg">{{
+                  t("personal.account.changePassword")
+                }}</CardTitle>
                 <CardDescription>
-                  Ensure your account is using a long, random password to stay
-                  secure.
+                  {{ t("personal.account.changePassword") }}
                 </CardDescription>
               </CardHeader>
               <CardContent class="space-y-4">
                 <div class="space-y-2">
-                  <Label htmlFor="current" class="text-xs font-bold"
-                    >Current Password</Label
-                  >
+                  <Label htmlFor="current" class="text-xs font-bold">{{
+                    t("personal.account.currentPassword")
+                  }}</Label>
                   <Input id="current" type="password" />
                 </div>
                 <div class="space-y-2">
-                  <Label htmlFor="new" class="text-xs font-bold"
-                    >New Password</Label
-                  >
+                  <Label htmlFor="new" class="text-xs font-bold">{{
+                    t("personal.account.newPassword")
+                  }}</Label>
                   <Input id="new" type="password" />
                 </div>
                 <div class="space-y-2">
-                  <Label htmlFor="confirm" class="text-xs font-bold"
-                    >Confirm New Password</Label
-                  >
+                  <Label htmlFor="confirm" class="text-xs font-bold">{{
+                    t("personal.account.confirmNewPassword")
+                  }}</Label>
                   <Input id="confirm" type="password" />
                 </div>
               </CardContent>
-              <CardFooter class="bg-muted/10 border-t justify-end py-4">
-                <Button class="rounded-full px-8">Update Password</Button>
+              <CardFooter class="bg-muted/5 border-t justify-end py-4">
+                <Button class="rounded-full px-8">{{
+                  t("personal.account.updatePassword")
+                }}</Button>
               </CardFooter>
             </Card>
 
             <Card class="border-destructive/20 bg-destructive/5 rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-lg text-destructive"
-                  >Danger Zone</CardTitle
-                >
+                <CardTitle class="text-lg text-destructive">{{
+                  t("personal.account.dangerZone")
+                }}</CardTitle>
                 <CardDescription>
-                  Permanently delete your account and all of your content.
+                  {{ t("personal.account.dangerZoneDesc") }}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p class="text-sm text-muted-foreground mb-4">
-                  Once you delete your account, there is no going back. Please
-                  be certain.
+                  {{ t("personal.account.deleteWarning") }}
                 </p>
-                <Button variant="destructive" class="rounded-full"
-                  >Delete Account</Button
-                >
+                <Button variant="destructive" class="rounded-full">{{
+                  t("personal.account.deleteAccount")
+                }}</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -367,17 +420,19 @@ onMounted(async () => {
             value="notifications"
             class="mt-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300"
           >
-            <Card class="border-none shadow-none bg-muted/20 rounded-2xl">
+            <Card class="border shadow-sm bg-card rounded-2xl">
               <CardHeader>
-                <CardTitle class="text-lg">Notification Preferences</CardTitle>
+                <CardTitle class="text-lg">{{
+                  t("personal.account.sections.notifications")
+                }}</CardTitle>
                 <CardDescription>
-                  Choose how you want to be notified about activity.
+                  {{ t("personal.account.sections.notificationsDesc") }}
                 </CardDescription>
               </CardHeader>
               <CardContent class="space-y-4">
                 <div class="space-y-4">
                   <div
-                    class="flex items-center justify-between space-x-4 rounded-xl border bg-card p-4 transition-all hover:border-primary/50"
+                    class="flex items-center justify-between space-x-4 rounded-xl border bg-background p-4 transition-all"
                   >
                     <div class="flex gap-4 items-center">
                       <div
@@ -386,18 +441,30 @@ onMounted(async () => {
                         <Mail class="h-5 w-5 text-primary" />
                       </div>
                       <div class="space-y-0.5">
-                        <Label class="text-base font-bold">Communication</Label>
+                        <Label class="text-base font-bold">{{
+                          t("personal.account.notificationTypes.communication")
+                        }}</Label>
                         <p class="text-sm text-muted-foreground">
-                          Receive emails about your account activity and
-                          updates.
+                          {{
+                            t(
+                              "personal.account.notificationTypes.communicationDesc",
+                            )
+                          }}
                         </p>
                       </div>
                     </div>
-                    <Switch :checked="true" />
+                    <Switch
+                      :checked="notificationPreferences?.communication ?? true"
+                      :disabled="preferencesSaving || !notificationPreferences"
+                      @update:checked="
+                        (value: boolean) =>
+                          handlePreferenceChange('communication', value)
+                      "
+                    />
                   </div>
 
                   <div
-                    class="flex items-center justify-between space-x-4 rounded-xl border bg-card p-4 transition-all hover:border-primary/50"
+                    class="flex items-center justify-between space-x-4 rounded-xl border bg-background p-4 transition-all"
                   >
                     <div class="flex gap-4 items-center">
                       <div
@@ -406,18 +473,30 @@ onMounted(async () => {
                         <Bell class="h-5 w-5 text-orange-500" />
                       </div>
                       <div class="space-y-0.5">
-                        <Label class="text-base font-bold">Marketing</Label>
+                        <Label class="text-base font-bold">{{
+                          t("personal.account.notificationTypes.marketing")
+                        }}</Label>
                         <p class="text-sm text-muted-foreground">
-                          Receive emails about new products, features, and
-                          offers.
+                          {{
+                            t(
+                              "personal.account.notificationTypes.marketingDesc",
+                            )
+                          }}
                         </p>
                       </div>
                     </div>
-                    <Switch :checked="false" />
+                    <Switch
+                      :checked="notificationPreferences?.marketing ?? false"
+                      :disabled="preferencesSaving || !notificationPreferences"
+                      @update:checked="
+                        (value: boolean) =>
+                          handlePreferenceChange('marketing', value)
+                      "
+                    />
                   </div>
 
                   <div
-                    class="flex items-center justify-between space-x-4 rounded-xl border bg-card p-4 opacity-70"
+                    class="flex items-center justify-between space-x-4 rounded-xl border bg-background p-4 opacity-70"
                   >
                     <div class="flex gap-4 items-center">
                       <div
@@ -426,15 +505,20 @@ onMounted(async () => {
                         <ShieldCheck class="h-5 w-5 text-emerald-500" />
                       </div>
                       <div class="space-y-0.5">
-                        <Label class="text-base font-bold"
-                          >Security Alerts</Label
-                        >
+                        <Label class="text-base font-bold">{{
+                          t("personal.account.notificationTypes.security")
+                        }}</Label>
                         <p class="text-sm text-muted-foreground">
-                          Critical security notifications (cannot be disabled).
+                          {{
+                            t("personal.account.notificationTypes.securityDesc")
+                          }}
                         </p>
                       </div>
                     </div>
-                    <Switch :checked="true" disabled />
+                    <Switch
+                      :checked="notificationPreferences?.security ?? true"
+                      disabled
+                    />
                   </div>
                 </div>
               </CardContent>

@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 import "highlight.js/styles/atom-one-dark.css";
 import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
 
 /**
  * Problem description data model for markdown rendering.
@@ -27,6 +28,8 @@ const props = defineProps<{
   description: ProblemDescription;
 }>();
 
+const { t } = useI18n();
+
 const handleCopy = (e: MouseEvent) => {
   const target = (e.target as HTMLElement).closest(".lc-copy-btn");
   if (!target) return;
@@ -36,7 +39,7 @@ const handleCopy = (e: MouseEvent) => {
     try {
       const decoded = decodeURIComponent(code);
       navigator.clipboard.writeText(decoded);
-      toast.success("Code copied to clipboard");
+      toast.success(t("problem.messages.codeCopied"));
     } catch (err) {
       console.error("Failed to copy", err);
     }
@@ -56,13 +59,15 @@ const markdownContent = computed(() => {
 
     props.description.examples.forEach((example, index) => {
       parts.push(
-        `### Example ${index + 1}\n`,
-        `> **Input:** \`${example.input}\`\n>\n`,
-        `> **Output:** \`${example.output}\`\n`,
+        `### ${t("common.labels.example")} ${index + 1}\n`,
+        `> **${t("problem.editor.input")}:** \`${example.input}\`\n>\n`,
+        `> **${t("problem.editor.expectedOutput")}:** \`${example.output}\`\n`,
       );
 
       if (example.explanation) {
-        parts.push(`>\n> **Explanation:** ${example.explanation}\n`);
+        parts.push(
+          `>\n> **${t("common.labels.explanation")}:** ${example.explanation}\n`,
+        );
       }
 
       parts.push(`\n`);
@@ -72,7 +77,7 @@ const markdownContent = computed(() => {
   // Add constraints
   if (props.description.constraints?.length) {
     parts.push(
-      "\n\n### Constraints\n\n",
+      `\n\n### ${t("problem.detail.tags")}\n\n`,
       ...props.description.constraints.map((c) => `- ${c}\n`),
     );
   }
@@ -81,7 +86,7 @@ const markdownContent = computed(() => {
   if (props.description.followUp) {
     parts.push(`
 
-### Follow-up
+### ${t("problem.detail.hints")}
 
 ${props.description.followUp}
 `);

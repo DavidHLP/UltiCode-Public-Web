@@ -58,6 +58,7 @@ import type {
 } from "@/types/problem-list";
 import { RouterLink } from "vue-router";
 import { ref, computed, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import { fetchCurrentUserId } from "@/utils/auth";
 import {
   fetchProblemListsOverview,
@@ -71,6 +72,7 @@ import {
 } from "@/api/problem-list";
 import { toast } from "vue-sonner";
 
+const { t } = useI18n();
 const currentUserId = fetchCurrentUserId();
 
 // Data state
@@ -290,7 +292,7 @@ const handleCreateList = async () => {
       @click="isCreateListOpen = true"
     >
       <ListPlus class="h-4 w-4" />
-      New List
+      {{ t("sidebar.problemLists.newList") }}
     </Button>
     <Button
       variant="ghost"
@@ -299,7 +301,7 @@ const handleCreateList = async () => {
       @click="isCreateCategoryOpen = true"
     >
       <Plus class="h-4 w-4" />
-      New Category
+      {{ t("sidebar.problemLists.newCategory") }}
     </Button>
   </div>
 
@@ -312,7 +314,9 @@ const handleCreateList = async () => {
             class="h-4 w-4 transform transition-transform duration-200 ui-open:rotate-90"
           />
           <User class="h-4 w-4 mr-1 text-blue-500" />
-          <span class="text-sm font-semibold">My Lists</span>
+          <span class="text-sm font-semibold">{{
+            t("sidebar.problemLists.myLists")
+          }}</span>
         </CollapsibleTrigger>
       </div>
 
@@ -350,7 +354,7 @@ const handleCreateList = async () => {
                     @click="openDeleteListDialog(item)"
                   >
                     <Trash2 class="mr-2 h-4 w-4" />
-                    Delete
+                    {{ t("common.actions.delete") }}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -370,7 +374,9 @@ const handleCreateList = async () => {
             class="h-4 w-4 transform transition-transform duration-200 ui-open:rotate-90"
           />
           <Bookmark class="h-4 w-4 mr-1 text-green-500" />
-          <span class="text-sm font-semibold">Saved Lists</span>
+          <span class="text-sm font-semibold">{{
+            t("sidebar.problemLists.savedLists")
+          }}</span>
         </CollapsibleTrigger>
       </div>
 
@@ -407,7 +413,7 @@ const handleCreateList = async () => {
                   <DropdownMenuSub v-if="allCategories.length > 0">
                     <DropdownMenuSubTrigger>
                       <FolderInput class="mr-2 h-4 w-4" />
-                      Move to Category
+                      {{ t("problem.problemList.detail.moveToCategory") }}
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent class="w-40">
                       <DropdownMenuItem
@@ -422,7 +428,7 @@ const handleCreateList = async () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="handleUnsaveList(item)">
                     <BookmarkMinus class="mr-2 h-4 w-4" />
-                    Unsave
+                    {{ t("problem.problemList.detail.unsave") }}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -442,7 +448,9 @@ const handleCreateList = async () => {
             class="h-4 w-4 transform transition-transform duration-200 ui-open:rotate-90"
           />
           <Star class="h-4 w-4 mr-1 text-yellow-500" />
-          <span class="text-sm font-semibold">Featured</span>
+          <span class="text-sm font-semibold">{{
+            t("sidebar.problemLists.featured")
+          }}</span>
         </CollapsibleTrigger>
       </div>
 
@@ -493,7 +501,7 @@ const handleCreateList = async () => {
           <DropdownMenuContent align="end" class="w-40">
             <DropdownMenuItem @click="openEditCategoryDialog(category)">
               <Pencil class="mr-2 h-4 w-4" />
-              Rename
+              {{ t("common.actions.edit") }}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -501,7 +509,7 @@ const handleCreateList = async () => {
               @click="openDeleteCategoryDialog(category)"
             >
               <Trash2 class="mr-2 h-4 w-4" />
-              Delete
+              {{ t("common.actions.delete") }}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -540,12 +548,12 @@ const handleCreateList = async () => {
                     @click="handleMoveListToCategory(item, null)"
                   >
                     <FolderInput class="mr-2 h-4 w-4" />
-                    Remove from Category
+                    {{ t("problem.problemList.detail.removeFromCategory") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem @click="handleUnsaveList(item)">
                     <BookmarkMinus class="mr-2 h-4 w-4" />
-                    Unsave
+                    {{ t("problem.problemList.detail.unsave") }}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -560,18 +568,22 @@ const handleCreateList = async () => {
   <Dialog v-model:open="isCreateCategoryOpen">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Create New Category</DialogTitle>
+        <DialogTitle>{{
+          t("sidebar.problemLists.createCategory")
+        }}</DialogTitle>
         <DialogDescription>
-          Enter a name for your new category.
+          {{ t("sidebar.problemLists.createCategory") }}
         </DialogDescription>
       </DialogHeader>
       <div class="space-y-4 py-4">
         <div class="space-y-2">
-          <Label for="category-name">Category Name</Label>
+          <Label for="category-name">{{
+            t("sidebar.problemLists.categoryName")
+          }}</Label>
           <Input
             id="category-name"
             v-model="createCategoryForm.name"
-            placeholder="e.g. Interview Prep"
+            :placeholder="t('sidebar.problemLists.categoryNamePlaceholder')"
             @keydown.enter="handleCreateCategory"
           />
         </div>
@@ -582,10 +594,14 @@ const handleCreateList = async () => {
           @click="isCreateCategoryOpen = false"
           :disabled="isCreatingCategory"
         >
-          Cancel
+          {{ t("common.actions.cancel") }}
         </Button>
         <Button @click="handleCreateCategory" :disabled="isCreatingCategory">
-          {{ isCreatingCategory ? "Creating..." : "Create" }}
+          {{
+            isCreatingCategory
+              ? t("common.status.saving")
+              : t("common.actions.create")
+          }}
         </Button>
       </DialogFooter>
     </DialogContent>
@@ -595,14 +611,18 @@ const handleCreateList = async () => {
   <Dialog v-model:open="isEditCategoryOpen">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Rename Category</DialogTitle>
+        <DialogTitle>{{
+          t("sidebar.problemLists.renameCategory")
+        }}</DialogTitle>
         <DialogDescription>
-          Enter a new name for this category.
+          {{ t("sidebar.problemLists.renameCategory") }}
         </DialogDescription>
       </DialogHeader>
       <div class="space-y-4 py-4">
         <div class="space-y-2">
-          <Label for="edit-category-name">Category Name</Label>
+          <Label for="edit-category-name">{{
+            t("sidebar.problemLists.categoryName")
+          }}</Label>
           <Input
             id="edit-category-name"
             v-model="editCategoryForm.name"
@@ -616,10 +636,14 @@ const handleCreateList = async () => {
           @click="isEditCategoryOpen = false"
           :disabled="isEditingCategory"
         >
-          Cancel
+          {{ t("common.actions.cancel") }}
         </Button>
         <Button @click="handleEditCategory" :disabled="isEditingCategory">
-          {{ isEditingCategory ? "Saving..." : "Save" }}
+          {{
+            isEditingCategory
+              ? t("common.status.saving")
+              : t("common.actions.save")
+          }}
         </Button>
       </DialogFooter>
     </DialogContent>
@@ -629,22 +653,31 @@ const handleCreateList = async () => {
   <AlertDialog v-model:open="isDeleteCategoryOpen">
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Delete Category</AlertDialogTitle>
+        <AlertDialogTitle>{{
+          t("sidebar.problemLists.deleteCategory")
+        }}</AlertDialogTitle>
         <AlertDialogDescription>
-          Are you sure you want to delete "{{ categoryToDelete?.name }}"? Lists
-          in this category will be moved back to "Saved Lists".
+          {{
+            t("sidebar.problemLists.deleteCategoryConfirm", {
+              name: categoryToDelete?.name,
+            })
+          }}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel :disabled="isDeletingCategory"
-          >Cancel</AlertDialogCancel
-        >
+        <AlertDialogCancel :disabled="isDeletingCategory">{{
+          t("common.actions.cancel")
+        }}</AlertDialogCancel>
         <AlertDialogAction
           class="bg-destructive text-white hover:bg-destructive/90"
           @click="handleDeleteCategory"
           :disabled="isDeletingCategory"
         >
-          {{ isDeletingCategory ? "Deleting..." : "Delete" }}
+          {{
+            isDeletingCategory
+              ? t("common.status.failed")
+              : t("common.actions.delete")
+          }}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
@@ -654,20 +687,31 @@ const handleCreateList = async () => {
   <AlertDialog v-model:open="isDeleteListOpen">
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Delete Problem List</AlertDialogTitle>
+        <AlertDialogTitle>{{
+          t("problem.problemList.delete")
+        }}</AlertDialogTitle>
         <AlertDialogDescription>
-          Are you sure you want to delete "{{ listToDelete?.name }}"? This
-          action cannot be undone.
+          {{
+            t("problem.problemList.detail.deleteConfirmDesc", {
+              name: listToDelete?.name,
+            })
+          }}
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel :disabled="isDeletingList">Cancel</AlertDialogCancel>
+        <AlertDialogCancel :disabled="isDeletingList">{{
+          t("common.actions.cancel")
+        }}</AlertDialogCancel>
         <AlertDialogAction
           class="bg-destructive text-white hover:bg-destructive/90"
           @click="handleDeleteList"
           :disabled="isDeletingList"
         >
-          {{ isDeletingList ? "Deleting..." : "Delete" }}
+          {{
+            isDeletingList
+              ? t("common.status.failed")
+              : t("common.actions.delete")
+          }}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
@@ -677,38 +721,42 @@ const handleCreateList = async () => {
   <Dialog v-model:open="isCreateListOpen">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Create New List</DialogTitle>
+        <DialogTitle>{{ t("problem.problemList.create") }}</DialogTitle>
         <DialogDescription>
-          Create a new problem list to organize your practice.
+          {{ t("problem.problemList.create") }}
         </DialogDescription>
       </DialogHeader>
       <div class="space-y-4 py-4">
         <div class="space-y-2">
-          <Label for="new-list-name">Name</Label>
+          <Label for="new-list-name">{{ t("common.labels.name") }}</Label>
           <Input
             id="new-list-name"
             v-model="createListForm.name"
-            placeholder="My Problem List"
+            :placeholder="t('problem.problemList.namePlaceholder')"
             @keydown.enter="handleCreateList"
           />
         </div>
         <div class="space-y-2">
-          <Label for="new-list-desc">Description (optional)</Label>
+          <Label for="new-list-desc">{{
+            t("problem.problemList.description")
+          }}</Label>
           <Textarea
             id="new-list-desc"
             v-model="createListForm.description"
-            placeholder="A brief description of this list..."
+            :placeholder="t('problem.problemList.descriptionPlaceholder')"
             rows="3"
           />
         </div>
         <div class="flex items-center justify-between">
           <div class="space-y-0.5">
-            <Label for="new-list-public">Public</Label>
+            <Label for="new-list-public">{{
+              t("problem.problemList.public")
+            }}</Label>
             <p class="text-xs text-muted-foreground">
               {{
                 createListForm.isPublic
-                  ? "Everyone can see this list"
-                  : "Only you can see this list"
+                  ? t("problem.problemList.detail.publicHint")
+                  : t("problem.problemList.detail.privateHint")
               }}
             </p>
           </div>
@@ -724,13 +772,17 @@ const handleCreateList = async () => {
           @click="isCreateListOpen = false"
           :disabled="isCreatingList"
         >
-          Cancel
+          {{ t("common.actions.cancel") }}
         </Button>
         <Button
           @click="handleCreateList"
           :disabled="isCreatingList || !createListForm.name.trim()"
         >
-          {{ isCreatingList ? "Creating..." : "Create" }}
+          {{
+            isCreatingList
+              ? t("common.status.saving")
+              : t("common.actions.create")
+          }}
         </Button>
       </DialogFooter>
     </DialogContent>

@@ -11,8 +11,10 @@ import {
   List,
   CheckCircle2,
 } from "lucide-vue-next";
+import { onMounted, computed } from "vue";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +30,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
+import { logout } from "@/api/auth";
+import { isAuthenticated, removeToken, removeUserId } from "@/utils/auth";
+import { toast } from "vue-sonner";
+import { useNotificationStore } from "@/stores/notification";
 
 const { user } = defineProps<{
   user: {
@@ -37,13 +46,21 @@ const { user } = defineProps<{
   };
 }>();
 
+const { t } = useI18n();
 const { isMobile } = useSidebar();
-import { useRouter } from "vue-router";
-import { logout } from "@/api/auth";
-import { removeToken, removeUserId } from "@/utils/auth";
-import { toast } from "vue-sonner";
-
 const router = useRouter();
+const notificationStore = useNotificationStore();
+const unreadCount = computed(() => notificationStore.unreadCount);
+const unreadLabel = computed(() =>
+  unreadCount.value > 99 ? "99+" : `${unreadCount.value}`,
+);
+
+onMounted(() => {
+  if (!isAuthenticated()) return;
+  notificationStore.loadUnreadCount().catch((error) => {
+    console.error("Failed to load notification count", error);
+  });
+});
 
 async function handleLogout() {
   try {
@@ -54,7 +71,7 @@ async function handleLogout() {
   } finally {
     removeToken();
     removeUserId();
-    toast.success("Logged out successfully");
+    toast.success(t("auth.messages.logoutSuccess"));
     router.push("/login");
   }
 }
@@ -71,7 +88,9 @@ async function handleLogout() {
           >
             <Avatar class="h-8 w-8 rounded-lg">
               <AvatarImage :src="user.avatar" :alt="user.name" />
-              <AvatarFallback class="rounded-lg"> CN </AvatarFallback>
+              <AvatarFallback class="rounded-lg">
+                {{ user.name.substring(0, 2).toUpperCase() }}
+              </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
               <span class="truncate font-medium">{{ user.name }}</span>
@@ -98,6 +117,7 @@ async function handleLogout() {
                 <span class="truncate font-medium">{{ user.name }}</span>
                 <span class="truncate text-xs">{{ user.email }}</span>
               </div>
+              <LanguageSwitcher />
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -105,13 +125,13 @@ async function handleLogout() {
             <RouterLink to="/personal">
               <DropdownMenuItem>
                 <User class="mr-2 h-4 w-4" />
-                Profile
+                {{ t("sidebar.personal.profile") }}
               </DropdownMenuItem>
             </RouterLink>
             <RouterLink to="/personal/account">
               <DropdownMenuItem>
                 <Settings class="mr-2 h-4 w-4" />
-                Account Settings
+                {{ t("sidebar.personal.accountSettings") }}
               </DropdownMenuItem>
             </RouterLink>
           </DropdownMenuGroup>
@@ -120,45 +140,56 @@ async function handleLogout() {
             <RouterLink to="/personal/submissions">
               <DropdownMenuItem>
                 <History class="mr-2 h-4 w-4" />
-                Submissions
+                {{ t("sidebar.personal.submissions") }}
               </DropdownMenuItem>
             </RouterLink>
             <RouterLink to="/personal/solutions">
               <DropdownMenuItem>
                 <CheckCircle2 class="mr-2 h-4 w-4" />
-                Solutions
+                {{ t("sidebar.personal.solutions") }}
               </DropdownMenuItem>
             </RouterLink>
             <RouterLink to="/personal/problem-lists">
               <DropdownMenuItem>
                 <List class="mr-2 h-4 w-4" />
-                Problem Lists
+                {{ t("sidebar.personal.problemLists") }}
               </DropdownMenuItem>
             </RouterLink>
             <RouterLink to="/personal/bookmarks">
               <DropdownMenuItem>
                 <Bookmark class="mr-2 h-4 w-4" />
-                Bookmarks
+                {{ t("sidebar.personal.bookmarks") }}
               </DropdownMenuItem>
             </RouterLink>
             <RouterLink to="/personal/forum-posts">
               <DropdownMenuItem>
                 <MessageSquare class="mr-2 h-4 w-4" />
-                Forum Posts
+                {{ t("sidebar.personal.forumPosts") }}
               </DropdownMenuItem>
             </RouterLink>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Bell class="mr-2 h-4 w-4" />
-              Notifications
-            </DropdownMenuItem>
+            <RouterLink to="/personal/notifications">
+              <DropdownMenuItem class="justify-between">
+                <div class="flex items-center">
+                  <Bell class="mr-2 h-4 w-4" />
+                  {{ t("sidebar.personal.notifications") }}
+                </div>
+                <Badge
+                  v-if="unreadCount > 0"
+                  variant="destructive"
+                  class="h-5 px-2 text-[10px] font-bold"
+                >
+                  {{ unreadLabel }}
+                </Badge>
+              </DropdownMenuItem>
+            </RouterLink>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="handleLogout" class="text-destructive">
             <LogOut class="mr-2 h-4 w-4" />
-            Log out
+            {{ t("sidebar.personal.logout") }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

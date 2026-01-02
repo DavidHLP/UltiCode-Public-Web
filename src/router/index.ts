@@ -195,6 +195,11 @@ const personalRoutes: RouteRecordRaw = {
       name: "personal-forum-posts",
       component: () => import("@/views/personal/ForumPostsView.vue"),
     },
+    {
+      path: "notifications",
+      name: "personal-notifications",
+      component: () => import("@/views/personal/NotificationsView.vue"),
+    },
   ],
 };
 

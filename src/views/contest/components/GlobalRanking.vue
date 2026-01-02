@@ -3,10 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { GlobalRankingEntry } from "@/types/contest";
 import RatingBadge from "./RatingBadge.vue";
+import { useI18n } from "vue-i18n";
 
 defineProps<{
   rankings: GlobalRankingEntry[];
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -18,11 +21,11 @@ defineProps<{
       <div class="p-6 text-center space-y-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-extrabold text-foreground/80 italic">
-            National Ranking
+            {{ t("contest.ranking.national") }}
           </h2>
           <span
             class="text-xs text-muted-foreground border rounded px-1 cursor-pointer"
-            >Global</span
+            >{{ t("contest.ranking.globalRanking") }}</span
           >
         </div>
 
@@ -140,16 +143,20 @@ defineProps<{
                 {{ user.username }}
               </p>
               <p class="text-xs text-muted-foreground">
-                Attended {{ user.contestsAttended || 0 }} contests
+                {{
+                  t("contest.ranking.attended", {
+                    n: user.contestsAttended || 0,
+                  })
+                }}
               </p>
             </div>
             <RatingBadge :rating="user.rating" size="sm" />
           </div>
         </div>
 
-        <Button variant="ghost" class="w-full text-primary text-sm"
-          >Show More</Button
-        >
+        <Button variant="ghost" class="w-full text-primary text-sm">{{
+          t("common.actions.loadMore")
+        }}</Button>
       </div>
     </Card>
   </div>

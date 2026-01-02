@@ -91,8 +91,10 @@ import {
   moveListToCategory,
 } from "@/api/problem-list";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 const loading = ref(true);
 const currentUserId = fetchCurrentUserId();
 const activeTab = ref("my-lists");
@@ -184,7 +186,7 @@ const loadData = async () => {
     data.value = await fetchProblemListsOverview(currentUserId);
   } catch (e) {
     console.error("Failed to load problem lists", e);
-    toast.error("Failed to load your problem lists");
+    toast.error(t("personal.messages.loadFailed"));
   } finally {
     loading.value = false;
   }
@@ -201,13 +203,13 @@ const handleCreateList = async () => {
       description: createForm.value.description.trim() || undefined,
       isPublic: createForm.value.isPublic,
     });
-    toast.success("Problem list created successfully");
+    toast.success(t("personal.messages.folderCreated"));
     isCreateOpen.value = false;
     createForm.value = { name: "", description: "", isPublic: false };
     router.push(`/problemset/list/${newList.id}`);
   } catch (e) {
     console.error("Failed to create problem list", e);
-    toast.error("Failed to create problem list");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     isCreating.value = false;
   }
@@ -225,13 +227,13 @@ const handleDeleteList = async () => {
   isDeletingList.value = true;
   try {
     await deleteProblemList(listToDelete.value.id, currentUserId);
-    toast.success("Problem list deleted successfully");
+    toast.success(t("personal.messages.folderDeleted"));
     isDeleteListOpen.value = false;
     listToDelete.value = null;
     await loadData();
   } catch (e) {
     console.error("Failed to delete problem list", e);
-    toast.error("Failed to delete problem list");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     isDeletingList.value = false;
   }
@@ -242,11 +244,11 @@ const handleUnsaveList = async (list: ProblemList) => {
   if (!currentUserId) return;
   try {
     await unsaveList(list.id, currentUserId);
-    toast.success(`Removed "${list.name}" from saved`);
+    toast.success(t("personal.messages.bookmarkRemoved"));
     await loadData();
   } catch (e) {
     console.error("Failed to unsave list", e);
-    toast.error("Failed to remove from saved");
+    toast.error(t("personal.messages.saveFailed"));
   }
 };
 
@@ -258,15 +260,11 @@ const handleMoveToCategory = async (
   if (!currentUserId) return;
   try {
     await moveListToCategory(list.id, currentUserId, categoryId);
-    toast.success(
-      categoryId
-        ? `Moved "${list.name}" to category`
-        : `Removed "${list.name}" from category`,
-    );
+    toast.success(t("personal.messages.profileUpdated"));
     await loadData();
   } catch (e) {
     console.error("Failed to move list", e);
-    toast.error("Failed to move list");
+    toast.error(t("personal.messages.saveFailed"));
   }
 };
 
@@ -278,13 +276,13 @@ const handleCreateCategory = async () => {
     await createCategory(currentUserId, {
       name: createCategoryForm.value.name.trim(),
     });
-    toast.success("Category created successfully");
+    toast.success(t("personal.messages.folderCreated"));
     isCreateCategoryOpen.value = false;
     createCategoryForm.value = { name: "" };
     await loadData();
   } catch (e) {
     console.error("Failed to create category", e);
-    toast.error("Failed to create category");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     isCreatingCategory.value = false;
   }
@@ -300,7 +298,7 @@ const openEditCategoryDialog = (category: ProblemListCategory) => {
 const handleEditCategory = async () => {
   if (!currentUserId || !categoryToEdit.value) return;
   if (!editCategoryForm.value.name.trim()) {
-    toast.error("Category name is required");
+    toast.error(t("personal.problemLists.dialogs.newName"));
     return;
   }
   isEditingCategory.value = true;
@@ -308,12 +306,12 @@ const handleEditCategory = async () => {
     await updateCategory(categoryToEdit.value.id, currentUserId, {
       name: editCategoryForm.value.name.trim(),
     });
-    toast.success("Category updated successfully");
+    toast.success(t("personal.messages.profileUpdated"));
     isEditCategoryOpen.value = false;
     await loadData();
   } catch (e) {
     console.error("Failed to update category", e);
-    toast.error("Failed to update category");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     isEditingCategory.value = false;
   }
@@ -324,11 +322,11 @@ const handleSaveList = async (list: ProblemList) => {
   if (!currentUserId) return;
   try {
     await saveList(list.id, currentUserId);
-    toast.success(`Saved "${list.name}" to your lists`);
+    toast.success(t("personal.messages.bookmarkAdded"));
     await loadData();
   } catch (e) {
     console.error("Failed to save list", e);
-    toast.error("Failed to save list");
+    toast.error(t("personal.messages.saveFailed"));
   }
 };
 
@@ -343,12 +341,12 @@ const handleDeleteCategory = async () => {
   isDeletingCategory.value = true;
   try {
     await deleteCategory(categoryToDelete.value.id, currentUserId);
-    toast.success("Category deleted successfully");
+    toast.success(t("personal.messages.folderDeleted"));
     isDeleteCategoryOpen.value = false;
     await loadData();
   } catch (e) {
     console.error("Failed to delete category", e);
-    toast.error("Failed to delete category");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     isDeletingCategory.value = false;
   }
@@ -360,8 +358,8 @@ onMounted(loadData);
 <template>
   <PersonalPageShell>
     <PersonalPageHeader
-      title="Problem Lists"
-      description="Curate, organize, and track your practice problem sets."
+      :title="t('personal.problemLists.title')"
+      :description="t('personal.problemLists.subtitle')"
     >
       <template #actions>
         <div class="flex items-center gap-3">
@@ -371,14 +369,16 @@ onMounted(loadData);
             class="gap-2 rounded-full"
           >
             <FolderPlus class="h-4 w-4" />
-            <span class="hidden sm:inline">New Category</span>
+            <span class="hidden sm:inline">{{
+              t("personal.problemLists.actions.newCategory")
+            }}</span>
           </Button>
           <Button
             @click="isCreateOpen = true"
             class="gap-2 rounded-full shadow-sm"
           >
             <Plus class="h-4 w-4" />
-            <span>New List</span>
+            <span>{{ t("personal.problemLists.actions.newList") }}</span>
           </Button>
         </div>
       </template>
@@ -390,7 +390,9 @@ onMounted(loadData);
       class="flex flex-col items-center justify-center py-20 gap-4"
     >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
-      <p class="text-sm text-muted-foreground">Loading your collections...</p>
+      <p class="text-sm text-muted-foreground">
+        {{ t("personal.problemLists.loadingLists") }}
+      </p>
     </div>
 
     <!-- Not Logged In State -->
@@ -403,12 +405,14 @@ onMounted(loadData);
       >
         <Lock class="h-8 w-8 text-muted-foreground/50" />
       </div>
-      <h3 class="text-xl font-bold">Authentication Required</h3>
+      <h3 class="text-xl font-bold">
+        {{ t("personal.profile.authenticationRequired") }}
+      </h3>
       <p class="text-muted-foreground mb-6 text-center max-w-xs mt-2">
-        Please log in to view and manage your custom problem lists.
+        {{ t("personal.problemLists.loginToManage") }}
       </p>
       <Button as-child class="rounded-full px-8 h-10 font-bold">
-        <RouterLink to="/login">Sign In</RouterLink>
+        <RouterLink to="/login">{{ t("personal.profile.signIn") }}</RouterLink>
       </Button>
     </div>
 
@@ -423,7 +427,7 @@ onMounted(loadData);
               value="my-lists"
               class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              My Lists
+              {{ t("personal.problemLists.tabs.myLists") }}
               <Badge
                 variant="secondary"
                 class="ml-2 h-5 min-w-[20px] px-1 rounded-full text-[10px]"
@@ -434,7 +438,7 @@ onMounted(loadData);
               value="saved"
               class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              Saved
+              {{ t("personal.problemLists.tabs.saved") }}
               <Badge
                 variant="secondary"
                 class="ml-2 h-5 min-w-[20px] px-1 rounded-full text-[10px]"
@@ -445,13 +449,13 @@ onMounted(loadData);
               value="categories"
               class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              Categories
+              {{ t("personal.problemLists.tabs.categories") }}
             </TabsTrigger>
             <TabsTrigger
               value="featured"
               class="rounded-full px-4 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              Featured
+              {{ t("personal.problemLists.tabs.featured") }}
             </TabsTrigger>
           </TabsList>
 
@@ -461,7 +465,9 @@ onMounted(loadData);
             />
             <Input
               v-model="searchQuery"
-              placeholder="Search lists..."
+              :placeholder="
+                t('personal.problemLists.dialogs.listNamePlaceholder')
+              "
               class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20"
             />
           </div>
@@ -478,10 +484,11 @@ onMounted(loadData);
             >
               <LayoutGrid class="h-8 w-8 text-muted-foreground/50" />
             </div>
-            <h4 class="text-xl font-bold">No problem lists yet</h4>
+            <h4 class="text-xl font-bold">
+              {{ t("personal.problemLists.emptyStates.noLists") }}
+            </h4>
             <p class="text-sm text-muted-foreground mt-1 max-w-[300px] mb-8">
-              Create your first problem list to organize your practice and track
-              your progress.
+              {{ t("personal.problemLists.emptyStates.noListsDesc") }}
             </p>
             <Button
               size="lg"
@@ -489,7 +496,7 @@ onMounted(loadData);
               class="rounded-full gap-2 px-8 h-10 font-bold"
             >
               <Plus class="h-4 w-4" />
-              Create Your First List
+              {{ t("personal.problemLists.emptyStates.createFirst") }}
             </Button>
           </div>
 
@@ -508,14 +515,16 @@ onMounted(loadData);
                         variant="secondary"
                         class="h-5 px-1.5 text-[10px] font-semibold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 border-emerald-500/20 rounded-md"
                       >
-                        <Globe class="h-3 w-3 mr-1" /> Public
+                        <Globe class="h-3 w-3 mr-1" />
+                        {{ t("personal.problemLists.listCard.public") }}
                       </Badge>
                       <Badge
                         v-else
                         variant="outline"
                         class="h-5 px-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground border-muted-foreground/20 rounded-md"
                       >
-                        <Lock class="h-3 w-3 mr-1" /> Private
+                        <Lock class="h-3 w-3 mr-1" />
+                        {{ t("personal.problemLists.listCard.private") }}
                       </Badge>
                     </div>
                     <CardTitle
@@ -540,7 +549,8 @@ onMounted(loadData);
                     <DropdownMenuContent align="end" class="w-48">
                       <DropdownMenuItem as-child class="gap-2">
                         <RouterLink :to="`/problemset/list/${list.id}`">
-                          <Pencil class="h-4 w-4" /> Edit List
+                          <Pencil class="h-4 w-4" />
+                          {{ t("personal.problemLists.actions.editList") }}
                         </RouterLink>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -548,7 +558,8 @@ onMounted(loadData);
                         class="text-destructive focus:text-destructive gap-2"
                         @click.prevent="openDeleteListDialog(list)"
                       >
-                        <Trash2 class="h-4 w-4" /> Delete List
+                        <Trash2 class="h-4 w-4" />
+                        {{ t("personal.problemLists.actions.deleteList") }}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -562,7 +573,7 @@ onMounted(loadData);
                   {{ list.description }}
                 </p>
                 <p v-else class="text-sm text-muted-foreground/40 italic">
-                  No description provided.
+                  {{ t("personal.problemLists.listCard.noDescription") }}
                 </p>
               </CardContent>
               <CardFooter class="bg-muted/20 border-t py-3 px-6">
@@ -570,7 +581,11 @@ onMounted(loadData);
                   class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
                 >
                   <List class="h-4 w-4 text-primary/70" />
-                  {{ list.problemCount }} PROBLEMS
+                  {{
+                    t("personal.problemLists.listCard.problemCount", {
+                      count: list.problemCount,
+                    })
+                  }}
                 </div>
               </CardFooter>
             </Card>
@@ -585,7 +600,7 @@ onMounted(loadData);
               <h3
                 class="text-lg font-black uppercase tracking-widest text-muted-foreground"
               >
-                Uncategorized
+                {{ t("personal.problemLists.categories.uncategorized") }}
               </h3>
               <Separator class="flex-1" />
             </div>
@@ -602,7 +617,7 @@ onMounted(loadData);
                         variant="secondary"
                         class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20 rounded-md"
                       >
-                        SAVED
+                        {{ t("personal.problemLists.listCard.saved") }}
                       </Badge>
                       <CardTitle
                         class="text-lg font-bold group-hover:text-primary transition-colors truncate"
@@ -626,7 +641,10 @@ onMounted(loadData);
                       <DropdownMenuContent align="end" class="w-56">
                         <DropdownMenuSub v-if="data.categories.length > 0">
                           <DropdownMenuSubTrigger class="gap-2">
-                            <FolderInput class="h-4 w-4" /> Move to Category
+                            <FolderInput class="h-4 w-4" />
+                            {{
+                              t("personal.problemLists.actions.moveToCategory")
+                            }}
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent>
                             <DropdownMenuItem
@@ -644,7 +662,8 @@ onMounted(loadData);
                           @click.prevent="handleUnsaveList(list)"
                           class="text-muted-foreground gap-2"
                         >
-                          <BookmarkMinus class="h-4 w-4" /> Unsave List
+                          <BookmarkMinus class="h-4 w-4" />
+                          {{ t("personal.problemLists.actions.unsaveList") }}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -663,7 +682,11 @@ onMounted(loadData);
                     class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
                   >
                     <List class="h-4 w-4 text-primary/70" />
-                    {{ list.problemCount }} PROBLEMS
+                    {{
+                      t("personal.problemLists.listCard.problemCount", {
+                        count: list.problemCount,
+                      })
+                    }}
                   </div>
                 </CardFooter>
               </Card>
@@ -709,14 +732,16 @@ onMounted(loadData);
                       @click="openEditCategoryDialog(category)"
                       class="gap-2"
                     >
-                      <Pencil class="h-4 w-4" /> Rename Category
+                      <Pencil class="h-4 w-4" />
+                      {{ t("personal.problemLists.actions.renameCategory") }}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       class="text-destructive focus:text-destructive gap-2"
                       @click="openDeleteCategoryDialog(category)"
                     >
-                      <Trash2 class="h-4 w-4" /> Delete Category
+                      <Trash2 class="h-4 w-4" />
+                      {{ t("personal.problemLists.actions.deleteCategory") }}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -729,7 +754,9 @@ onMounted(loadData);
                 >
                   <FolderInput class="h-10 w-10 opacity-20 mb-3" />
                   <p class="text-sm font-medium">
-                    No lists in this category yet
+                    {{
+                      t("personal.problemLists.emptyStates.noListsInCategory")
+                    }}
                   </p>
                 </div>
                 <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -763,15 +790,22 @@ onMounted(loadData);
                               @click.prevent="handleMoveToCategory(list, null)"
                               class="gap-2"
                             >
-                              <FolderInput class="h-4 w-4" /> Remove from
-                              Category
+                              <FolderInput class="h-4 w-4" />
+                              {{
+                                t(
+                                  "personal.problemLists.actions.removeFromCategory",
+                                )
+                              }}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               @click.prevent="handleUnsaveList(list)"
                               class="text-muted-foreground gap-2"
                             >
-                              <BookmarkMinus class="h-4 w-4" /> Unsave List
+                              <BookmarkMinus class="h-4 w-4" />
+                              {{
+                                t("personal.problemLists.actions.unsaveList")
+                              }}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -782,7 +816,11 @@ onMounted(loadData);
                         class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
                       >
                         <List class="h-4 w-4 text-primary/70" />
-                        {{ list.problemCount }} PROBLEMS
+                        {{
+                          t("personal.problemLists.listCard.problemCount", {
+                            count: list.problemCount,
+                          })
+                        }}
                       </div>
                     </CardFooter>
                   </Card>
@@ -801,9 +839,11 @@ onMounted(loadData);
             >
               <Bookmark class="h-8 w-8" />
             </div>
-            <h4 class="text-xl font-bold">No saved lists yet</h4>
+            <h4 class="text-xl font-bold">
+              {{ t("personal.problemLists.emptyStates.noSaved") }}
+            </h4>
             <p class="text-sm text-muted-foreground mt-1 max-w-[300px]">
-              Save problem lists created by others to keep them organized here.
+              {{ t("personal.problemLists.emptyStates.noSavedDesc") }}
             </p>
           </div>
         </TabsContent>
@@ -835,8 +875,11 @@ onMounted(loadData);
                     <p
                       class="text-xs font-bold text-muted-foreground uppercase tracking-widest"
                     >
-                      {{ category.lists.length }} LIST{{
-                        category.lists.length !== 1 ? "S" : ""
+                      {{
+                        t("personal.problemLists.categories.listCount", {
+                          count: category.lists.length,
+                          s: category.lists.length !== 1 ? "S" : "",
+                        })
                       }}
                     </p>
                   </div>
@@ -867,7 +910,11 @@ onMounted(loadData);
                   class="text-center py-10 bg-muted/10 rounded-xl border-2 border-dashed"
                 >
                   <p class="text-sm text-muted-foreground italic">
-                    No lists in this category.
+                    {{
+                      t(
+                        "personal.problemLists.emptyStates.noListsInCategoryDesc",
+                      )
+                    }}
                   </p>
                 </div>
                 <div v-else class="grid gap-3">
@@ -886,7 +933,11 @@ onMounted(loadData);
                         variant="secondary"
                         class="h-5 px-1.5 rounded-full text-[10px]"
                       >
-                        {{ list.problemCount }} problems
+                        {{
+                          t("personal.problemLists.listCard.problemsCount", {
+                            count: list.problemCount,
+                          })
+                        }}
                       </Badge>
                     </RouterLink>
                     <DropdownMenu>
@@ -902,7 +953,10 @@ onMounted(loadData);
                       <DropdownMenuContent align="end" class="w-56">
                         <DropdownMenuSub v-if="data.categories.length > 1">
                           <DropdownMenuSubTrigger class="gap-2">
-                            <FolderInput class="h-4 w-4" /> Move to Another
+                            <FolderInput class="h-4 w-4" />
+                            {{
+                              t("personal.problemLists.actions.moveToAnother")
+                            }}
                           </DropdownMenuSubTrigger>
                           <DropdownMenuSubContent>
                             <DropdownMenuItem
@@ -920,14 +974,20 @@ onMounted(loadData);
                           @click="handleMoveToCategory(list, null)"
                           class="gap-2"
                         >
-                          <FolderInput class="h-4 w-4" /> Remove from Category
+                          <FolderInput class="h-4 w-4" />
+                          {{
+                            t(
+                              "personal.problemLists.actions.removeFromCategory",
+                            )
+                          }}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           @click="handleUnsaveList(list)"
                           class="text-muted-foreground gap-2"
                         >
-                          <BookmarkMinus class="h-4 w-4" /> Unsave List
+                          <BookmarkMinus class="h-4 w-4" />
+                          {{ t("personal.problemLists.actions.unsaveList") }}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -949,9 +1009,11 @@ onMounted(loadData);
             >
               <Star class="h-8 w-8" />
             </div>
-            <h4 class="text-xl font-bold">No featured lists</h4>
+            <h4 class="text-xl font-bold">
+              {{ t("personal.problemLists.emptyStates.noFeatured") }}
+            </h4>
             <p class="text-muted-foreground mt-2">
-              Check back later for curated problem lists.
+              {{ t("personal.problemLists.emptyStates.noFeaturedDesc") }}
             </p>
           </div>
 
@@ -969,14 +1031,14 @@ onMounted(loadData);
                         variant="secondary"
                         class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-amber-500/10 text-amber-600 border-amber-500/20 rounded-md"
                       >
-                        FEATURED
+                        {{ t("personal.problemLists.listCard.featured") }}
                       </Badge>
                       <Badge
                         v-if="list.isSaved"
                         variant="secondary"
                         class="h-5 px-1.5 text-[10px] font-bold uppercase tracking-widest bg-blue-500/10 text-blue-600 border-blue-500/20 rounded-md"
                       >
-                        SAVED
+                        {{ t("personal.problemLists.listCard.saved") }}
                       </Badge>
                     </div>
                     <CardTitle
@@ -999,7 +1061,8 @@ onMounted(loadData);
                     class="rounded-full gap-1.5 h-8 font-bold text-[10px] opacity-0 group-hover:opacity-100 transition-all"
                     @click="handleSaveList(list)"
                   >
-                    <Save class="h-3.5 w-3.5" /> SAVE
+                    <Save class="h-3.5 w-3.5" />
+                    {{ t("personal.problemLists.actions.save") }}
                   </Button>
                   <Button
                     v-else
@@ -1008,7 +1071,8 @@ onMounted(loadData);
                     class="rounded-full gap-1.5 h-8 font-bold text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-all"
                     @click="handleUnsaveList(list)"
                   >
-                    <BookmarkMinus class="h-3.5 w-3.5" /> UNSAVE
+                    <BookmarkMinus class="h-3.5 w-3.5" />
+                    {{ t("personal.problemLists.actions.unsave") }}
                   </Button>
                 </div>
               </CardHeader>
@@ -1025,7 +1089,11 @@ onMounted(loadData);
                   class="flex items-center gap-2 text-xs font-bold text-muted-foreground"
                 >
                   <List class="h-4 w-4 text-primary/70" />
-                  {{ list.problemCount }} PROBLEMS
+                  {{
+                    t("personal.problemLists.listCard.problemCount", {
+                      count: list.problemCount,
+                    })
+                  }}
                 </div>
               </CardFooter>
             </Card>
@@ -1038,11 +1106,11 @@ onMounted(loadData);
     <Dialog v-model:open="isCreateOpen">
       <DialogContent class="sm:max-w-[425px] rounded-2xl">
         <DialogHeader>
-          <DialogTitle class="text-2xl font-black tracking-tight"
-            >Create New List</DialogTitle
-          >
+          <DialogTitle class="text-2xl font-black tracking-tight">{{
+            t("personal.problemLists.dialogs.createList")
+          }}</DialogTitle>
           <DialogDescription>
-            Organize your practice with a custom problem collection.
+            {{ t("personal.problemLists.dialogs.createListDesc") }}
           </DialogDescription>
         </DialogHeader>
         <div class="space-y-6 py-4">
@@ -1050,12 +1118,14 @@ onMounted(loadData);
             <Label
               for="create-name"
               class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
-              >List Name</Label
+              >{{ t("personal.problemLists.dialogs.listName") }}</Label
             >
             <Input
               id="create-name"
               v-model="createForm.name"
-              placeholder="e.g. Dynamic Programming Masterclass"
+              :placeholder="
+                t('personal.problemLists.dialogs.listNamePlaceholder')
+              "
               class="h-11 rounded-lg"
             />
           </div>
@@ -1063,12 +1133,14 @@ onMounted(loadData);
             <Label
               for="create-description"
               class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
-              >Description</Label
+              >{{ t("personal.problemLists.dialogs.description") }}</Label
             >
             <Textarea
               id="create-description"
               v-model="createForm.description"
-              placeholder="What is this collection for?"
+              :placeholder="
+                t('personal.problemLists.dialogs.descriptionPlaceholder')
+              "
               class="min-h-[100px] resize-none rounded-lg"
             />
           </div>
@@ -1076,11 +1148,11 @@ onMounted(loadData);
             class="flex items-center justify-between p-4 rounded-xl bg-muted/30 border"
           >
             <div class="space-y-0.5">
-              <Label for="create-public" class="text-sm font-bold"
-                >Public List</Label
-              >
+              <Label for="create-public" class="text-sm font-bold">{{
+                t("personal.problemLists.dialogs.publicList")
+              }}</Label>
               <p class="text-xs text-muted-foreground">
-                Visible to the community
+                {{ t("personal.problemLists.dialogs.publicListDesc") }}
               </p>
             </div>
             <Switch id="create-public" v-model:checked="createForm.isPublic" />
@@ -1091,14 +1163,18 @@ onMounted(loadData);
             variant="outline"
             @click="isCreateOpen = false"
             class="rounded-full"
-            >Cancel</Button
+            >{{ t("common.actions.cancel") }}</Button
           >
           <Button
             @click="handleCreateList"
             :disabled="isCreating || !createForm.name.trim()"
             class="rounded-full px-8"
           >
-            {{ isCreating ? "Creating..." : "Create List" }}
+            {{
+              isCreating
+                ? t("personal.problemLists.dialogs.creating")
+                : t("personal.problemLists.dialogs.createButton")
+            }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1111,24 +1187,31 @@ onMounted(loadData);
     <AlertDialog v-model:open="isDeleteListOpen">
       <AlertDialogContent class="rounded-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Problem List</AlertDialogTitle>
+          <AlertDialogTitle>{{
+            t("personal.problemLists.dialogs.deleteList")
+          }}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete
-            <span class="font-bold text-foreground"
-              >"{{ listToDelete?.name }}"</span
-            >? This action is permanent.
+            {{
+              t("personal.problemLists.dialogs.deleteListConfirm", {
+                name: listToDelete?.name,
+              })
+            }}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel :disabled="isDeletingList" class="rounded-full"
-            >Cancel</AlertDialogCancel
-          >
+          <AlertDialogCancel :disabled="isDeletingList" class="rounded-full">{{
+            t("common.actions.cancel")
+          }}</AlertDialogCancel>
           <AlertDialogAction
             class="bg-destructive text-white hover:bg-destructive/90 rounded-full"
             @click="handleDeleteList"
             :disabled="isDeletingList"
           >
-            {{ isDeletingList ? "Deleting..." : "Delete Permanently" }}
+            {{
+              isDeletingList
+                ? t("common.status.saving")
+                : t("common.actions.confirm")
+            }}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -1138,11 +1221,11 @@ onMounted(loadData);
     <Dialog v-model:open="isCreateCategoryOpen">
       <DialogContent class="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle class="text-2xl font-black tracking-tight"
-            >New Category</DialogTitle
-          >
+          <DialogTitle class="text-2xl font-black tracking-tight">{{
+            t("personal.problemLists.dialogs.newCategory")
+          }}</DialogTitle>
           <DialogDescription>
-            Group your saved lists to keep them organized.
+            {{ t("personal.problemLists.dialogs.newCategoryDesc") }}
           </DialogDescription>
         </DialogHeader>
         <div class="space-y-4 py-4">
@@ -1150,12 +1233,14 @@ onMounted(loadData);
             <Label
               for="category-name"
               class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
-              >Category Name</Label
+              >{{ t("personal.problemLists.dialogs.categoryName") }}</Label
             >
             <Input
               id="category-name"
               v-model="createCategoryForm.name"
-              placeholder="e.g. Meta Prep 2026"
+              :placeholder="
+                t('personal.problemLists.dialogs.categoryNamePlaceholder')
+              "
               class="h-11 rounded-lg"
               @keydown.enter="handleCreateCategory"
             />
@@ -1168,14 +1253,18 @@ onMounted(loadData);
             :disabled="isCreatingCategory"
             class="rounded-full"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </Button>
           <Button
             @click="handleCreateCategory"
             :disabled="isCreatingCategory || !createCategoryForm.name.trim()"
             class="rounded-full px-8"
           >
-            {{ isCreatingCategory ? "Creating..." : "Create Category" }}
+            {{
+              isCreatingCategory
+                ? t("personal.problemLists.dialogs.creating")
+                : t("personal.problemLists.dialogs.createCategory")
+            }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1185,16 +1274,16 @@ onMounted(loadData);
     <Dialog v-model:open="isEditCategoryOpen">
       <DialogContent class="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle class="text-2xl font-black tracking-tight"
-            >Rename Category</DialogTitle
-          >
+          <DialogTitle class="text-2xl font-black tracking-tight">{{
+            t("personal.problemLists.dialogs.renameCategory")
+          }}</DialogTitle>
         </DialogHeader>
         <div class="space-y-4 py-4">
           <div class="space-y-2">
             <Label
               for="edit-category-name"
               class="text-xs font-bold uppercase tracking-widest text-muted-foreground"
-              >New Name</Label
+              >{{ t("personal.problemLists.dialogs.newName") }}</Label
             >
             <Input
               id="edit-category-name"
@@ -1211,14 +1300,18 @@ onMounted(loadData);
             :disabled="isEditingCategory"
             class="rounded-full"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </Button>
           <Button
             @click="handleEditCategory"
             :disabled="isEditingCategory || !editCategoryForm.name.trim()"
             class="rounded-full px-8"
           >
-            {{ isEditingCategory ? "Saving..." : "Save Changes" }}
+            {{
+              isEditingCategory
+                ? t("common.status.saving")
+                : t("common.actions.save")
+            }}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1228,24 +1321,33 @@ onMounted(loadData);
     <AlertDialog v-model:open="isDeleteCategoryOpen">
       <AlertDialogContent class="rounded-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Category</AlertDialogTitle>
+          <AlertDialogTitle>{{
+            t("personal.problemLists.dialogs.deleteCategory")
+          }}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete
-            <span class="font-bold text-foreground"
-              >"{{ categoryToDelete?.name }}"</span
-            >? Your saved lists will be moved to the "Uncategorized" section.
+            {{
+              t("personal.problemLists.dialogs.deleteCategoryConfirm", {
+                name: categoryToDelete?.name,
+              })
+            }}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel :disabled="isDeletingCategory" class="rounded-full"
-            >Cancel</AlertDialogCancel
+          <AlertDialogCancel
+            :disabled="isDeletingCategory"
+            class="rounded-full"
+            >{{ t("common.actions.cancel") }}</AlertDialogCancel
           >
           <AlertDialogAction
             class="bg-destructive text-white hover:bg-destructive/90 rounded-full"
             @click="handleDeleteCategory"
             :disabled="isDeletingCategory"
           >
-            {{ isDeletingCategory ? "Deleting..." : "Delete Category" }}
+            {{
+              isDeletingCategory
+                ? t("common.status.saving")
+                : t("common.actions.confirm")
+            }}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

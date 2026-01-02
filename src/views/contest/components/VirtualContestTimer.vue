@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "vue-sonner";
 import { Clock, Trophy } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 const contestStore = useContestStore();
+const { t } = useI18n();
 const timeRemaining = ref(0);
 let intervalId: number | null = null;
 
@@ -65,7 +67,7 @@ async function handleFinish() {
     await contestStore.finishVirtualContest(session.value.contest_id);
   } catch (error) {
     console.error("Failed to finish virtual contest:", error);
-    toast.error("Failed to finish virtual contest");
+    toast.error(t("contest.virtual.finishFailed"));
   }
 }
 
@@ -89,29 +91,36 @@ onUnmounted(() => {
           <div class="flex items-center gap-2">
             <Trophy class="h-5 w-5 text-primary" />
             <div>
-              <p class="text-sm font-semibold">Virtual Contest Active</p>
+              <p class="text-sm font-semibold">
+                {{ t("contest.virtual.active") }}
+              </p>
               <p class="text-xs text-muted-foreground">
-                Contest ID: {{ session.contest_id }}
+                {{ t("contest.virtual.contestId") }} {{ session.contest_id }}
               </p>
             </div>
           </div>
           <AlertDialog>
             <AlertDialogTrigger as-child>
-              <Button size="sm" variant="outline"> Finish Early </Button>
+              <Button size="sm" variant="outline">
+                {{ t("contest.virtual.finishEarly") }}
+              </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Finish Virtual Contest?</AlertDialogTitle>
+                <AlertDialogTitle>{{
+                  t("contest.virtual.finishTitle")
+                }}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to finish this virtual contest early?
-                  This action cannot be undone.
+                  {{ t("contest.virtual.finishDescription") }}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction @click="handleFinish"
-                  >Confirm</AlertDialogAction
-                >
+                <AlertDialogCancel>{{
+                  t("common.actions.cancel")
+                }}</AlertDialogCancel>
+                <AlertDialogAction @click="handleFinish">{{
+                  t("common.actions.confirm")
+                }}</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -121,7 +130,9 @@ onUnmounted(() => {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <Clock class="h-4 w-4 text-muted-foreground" />
-              <span class="text-xs text-muted-foreground">Time Remaining</span>
+              <span class="text-xs text-muted-foreground">{{
+                t("contest.virtual.timeRemaining")
+              }}</span>
             </div>
             <span
               class="font-mono text-lg font-bold"
@@ -146,8 +157,14 @@ onUnmounted(() => {
         <div
           class="flex items-center justify-between text-xs text-muted-foreground"
         >
-          <span>Score: {{ session.total_score || 0 }}</span>
-          <span>Penalty: {{ session.total_penalty || 0 }}</span>
+          <span
+            >{{ t("contest.ranking.score") }}:
+            {{ session.total_score || 0 }}</span
+          >
+          <span
+            >{{ t("contest.ranking.penalty") }}:
+            {{ session.total_penalty || 0 }}</span
+          >
         </div>
       </div>
     </CardContent>

@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   problemId: number;
@@ -46,6 +47,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   change: [listIds: string[]];
 }>();
+
+const { t } = useI18n();
 
 const userLists = ref<ProblemListWithStatus[]>([]);
 const isLoading = ref(false);
@@ -84,7 +87,7 @@ async function loadData() {
     userLists.value = await getUserListsForProblem(userId, props.problemId);
   } catch (error) {
     console.error("Failed to load user lists:", error);
-    toast.error("Failed to load problem lists");
+    toast.error(t("problem.save.toast.loadListsFailed"));
   } finally {
     isLoading.value = false;
   }
@@ -92,7 +95,7 @@ async function loadData() {
 
 async function toggleList(listId: string) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to manage problem lists");
+    toast.error(t("problem.save.toast.loginRequired"));
     return;
   }
 
@@ -109,18 +112,20 @@ async function toggleList(listId: string) {
       // Remove from this list
       await batchRemoveProblemFromLists(userId, props.problemId, [listId]);
       list.containsProblem = false;
-      toast.success(`Removed from "${list.name}"`);
+      toast.success(
+        t("problem.save.toast.removedFromList", { name: list.name }),
+      );
     } else {
       // Add to this list
       await batchAddProblemToLists(userId, props.problemId, [listId]);
       list.containsProblem = true;
-      toast.success(`Added to "${list.name}"`);
+      toast.success(t("problem.save.toast.addedToList", { name: list.name }));
     }
 
     emit("change", selectedListIds.value);
   } catch (error) {
     console.error("Failed to toggle list:", error);
-    toast.error("Failed to update problem list");
+    toast.error(t("problem.save.toast.updateListFailed"));
   }
 }
 
@@ -138,7 +143,7 @@ function openCreateDialog() {
 
 async function handleCreateList() {
   if (!newListName.value.trim()) {
-    toast.error("Please enter a list name");
+    toast.error(t("problem.save.toast.enterName"));
     return;
   }
 
@@ -158,11 +163,13 @@ async function handleCreateList() {
     // Reload the lists
     await loadData();
 
-    toast.success(`Created "${newList.name}" and added problem`);
+    toast.success(
+      t("problem.save.toast.createdAndAdded", { name: newList.name }),
+    );
     showCreateDialog.value = false;
   } catch (error) {
     console.error("Failed to create list:", error);
-    toast.error("Failed to create problem list");
+    toast.error(t("problem.save.toast.createFailed"));
   } finally {
     isCreating.value = false;
   }
@@ -184,7 +191,7 @@ watch(
           :variant="variant ?? 'ghost'"
           :size="size ?? 'icon'"
           class="relative rounded-full"
-          aria-label="Add to problem list"
+          :aria-label="t('problem.save.addToProblemList')"
         >
           <component
             :is="hasAnyList ? ListCheck : ListPlus"
@@ -194,7 +201,9 @@ watch(
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent class="w-72" align="end">
-        <DropdownMenuLabel>Add to Problem List</DropdownMenuLabel>
+        <DropdownMenuLabel>{{
+          t("problem.save.addToProblemList")
+        }}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <template v-if="isLoading">
           <div class="flex items-center justify-center py-4">
@@ -203,7 +212,7 @@ watch(
         </template>
         <template v-else-if="!isAuthed">
           <div class="px-3 py-2 text-sm text-muted-foreground">
-            Please log in to manage problem lists.
+            {{ t("problem.save.loginRequired") }}
           </div>
         </template>
         <template v-else>
@@ -211,8 +220,8 @@ watch(
             v-if="userLists.length === 0"
             class="px-3 py-4 text-sm text-muted-foreground text-center"
           >
-            <p class="mb-2">You don't have any problem lists yet.</p>
-            <p class="text-xs">Create one to get started!</p>
+            <p class="mb-2">{{ t("problem.save.emptyLists") }}</p>
+            <p class="text-xs">{{ t("problem.save.createOneHint") }}</p>
           </div>
           <div v-else class="max-h-[300px] overflow-y-auto">
             <DropdownMenuCheckboxItem
@@ -233,9 +242,12 @@ watch(
                 <div
                   class="flex items-center gap-2 text-xs text-muted-foreground"
                 >
-                  <span>{{ list.problemCount }} problems</span>
+                  <span>{{ list.problemCount }} {{ t("bookmark.items") }}</span>
                   <span>•</span>
-                  <span>{{ list.favoritesCount }} saves</span>
+                  <span
+                    >{{ list.favoritesCount }}
+                    {{ t("problem.save.saves") }}</span
+                  >
                 </div>
               </div>
             </DropdownMenuCheckboxItem>
@@ -245,7 +257,7 @@ watch(
 
           <DropdownMenuItem class="cursor-pointer" @select="openCreateDialog">
             <FolderPlus class="mr-2 h-4 w-4" />
-            Create New List
+            {{ t("problem.save.createNewList") }}
           </DropdownMenuItem>
         </template>
       </DropdownMenuContent>
@@ -254,18 +266,18 @@ watch(
     <Dialog v-model:open="showCreateDialog">
       <DialogContent class="sm:max-w-[425px] rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Create New Problem List</DialogTitle>
+          <DialogTitle>{{ t("problem.save.createListTitle") }}</DialogTitle>
           <DialogDescription>
-            Create a new problem list and add this problem to it.
+            {{ t("problem.save.createListDesc") }}
           </DialogDescription>
         </DialogHeader>
         <div class="grid gap-4 py-4">
           <div class="grid gap-2">
-            <Label for="list-name">List Name</Label>
+            <Label for="list-name">{{ t("problem.save.listName") }}</Label>
             <Input
               id="list-name"
               v-model="newListName"
-              placeholder="e.g., Dynamic Programming Practice"
+              :placeholder="t('problem.save.listNamePlaceholder')"
               class="rounded-lg"
               @keyup.enter="handleCreateList"
             />
@@ -278,7 +290,7 @@ watch(
             :disabled="isCreating"
             class="rounded-full"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </Button>
           <Button
             @click="handleCreateList"
@@ -286,7 +298,7 @@ watch(
             class="rounded-full"
           >
             <Loader2 v-if="isCreating" class="mr-2 h-4 w-4 animate-spin" />
-            Create & Add
+            {{ t("problem.save.createAndAdd") }}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -15,8 +15,11 @@ import {
 } from "@/components/ui/sidebar";
 import type { RouteLocationRaw } from "vue-router";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { computed } from "vue";
 
 const route = useRoute();
+const { t } = useI18n();
 
 type NavItem = {
   label: string;
@@ -25,20 +28,20 @@ type NavItem = {
   comingSoon?: boolean;
 };
 
-const navItems: NavItem[] = [
+const navItems = computed<NavItem[]>(() => [
   {
-    label: "ProblemSet",
+    label: t("sidebar.problem.problemSet"),
     to: { name: "problemset" },
   },
   {
-    label: "Forum",
+    label: t("sidebar.forum.platform"),
     to: { name: "forum-home" },
   },
   {
-    label: "Contest",
+    label: t("sidebar.contest.contestSection"),
     to: { name: "contest-home" },
   },
-];
+]);
 
 const isActiveNav = (item: NavItem) => {
   if (!item.to) return false;
@@ -80,7 +83,7 @@ const isActiveNav = (item: NavItem) => {
                     v-if="item.comingSoon"
                     class="rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs"
                   >
-                    Soon
+                    {{ t("common.labels.soon") }}
                   </span>
                 </RouterLink>
               </NavigationMenuLink>
@@ -97,7 +100,7 @@ const isActiveNav = (item: NavItem) => {
                   v-if="item.comingSoon"
                   class="rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground md:text-xs"
                 >
-                  Soon
+                  {{ t("common.labels.soon") }}
                 </span>
               </NavigationMenuLink>
             </NavigationMenuItem>

@@ -5,7 +5,7 @@
     >
       <Textarea
         v-model="content"
-        placeholder="What are your thoughts?"
+        :placeholder="t('forum.comments.placeholder')"
         class="min-h-[100px] w-full resize-none border-0 bg-transparent px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
       />
       <div
@@ -38,7 +38,7 @@
             class="rounded-full px-4 h-8 text-[12px] font-bold text-muted-foreground hover:bg-muted"
             @click="onCancel"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </Button>
           <Button
             type="submit"
@@ -46,7 +46,7 @@
             class="rounded-full px-5 h-8 text-[12px] font-bold shadow-sm"
             :disabled="!content.trim()"
           >
-            Comment
+            {{ t("forum.comments.submit") }}
           </Button>
         </div>
       </div>
@@ -59,6 +59,7 @@ import { ref } from "vue";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Image as ImageIcon, Type } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 defineOptions({
   name: "CommentForm",
@@ -73,6 +74,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "submit", content: string, parentId?: number | string): void;
 }>();
+
+const { t } = useI18n();
 
 const content = ref(props.initialContent || "");
 

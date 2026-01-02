@@ -10,6 +10,7 @@ import type {
 import { Clock, Microchip } from "lucide-vue-next";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
+import { useI18n } from "vue-i18n";
 
 interface TooltipCallbackDataParams {
   dataIndex: number;
@@ -26,6 +27,8 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const { t } = useI18n();
 
 const parseMs = (value: string | number) => {
   if (typeof value === "number") return value;
@@ -172,7 +175,7 @@ const initRuntimeChart = () => {
         const total = totalCount.value;
         const percentage = total ? ((count / total) * 100).toFixed(2) : "0";
         const isUserPosition = data.dataIndex === userIndex;
-        return `${bin}ms<br/>Count: ${count}<br/>Percentage: ${percentage}%${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">Your Position</span>' : ""}`;
+        return `${bin}ms<br/>${t("problem.layout.count")}: ${count}<br/>${t("problem.layout.percentage")}: ${percentage}%${isUserPosition ? `<br/><span style="color: hsl(var(--chart-series-1));">${t("problem.layout.userPosition")}</span>` : ""}`;
       },
     },
     grid: {
@@ -325,7 +328,7 @@ const initMemoryChart = () => {
         const data = dataArray[0];
         if (!data) return "";
         const isUserPosition = data.dataIndex === userMemoryIndex;
-        return `${memoryBins[data.dataIndex]}MB<br/>Count: ${data.value}${isUserPosition ? '<br/><span style="color: hsl(var(--chart-series-1));">Your Position</span>' : ""}`;
+        return `${memoryBins[data.dataIndex]}MB<br/>${t("problem.layout.count")}: ${data.value}${isUserPosition ? `<br/><span style="color: hsl(var(--chart-series-1));">${t("problem.layout.userPosition")}</span>` : ""}`;
       },
     },
     grid: {
@@ -502,13 +505,19 @@ const handleWriteSolution = () => {
           v-if="!isCompileError && !isPending"
           class="text-xs font-normal text-muted-foreground"
         >
-          <span v-if="isAccepted"> All test cases passed </span>
+          <span v-if="isAccepted">
+            {{ t("problem.submissions.allTestsPassed") }}
+          </span>
           <span v-else>
             {{
-              props.submission?.tests?.filter((t) => t.status === "Accepted")
-                .length ?? 0
+              t("problem.submissions.testsPassed", {
+                count:
+                  props.submission?.tests?.filter(
+                    (t) => t.status === "Accepted",
+                  ).length ?? 0,
+                total: props.submission?.tests?.length ?? 0,
+              })
             }}
-            / {{ props.submission?.tests?.length ?? 0 }} test cases passed
           </span>
         </div>
 
@@ -526,7 +535,9 @@ const handleWriteSolution = () => {
             <span class="font-medium text-foreground">{{
               props.submission.user?.username || "User"
             }}</span>
-            <span class="text-muted-foreground/60">submitted at</span>
+            <span class="text-muted-foreground/60">{{
+              t("problem.submissions.submittedAt")
+            }}</span>
             <span>{{
               new Date(
                 props.submission.submittedAt ?? props.submission.created_at,
@@ -544,7 +555,7 @@ const handleWriteSolution = () => {
           class="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
           @click="handleWriteSolution"
         >
-          Write Solution
+          {{ t("problem.solutions.writeSolution") }}
         </Button>
       </div>
     </div>
@@ -554,7 +565,9 @@ const handleWriteSolution = () => {
       v-if="showVerdictMeta"
       class="rounded-md border border-border bg-muted/40 px-4 py-3 text-xs"
     >
-      <div class="text-xs font-medium text-muted-foreground">Verdict info</div>
+      <div class="text-xs font-medium text-muted-foreground">
+        {{ t("problem.submissions.verdictInfo") }}
+      </div>
       <div v-if="statusMeta?.description" class="mt-2 text-sm text-foreground">
         {{ statusMeta.description }}
       </div>
@@ -568,7 +581,7 @@ const handleWriteSolution = () => {
         v-if="statusMeta?.suggestion"
         class="mt-2 text-xs text-muted-foreground"
       >
-        Suggestion: {{ statusMeta.suggestion }}
+        {{ t("problem.submissions.suggestion") }}: {{ statusMeta.suggestion }}
       </div>
     </div>
 
@@ -578,12 +591,13 @@ const handleWriteSolution = () => {
       class="rounded-md bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 p-4"
     >
       <h3 class="font-medium text-red-700 dark:text-red-400 text-sm mb-2">
-        Compile Error
+        {{ t("problem.submissions.compileError") }}
       </h3>
       <pre
         class="whitespace-pre-wrap text-sm font-mono text-red-600 dark:text-red-300 bg-transparent p-0"
         >{{
-          props.submission.compiler_error || "No error message available."
+          props.submission.compiler_error ||
+          t("problem.submissions.noErrorMessage")
         }}</pre
       >
     </div>
@@ -591,7 +605,9 @@ const handleWriteSolution = () => {
     <!-- 2. Failure details -->
     <div v-else-if="showCaseDetails" class="space-y-4">
       <div v-if="props.submission.input" class="space-y-1.5">
-        <div class="text-xs font-medium text-muted-foreground">Input</div>
+        <div class="text-xs font-medium text-muted-foreground">
+          {{ t("problem.layout.input") }}
+        </div>
         <div
           class="rounded-md bg-muted px-3 py-2 text-sm font-mono text-foreground"
         >
@@ -600,7 +616,9 @@ const handleWriteSolution = () => {
       </div>
 
       <div v-if="props.submission.output" class="space-y-1.5">
-        <div class="text-xs font-medium text-muted-foreground">Output</div>
+        <div class="text-xs font-medium text-muted-foreground">
+          {{ t("problem.layout.output") }}
+        </div>
         <div
           class="rounded-md bg-muted px-3 py-2 text-sm font-mono text-foreground"
         >
@@ -609,7 +627,9 @@ const handleWriteSolution = () => {
       </div>
 
       <div v-if="props.submission.expected_output" class="space-y-1.5">
-        <div class="text-xs font-medium text-muted-foreground">Expected</div>
+        <div class="text-xs font-medium text-muted-foreground">
+          {{ t("problem.layout.expected") }}
+        </div>
         <div
           class="rounded-md bg-muted px-3 py-2 text-sm font-mono text-foreground"
         >
@@ -635,7 +655,9 @@ const handleWriteSolution = () => {
               <div class="flex justify-between gap-1.5">
                 <div class="flex items-center gap-1 text-foreground">
                   <Clock class="h-3 w-3" />
-                  <div class="flex-1 text-xs">Runtime Distribution</div>
+                  <div class="flex-1 text-xs">
+                    {{ t("problem.submissions.runtimeDistribution") }}
+                  </div>
                 </div>
               </div>
               <div class="mt-1.5 flex items-center gap-1">
@@ -644,8 +666,13 @@ const handleWriteSolution = () => {
                   ms
                 </span>
                 <span class="text-muted-foreground">
-                  Beats
-                  {{ (props.submission?.runtimePercentile ?? 0).toFixed(1) }}%
+                  {{
+                    t("problem.layout.beats", {
+                      percent: (
+                        props.submission?.runtimePercentile ?? 0
+                      ).toFixed(1),
+                    })
+                  }}
                 </span>
               </div>
             </div>
@@ -659,7 +686,9 @@ const handleWriteSolution = () => {
               <div class="flex justify-between gap-1.5">
                 <div class="flex items-center gap-1 text-foreground">
                   <Microchip class="h-3 w-3" />
-                  <div class="flex-1 text-xs">Memory Distribution</div>
+                  <div class="flex-1 text-xs">
+                    {{ t("problem.submissions.memoryDistribution") }}
+                  </div>
                 </div>
               </div>
               <div class="mt-1.5 flex items-center gap-1">
@@ -667,8 +696,13 @@ const handleWriteSolution = () => {
                   {{ props.submission?.memory.toString().replace("MB", "") }} MB
                 </span>
                 <span class="text-muted-foreground">
-                  Beats
-                  {{ (props.submission?.memoryPercentile ?? 0).toFixed(1) }}%
+                  {{
+                    t("problem.layout.beats", {
+                      percent: (
+                        props.submission?.memoryPercentile ?? 0
+                      ).toFixed(1),
+                    })
+                  }}
                 </span>
               </div>
             </div>
@@ -689,12 +723,14 @@ const handleWriteSolution = () => {
       v-else-if="!showVerdictMeta"
       class="rounded-md border border-dashed border-border bg-muted/30 px-4 py-3 text-xs text-muted-foreground"
     >
-      Details are not available yet.
+      {{ t("problem.submissions.detailsNotAvailable") }}
     </div>
 
     <!-- Code Section -->
     <div class="space-y-2 mt-2">
-      <div class="text-xs font-medium text-muted-foreground">Code</div>
+      <div class="text-xs font-medium text-muted-foreground">
+        {{ t("problem.submissions.code") }}
+      </div>
       <MarkdownView
         :content="codeMarkdown"
         editor-id="submission-code-preview"

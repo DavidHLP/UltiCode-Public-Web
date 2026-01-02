@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import {
   Tooltip,
   TooltipContent,
@@ -11,6 +12,8 @@ import {
 const props = defineProps<{
   data?: { date: string; level: number }[];
 }>();
+
+const { t } = useI18n();
 
 const activityData = computed(() => {
   if (props.data && props.data.length > 0) {
@@ -66,20 +69,20 @@ const getColorClass = (level: number) => {
   }
 };
 
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+const months = computed(() => [
+  t("common.months.jan"),
+  t("common.months.feb"),
+  t("common.months.mar"),
+  t("common.months.apr"),
+  t("common.months.may"),
+  t("common.months.jun"),
+  t("common.months.jul"),
+  t("common.months.aug"),
+  t("common.months.sep"),
+  t("common.months.oct"),
+  t("common.months.nov"),
+  t("common.months.dec"),
+]);
 </script>
 
 <template>
@@ -109,7 +112,8 @@ const months = [
               </TooltipTrigger>
               <TooltipContent>
                 <p>
-                  {{ day.level === 0 ? "No" : day.level }} contributions on
+                  {{ day.level === 0 ? t("common.labels.none") : day.level }}
+                  {{ t("personal.profile.contributions") }} on
                   {{ day.date }}
                 </p>
               </TooltipContent>
@@ -119,7 +123,7 @@ const months = [
       </div>
 
       <div class="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Less</span>
+        <span>{{ t("common.labels.less") }}</span>
         <div class="flex gap-[2px]">
           <div class="h-3 w-3 rounded-[2px] bg-secondary/60"></div>
           <div
@@ -135,7 +139,7 @@ const months = [
             class="h-3 w-3 rounded-[2px] bg-emerald-700 dark:bg-emerald-400"
           ></div>
         </div>
-        <span>More</span>
+        <span>{{ t("common.labels.more") }}</span>
       </div>
     </div>
   </div>

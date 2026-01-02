@@ -40,6 +40,7 @@ import CreateFolderDialog from "@/components/bookmark/CreateFolderDialog.vue";
 import { useBookmarkStore } from "@/stores/bookmark";
 import { fetchFolder, removeBookmark } from "@/api/bookmark";
 import { BookmarkType } from "@/api/bookmark";
+import { useI18n } from "vue-i18n";
 import type {
   BookmarkFolder,
   BookmarkFolderWithItems,
@@ -72,6 +73,7 @@ interface ForumMetadata {
 }
 
 const store = useBookmarkStore();
+const { t } = useI18n();
 
 const selectedFolderId = ref<string | null>(null);
 const selectedFolderDetails = ref<BookmarkFolderWithItems | null>(null);
@@ -107,7 +109,7 @@ async function loadFolderDetails(id: string) {
     selectedFolderDetails.value = await fetchFolder(id);
   } catch (error) {
     console.error("Failed to load folder details:", error);
-    toast.error("Failed to load folder");
+    toast.error(t("personal.messages.loadFailed"));
   } finally {
     isLoadingDetails.value = false;
   }
@@ -147,24 +149,24 @@ function handleDeleteFolder(folder: BookmarkFolder) {
 async function handleCreateFolder(data: CreateFolderInput) {
   try {
     const newFolder = await store.createFolder(data);
-    toast.success("Folder created");
+    toast.success(t("personal.messages.folderCreated"));
     handleSelectFolder(newFolder);
   } catch (error) {
     console.error("Failed to create folder:", error);
-    toast.error("Failed to create folder");
+    toast.error(t("personal.messages.saveFailed"));
   }
 }
 
 async function handleUpdateFolder(id: string, data: UpdateFolderInput) {
   try {
     await store.updateFolder(id, data);
-    toast.success("Folder updated");
+    toast.success(t("personal.messages.profileUpdated"));
     if (selectedFolderId.value === id) {
       loadFolderDetails(id);
     }
   } catch (error) {
     console.error("Failed to update folder:", error);
-    toast.error("Failed to update folder");
+    toast.error(t("personal.messages.saveFailed"));
   }
 }
 
@@ -173,14 +175,14 @@ async function confirmDelete() {
 
   try {
     await store.removeFolder(deletingFolder.value.id);
-    toast.success("Folder deleted");
+    toast.success(t("personal.messages.folderDeleted"));
     if (selectedFolderId.value === deletingFolder.value.id) {
       selectedFolderId.value = null;
       selectedFolderDetails.value = null;
     }
   } catch (error) {
     console.error("Failed to delete folder:", error);
-    toast.error("Failed to delete folder");
+    toast.error(t("personal.messages.saveFailed"));
   } finally {
     showDeleteDialog.value = false;
     deletingFolder.value = null;
@@ -191,14 +193,14 @@ async function handleRemoveItem(bookmarkId: string) {
   if (!selectedFolderId.value) return;
   try {
     await removeBookmark(selectedFolderId.value, bookmarkId);
-    toast.success("Removed from collection");
+    toast.success(t("personal.messages.bookmarkRemoved"));
     // Refresh
     loadFolderDetails(selectedFolderId.value);
     // Optionally refresh folder list count
     store.loadFolders();
   } catch (error) {
     console.error("Failed to remove item", error);
-    toast.error("Failed to remove item");
+    toast.error(t("personal.messages.saveFailed"));
   }
 }
 
@@ -264,8 +266,8 @@ onMounted(() => {
 <template>
   <PersonalPageShell>
     <PersonalPageHeader
-      title="Collections"
-      description="Organize your saved problems, solutions, and forum discussions."
+      :title="t('personal.bookmarks.title')"
+      :description="t('personal.bookmarks.subtitle')"
     >
       <template #actions>
         <Button
@@ -273,7 +275,7 @@ onMounted(() => {
           class="rounded-full gap-2 shadow-sm"
         >
           <Plus class="h-4 w-4" />
-          New Collection
+          {{ t("personal.bookmarks.newCollection") }}
         </Button>
       </template>
     </PersonalPageHeader>
@@ -286,7 +288,7 @@ onMounted(() => {
         <CardHeader class="pb-3 px-4">
           <CardTitle
             class="text-sm font-semibold uppercase tracking-widest text-muted-foreground/70"
-            >My Folders</CardTitle
+            >{{ t("personal.bookmarks.folders") }}</CardTitle
           >
         </CardHeader>
         <CardContent class="px-2 pb-4">
@@ -327,7 +329,7 @@ onMounted(() => {
               />
               <Input
                 v-model="searchQuery"
-                placeholder="Search items..."
+                :placeholder="t('personal.bookmarks.searchPlaceholder')"
                 class="pl-10 rounded-full h-10 border-muted-foreground/20 focus:ring-primary/20"
               />
             </div>
@@ -340,7 +342,9 @@ onMounted(() => {
                 class="flex flex-col items-center justify-center py-20 gap-4"
               >
                 <Loader2 class="h-10 w-10 animate-spin text-primary" />
-                <p class="text-sm text-muted-foreground">Loading items...</p>
+                <p class="text-sm text-muted-foreground">
+                  {{ t("personal.bookmarks.loadingItems") }}
+                </p>
               </div>
 
               <div v-else-if="!selectedFolderDetails" class="py-24 text-center">
@@ -350,7 +354,7 @@ onMounted(() => {
                   <FolderOpen class="h-8 w-8 text-muted-foreground/50" />
                 </div>
                 <p class="text-muted-foreground">
-                  Select a collection to view its contents
+                  {{ t("personal.bookmarks.noCollectionSelected") }}
                 </p>
               </div>
 
@@ -363,10 +367,11 @@ onMounted(() => {
                 >
                   <FileText class="h-8 w-8 text-muted-foreground/50" />
                 </div>
-                <h4 class="text-lg font-bold">This collection is empty</h4>
+                <h4 class="text-lg font-bold">
+                  {{ t("personal.bookmarks.emptyCollection") }}
+                </h4>
                 <p class="text-sm text-muted-foreground mt-1 max-w-[280px]">
-                  Browse the platform and save interesting problems or
-                  discussions here.
+                  {{ t("personal.bookmarks.emptyCollectionDesc") }}
                 </p>
               </div>
 
@@ -456,7 +461,8 @@ onMounted(() => {
                         <DropdownMenuContent align="end" class="w-48">
                           <DropdownMenuItem as-child class="gap-2">
                             <RouterLink :to="getItemUrl(item)">
-                              <ExternalLink class="h-4 w-4" /> Open Item
+                              <ExternalLink class="h-4 w-4" />
+                              {{ t("personal.bookmarks.actions.openItem") }}
                             </RouterLink>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -464,7 +470,12 @@ onMounted(() => {
                             class="text-destructive focus:text-destructive gap-2"
                             @click="handleRemoveItem(item.id)"
                           >
-                            <Trash2 class="h-4 w-4" /> Remove from Collection
+                            <Trash2 class="h-4 w-4" />
+                            {{
+                              t(
+                                "personal.bookmarks.actions.removeFromCollection",
+                              )
+                            }}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -486,7 +497,7 @@ onMounted(() => {
                   class="py-20 text-center"
                 >
                   <p class="text-muted-foreground">
-                    No items match your search.
+                    {{ t("personal.bookmarks.noResults") }}
                   </p>
                 </div>
               </div>
@@ -499,9 +510,11 @@ onMounted(() => {
           class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 rounded-2xl bg-muted/5 text-center px-6"
         >
           <FolderOpen class="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <h3 class="text-xl font-bold">No collection selected</h3>
+          <h3 class="text-xl font-bold">
+            {{ t("personal.bookmarks.noCollectionSelected") }}
+          </h3>
           <p class="text-muted-foreground mt-2">
-            Choose a collection from the sidebar to view your bookmarks.
+            {{ t("personal.bookmarks.noCollectionSelectedDesc") }}
           </p>
         </div>
       </div>
@@ -523,13 +536,15 @@ onMounted(() => {
     >
       <AlertDialogContent class="rounded-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Collection</AlertDialogTitle>
+          <AlertDialogTitle>{{
+            t("personal.bookmarks.dialogs.deleteTitle")
+          }}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete
-            <span class="font-bold text-foreground"
-              >"{{ deletingFolder?.name }}"</span
-            >? This action cannot be undone and all bookmarks inside will be
-            lost.
+            {{
+              t("personal.bookmarks.dialogs.deleteConfirm", {
+                name: deletingFolder?.name,
+              })
+            }}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -537,13 +552,13 @@ onMounted(() => {
             @click="showDeleteDialog = false"
             class="rounded-full"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </AlertDialogCancel>
           <AlertDialogAction
             class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full"
             @click="confirmDelete"
           >
-            Delete Permanently
+            {{ t("common.actions.delete") }}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

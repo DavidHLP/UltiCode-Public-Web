@@ -20,10 +20,10 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Trophy,
+  Users,
   Calendar,
   Clock,
-  Users,
-  Trophy,
   PlayCircle,
   ChevronRight,
   TrendingUp,
@@ -33,9 +33,11 @@ import {
   ArrowLeft,
   Lock,
 } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const contestStore = useContestStore();
+const { t } = useI18n();
 const contestId = route.params.contestId as string;
 
 const contest = computed(() => contestStore.currentContest);
@@ -44,7 +46,7 @@ const loading = computed(() => contestStore.loading);
 const registering = ref(false);
 const startingVirtual = ref(false);
 const statusCountdown = ref("00:00:00");
-const statusLabel = ref("Starts In");
+const statusLabel = ref(t("contest.time.startsIn"));
 const statusHint = ref("");
 const statusProgress = ref(0);
 let statusIntervalId: number | null = null;
@@ -126,7 +128,9 @@ async function handleRegister() {
     await contestStore.registerForContest(contestId);
   } catch (error: unknown) {
     console.error("Registration failed:", error);
-    toast.error(getErrorMessage(error, "Failed to register for contest"));
+    toast.error(
+      getErrorMessage(error, t("contest.messages.registrationFailed")),
+    );
   } finally {
     registering.value = false;
   }
@@ -138,7 +142,9 @@ async function handleUnregister() {
     await contestStore.unregisterFromContest(contestId);
   } catch (error: unknown) {
     console.error("Unregister failed:", error);
-    toast.error(getErrorMessage(error, "Failed to unregister from contest"));
+    toast.error(
+      getErrorMessage(error, t("contest.detail.unregistrationFailed")),
+    );
   } finally {
     registering.value = false;
   }
@@ -153,7 +159,7 @@ async function handleStartVirtual() {
     await contestStore.loadParticipationStatus(contestId);
   } catch (error: unknown) {
     console.error("Failed to start virtual contest:", error);
-    toast.error(getErrorMessage(error, "Failed to start virtual contest"));
+    toast.error(getErrorMessage(error, t("contest.detail.startVirtualFailed")));
   } finally {
     startingVirtual.value = false;
   }
@@ -181,7 +187,7 @@ function formatCountdown(totalSeconds: number): string {
   const secs = seconds % 60;
 
   if (days > 0) {
-    return `${days}d ${hours}h ${minutes}m`;
+    return `${days}${t("contest.time.days")} ${hours}${t("contest.time.hours")} ${minutes}${t("contest.time.minutes")}`;
   }
   return `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
@@ -228,11 +234,11 @@ function updateStatusTimer() {
 
   if (value.status === "upcoming") {
     const remaining = Math.max(0, Math.floor((startMs - now) / 1000));
-    statusLabel.value = "Starts In";
+    statusLabel.value = t("contest.time.startsIn");
     statusCountdown.value = formatCountdown(remaining);
     statusHint.value = isRegistered.value
-      ? "You are registered"
-      : "Registration is open";
+      ? t("contest.detail.youAreRegistered")
+      : t("contest.detail.registrationOpen");
     statusProgress.value = 0;
     return;
   }
@@ -241,16 +247,16 @@ function updateStatusTimer() {
     const remaining = Math.max(0, Math.floor(((endMs ?? now) - now) / 1000));
     const total = Math.max(1, Math.floor(((endMs ?? now) - startMs) / 1000));
     const elapsed = Math.min(total, Math.max(0, total - remaining));
-    statusLabel.value = "Time Remaining";
+    statusLabel.value = t("contest.virtual.timeRemaining");
     statusCountdown.value = formatCountdown(remaining);
-    statusHint.value = "Submissions are live";
+    statusHint.value = t("contest.detail.submissionsLive");
     statusProgress.value = Math.min(100, Math.max(0, (elapsed / total) * 100));
     return;
   }
 
-  statusLabel.value = "Contest Ended";
-  statusCountdown.value = "Results Published";
-  statusHint.value = "Replay with virtual contest";
+  statusLabel.value = t("contest.detail.ended");
+  statusCountdown.value = t("contest.detail.resultsPublished");
+  statusHint.value = t("contest.detail.replayHint");
   statusProgress.value = 100;
 }
 
@@ -315,7 +321,9 @@ function getCountryFlag(countryCode: string): string {
       <div
         class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
       ></div>
-      <p class="ml-4 text-sm text-muted-foreground">Loading contest...</p>
+      <p class="ml-4 text-sm text-muted-foreground">
+        {{ t("contest.detail.loading") }}
+      </p>
     </div>
 
     <div v-else-if="contest" class="space-y-8">
@@ -328,7 +336,7 @@ function getCountryFlag(countryCode: string): string {
           @click="$router.push({ name: 'contest-home' })"
         >
           <ArrowLeft class="h-4 w-4" />
-          Back to Contest List
+          {{ t("contest.detail.backToList") }}
         </Button>
 
         <div
@@ -351,10 +359,10 @@ function getCountryFlag(countryCode: string): string {
               >
                 {{
                   contest.status === "upcoming"
-                    ? "Upcoming"
+                    ? t("contest.status.upcoming")
                     : contest.status === "running"
-                      ? "Live"
-                      : "Ended"
+                      ? t("contest.list.liveBadge")
+                      : t("contest.status.finished")
                 }}
               </Badge>
             </div>
@@ -375,7 +383,11 @@ function getCountryFlag(countryCode: string): string {
               @click="handleRegister"
             >
               <Users class="h-5 w-5" />
-              {{ registering ? "Registering..." : "Register Now" }}
+              {{
+                registering
+                  ? t("contest.detail.registering")
+                  : t("contest.detail.register")
+              }}
             </Button>
             <Button
               v-else-if="isRegistered && contest.status === 'upcoming'"
@@ -386,7 +398,11 @@ function getCountryFlag(countryCode: string): string {
               @click="handleUnregister"
             >
               <Users class="h-5 w-5" />
-              {{ registering ? "Unregistering..." : "Unregister" }}
+              {{
+                registering
+                  ? t("contest.detail.unregistering")
+                  : t("contest.detail.unregister")
+              }}
             </Button>
             <template v-else-if="contest.status === 'running'">
               <Button
@@ -395,7 +411,7 @@ function getCountryFlag(countryCode: string): string {
                 @click="scrollToSection('contest-problems')"
               >
                 <PlayCircle class="h-5 w-5" />
-                Enter Contest
+                {{ t("contest.detail.enterContest") }}
               </Button>
               <Button
                 size="lg"
@@ -404,7 +420,7 @@ function getCountryFlag(countryCode: string): string {
                 @click="scrollToSection('contest-ranking')"
               >
                 <Trophy class="h-5 w-5" />
-                Live Ranking
+                {{ t("contest.detail.liveRanking") }}
               </Button>
             </template>
             <template v-if="contest.status === 'finished'">
@@ -419,7 +435,11 @@ function getCountryFlag(countryCode: string): string {
                 @click="handleStartVirtual"
               >
                 <PlayCircle class="h-5 w-5" />
-                {{ startingVirtual ? "Starting..." : "Start Virtual Contest" }}
+                {{
+                  startingVirtual
+                    ? t("contest.detail.starting")
+                    : t("contest.virtual.start")
+                }}
               </Button>
               <Button
                 v-else
@@ -429,7 +449,7 @@ function getCountryFlag(countryCode: string): string {
                 disabled
               >
                 <PlayCircle class="h-5 w-5" />
-                Virtual Contest Active
+                {{ t("contest.virtual.active") }}
               </Button>
             </template>
           </div>
@@ -448,7 +468,7 @@ function getCountryFlag(countryCode: string): string {
               <p
                 class="text-[10px] font-black uppercase tracking-[0.2em] text-white/70"
               >
-                Contest Status
+                {{ t("contest.detail.contestStatus") }}
               </p>
               <div class="flex items-center gap-3">
                 <span
@@ -460,10 +480,10 @@ function getCountryFlag(countryCode: string): string {
                   ></span>
                   {{
                     contest.status === "running"
-                      ? "Live"
+                      ? t("contest.list.liveBadge")
                       : contest.status === "upcoming"
-                        ? "Upcoming"
-                        : "Ended"
+                        ? t("contest.status.upcoming")
+                        : t("contest.status.finished")
                   }}
                 </span>
                 <span v-if="statusHint" class="text-xs text-white/80">{{
@@ -478,10 +498,10 @@ function getCountryFlag(countryCode: string): string {
               <p class="text-xs uppercase tracking-widest text-white/70">
                 {{
                   contest.status === "running"
-                    ? "Time Remaining"
+                    ? t("contest.virtual.timeRemaining")
                     : contest.status === "upcoming"
-                      ? "Starts In"
-                      : "Status"
+                      ? t("contest.time.startsIn")
+                      : t("contest.detail.status")
                 }}
               </p>
               <p
@@ -490,7 +510,11 @@ function getCountryFlag(countryCode: string): string {
                 {{ statusCountdown }}
               </p>
               <p v-if="contestEndTime" class="text-xs text-white/70">
-                {{ contest.status === "finished" ? "Ended at" : "Ends at" }}
+                {{
+                  contest.status === "finished"
+                    ? t("contest.detail.endedAt")
+                    : t("contest.detail.endsAt")
+                }}
                 {{ formatDateTime(contestEndTime) }}
               </p>
             </div>
@@ -517,7 +541,7 @@ function getCountryFlag(countryCode: string): string {
             <span class="flex items-center gap-2">
               <Users class="h-4 w-4" />
               {{ contest.participant_count || contest.participantCount || 0 }}
-              competitors
+              {{ t("contest.detail.participants") }}
             </span>
           </div>
         </CardContent>
@@ -546,7 +570,7 @@ function getCountryFlag(countryCode: string): string {
                 <p
                   class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
                 >
-                  Start Time
+                  {{ t("contest.detail.startTime") }}
                 </p>
                 <p class="text-sm font-bold truncate">
                   {{ formatDateTime(contest.start_time) }}
@@ -563,11 +587,11 @@ function getCountryFlag(countryCode: string): string {
                 <p
                   class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
                 >
-                  Duration
+                  {{ t("contest.detail.duration") }}
                 </p>
                 <p class="text-sm font-bold truncate">
                   {{ contest.duration_minutes || contest.durationMinutes || 0 }}
-                  Minutes
+                  {{ t("contest.time.min_short") }}
                 </p>
               </div>
             </div>
@@ -581,7 +605,7 @@ function getCountryFlag(countryCode: string): string {
                 <p
                   class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
                 >
-                  Participants
+                  {{ t("contest.detail.participants") }}
                 </p>
                 <p class="text-sm font-bold truncate">
                   {{
@@ -600,11 +624,13 @@ function getCountryFlag(countryCode: string): string {
                 <p
                   class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
                 >
-                  Contest Type
+                  {{ t("contest.types.title") }}
                 </p>
                 <p class="text-sm font-bold truncate">
                   {{
-                    (contest.isRated ?? contest.is_rated) ? "Rated" : "Unrated"
+                    (contest.isRated ?? contest.is_rated)
+                      ? t("contest.list.rated")
+                      : t("contest.types.unrated")
                   }}
                 </p>
               </div>
@@ -620,7 +646,7 @@ function getCountryFlag(countryCode: string): string {
         <CardHeader class="pb-3 border-b bg-muted/20">
           <CardTitle
             class="text-lg font-black uppercase tracking-widest text-muted-foreground"
-            >Rules & Notes</CardTitle
+            >{{ t("contest.detail.rules") }}</CardTitle
           >
         </CardHeader>
         <CardContent class="p-6">
@@ -640,13 +666,13 @@ function getCountryFlag(countryCode: string): string {
               value="problems"
               class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              Problems
+              {{ t("contest.detail.problems") }}
             </TabsTrigger>
             <TabsTrigger
               value="ranking"
               class="rounded-full px-8 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
-              Ranking
+              {{ t("contest.detail.ranking") }}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -660,7 +686,7 @@ function getCountryFlag(countryCode: string): string {
             <CardHeader class="pb-3 border-b bg-muted/20">
               <CardTitle
                 class="text-lg font-black uppercase tracking-widest text-muted-foreground"
-                >Contest Challenges</CardTitle
+                >{{ t("contest.detail.challenges") }}</CardTitle
               >
             </CardHeader>
             <CardContent class="p-0">
@@ -674,10 +700,11 @@ function getCountryFlag(countryCode: string): string {
                   <Lock class="h-7 w-7" />
                 </div>
                 <div class="space-y-2">
-                  <h3 class="text-lg font-black">Problems Locked</h3>
+                  <h3 class="text-lg font-black">
+                    {{ t("contest.detail.problemsLocked") }}
+                  </h3>
                   <p class="text-sm text-muted-foreground max-w-sm">
-                    Challenges unlock when the contest begins. Register now so
-                    you're ready at the start time.
+                    {{ t("contest.detail.problemsUnlockHint") }}
                   </p>
                 </div>
                 <Button
@@ -687,21 +714,25 @@ function getCountryFlag(countryCode: string): string {
                   :disabled="registering"
                   @click="handleRegister"
                 >
-                  Register for Contest
+                  {{ t("contest.detail.register") }}
                 </Button>
               </div>
               <Table v-else>
                 <TableHeader class="bg-muted/50">
                   <TableRow>
                     <TableHead class="w-20 pl-6 font-bold">#</TableHead>
-                    <TableHead class="font-bold">Title</TableHead>
-                    <TableHead class="w-32 font-bold">Difficulty</TableHead>
-                    <TableHead class="w-24 text-center font-bold"
-                      >Score</TableHead
-                    >
-                    <TableHead class="w-32 text-center font-bold"
-                      >Acceptance</TableHead
-                    >
+                    <TableHead class="font-bold">{{
+                      t("contest.detail.problemHeaders.title")
+                    }}</TableHead>
+                    <TableHead class="w-32 font-bold">{{
+                      t("contest.detail.problemHeaders.difficulty")
+                    }}</TableHead>
+                    <TableHead class="w-24 text-center font-bold">{{
+                      t("contest.detail.problemHeaders.score")
+                    }}</TableHead>
+                    <TableHead class="w-32 text-center font-bold">{{
+                      t("contest.detail.problemHeaders.acceptance")
+                    }}</TableHead>
                     <TableHead class="w-20 pr-6"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -734,13 +765,12 @@ function getCountryFlag(countryCode: string): string {
                         >
                           <span class="flex items-center gap-1">
                             <Target class="h-3 w-3" />
-                            {{ problem.solvedCount || 0 }} Solved
+                            {{ problem.solvedCount || 0 }}
+                            {{ t("problem.status.solved") }}
                           </span>
                           <span
-                            >{{
-                              problem.submissionCount || 0
-                            }}
-                            Submissions</span
+                            >{{ problem.submissionCount || 0 }}
+                            {{ t("problem.detail.submissions") }}</span
                           >
                         </div>
                       </div>
@@ -753,7 +783,11 @@ function getCountryFlag(countryCode: string): string {
                           'font-black text-[10px] uppercase h-5 px-2 rounded-sm border-current/20 bg-current/5',
                         ]"
                       >
-                        {{ problem.difficulty }}
+                        {{
+                          t(
+                            `problem.difficulty.${(problem.difficulty || "medium").toLowerCase()}`,
+                          )
+                        }}
                       </Badge>
                     </TableCell>
                     <TableCell class="text-center">
@@ -802,31 +836,37 @@ function getCountryFlag(countryCode: string): string {
             >
               <CardTitle
                 class="text-lg font-black uppercase tracking-widest text-muted-foreground"
-                >Leaderboard</CardTitle
+                >{{ t("contest.detail.leaderboard") }}</CardTitle
               >
               <Button
                 variant="outline"
                 size="sm"
                 class="rounded-full h-8 font-bold text-[10px]"
-                >VIEW ALL</Button
+                >{{ t("contest.detail.viewAll") }}</Button
               >
             </CardHeader>
             <CardContent class="p-0">
               <Table>
                 <TableHeader class="bg-muted/50">
                   <TableRow>
-                    <TableHead class="w-20 pl-6 font-bold">Rank</TableHead>
-                    <TableHead class="font-bold">User</TableHead>
-                    <TableHead class="w-24 text-center font-bold"
-                      >Score</TableHead
-                    >
-                    <TableHead class="w-32 text-center font-bold"
-                      >Time</TableHead
-                    >
-                    <TableHead class="w-48 font-bold">Problems</TableHead>
-                    <TableHead class="w-32 pr-6 text-right font-bold"
-                      >Rating</TableHead
-                    >
+                    <TableHead class="w-20 pl-6 font-bold">{{
+                      t("contest.detail.rankingHeaders.rank")
+                    }}</TableHead>
+                    <TableHead class="font-bold">{{
+                      t("contest.detail.rankingHeaders.user")
+                    }}</TableHead>
+                    <TableHead class="w-24 text-center font-bold">{{
+                      t("contest.detail.rankingHeaders.score")
+                    }}</TableHead>
+                    <TableHead class="w-32 text-center font-bold">{{
+                      t("contest.detail.rankingHeaders.time")
+                    }}</TableHead>
+                    <TableHead class="w-48 font-bold">{{
+                      t("contest.detail.rankingHeaders.problems")
+                    }}</TableHead>
+                    <TableHead class="w-32 pr-6 text-right font-bold">{{
+                      t("contest.detail.rankingHeaders.rating")
+                    }}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -946,16 +986,18 @@ function getCountryFlag(countryCode: string): string {
       class="flex flex-col items-center justify-center py-32 border-2 border-dashed rounded-3xl bg-muted/5 text-center px-6"
     >
       <Trophy class="h-16 w-16 text-muted-foreground/20 mb-4" />
-      <h3 class="text-2xl font-black tracking-tight">Contest Not Found</h3>
+      <h3 class="text-2xl font-black tracking-tight">
+        {{ t("contest.detail.notFound.title") }}
+      </h3>
       <p class="text-muted-foreground mt-2 max-w-[300px]">
-        The contest you are looking for might have been moved or removed.
+        {{ t("contest.detail.notFound.description") }}
       </p>
       <Button
         variant="outline"
         class="mt-8 rounded-full px-8 h-11 font-bold"
         @click="$router.push({ name: 'contest-home' })"
       >
-        Return to Contests
+        {{ t("contest.detail.notFound.return") }}
       </Button>
     </div>
   </div>

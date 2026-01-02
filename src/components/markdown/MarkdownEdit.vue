@@ -6,7 +6,7 @@
       v-if="!hideHeader"
       class="flex items-center border-b bg-muted/30 px-3 py-2 text-xs font-medium text-muted-foreground"
     >
-      Markdown Editor
+      {{ t("markdown.editor") }}
     </div>
     <div
       ref="editorRef"
@@ -22,6 +22,7 @@ import * as monaco from "monaco-editor";
 import loader from "@monaco-editor/loader";
 import { usePreferredDark } from "@vueuse/core";
 import { configureMonacoWorkers } from "@/utils/monaco-workers";
+import { useI18n } from "vue-i18n";
 
 // 确保 Worker 配置生效
 configureMonacoWorkers();
@@ -37,6 +38,8 @@ const props = withDefaults(defineProps<MarkdownEditProps>(), {
   readOnly: false,
   editorClass: "",
 });
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;

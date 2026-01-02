@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { renderMarkdown } from "@/utils/markdown";
 import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
 
 import type { MarkdownViewProps } from "./type";
 
 const props = defineProps<MarkdownViewProps>();
+const { t } = useI18n();
 
 const handleClick = (e: MouseEvent) => {
   const target = e.target as HTMLElement;
@@ -17,7 +19,7 @@ const handleClick = (e: MouseEvent) => {
       try {
         const decoded = decodeURIComponent(code);
         navigator.clipboard.writeText(decoded);
-        toast.success("Code copied to clipboard");
+        toast.success(t("common.messages.copiedToClipboard"));
       } catch (err) {
         console.error("Failed to copy", err);
       }

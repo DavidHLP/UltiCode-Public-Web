@@ -33,10 +33,12 @@ import { fetchProblems, fetchRandomProblem } from "@/api/problem";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 import type { ProblemExplorerProps } from "./type";
 
 const router = useRouter();
+const { t } = useI18n();
 
 const props = defineProps<ProblemExplorerProps>();
 
@@ -270,11 +272,11 @@ async function pickOne() {
     if (problem) {
       await router.push(`/problems/${problem.slug}`);
     } else {
-      toast.error("No problems available.");
+      toast.error(t("problem.explorer.noProblemsAvailable"));
     }
   } catch (error) {
     console.error("Failed to fetch random problem", error);
-    toast.error("Failed to pick a random problem.");
+    toast.error(t("problem.explorer.failedToPickRandom"));
   }
 }
 
@@ -311,7 +313,7 @@ function loadMore() {
           >
             <component :is="cat.icon" class="w-3 h-3" />
           </div>
-          {{ cat.name }}
+          {{ t("problem.categories." + cat.value) }}
         </button>
       </div>
 
@@ -326,7 +328,7 @@ function loadMore() {
           />
           <Input
             v-model="searchQuery"
-            placeholder="Search problems by title or ID..."
+            :placeholder="t('problem.list.searchPlaceholder')"
             class="pl-9 h-10 rounded-full"
           />
         </div>
@@ -340,7 +342,7 @@ function loadMore() {
                 class="h-10 gap-2 border-dashed rounded-full"
               >
                 <ListFilter class="h-4 w-4" />
-                Filters
+                {{ t("problem.explorer.filters") }}
                 <Badge
                   v-if="
                     selectedStatus.length +
@@ -360,7 +362,9 @@ function loadMore() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-56" align="end">
-              <DropdownMenuLabel>Status</DropdownMenuLabel>
+              <DropdownMenuLabel>{{
+                t("problem.explorer.status")
+              }}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 :checked="selectedStatus.includes('solved')"
@@ -369,7 +373,7 @@ function loadMore() {
                 "
               >
                 <span class="flex items-center w-full">
-                  Solved
+                  {{ t("problem.status.solved") }}
                   <CheckIcon
                     v-if="selectedStatus.includes('solved')"
                     class="ml-auto h-4 w-4"
@@ -384,7 +388,7 @@ function loadMore() {
                 "
               >
                 <span class="flex items-center w-full">
-                  Attempted
+                  {{ t("problem.status.attempted") }}
                   <CheckIcon
                     v-if="selectedStatus.includes('attempted')"
                     class="ml-auto h-4 w-4"
@@ -398,7 +402,7 @@ function loadMore() {
                 "
               >
                 <span class="flex items-center w-full">
-                  Todo
+                  {{ t("problem.status.todo") }}
                   <CheckIcon
                     v-if="selectedStatus.includes('todo')"
                     class="ml-auto h-4 w-4"
@@ -406,7 +410,9 @@ function loadMore() {
                 </span>
               </DropdownMenuCheckboxItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Difficulty</DropdownMenuLabel>
+              <DropdownMenuLabel>{{
+                t("problem.explorer.difficulty")
+              }}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 :checked="selectedDifficulty.includes('Easy')"
@@ -416,7 +422,7 @@ function loadMore() {
                 "
               >
                 <span class="flex items-center w-full">
-                  Easy
+                  {{ t("problem.difficulty.easy") }}
                   <CheckIcon
                     v-if="selectedDifficulty.includes('Easy')"
                     class="ml-auto h-4 w-4"
@@ -433,7 +439,7 @@ function loadMore() {
                 "
               >
                 <span class="flex items-center w-full">
-                  Medium
+                  {{ t("problem.difficulty.medium") }}
                   <CheckIcon
                     v-if="selectedDifficulty.includes('Medium')"
                     class="ml-auto h-4 w-4"
@@ -448,7 +454,7 @@ function loadMore() {
                 "
               >
                 <span class="flex items-center w-full">
-                  Hard
+                  {{ t("problem.difficulty.hard") }}
                   <CheckIcon
                     v-if="selectedDifficulty.includes('Hard')"
                     class="ml-auto h-4 w-4"
@@ -456,14 +462,16 @@ function loadMore() {
                 </span>
               </DropdownMenuCheckboxItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Premium</DropdownMenuLabel>
+              <DropdownMenuLabel>{{
+                t("problem.explorer.premium")
+              }}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 :checked="showPremium === false"
                 @click="() => togglePremiumFree(!(showPremium === false))"
               >
                 <span class="flex items-center w-full">
-                  Free
+                  {{ t("problem.explorer.free") }}
                   <CheckIcon
                     v-if="showPremium === false"
                     class="ml-auto h-4 w-4"
@@ -475,7 +483,7 @@ function loadMore() {
                 @click="() => togglePremiumPremium(!(showPremium === true))"
               >
                 <span class="flex items-center w-full">
-                  Premium
+                  {{ t("problem.explorer.premium") }}
                   <CheckIcon
                     v-if="showPremium === true"
                     class="ml-auto h-4 w-4"
@@ -486,7 +494,7 @@ function loadMore() {
           </DropdownMenu>
 
           <Button variant="outline" class="h-10 rounded-full" @click="pickOne">
-            Pick One
+            {{ t("problem.explorer.pickOne") }}
           </Button>
 
           <Button
@@ -501,7 +509,9 @@ function loadMore() {
             size="icon"
             class="h-10 w-10 rounded-full"
             @click="clearFilters"
-            aria-label="Clear filters"
+            :aria-label="
+              t('common.actions.clear') + ' ' + t('problem.explorer.filters')
+            "
           >
             <X class="h-4 w-4" />
           </Button>
@@ -530,7 +540,7 @@ function loadMore() {
               size="sm"
               class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground rounded-full"
             >
-              Show more tags
+              {{ t("problem.explorer.showMoreTags") }}
               <ChevronDown class="h-3 w-3" />
             </Button>
           </CollapsibleTrigger>

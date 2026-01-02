@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,23 +14,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const feedbackType = ref<string>("bug");
 const subject = ref("");
 const description = ref("");
 const isSubmitting = ref(false);
 
-const feedbackTypes = [
-  { value: "bug", label: "Bug Report" },
-  { value: "feature", label: "Feature Request" },
-  { value: "improvement", label: "Improvement Suggestion" },
-  { value: "content", label: "Content Issue" },
-  { value: "other", label: "Other" },
-];
+const feedbackTypes = computed(() => [
+  { value: "bug", label: t("forum.feedback.types.bug") },
+  { value: "feature", label: t("forum.feedback.types.feature") },
+  { value: "improvement", label: t("forum.feedback.types.improvement") },
+  { value: "content", label: t("forum.feedback.types.content") },
+  { value: "other", label: t("forum.feedback.types.other") },
+]);
 
 async function submitFeedback() {
   if (!subject.value.trim() || !description.value.trim()) {
-    toast.error("Please fill in all required fields.");
+    toast.error(t("forum.feedback.fillRequired"));
     return;
   }
 
@@ -40,14 +43,14 @@ async function submitFeedback() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    toast.success("Feedback submitted. Thank you!");
+    toast.success(t("forum.feedback.success"));
 
     // Reset form
     subject.value = "";
     description.value = "";
     feedbackType.value = "bug";
   } catch {
-    toast.error("Failed to submit feedback. Please try again.");
+    toast.error(t("forum.feedback.error"));
   } finally {
     isSubmitting.value = false;
   }
@@ -59,10 +62,11 @@ async function submitFeedback() {
     class="max-w-7xl mx-auto w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10 px-4 py-8"
   >
     <div class="space-y-2">
-      <h1 class="text-3xl font-bold tracking-tight">Feedback & Support</h1>
+      <h1 class="text-3xl font-bold tracking-tight">
+        {{ t("forum.feedback.title") }}
+      </h1>
       <p class="text-muted-foreground text-lg">
-        Help us improve UltiCode by sharing your feedback, reporting bugs, or
-        suggesting new features.
+        {{ t("forum.feedback.description") }}
       </p>
     </div>
 
@@ -71,15 +75,17 @@ async function submitFeedback() {
     <div class="grid gap-8 md:grid-cols-3">
       <Card class="md:col-span-2 border-none shadow-sm bg-muted/20">
         <CardHeader>
-          <CardTitle>Submit Feedback</CardTitle>
+          <CardTitle>{{ t("forum.feedback.submitTitle") }}</CardTitle>
         </CardHeader>
         <CardContent>
           <form @submit.prevent="submitFeedback" class="space-y-6">
             <div class="space-y-2">
-              <Label for="feedback-type">Feedback Type *</Label>
+              <Label for="feedback-type">{{ t("forum.feedback.type") }}</Label>
               <Select v-model="feedbackType">
                 <SelectTrigger id="feedback-type" class="bg-background">
-                  <SelectValue placeholder="Select feedback type" />
+                  <SelectValue
+                    :placeholder="t('forum.feedback.typePlaceholder')"
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem
@@ -94,28 +100,28 @@ async function submitFeedback() {
             </div>
 
             <div class="space-y-2">
-              <Label for="subject">Subject *</Label>
+              <Label for="subject">{{ t("forum.feedback.subject") }}</Label>
               <Input
                 id="subject"
                 v-model="subject"
-                placeholder="Brief description of your feedback"
+                :placeholder="t('forum.feedback.subjectPlaceholder')"
                 required
                 class="bg-background"
               />
             </div>
 
             <div class="space-y-2">
-              <Label for="description">Description *</Label>
+              <Label for="description">{{ t("forum.feedback.content") }}</Label>
               <Textarea
                 id="description"
                 v-model="description"
-                placeholder="Please provide as much detail as possible..."
+                :placeholder="t('forum.feedback.contentPlaceholder')"
                 rows="8"
                 required
                 class="bg-background resize-none"
               />
               <p class="text-xs text-muted-foreground">
-                For bug reports, please include steps to reproduce the issue.
+                {{ t("forum.feedback.bugHint") }}
               </p>
             </div>
 
@@ -124,8 +130,10 @@ async function submitFeedback() {
               :disabled="isSubmitting"
               class="w-full h-11 rounded-full text-base font-bold"
             >
-              <span v-if="isSubmitting">Submitting...</span>
-              <span v-else>Submit Feedback</span>
+              <span v-if="isSubmitting">{{
+                t("forum.feedback.submitting")
+              }}</span>
+              <span v-else>{{ t("forum.feedback.submitButton") }}</span>
             </Button>
           </form>
         </CardContent>
@@ -134,9 +142,9 @@ async function submitFeedback() {
       <div class="space-y-6">
         <Card class="border-none shadow-sm bg-muted/20">
           <CardHeader>
-            <CardTitle class="text-base font-black uppercase tracking-widest"
-              >Quick Links</CardTitle
-            >
+            <CardTitle class="text-base font-black uppercase tracking-widest">{{
+              t("forum.feedback.quickLinks")
+            }}</CardTitle>
           </CardHeader>
           <CardContent class="space-y-4 text-sm">
             <div class="group">
@@ -144,10 +152,10 @@ async function submitFeedback() {
                 to="/forum/guidelines"
                 class="text-primary hover:underline font-bold"
               >
-                Community Guidelines
+                {{ t("forum.feedback.communityGuidelines") }}
               </router-link>
               <p class="mt-1 text-xs text-muted-foreground">
-                Read our community rules
+                {{ t("forum.feedback.readRules") }}
               </p>
             </div>
             <div class="group">
@@ -155,10 +163,10 @@ async function submitFeedback() {
                 to="/forum"
                 class="text-primary hover:underline font-bold"
               >
-                Forum Home
+                {{ t("forum.feedback.forumHome") }}
               </router-link>
               <p class="mt-1 text-xs text-muted-foreground">
-                Back to discussions
+                {{ t("forum.feedback.backToDiscussions") }}
               </p>
             </div>
           </CardContent>
@@ -166,27 +174,33 @@ async function submitFeedback() {
 
         <Card class="border-none shadow-sm bg-muted/20">
           <CardHeader>
-            <CardTitle class="text-base font-black uppercase tracking-widest"
-              >Common Issues</CardTitle
-            >
+            <CardTitle class="text-base font-black uppercase tracking-widest">{{
+              t("forum.feedback.commonIssues")
+            }}</CardTitle>
           </CardHeader>
           <CardContent class="space-y-4 text-xs">
             <div>
-              <p class="font-bold text-foreground/80">Can't submit code?</p>
+              <p class="font-bold text-foreground/80">
+                {{ t("forum.feedback.issue1Title") }}
+              </p>
               <p class="text-muted-foreground leading-relaxed">
-                Check your code syntax and try refreshing the page.
+                {{ t("forum.feedback.issue1Desc") }}
               </p>
             </div>
             <div>
-              <p class="font-bold text-foreground/80">Login problems?</p>
+              <p class="font-bold text-foreground/80">
+                {{ t("forum.feedback.issue2Title") }}
+              </p>
               <p class="text-muted-foreground leading-relaxed">
-                Try clearing your browser cache or resetting your password.
+                {{ t("forum.feedback.issue2Desc") }}
               </p>
             </div>
             <div>
-              <p class="font-bold text-foreground/80">Missing features?</p>
+              <p class="font-bold text-foreground/80">
+                {{ t("forum.feedback.issue3Title") }}
+              </p>
               <p class="text-muted-foreground leading-relaxed">
-                Submit a feature request using the form!
+                {{ t("forum.feedback.issue3Desc") }}
               </p>
             </div>
           </CardContent>

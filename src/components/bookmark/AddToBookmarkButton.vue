@@ -19,6 +19,7 @@ import {
 import type { BookmarkType } from "@/types/bookmark";
 import { toast } from "vue-sonner";
 import { isAuthenticated } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   targetType: BookmarkType;
@@ -32,6 +33,7 @@ const emit = defineEmits<{
   "create-folder": [];
 }>();
 const store = useBookmarkStore();
+const { t } = useI18n();
 
 const itemFolders = ref<string[]>([]);
 const isLoading = ref(false);
@@ -71,7 +73,7 @@ async function loadData() {
 
 async function toggleFolder(folderId: string) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to manage bookmarks");
+    toast.error(t("bookmark.toasts.loginRequired"));
     return;
   }
 
@@ -94,7 +96,7 @@ async function toggleFolder(folderId: string) {
     emit("change", isBookmarked.value, itemFolders.value);
   } catch (error) {
     console.error("Failed to toggle bookmark:", error);
-    toast.error("Failed to update bookmark");
+    toast.error(t("bookmark.toasts.updateFailed"));
   }
 }
 
@@ -142,10 +144,10 @@ watch(
           <p
             class="text-xs font-bold text-muted-foreground uppercase tracking-widest"
           >
-            Please log in
+            {{ t("bookmark.pleaseLogIn") }}
           </p>
           <p class="text-[10px] text-muted-foreground mt-1">
-            Sign in to save items to collections
+            {{ t("bookmark.signInToSave") }}
           </p>
         </div>
       </template>
@@ -154,7 +156,7 @@ watch(
           <h4
             class="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70"
           >
-            Save to Collection
+            {{ t("bookmark.saveToCollection") }}
           </h4>
         </div>
 
@@ -177,10 +179,13 @@ watch(
           </div>
           <div class="flex flex-col min-w-0">
             <span class="text-sm font-bold truncate">{{
-              store.defaultFolder.name
+              store.defaultFolder.isDefault
+                ? t("bookmark.defaultFolder")
+                : store.defaultFolder.name
             }}</span>
             <span class="text-[10px] font-bold text-muted-foreground/60"
-              >{{ store.defaultFolder.itemCount }} items</span
+              >{{ store.defaultFolder.itemCount }}
+              {{ t("bookmark.items") }}</span
             >
           </div>
         </DropdownMenuCheckboxItem>
@@ -211,7 +216,7 @@ watch(
           <div class="flex flex-col min-w-0">
             <span class="text-sm font-bold truncate">{{ folder.name }}</span>
             <span class="text-[10px] font-bold text-muted-foreground/60"
-              >{{ folder.itemCount }} items</span
+              >{{ folder.itemCount }} {{ t("bookmark.items") }}</span
             >
           </div>
         </DropdownMenuCheckboxItem>
@@ -227,7 +232,9 @@ watch(
           >
             <FolderPlus class="h-4 w-4" />
           </div>
-          <span class="text-sm font-black">Create Folder</span>
+          <span class="text-sm font-black">{{
+            t("bookmark.createFolder")
+          }}</span>
         </DropdownMenuItem>
       </template>
     </DropdownMenuContent>

@@ -6,6 +6,7 @@ import SolutionDetail from "./components/SolutionDetail.vue";
 import { fetchSolutionFeed } from "@/api/solution";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { problemHooks } from "@/hooks/problem-hooks";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   problemId: number;
@@ -16,6 +17,7 @@ const emit = defineEmits<{
   select: [item: SolutionFeedItem];
 }>();
 
+const { t } = useI18n();
 const selectedSolution = ref<SolutionFeedItem | null>(null);
 const isLoading = ref(true);
 const feed = ref<Awaited<ReturnType<typeof fetchSolutionFeed>> | null>(null);
@@ -57,15 +59,15 @@ watch(
 const fallbackSolution = computed<SolutionFeedItem>(() => ({
   id: "follow-up",
   problem_id: props.problemId.toString(),
-  title: "Follow-up Insight",
+  title: t("problem.detail.hints"),
   summary: props.followUp,
-  highlight: "Follow-up discussion",
+  highlight: t("problem.detail.hints"),
   flair: "",
   badges: [],
   authorId: "author-fallback",
   author: {
     id: "author-fallback",
-    name: "Editorial",
+    name: t("personal.profile.displayName"),
     username: "editorial",
     role: "System Note",
     avatarColor: "#94a3b8",
@@ -85,7 +87,7 @@ const fallbackSolution = computed<SolutionFeedItem>(() => ({
   publishedAt: new Date().toISOString(),
   topic: {
     id: "general",
-    name: "General",
+    name: t("problem.categories.all"),
   },
   languageFilter: "all",
   language: "markdown",
@@ -121,7 +123,7 @@ const handleSolutionDeleted = (id: string) => {
         class="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition hover:text-foreground"
         @click="resetSelectedSolution"
       >
-        &larr; Return solution list
+        &larr; {{ t("problem.solutions.returnToList") }}
       </button>
       <SolutionDetail
         :item="selectedSolution"
@@ -139,7 +141,7 @@ const handleSolutionDeleted = (id: string) => {
   </div>
   <div v-else>
     <div v-if="isLoading" class="px-5 py-4 text-sm text-muted-foreground">
-      Loading solutions…
+      {{ t("problem.solutions.loading") }}
     </div>
     <SolutionDetail v-else :item="fallbackSolution" />
   </div>

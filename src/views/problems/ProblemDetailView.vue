@@ -48,7 +48,9 @@ import {
 } from "./problem-context";
 import { PanelComponentMapKey } from "@/features/layout/panels/panel-context";
 import { useProblemContext } from "./useProblemContext";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const isSidePanelOpen = ref(false);
 const toggleSidePanel = () => {
   isSidePanelOpen.value = !isSidePanelOpen.value;
@@ -96,7 +98,7 @@ const ConnectedDescriptionView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            t("common.status.loading"),
           );
   },
 });
@@ -117,7 +119,7 @@ const ConnectedSolutionsView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            t("common.status.loading"),
           );
   },
 });
@@ -135,7 +137,7 @@ const ConnectedSubmissionsView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            t("common.status.loading"),
           );
   },
 });
@@ -153,7 +155,7 @@ const ConnectedCodeView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            t("common.status.loading"),
           );
   },
 });
@@ -171,7 +173,7 @@ const ConnectedTestCaseView = defineComponent({
         : h(
             "div",
             { class: "flex items-center justify-center h-full" },
-            "Loading...",
+            t("common.status.loading"),
           );
   },
 });
@@ -210,12 +212,12 @@ const createInitialHeaderGroups = (): HeaderGroup[] => {
   return [
     {
       id: "problem-info",
-      name: "Problem Information",
+      name: t("problem.layout.problemInfo"),
       headers: [
         {
           id: 1,
           index: 0,
-          title: "Problem Description",
+          title: t("problem.layout.problemDescription"),
           icon: "FileText",
           color: "#1a1a1a",
           iconColor: "#007bff",
@@ -223,7 +225,7 @@ const createInitialHeaderGroups = (): HeaderGroup[] => {
         {
           id: 2,
           index: 1,
-          title: "Solution",
+          title: t("problem.layout.solution"),
           icon: "FlaskConical",
           color: "#1a1a1a",
           iconColor: "#007bff",
@@ -231,7 +233,7 @@ const createInitialHeaderGroups = (): HeaderGroup[] => {
         {
           id: 3,
           index: 2,
-          title: "Submission Records",
+          title: t("problem.layout.submissions"),
           icon: "History",
           color: "#1a1a1a",
           iconColor: "#007bff",
@@ -240,12 +242,12 @@ const createInitialHeaderGroups = (): HeaderGroup[] => {
     },
     {
       id: "code-editor",
-      name: "Code Editor",
+      name: t("problem.layout.codeEditor"),
       headers: [
         {
           id: 4,
           index: 0,
-          title: "Code",
+          title: t("problem.layout.code"),
           icon: "Code2",
           color: "#1a1a1a",
           iconColor: "#02b128",
@@ -254,12 +256,12 @@ const createInitialHeaderGroups = (): HeaderGroup[] => {
     },
     {
       id: "test-info",
-      name: "Test Information",
+      name: t("problem.layout.testInfo"),
       headers: [
         {
           id: 5,
           index: 0,
-          title: "Test Cases",
+          title: t("problem.layout.testCases"),
           icon: "SquareCheck",
           color: "#1a1a1a",
           iconColor: "#02b128",
@@ -267,7 +269,7 @@ const createInitialHeaderGroups = (): HeaderGroup[] => {
         {
           id: 6,
           index: 1,
-          title: "Test Results",
+          title: t("problem.layout.testResults"),
           icon: "Terminal",
           color: "#1a1a1a",
           iconColor: "#02b128",
@@ -289,7 +291,10 @@ const getLeetLayoutConfig = () => {
         type: "leaf",
         size: 50,
         groupId: "problem-info",
-        groupMetadata: { id: "problem-info", name: "Problem Information" },
+        groupMetadata: {
+          id: "problem-info",
+          name: t("problem.layout.problemInfo"),
+        },
       },
       {
         id: "programming-right",
@@ -302,14 +307,20 @@ const getLeetLayoutConfig = () => {
             type: "leaf",
             size: 50,
             groupId: "code-editor",
-            groupMetadata: { id: "code-editor", name: "Code Editor" },
+            groupMetadata: {
+              id: "code-editor",
+              name: t("problem.layout.codeEditor"),
+            },
           },
           {
             id: "programming-right-bottom",
             type: "leaf",
             size: 50,
             groupId: "test-info",
-            groupMetadata: { id: "test-info", name: "Test Information" },
+            groupMetadata: {
+              id: "test-info",
+              name: t("problem.layout.testInfo"),
+            },
           },
         ],
       },
@@ -330,7 +341,10 @@ const getClassicLayoutConfig = () => {
         type: "leaf",
         size: 40,
         groupId: "problem-info",
-        groupMetadata: { id: "problem-info", name: "Problem Information" },
+        groupMetadata: {
+          id: "problem-info",
+          name: t("problem.layout.problemInfo"),
+        },
       },
       {
         id: "classic-bottom",
@@ -343,14 +357,20 @@ const getClassicLayoutConfig = () => {
             type: "leaf",
             size: 50,
             groupId: "code-editor",
-            groupMetadata: { id: "code-editor", name: "Code Editor" },
+            groupMetadata: {
+              id: "code-editor",
+              name: t("problem.layout.codeEditor"),
+            },
           },
           {
             id: "classic-bottom-right",
             type: "leaf",
             size: 50,
             groupId: "test-info",
-            groupMetadata: { id: "test-info", name: "Test Information" },
+            groupMetadata: {
+              id: "test-info",
+              name: t("problem.layout.testInfo"),
+            },
           },
         ],
       },
@@ -377,14 +397,20 @@ const getCompactLayoutConfig = () => {
             type: "leaf",
             size: 50,
             groupId: "problem-info",
-            groupMetadata: { id: "problem-info", name: "Problem Information" },
+            groupMetadata: {
+              id: "problem-info",
+              name: t("problem.layout.problemInfo"),
+            },
           },
           {
             id: "compact-left-bottom",
             type: "leaf",
             size: 50,
             groupId: "test-info",
-            groupMetadata: { id: "test-info", name: "Test Information" },
+            groupMetadata: {
+              id: "test-info",
+              name: t("problem.layout.testInfo"),
+            },
           },
         ],
       },
@@ -393,7 +419,10 @@ const getCompactLayoutConfig = () => {
         type: "leaf",
         size: 70,
         groupId: "code-editor",
-        groupMetadata: { id: "code-editor", name: "Code Editor" },
+        groupMetadata: {
+          id: "code-editor",
+          name: t("problem.layout.codeEditor"),
+        },
       },
     ],
   };
@@ -412,21 +441,27 @@ const getWideLayoutConfig = () => {
         type: "leaf",
         size: 25,
         groupId: "problem-info",
-        groupMetadata: { id: "problem-info", name: "Problem Information" },
+        groupMetadata: {
+          id: "problem-info",
+          name: t("problem.layout.problemInfo"),
+        },
       },
       {
         id: "wide-center",
         type: "leaf",
         size: 50,
         groupId: "code-editor",
-        groupMetadata: { id: "code-editor", name: "Code Editor" },
+        groupMetadata: {
+          id: "code-editor",
+          name: t("problem.layout.codeEditor"),
+        },
       },
       {
         id: "wide-right",
         type: "leaf",
         size: 25,
         groupId: "test-info",
-        groupMetadata: { id: "test-info", name: "Test Information" },
+        groupMetadata: { id: "test-info", name: t("problem.layout.testInfo") },
       },
     ],
   };
@@ -540,8 +575,10 @@ onUnmounted(() => {
     <Sheet v-model:open="isSidePanelOpen">
       <SheetContent side="left" class="p-0 w-[400px] sm:w-[540px]">
         <SheetHeader class="sr-only">
-          <SheetTitle>Problem List</SheetTitle>
-          <SheetDescription>Navigate through the problem list</SheetDescription>
+          <SheetTitle>{{ t("problem.drawer.problemList") }}</SheetTitle>
+          <SheetDescription>{{
+            t("problem.drawer.noProblemsFound")
+          }}</SheetDescription>
         </SheetHeader>
         <ProblemListDrawer
           :current-problem-id="problem?.id"
@@ -553,9 +590,9 @@ onUnmounted(() => {
     <Sheet :open="isNotesOpen" @update:open="isNotesOpen = $event">
       <SheetContent side="right" class="p-0 w-[400px] sm:w-[500px]">
         <SheetHeader class="sr-only">
-          <SheetTitle>Problem Notes</SheetTitle>
+          <SheetTitle>{{ t("problem.notes.title") }}</SheetTitle>
           <SheetDescription>
-            View and edit notes for this problem
+            {{ t("problem.notes.description") }}
           </SheetDescription>
         </SheetHeader>
         <ProblemNotesDrawer

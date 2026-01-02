@@ -30,9 +30,11 @@ import {
 import { RouterLink } from "vue-router";
 import { Button } from "@/components/ui/button";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 import PersonalPageHeader from "./components/PersonalPageHeader.vue";
 import PersonalPageShell from "./components/PersonalPageShell.vue";
 
+const { t, locale } = useI18n();
 const submissions = ref<SubmissionRecord[]>([]);
 const loading = ref(true);
 const hasUser = ref(false);
@@ -98,13 +100,13 @@ onMounted(async () => {
 <template>
   <PersonalPageShell>
     <PersonalPageHeader
-      title="My Submissions"
-      description="A historical record of all your problem solving attempts."
+      :title="t('personal.submissions.title')"
+      :description="t('personal.submissions.subtitle')"
     >
       <template #actions>
         <Button variant="outline" size="sm" class="gap-2 rounded-full" as-child>
           <RouterLink to="/problemset">
-            Browse Problems
+            {{ t("personal.submissions.browseProblems") }}
             <ExternalLink class="h-3.5 w-3.5" />
           </RouterLink>
         </Button>
@@ -117,7 +119,7 @@ onMounted(async () => {
     >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
       <p class="text-sm text-muted-foreground">
-        Retrieving submission history...
+        {{ t("personal.submissions.loadingSubmissions") }}
       </p>
     </div>
 
@@ -126,58 +128,68 @@ onMounted(async () => {
       class="flex flex-col items-center justify-center py-24 border-2 border-dashed border-muted/50 bg-muted/5 rounded-2xl"
     >
       <p class="text-muted-foreground mb-4">
-        Please log in to view your submissions.
+        {{ t("personal.submissions.loginToView") }}
       </p>
       <Button as-child class="rounded-full px-6 h-10 font-bold">
-        <RouterLink to="/login">Sign In</RouterLink>
+        <RouterLink to="/login">{{ t("personal.profile.signIn") }}</RouterLink>
       </Button>
     </div>
 
     <Card
       v-else-if="submissions.length > 0"
-      class="border-none shadow-sm overflow-hidden rounded-2xl"
+      class="border shadow-sm overflow-hidden rounded-2xl"
     >
-      <CardHeader class="pb-2 border-b bg-muted/20">
+      <CardHeader class="pb-4 border-b">
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle class="text-lg font-bold">Recent Attempts</CardTitle>
+            <CardTitle class="text-lg font-bold">{{
+              t("personal.submissions.recentAttempts")
+            }}</CardTitle>
             <CardDescription>
-              Displaying your latest {{ submissions.length }} submissions.
+              {{
+                t("personal.submissions.latestSubmissions", {
+                  count: submissions.length,
+                })
+              }}
             </CardDescription>
           </div>
           <Badge variant="secondary" class="rounded-full px-3">
-            {{ submissions.length }} Total
+            {{
+              t("personal.submissions.totalSubmissions", {
+                count: submissions.length,
+              })
+            }}
           </Badge>
         </div>
       </CardHeader>
       <CardContent class="p-0">
         <div class="overflow-x-auto">
           <Table>
-            <TableHeader class="bg-muted/50">
-              <TableRow>
+            <TableHeader class="bg-muted/30">
+              <TableRow class="hover:bg-muted/30">
                 <TableHead
                   class="w-[300px] font-semibold text-xs uppercase tracking-wider"
-                  >Problem</TableHead
+                  >{{ t("personal.submissions.problem") }}</TableHead
                 >
                 <TableHead
                   class="font-semibold text-xs uppercase tracking-wider"
-                  >Status</TableHead
+                  >{{ t("personal.submissions.status") }}</TableHead
                 >
                 <TableHead
                   class="font-semibold text-xs uppercase tracking-wider"
-                  >Language</TableHead
+                  >{{ t("personal.submissions.language") }}</TableHead
                 >
                 <TableHead
                   class="font-semibold text-xs uppercase tracking-wider"
-                  >Runtime</TableHead
+                  >{{ t("personal.submissions.runtime") }}</TableHead
                 >
                 <TableHead
                   class="font-semibold text-xs uppercase tracking-wider"
-                  >Memory</TableHead
+                  >{{ t("personal.submissions.memory") }}</TableHead
                 >
                 <TableHead
                   class="text-right font-semibold text-xs uppercase tracking-wider"
-                  >Submitted At</TableHead
+                  >{{ t("personal.submissions.submittedAt") }}</TableHead
                 >
                 <TableHead class="w-10"></TableHead>
               </TableRow>
@@ -186,7 +198,7 @@ onMounted(async () => {
               <TableRow
                 v-for="submission in submissions"
                 :key="submission.id"
-                class="group cursor-default hover:bg-muted/30 transition-colors"
+                class="group cursor-default hover:bg-muted/30 transition-colors border-b last:border-0"
               >
                 <TableCell>
                   <div class="flex flex-col">
@@ -243,13 +255,16 @@ onMounted(async () => {
                 <TableCell class="text-right">
                   <div class="flex flex-col items-end">
                     <span class="text-sm font-medium">{{
-                      new Date(submission.created_at).toLocaleDateString()
+                      new Date(submission.created_at).toLocaleDateString(locale)
                     }}</span>
                     <span class="text-[10px] text-muted-foreground">{{
-                      new Date(submission.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                      new Date(submission.created_at).toLocaleTimeString(
+                        locale,
+                        {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        },
+                      )
                     }}</span>
                   </div>
                 </TableCell>
@@ -283,13 +298,16 @@ onMounted(async () => {
       >
         <ListX class="h-8 w-8 text-muted-foreground/50" />
       </div>
-      <h3 class="text-xl font-bold">No submissions found</h3>
+      <h3 class="text-xl font-bold">
+        {{ t("personal.submissions.noSubmissions") }}
+      </h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        You haven't submitted any code yet. Ready to take on your first
-        challenge?
+        {{ t("personal.submissions.noSubmissionsDesc") }}
       </p>
       <Button class="rounded-full px-8 h-10 font-bold" as-child>
-        <RouterLink to="/problemset">Start Solving Problems</RouterLink>
+        <RouterLink to="/problemset">{{
+          t("personal.submissions.startSolving")
+        }}</RouterLink>
       </Button>
     </div>
   </PersonalPageShell>

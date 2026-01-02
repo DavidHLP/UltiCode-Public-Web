@@ -38,7 +38,9 @@ import {
 import { fetchUserSubmissions } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
 const loading = ref(true);
 const user = ref<UserProfile | null>(null);
 const submissions = ref<SubmissionRecord[]>([]);
@@ -62,23 +64,23 @@ const stats = computed(() => {
       hard: { count: 0, total: 0, color: "text-rose-500", bg: "bg-rose-500" },
     };
 
-  const { stats } = statsData.value;
+  const { stats: s } = statsData.value;
   return {
     easy: {
-      count: stats.Easy.count,
-      total: stats.Easy.total,
+      count: s.Easy.count,
+      total: s.Easy.total,
       color: "text-emerald-500",
       bg: "bg-emerald-500",
     },
     medium: {
-      count: stats.Medium.count,
-      total: stats.Medium.total,
+      count: s.Medium.count,
+      total: s.Medium.total,
       color: "text-orange-500",
       bg: "bg-orange-500",
     },
     hard: {
-      count: stats.Hard.count,
-      total: stats.Hard.total,
+      count: s.Hard.count,
+      total: s.Hard.total,
       color: "text-rose-500",
       bg: "bg-rose-500",
     },
@@ -87,7 +89,10 @@ const stats = computed(() => {
 
 const recentActivity = computed(() => {
   return submissions.value.slice(0, 5).map((sub) => ({
-    action: sub.status === "Accepted" ? "Solved" : "Attempted",
+    action:
+      sub.status === "Accepted"
+        ? t("personal.stats.solved")
+        : t("personal.submissions.attempted"),
     problem: sub.problem?.title || "Unknown Problem",
     problemSlug: sub.problem?.slug || "",
     time: new Date(sub.created_at).toLocaleDateString(),
@@ -123,7 +128,7 @@ onMounted(async () => {
         class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
       ></div>
       <p class="text-sm text-muted-foreground animate-pulse">
-        Loading profile...
+        {{ t("personal.profile.loadingProfile") }}
       </p>
     </div>
   </div>
@@ -133,12 +138,16 @@ onMounted(async () => {
         <div class="mb-4 rounded-full bg-muted p-3 text-muted-foreground">
           <Activity class="h-10 w-10" />
         </div>
-        <h3 class="text-xl font-semibold">Authentication Required</h3>
+        <h3 class="text-xl font-semibold">
+          {{ t("personal.profile.authenticationRequired") }}
+        </h3>
         <p class="mb-6 mt-2 text-sm text-muted-foreground">
-          Please log in to view and manage your profile.
+          {{ t("personal.profile.loginToView") }}
         </p>
         <Button as-child class="rounded-full px-6 font-bold">
-          <RouterLink to="/login">Sign In</RouterLink>
+          <RouterLink to="/login">{{
+            t("personal.profile.signIn")
+          }}</RouterLink>
         </Button>
       </CardContent>
     </Card>
@@ -198,7 +207,7 @@ onMounted(async () => {
                   variant="secondary"
                   class="rounded-full px-2 py-0 h-5 text-[10px] font-semibold uppercase tracking-wider"
                 >
-                  Pro Member
+                  {{ t("personal.profile.proBadge") }}
                 </Badge>
               </div>
             </div>
@@ -210,13 +219,13 @@ onMounted(async () => {
             >
               <RouterLink to="/personal/account">
                 <Edit class="h-4 w-4" />
-                Edit Profile
+                {{ t("personal.profile.editProfile") }}
               </RouterLink>
             </Button>
           </div>
 
           <p class="max-w-2xl text-base leading-relaxed text-muted-foreground">
-            {{ user.bio || "No bio provided. Write something about yourself!" }}
+            {{ user.bio || t("personal.profile.noBio") }}
           </p>
 
           <div
@@ -254,17 +263,16 @@ onMounted(async () => {
             </div>
             <div class="flex items-center gap-1.5 text-muted-foreground">
               <Calendar class="h-4 w-4 text-primary/70" />
-              <span
-                >Joined
-                {{
-                  user.joined_at
+              <span>{{
+                t("personal.profile.joinedDate", {
+                  date: user.joined_at
                     ? new Date(user.joined_at).toLocaleDateString(undefined, {
                         month: "long",
                         year: "numeric",
                       })
-                    : "Recently"
-                }}</span
-              >
+                    : "Recently",
+                })
+              }}</span>
             </div>
           </div>
         </div>
@@ -286,7 +294,7 @@ onMounted(async () => {
             >
               <CardTitle
                 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                >Global Rank</CardTitle
+                >{{ t("personal.profile.globalRank") }}</CardTitle
               >
               <Trophy class="h-4 w-4 text-blue-500" />
             </CardHeader>
@@ -303,7 +311,9 @@ onMounted(async () => {
                 </Badge>
                 <span
                   class="text-[10px] text-muted-foreground font-medium uppercase"
-                  >Top 0.5%</span
+                  >{{
+                    t("personal.stats.topPercent", { percent: "0.5" })
+                  }}</span
                 >
               </div>
             </CardContent>
@@ -318,7 +328,7 @@ onMounted(async () => {
             >
               <CardTitle
                 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                >Solved</CardTitle
+                >{{ t("personal.profile.solved") }}</CardTitle
               >
               <CheckCircle2 class="h-4 w-4 text-emerald-500" />
             </CardHeader>
@@ -327,7 +337,7 @@ onMounted(async () => {
                 {{ statsData?.totalSolved || 0 }}
               </div>
               <div class="mt-2 text-[11px] text-muted-foreground font-medium">
-                Total problems completed
+                {{ t("personal.profile.totalProblems") }}
               </div>
             </CardContent>
           </Card>
@@ -341,7 +351,7 @@ onMounted(async () => {
             >
               <CardTitle
                 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
-                >Streak</CardTitle
+                >{{ t("personal.profile.streak") }}</CardTitle
               >
               <Flame class="h-4 w-4 text-orange-500" />
             </CardHeader>
@@ -371,10 +381,10 @@ onMounted(async () => {
             <div class="flex items-center justify-between">
               <CardTitle class="text-lg font-bold flex items-center gap-2">
                 <Target class="h-5 w-5 text-primary" />
-                Problem Solving Progress
+                {{ t("personal.profile.solvingProgress") }}
               </CardTitle>
               <div class="text-xs font-bold text-muted-foreground">
-                OVERALL
+                {{ t("personal.profile.overallProgress") }}
                 {{
                   (
                     ((statsData?.totalSolved || 0) /
@@ -397,7 +407,7 @@ onMounted(async () => {
                 <div class="flex items-end justify-between">
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-bold capitalize">{{
-                      difficulty
+                      t(`personal.stats.${difficulty}`)
                     }}</span>
                     <Badge
                       variant="outline"
@@ -431,10 +441,10 @@ onMounted(async () => {
           <CardHeader class="pb-2">
             <CardTitle class="text-lg font-bold flex items-center gap-2">
               <Activity class="h-5 w-5 text-primary" />
-              Submission Heatmap
+              {{ t("personal.profile.heatmapTitle") }}
             </CardTitle>
             <CardDescription>
-              Your activity across the platform over the last year.
+              {{ t("personal.profile.heatmapSubtitle") }}
             </CardDescription>
           </CardHeader>
           <CardContent class="pt-2">
@@ -449,7 +459,7 @@ onMounted(async () => {
           <CardHeader class="pb-4 border-b bg-muted/20">
             <CardTitle class="text-base font-bold flex items-center gap-2">
               <GitCommit class="h-4 w-4 text-primary" />
-              Recent Activity
+              {{ t("personal.profile.recentActivity") }}
             </CardTitle>
           </CardHeader>
           <CardContent class="p-0">
@@ -511,7 +521,9 @@ onMounted(async () => {
               class="flex flex-col items-center justify-center py-12 text-center text-muted-foreground"
             >
               <Activity class="h-8 w-8 mb-2 opacity-20" />
-              <p class="text-sm">No recent activity found.</p>
+              <p class="text-sm">
+                {{ t("personal.submissions.noSubmissions") }}
+              </p>
             </div>
           </CardContent>
           <div class="p-4 border-t bg-muted/5">
@@ -522,7 +534,7 @@ onMounted(async () => {
               as-child
             >
               <RouterLink to="/personal/submissions">
-                VIEW ALL SUBMISSIONS
+                {{ t("personal.profile.viewAllSubmissions") }}
                 <ChevronRight class="h-3 w-3" />
               </RouterLink>
             </Button>

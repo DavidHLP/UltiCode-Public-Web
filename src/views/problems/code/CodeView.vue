@@ -21,12 +21,14 @@ import {
 } from "lucide-vue-next";
 import { problemHooks } from "@/hooks/problem-hooks";
 import { useProblemEditorStore } from "@/stores/problemEditorStore";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   languages: ProblemLanguageOption[];
   starterNotes: string[];
 }>();
 
+const { t } = useI18n();
 const prefersDark = usePreferredDark();
 const editorStore = useProblemEditorStore();
 
@@ -54,7 +56,7 @@ const activeLanguageLabel = computed(() => {
       ? "TypeScript"
       : "JavaScript";
   }
-  return languageMeta.value?.label ?? "Select language";
+  return languageMeta.value?.label ?? t("problem.editor.language");
 });
 const starterCode = computed(() => languageMeta.value?.starterCode ?? "");
 const canReset = computed(() => code.value !== starterCode.value);
@@ -181,7 +183,7 @@ watch(
             size="icon"
             class="h-7 w-7"
             :aria-pressed="isWordWrapEnabled"
-            title="Toggle word wrap"
+            :title="t('problem.layout.toggleWordWrap')"
             @click="toggleWordWrap"
           >
             <AlignLeft class="h-3.5 w-3.5" />
@@ -190,7 +192,7 @@ watch(
             variant="ghost"
             size="icon"
             class="h-7 w-7"
-            title="Format code"
+            :title="t('problem.layout.formatCode')"
             @click="handleFormat"
           >
             <Wand2 class="h-3.5 w-3.5" />
@@ -200,7 +202,7 @@ watch(
             size="icon"
             class="h-7 w-7"
             :disabled="!canReset"
-            title="Reset to starter code"
+            :title="t('problem.layout.resetCode')"
             @click="handleReset"
           >
             <RotateCcw class="h-3.5 w-3.5" />
@@ -210,7 +212,7 @@ watch(
             size="icon"
             class="h-7 w-7"
             :aria-pressed="isFullscreen"
-            title="Toggle fullscreen"
+            :title="t('problem.layout.toggleFullscreen')"
             @click="handleFullscreenToggle"
           >
             <Maximize2 class="h-3.5 w-3.5" />
@@ -220,7 +222,7 @@ watch(
             size="icon"
             class="h-7 w-7"
             :aria-pressed="isMinimapVisible"
-            title="Toggle minimap"
+            :title="t('problem.layout.toggleMinimap')"
             @click="toggleMinimap"
           >
             <Scan class="h-3.5 w-3.5" />

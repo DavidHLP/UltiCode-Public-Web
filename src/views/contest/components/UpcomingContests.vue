@@ -6,12 +6,14 @@ import { Calendar, Clock } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import type { ContestListItem } from "@/types/contest";
 import { formatDateTime, getDurationMinutes } from "@/utils/date";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   contests: ContestListItem[];
 }>();
 
 const router = useRouter();
+const { t } = useI18n();
 const countdowns = ref<Map<string, string>>(new Map());
 let intervalId: number | null = null;
 
@@ -24,7 +26,7 @@ function updateCountdowns() {
     const diff = start - now;
 
     if (diff <= 0) {
-      countdowns.value.set(contest.id, "Started");
+      countdowns.value.set(contest.id, t("contest.status.started"));
       return;
     }
 
@@ -35,8 +37,17 @@ function updateCountdowns() {
 
     const countdown =
       days > 0
-        ? `${days}d ${hours}h ${minutes}m ${seconds}s`
-        : `${hours}h ${minutes}m ${seconds}s`;
+        ? t("contest.time.countdown_full", {
+            d: days,
+            h: hours,
+            m: minutes,
+            s: seconds,
+          })
+        : t("contest.time.countdown_short", {
+            h: hours,
+            m: minutes,
+            s: seconds,
+          });
 
     countdowns.value.set(contest.id, countdown);
   });
@@ -44,17 +55,7 @@ function updateCountdowns() {
 
 // Get countdown for specific contest
 function getCountdown(contestId: string): string {
-  return countdowns.value.get(contestId) || "Calculating...";
-}
-
-// Get contest type label
-function getContestTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    weekly: "Weekly Contest",
-    biweekly: "Biweekly Contest",
-    special: "Special Contest",
-  };
-  return labels[type] || type;
+  return countdowns.value.get(contestId) || t("contest.status.calculating");
 }
 
 // Watch for contest changes
@@ -109,7 +110,7 @@ onUnmounted(() => {
             <div class="flex justify-between items-start">
               <div class="space-y-2">
                 <p class="text-sm font-medium text-white/90">
-                  {{ getContestTypeLabel(contest.type || "weekly") }}
+                  {{ t(`contest.types.${contest.type || "weekly"}`) }}
                 </p>
                 <h3 class="text-2xl font-bold leading-tight">
                   {{ contest.title }}
@@ -125,21 +126,24 @@ onUnmounted(() => {
             <div class="space-y-2 text-sm text-gray-100">
               <div class="flex items-center gap-2">
                 <Calendar class="h-4 w-4" />
-                <span>Time: {{ formatDateTime(contest.start_time) }}</span>
+                <span
+                  >{{ t("contest.list.time") }}
+                  {{ formatDateTime(contest.start_time) }}</span
+                >
               </div>
               <div class="flex items-center gap-2">
                 <Clock class="h-4 w-4" />
                 <span
-                  >Duration:
+                  >{{ t("contest.list.duration") }}
                   {{ getDurationMinutes(contest.start_time, contest.end_time) }}
-                  min</span
+                  {{ t("contest.time.min_short") }}</span
                 >
               </div>
             </div>
 
             <div class="flex items-center justify-between mt-4">
               <div class="text-sm font-medium opacity-90">
-                Time until start: {{ getCountdown(contest.id) }}
+                {{ t("contest.list.startsIn") }} {{ getCountdown(contest.id) }}
               </div>
               <Button
                 variant="secondary"
@@ -147,7 +151,8 @@ onUnmounted(() => {
                 class="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
                 @click.stop
               >
-                <Calendar class="mr-2 h-3 w-3" /> Add to Calendar
+                <Calendar class="mr-2 h-3 w-3" />
+                {{ t("contest.list.addToCalendar") }}
               </Button>
             </div>
           </div>

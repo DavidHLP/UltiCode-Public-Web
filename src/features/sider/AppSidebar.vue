@@ -12,6 +12,7 @@ import {
 } from "@/features/sider/sidebar.data";
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { fetchCurrentUserId } from "@/utils/auth";
 import {
   Sidebar,
@@ -24,9 +25,10 @@ import {
 
 const props = defineProps<SidebarProps>();
 const route = useRoute();
+const { t } = useI18n();
 
 const user = ref({
-  name: "Guest",
+  name: t("common.labels.guest"),
   email: "guest@example.com",
   avatar: "",
 });

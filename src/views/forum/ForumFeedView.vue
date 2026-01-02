@@ -31,6 +31,7 @@ import {
 import { toast } from "vue-sonner";
 import { isAuthenticated } from "@/utils/auth";
 import { vote, VoteTargetType } from "@/api/vote";
+import { useI18n } from "vue-i18n";
 
 const posts = ref<ForumPost[]>([]);
 const communities = ref<ForumCommunity[]>([]);
@@ -39,6 +40,8 @@ const currentCommunity = ref<ForumCommunity | null>(null);
 const communityRules = ref<ForumCommunityRule[]>([]);
 const communityLinks = ref<ForumCommunityLink[]>([]);
 const isLoading = ref(true);
+
+const { t } = useI18n();
 
 const props = defineProps<{
   filter?: string;
@@ -62,7 +65,10 @@ async function loadAllPosts() {
     ]);
     posts.value = postRows;
     communities.value = communityRows;
-    quickFilters.value = filters;
+    quickFilters.value = filters.map((f) => ({
+      ...f,
+      label: t(`forum.sort.${f.value}`),
+    }));
     currentCommunity.value = null;
     communityRules.value = [];
     communityLinks.value = [];
@@ -165,7 +171,7 @@ const sortedPosts = computed(() => {
 
 function handleCreatePost() {
   if (!isAuthenticated()) {
-    toast.error("Please log in to create a post.");
+    toast.error(t("forum.messages.loginToCreate"));
     return;
   }
   router.push({ name: "forum-create" });
@@ -173,7 +179,7 @@ function handleCreatePost() {
 
 async function handlePostVote(postId: string, type: 1 | -1) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to vote.");
+    toast.error(t("forum.messages.loginToVote"));
     return;
   }
   try {
@@ -196,7 +202,7 @@ async function handlePostVote(postId: string, type: 1 | -1) {
     }
   } catch (error) {
     console.error("Failed to vote post", error);
-    toast.error("Failed to vote.");
+    toast.error(t("forum.messages.voteFailed"));
   }
 }
 
@@ -224,13 +230,13 @@ function handlePostSave(postId: string, isSaved: boolean) {
             />
             <Input
               v-model="searchQuery"
-              placeholder="Search posts, tags, or keywords..."
+              :placeholder="t('forum.list.searchPlaceholder')"
               class="h-10 pl-10 rounded-full bg-background/50"
             />
           </div>
           <Select v-model="quickFilter">
             <SelectTrigger class="h-10 w-40 rounded-full bg-background/50">
-              <SelectValue placeholder="Sort" />
+              <SelectValue :placeholder="t('forum.list.sort')" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem
@@ -245,7 +251,7 @@ function handlePostSave(postId: string, isSaved: boolean) {
         </div>
         <Button class="h-10 rounded-full px-6 gap-2" @click="handleCreatePost">
           <Plus class="h-4 w-4" />
-          New Post
+          {{ t("forum.list.newPost") }}
         </Button>
       </div>
       <div v-if="isLoading" class="space-y-4">

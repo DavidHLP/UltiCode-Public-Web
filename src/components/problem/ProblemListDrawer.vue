@@ -16,6 +16,7 @@ import {
 import { useRouter } from "vue-router";
 import { cn } from "@/lib/utils";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 defineProps<{
   currentProblemId?: number;
@@ -25,6 +26,7 @@ const emit = defineEmits<{
   (e: "close"): void;
 }>();
 
+const { t } = useI18n();
 const router = useRouter();
 const problems = ref<Problem[]>([]);
 const searchQuery = ref("");
@@ -62,7 +64,9 @@ const navigateToProblem = (slug: string) => {
     <div class="flex-none px-4 py-3 border-b bg-background sticky top-0 z-10">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-1 cursor-pointer hover:opacity-80">
-          <h2 class="text-base font-medium text-foreground">Problem List</h2>
+          <h2 class="text-base font-medium text-foreground">
+            {{ t("problem.drawer.problemList") }}
+          </h2>
           <ChevronRight class="h-4 w-4 text-muted-foreground" />
         </div>
         <div class="flex items-center text-xs text-muted-foreground">
@@ -77,7 +81,7 @@ const navigateToProblem = (slug: string) => {
           <span
             >{{
               filteredProblems.filter((p) => p.status === "solved").length
-            }}/{{ problems.length }} Solved</span
+            }}/{{ problems.length }} {{ t("problem.drawer.solved") }}</span
           >
         </div>
       </div>
@@ -90,7 +94,7 @@ const navigateToProblem = (slug: string) => {
           />
           <Input
             v-model="searchQuery"
-            placeholder="Search questions"
+            :placeholder="t('problem.drawer.searchQuestions')"
             class="pl-9 h-9 bg-muted/50 border-transparent rounded-full focus:bg-background focus:border-border transition-all placeholder:text-muted-foreground/70"
           />
         </div>
@@ -132,7 +136,9 @@ const navigateToProblem = (slug: string) => {
             >
               <Search class="h-6 w-6 text-muted-foreground/50" />
             </div>
-            <span class="text-sm font-bold">No problems found.</span>
+            <span class="text-sm font-bold">{{
+              t("problem.drawer.noProblemsFound")
+            }}</span>
           </div>
         </template>
         <template v-else>
@@ -184,10 +190,10 @@ const navigateToProblem = (slug: string) => {
                 >
                   {{
                     problem.difficulty === "Easy"
-                      ? "Easy"
+                      ? t("problem.difficulty.easy")
                       : problem.difficulty === "Medium"
-                        ? "Medium"
-                        : "Hard"
+                        ? t("problem.difficulty.medium")
+                        : t("problem.difficulty.hard")
                   }}
                 </span>
               </div>

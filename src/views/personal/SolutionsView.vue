@@ -37,10 +37,12 @@ import {
 import { toast } from "vue-sonner";
 import { RouterLink, useRouter } from "vue-router";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 import PersonalPageHeader from "./components/PersonalPageHeader.vue";
 import PersonalPageShell from "./components/PersonalPageShell.vue";
 
 const router = useRouter();
+const { t, locale } = useI18n();
 
 const solutions = ref<SolutionFeedResponse["items"]>([]);
 const loading = ref(true);
@@ -59,18 +61,16 @@ const handleView = (solution: SolutionFeedResponse["items"][number]) => {
 };
 
 const handleDelete = async (solutionId: string) => {
-  const confirmed = window.confirm(
-    "Delete this solution? This action cannot be undone.",
-  );
+  const confirmed = window.confirm(t("personal.solutions.deleteConfirm"));
   if (!confirmed) return;
   try {
     await deleteSolution(solutionId);
-    toast.success("Solution deleted successfully");
+    toast.success(t("personal.messages.profileUpdated"));
     // Remove from list
     solutions.value = solutions.value.filter((s) => s.id !== solutionId);
   } catch (error) {
     console.error("Failed to delete solution", error);
-    toast.error("Failed to delete solution");
+    toast.error(t("personal.messages.saveFailed"));
   }
 };
 
@@ -92,14 +92,14 @@ onMounted(async () => {
 <template>
   <PersonalPageShell>
     <PersonalPageHeader
-      title="My Solutions"
-      description="Manage and track the performance of your shared technical solutions."
+      :title="t('personal.solutions.title')"
+      :description="t('personal.solutions.subtitle')"
     >
       <template #actions>
         <Button as-child class="rounded-full gap-2">
           <RouterLink to="/problemset">
             <Plus class="h-4 w-4" />
-            New Solution
+            {{ t("personal.solutions.newSolution") }}
           </RouterLink>
         </Button>
       </template>
@@ -110,7 +110,9 @@ onMounted(async () => {
       class="flex flex-col items-center justify-center py-20 gap-4"
     >
       <Loader2 class="h-10 w-10 animate-spin text-primary" />
-      <p class="text-sm text-muted-foreground">Loading your solutions...</p>
+      <p class="text-sm text-muted-foreground">
+        {{ t("personal.solutions.loadingSolutions") }}
+      </p>
     </div>
 
     <div
@@ -118,10 +120,10 @@ onMounted(async () => {
       class="text-center py-20 border-2 border-dashed rounded-3xl"
     >
       <p class="text-muted-foreground mb-4">
-        Please log in to view your solutions.
+        {{ t("personal.solutions.loginToView") }}
       </p>
       <Button as-child>
-        <RouterLink to="/login">Sign In</RouterLink>
+        <RouterLink to="/login">{{ t("personal.profile.signIn") }}</RouterLink>
       </Button>
     </div>
 
@@ -147,7 +149,7 @@ onMounted(async () => {
             >
               <Calendar class="h-3 w-3" />
               {{
-                new Date(sol.created_at).toLocaleDateString(undefined, {
+                new Date(sol.created_at).toLocaleDateString(locale, {
                   month: "short",
                   day: "numeric",
                   year: "numeric",
@@ -167,9 +169,10 @@ onMounted(async () => {
               <div
                 class="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
               >
-                <Code2 class="h-3.5 w-3.5" />
+                <code2 class="h-3.5 w-3.5" />
                 <span class="truncate"
-                  >Problem: {{ sol.problem?.title || "Unknown" }}</span
+                  >{{ t("personal.submissions.problem") }}:
+                  {{ sol.problem?.title || "Unknown" }}</span
                 >
               </div>
             </div>
@@ -186,16 +189,17 @@ onMounted(async () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-40">
                 <DropdownMenuItem @click="handleView(sol)" class="gap-2">
-                  <Eye class="h-4 w-4" /> View
+                  <Eye class="h-4 w-4" /> {{ t("personal.solutions.view") }}
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="handleEdit(sol.id)" class="gap-2">
-                  <Pencil class="h-4 w-4" /> Edit
+                  <Pencil class="h-4 w-4" /> {{ t("personal.solutions.edit") }}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   @click="handleDelete(sol.id)"
                   class="text-destructive focus:text-destructive gap-2"
                 >
-                  <Trash2 class="h-4 w-4" /> Delete
+                  <Trash2 class="h-4 w-4" />
+                  {{ t("personal.solutions.delete") }}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -215,7 +219,7 @@ onMounted(async () => {
             <span
               v-if="!sol.tags || sol.tags.length === 0"
               class="text-xs text-muted-foreground italic"
-              >No tags</span
+              >{{ t("personal.solutions.noTags") }}</span
             >
           </div>
         </CardContent>
@@ -256,7 +260,7 @@ onMounted(async () => {
               class="h-8 text-xs font-bold gap-1 rounded-full hover:bg-primary hover:text-primary-foreground transition-all"
               @click="handleView(sol)"
             >
-              DETAILS
+              {{ t("personal.solutions.details") }}
               <ArrowRight class="h-3 w-3" />
             </Button>
           </div>
@@ -273,13 +277,16 @@ onMounted(async () => {
       >
         <FileCode2 class="h-8 w-8 text-muted-foreground/50" />
       </div>
-      <h3 class="text-xl font-bold">No solutions shared yet</h3>
+      <h3 class="text-xl font-bold">
+        {{ t("personal.solutions.noSolutions") }}
+      </h3>
       <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        Sharing your thought process helps you and others learn better. Post
-        your first solution!
+        {{ t("personal.solutions.noSolutionsDesc") }}
       </p>
       <Button as-child class="rounded-full px-8 h-10 font-bold">
-        <RouterLink to="/problemset">Start Coding</RouterLink>
+        <RouterLink to="/problemset">{{
+          t("personal.solutions.startCoding")
+        }}</RouterLink>
       </Button>
     </div>
   </PersonalPageShell>

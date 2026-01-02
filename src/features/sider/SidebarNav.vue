@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronRight } from "lucide-vue-next";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "vue-i18n";
 import type { SidebarSection } from "./sidebar.data";
+
+const { t } = useI18n();
 
 defineProps<{
   sections: SidebarSection[];
@@ -33,7 +36,7 @@ defineProps<{
           class="group/label w-full text-xs font-medium text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
         >
           <CollapsibleTrigger>
-            {{ section.name.toUpperCase() }}
+            {{ t(section.name).toUpperCase() }}
             <ChevronRight
               class="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90"
             />
@@ -42,10 +45,10 @@ defineProps<{
         <CollapsibleContent>
           <SidebarMenu>
             <SidebarMenuItem v-for="item in section.items" :key="item.title">
-              <SidebarMenuButton :tooltip="item.title" as-child>
+              <SidebarMenuButton :tooltip="t(item.title)" as-child>
                 <router-link :to="item.url || '#'">
                   <component :is="item.icon" v-if="item.icon" />
-                  <span>{{ item.title }}</span>
+                  <span>{{ t(item.title) }}</span>
                   <Badge
                     v-if="item.badge"
                     :variant="item.badgeVariant || 'default'"
@@ -64,10 +67,10 @@ defineProps<{
         <!-- Non-collapsible simpler group -->
         <SidebarMenu class="mt-2">
           <SidebarMenuItem v-for="item in section.items" :key="item.title">
-            <SidebarMenuButton :tooltip="item.title" as-child>
+            <SidebarMenuButton :tooltip="t(item.title)" as-child>
               <router-link :to="item.url || '#'">
                 <component :is="item.icon" v-if="item.icon" />
-                <span>{{ item.title }}</span>
+                <span>{{ t(item.title) }}</span>
                 <Badge
                   v-if="item.badge"
                   :variant="item.badgeVariant || 'default'"

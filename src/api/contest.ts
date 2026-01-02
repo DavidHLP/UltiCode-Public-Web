@@ -105,6 +105,34 @@ function mapContestDetail(data: unknown): ContestDetail {
   };
 }
 
+function mapGlobalRankingEntry(data: unknown): GlobalRankingEntry {
+  if (!data || typeof data !== "object") return data as GlobalRankingEntry;
+  const ranking = data as Record<string, unknown>;
+  const rating = toNumber(ranking.rating) ?? 0;
+  const ratingTitle =
+    ranking.rating_title ??
+    ranking.ratingTitle ??
+    (rating > 0 ? "NEWBIE" : "NEWBIE");
+  const maxRating = toNumber(ranking.max_rating ?? ranking.maxRating) ?? rating;
+  const maxRatingTitle =
+    ranking.max_rating_title ?? ranking.maxRatingTitle ?? ratingTitle;
+
+  return {
+    rank: toNumber(ranking.rank ?? ranking.global_rank) ?? 0,
+    userId: (ranking.user_id ?? ranking.userId ?? ranking.id) as string,
+    username: ranking.username as string,
+    avatar: (ranking.avatar as string | null) ?? null,
+    country: (ranking.country as string | null) ?? null,
+    rating,
+    maxRating,
+    ratingTitle: ratingTitle as GlobalRankingEntry["ratingTitle"],
+    maxRatingTitle: maxRatingTitle as GlobalRankingEntry["maxRatingTitle"],
+    contestsAttended:
+      toNumber(ranking.contests_attended ?? ranking.contestsAttended) ?? 0,
+    badge: (ranking.badge as string | null) ?? null,
+  };
+}
+
 // ============================================================================
 // CONTEST QUERIES
 // ============================================================================
@@ -181,14 +209,19 @@ export async function fetchGlobalRankings(options?: {
   if (country) {
     url += `&country=${country}`;
   }
-  return apiGet<PaginatedResult<GlobalRankingEntry>>(url);
+  const result = await apiGet<PaginatedResult<GlobalRankingEntry>>(url);
+  return {
+    ...result,
+    items: (result.items || []).map(mapGlobalRankingEntry),
+  };
 }
 
 // Legacy API for backward compatibility
 export async function fetchGlobalRankingsLegacy(): Promise<
   GlobalRankingEntry[]
 > {
-  return apiGet<GlobalRankingEntry[]>("/contest/global-ranking");
+  const result = await apiGet<GlobalRankingEntry[]>("/contest/global-ranking");
+  return (result || []).map(mapGlobalRankingEntry);
 }
 
 // ============================================================================

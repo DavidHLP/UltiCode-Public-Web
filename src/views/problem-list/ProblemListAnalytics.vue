@@ -4,12 +4,14 @@ import type { Problem } from "@/types/problem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DonutChart } from "@/components/ui/chart-donut";
+import { useI18n } from "vue-i18n";
 
 interface Props {
   problems: Problem[];
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const statusCategories = ["Solved", "Attempted", "Todo"] as const;
 const statusColorTokens = {
@@ -34,9 +36,9 @@ const statusDistribution = computed(() => {
     { solved: 0, attempted: 0, todo: 0 },
   );
   return [
-    { label: "Solved", value: derived.solved },
-    { label: "Attempted", value: derived.attempted },
-    { label: "Todo", value: derived.todo },
+    { label: t("problem.status.solved"), value: derived.solved },
+    { label: t("problem.status.attempted"), value: derived.attempted },
+    { label: t("problem.status.todo"), value: derived.todo },
   ];
 });
 
@@ -65,6 +67,7 @@ const difficultyStats = computed(() => {
 
     return {
       difficulty,
+      label: t(`problem.difficulty.${difficulty.toLowerCase()}`),
       total,
       solved,
       percentage,
@@ -89,13 +92,15 @@ const donutValueFormatter = (tick: number | Date) =>
     <!-- Progress Overview -->
     <Card class="border-none shadow-md bg-gradient-to-br from-card to-muted/20">
       <CardHeader class="pb-2">
-        <CardTitle class="text-lg font-semibold tracking-tight"
-          >Progress</CardTitle
-        >
+        <CardTitle class="text-lg font-semibold tracking-tight">{{
+          t("problem.problemList.analytics.progress")
+        }}</CardTitle>
       </CardHeader>
       <CardContent>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-muted-foreground">Overall Completion</span>
+          <span class="text-sm text-muted-foreground">{{
+            t("problem.problemList.analytics.overallCompletion")
+          }}</span>
           <span class="text-xl font-bold">{{ progressPercentage }}%</span>
         </div>
         <Progress :model-value="progressPercentage" class="h-2 mb-6" />
@@ -117,9 +122,9 @@ const donutValueFormatter = (tick: number | Date) =>
     <!-- Difficulty Breakdown -->
     <Card class="border-none shadow-md">
       <CardHeader class="pb-4">
-        <CardTitle class="text-lg font-semibold tracking-tight"
-          >Difficulty</CardTitle
-        >
+        <CardTitle class="text-lg font-semibold tracking-tight">{{
+          t("problem.problemList.analytics.difficulty")
+        }}</CardTitle>
       </CardHeader>
       <CardContent class="space-y-5">
         <div
@@ -136,7 +141,7 @@ const donutValueFormatter = (tick: number | Date) =>
                   stat.difficulty === 'Medium',
                 'text-red-600 dark:text-red-400': stat.difficulty === 'Hard',
               }"
-              >{{ stat.difficulty }}</span
+              >{{ stat.label }}</span
             >
             <span class="text-muted-foreground">
               <span class="text-foreground">{{ stat.solved }}</span> /

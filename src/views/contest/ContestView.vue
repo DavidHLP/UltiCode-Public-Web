@@ -10,10 +10,12 @@ import RunningContests from "./components/RunningContests.vue";
 import GlobalRanking from "./components/GlobalRanking.vue";
 import PastContests from "./components/PastContests.vue";
 import MyContests from "./components/MyContests.vue";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
 const route = useRoute();
 const contestStore = useContestStore();
+const { t } = useI18n();
 
 defineProps<{
   tab?: string;
@@ -26,12 +28,15 @@ const {
   pastContests,
   pastContestsTotal,
   globalRankings,
-  loading,
   loadingContests,
+  loadingRankings,
 } = storeToRefs(contestStore);
 
 const currentPage = ref(1);
 const pageSize = 10;
+const initialLoading = ref(true);
+
+const isLoading = computed(() => initialLoading.value || loadingRankings.value);
 
 const totalPages = computed(() =>
   Math.ceil(pastContestsTotal.value / pageSize),
@@ -50,6 +55,8 @@ onMounted(async () => {
     ]);
   } catch (error) {
     console.error("Failed to load contest data:", error);
+  } finally {
+    initialLoading.value = false;
   }
 });
 
@@ -78,23 +85,27 @@ watch(currentPage, async (newPage) => {
           <h1
             class="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-orange-600"
           >
-            UltiCode Contests
+            {{ t("contest.list.mainTitle") }}
           </h1>
         </div>
         <p class="text-muted-foreground">
-          Join weekly challenges, solve problems in real-time, and improve your
-          global ranking.
+          {{ t("contest.list.subtitle") }}
         </p>
       </div>
     </div>
 
     <Separator />
 
-    <div v-if="loading" class="flex flex-col items-center justify-center py-20">
+    <div
+      v-if="isLoading"
+      class="flex flex-col items-center justify-center py-20"
+    >
       <div
         class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
       ></div>
-      <p class="mt-4 text-sm text-muted-foreground">Loading contest data...</p>
+      <p class="mt-4 text-sm text-muted-foreground">
+        {{ t("contest.list.loading") }}
+      </p>
     </div>
 
     <div v-else class="space-y-8">

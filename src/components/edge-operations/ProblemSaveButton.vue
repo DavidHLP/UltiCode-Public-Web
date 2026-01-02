@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   problemId: number;
@@ -56,6 +57,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   change: [isFavorite: boolean, folders: string[], listIds: string[]];
 }>();
+
+const { t } = useI18n();
 
 const bookmarkStore = useBookmarkStore();
 
@@ -120,7 +123,7 @@ async function loadData() {
     userLists.value = lists;
   } catch (error) {
     console.error("Failed to load data:", error);
-    toast.error("Failed to load save options");
+    toast.error(t("problem.save.toast.loadFailed"));
   } finally {
     isLoading.value = false;
   }
@@ -128,7 +131,7 @@ async function loadData() {
 
 async function toggleFolder(folderId: string) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to save");
+    toast.error(t("problem.save.toast.loginRequired"));
     return;
   }
 
@@ -155,13 +158,13 @@ async function toggleFolder(folderId: string) {
     emitChange();
   } catch (error) {
     console.error("Failed to toggle bookmark folder:", error);
-    toast.error("Failed to update bookmark");
+    toast.error(t("bookmark.toasts.updateFailed"));
   }
 }
 
 async function toggleList(listId: string) {
   if (!isAuthenticated()) {
-    toast.error("Please log in to save");
+    toast.error(t("problem.save.toast.loginRequired"));
     return;
   }
 
@@ -177,17 +180,19 @@ async function toggleList(listId: string) {
     if (isInList) {
       await batchRemoveProblemFromLists(userId, props.problemId, [listId]);
       list.containsProblem = false;
-      toast.success(`Removed from "${list.name}"`);
+      toast.success(
+        t("problem.save.toast.removedFromList", { name: list.name }),
+      );
     } else {
       await batchAddProblemToLists(userId, props.problemId, [listId]);
       list.containsProblem = true;
-      toast.success(`Added to "${list.name}"`);
+      toast.success(t("problem.save.toast.addedToList", { name: list.name }));
     }
 
     emitChange();
   } catch (error) {
     console.error("Failed to toggle list:", error);
-    toast.error("Failed to update problem list");
+    toast.error(t("problem.save.toast.updateListFailed"));
   }
 }
 
@@ -209,7 +214,7 @@ function openCreateDialog() {
 
 async function handleCreateList() {
   if (!newListName.value.trim()) {
-    toast.error("Please enter a list name");
+    toast.error(t("problem.save.toast.enterName"));
     return;
   }
 
@@ -229,12 +234,14 @@ async function handleCreateList() {
     // Reload the lists
     await loadData();
 
-    toast.success(`Created "${newList.name}" and added problem`);
+    toast.success(
+      t("problem.save.toast.createdAndAdded", { name: newList.name }),
+    );
     showCreateDialog.value = false;
     emitChange();
   } catch (error) {
     console.error("Failed to create list:", error);
-    toast.error("Failed to create problem list");
+    toast.error(t("problem.save.toast.createFailed"));
   } finally {
     isCreating.value = false;
   }
@@ -256,15 +263,15 @@ watch(
         <ActionItem
           :icon="isSaved ? BookmarkCheck : Bookmark"
           :count="count"
-          label="Save"
+          :label="t('problem.save.title')"
           :active="isSaved"
           class="cursor-pointer"
           :class="{ 'fill-primary/20': isSaved }"
-          aria-label="Save problem"
+          :aria-label="t('problem.save.title')"
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent class="w-72" align="end">
-        <DropdownMenuLabel>Save problem</DropdownMenuLabel>
+        <DropdownMenuLabel>{{ t("problem.save.title") }}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <template v-if="isLoading">
@@ -274,14 +281,14 @@ watch(
         </template>
         <template v-else-if="!isAuthed">
           <div class="px-3 py-2 text-sm text-muted-foreground">
-            Please log in to save problems.
+            {{ t("problem.save.loginRequired") }}
           </div>
         </template>
         <template v-else>
           <!-- Bookmark Folders Section -->
           <div v-if="bookmarkStore.defaultFolder">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
-              Quick save
+              {{ t("problem.save.quickSave") }}
             </DropdownMenuLabel>
             <DropdownMenuCheckboxItem
               :checked="isFavorited"
@@ -317,7 +324,7 @@ watch(
           <!-- Custom Folders -->
           <div v-if="bookmarkStore.customFolders.length > 0">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
-              Folders
+              {{ t("problem.save.folders") }}
             </DropdownMenuLabel>
             <DropdownMenuCheckboxItem
               v-for="folder in bookmarkStore.customFolders"
@@ -351,7 +358,7 @@ watch(
           <!-- Problem Lists Section -->
           <div v-if="userLists.length > 0">
             <DropdownMenuLabel class="text-xs text-muted-foreground px-2 py-1">
-              Problem lists
+              {{ t("problem.save.lists") }}
             </DropdownMenuLabel>
             <div class="max-h-[200px] overflow-y-auto">
               <DropdownMenuCheckboxItem
@@ -387,9 +394,14 @@ watch(
                       'text-muted-foreground': !list.containsProblem,
                     }"
                   >
-                    <span>{{ list.problemCount }} problems</span>
+                    <span
+                      >{{ list.problemCount }} {{ t("bookmark.items") }}</span
+                    >
                     <span>•</span>
-                    <span>{{ list.favoritesCount }} saves</span>
+                    <span
+                      >{{ list.favoritesCount }}
+                      {{ t("problem.save.saves") }}</span
+                    >
                   </div>
                 </div>
               </DropdownMenuCheckboxItem>
@@ -405,8 +417,8 @@ watch(
             "
             class="px-3 py-4 text-sm text-muted-foreground text-center"
           >
-            <p class="mb-2">No folders or lists yet.</p>
-            <p class="text-xs">Create a problem list to get started!</p>
+            <p class="mb-2">{{ t("problem.save.empty") }}</p>
+            <p class="text-xs">{{ t("problem.save.createHint") }}</p>
           </div>
 
           <DropdownMenuSeparator />
@@ -414,7 +426,7 @@ watch(
           <!-- Actions -->
           <DropdownMenuItem class="cursor-pointer" @select="openCreateDialog">
             <FolderPlus class="mr-2 h-4 w-4" />
-            Create problem list
+            {{ t("problem.save.createList") }}
           </DropdownMenuItem>
         </template>
       </DropdownMenuContent>
@@ -424,18 +436,18 @@ watch(
     <Dialog v-model:open="showCreateDialog">
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create new problem list</DialogTitle>
+          <DialogTitle>{{ t("problem.save.createListTitle") }}</DialogTitle>
           <DialogDescription>
-            Create a new problem list and add this problem to it.
+            {{ t("problem.save.createListDesc") }}
           </DialogDescription>
         </DialogHeader>
         <div class="grid gap-4 py-4">
           <div class="grid gap-2">
-            <Label for="list-name">List name</Label>
+            <Label for="list-name">{{ t("problem.save.listName") }}</Label>
             <Input
               id="list-name"
               v-model="newListName"
-              placeholder="e.g., Dynamic Programming Practice"
+              :placeholder="t('problem.save.listNamePlaceholder')"
               @keyup.enter="handleCreateList"
             />
           </div>
@@ -446,11 +458,11 @@ watch(
             @click="showCreateDialog = false"
             :disabled="isCreating"
           >
-            Cancel
+            {{ t("common.actions.cancel") }}
           </Button>
           <Button @click="handleCreateList" :disabled="isCreating">
             <Loader2 v-if="isCreating" class="mr-2 h-4 w-4 animate-spin" />
-            Create & add
+            {{ t("problem.save.createAndAdd") }}
           </Button>
         </DialogFooter>
       </DialogContent>

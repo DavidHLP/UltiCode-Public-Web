@@ -11,9 +11,12 @@ import { type Ref, ref, onMounted } from "vue";
 import { Trophy } from "lucide-vue-next";
 import { fetchDailyActivity } from "@/api/submission";
 import { isAuthenticated } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 const date = ref(today(getLocalTimeZone())) as Ref<DateValue>;
 const completedDates = ref<string[]>([]);
+
+const { t } = useI18n();
 
 onMounted(async () => {
   if (isAuthenticated()) {
@@ -37,7 +40,7 @@ onMounted(async () => {
         >
           <div class="flex items-center gap-2">
             <Trophy class="w-4 h-4 text-amber-500" />
-            <span>Daily Challenge</span>
+            <span>{{ t("problem.sidebar.dailyChallenge") }}</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="text-xs font-normal text-muted-foreground mr-1"

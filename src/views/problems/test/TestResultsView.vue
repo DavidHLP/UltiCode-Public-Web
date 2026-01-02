@@ -11,6 +11,7 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty";
 import { useBottomPanelStore } from "./test";
+import { useI18n } from "vue-i18n";
 import type {
   ProblemCaseResultDetail,
   ProblemRunResult,
@@ -20,6 +21,7 @@ const props = defineProps<{
   runResult: ProblemRunResult | null;
 }>();
 
+const { t } = useI18n();
 const { activeCaseLabel } = useBottomPanelStore();
 
 const cases = computed<ProblemCaseResultDetail[]>(
@@ -52,32 +54,14 @@ const activeResult = computed<ProblemCaseResultDetail | undefined>(() => {
 
 const verdictLabel = computed(() => {
   const verdict = props.runResult?.verdict;
-  if (!verdict) return "No verdict yet";
+  if (!verdict) return t("problem.layout.noVerdict");
   switch (verdict) {
     case "Accepted":
-      return "Accepted";
+      return t("problem.status.solved");
     case "Wrong Answer":
-      return "Wrong Answer";
-    case "Runtime Error":
-      return "Runtime Error";
-    case "Time Limit Exceeded":
-      return "Time Limit Exceeded";
-    case "Memory Limit Exceeded":
-      return "Memory Limit Exceeded";
-    case "Output Limit Exceeded":
-      return "Output Limit Exceeded";
-    case "Presentation Error":
-      return "Presentation Error";
-    case "System Error":
-      return "System Error";
-    case "Compile Error":
-      return "Compile Error";
-    case "Judging":
-      return "Judging";
-    case "Pending":
-      return "Pending";
+      return t("problem.status.attempted"); // or map specifically
     default:
-      return verdict;
+      return verdict; // maybe add more mappings if needed
   }
 });
 
@@ -163,9 +147,11 @@ const selectCase = (label: string) => {
         </EmptyMedia>
         <EmptyHeader>
           <div class="text-base font-semibold text-foreground">
-            暂无测试结果
+            {{ t("problem.layout.noTestResults") }}
           </div>
-          <EmptyDescription>请先执行代码后查看测试结果。</EmptyDescription>
+          <EmptyDescription>{{
+            t("problem.layout.runCodeToSeeResults")
+          }}</EmptyDescription>
         </EmptyHeader>
       </EmptyContent>
     </Empty>
@@ -246,12 +232,14 @@ const selectCase = (label: string) => {
                   />
                 </div>
               </template>
-              <p v-else class="text-muted-foreground">此用例没有输入。</p>
+              <p v-else class="text-muted-foreground">
+                {{ t("problem.layout.noPredefinedInputs") }}
+              </p>
             </div>
 
             <div class="space-y-2">
               <div class="text-xs font-medium text-muted-foreground">
-                Output =
+                {{ t("problem.layout.output") }} =
               </div>
               <Input
                 :model-value="activeResult.output"
@@ -262,7 +250,7 @@ const selectCase = (label: string) => {
 
             <div class="space-y-2">
               <div class="text-xs font-medium text-muted-foreground">
-                Expected =
+                {{ t("problem.layout.expected") }} =
               </div>
               <Input
                 :model-value="activeResult.expectedOutput"

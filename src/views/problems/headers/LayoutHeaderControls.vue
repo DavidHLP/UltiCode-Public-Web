@@ -25,6 +25,7 @@ import {
 import type { ProblemDetail } from "@/types/problem-detail";
 import { RouterLink } from "vue-router";
 import { ProblemEdgeOperations } from "@/components/edge-operations";
+import { useI18n } from "vue-i18n";
 
 interface Props {
   currentLayout: "leet" | "classic" | "compact" | "wide";
@@ -36,29 +37,31 @@ const emit = defineEmits<{
   "layout-change": [layout: "leet" | "classic" | "compact" | "wide"];
 }>();
 
+const { t } = useI18n();
+
 // Layout options
-const layoutOptions = [
+const layoutOptions = computed(() => [
   {
     id: "leet",
-    label: "Leet",
+    label: t("problem.layout.leet"),
     value: "leet",
   },
   {
     id: "classic",
-    label: "Classic",
+    label: t("problem.layout.classic"),
     value: "classic",
   },
   {
     id: "compact",
-    label: "Compact",
+    label: t("problem.layout.compact"),
     value: "compact",
   },
   {
     id: "wide",
-    label: "Wide",
+    label: t("problem.layout.wide"),
     value: "wide",
   },
-];
+]);
 
 const selectedLayout = computed({
   get: () => props.currentLayout,
@@ -80,7 +83,7 @@ const selectedLayout = computed({
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Layout"
+              :aria-label="t('problem.explorer.filters')"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
             >
               <Layout class="h-4 w-4" />
@@ -88,7 +91,9 @@ const selectedLayout = computed({
           </DropdownMenuTrigger>
           <DropdownMenuContent class="w-96 p-4">
             <div class="space-y-3">
-              <div class="text-sm font-semibold text-gray-900">Layout</div>
+              <div class="text-sm font-semibold text-gray-900">
+                {{ t("problem.explorer.filters") }}
+              </div>
               <DropdownMenuRadioGroup
                 :model-value="selectedLayout"
                 @update:model-value="
@@ -211,32 +216,34 @@ const selectedLayout = computed({
             <Button
               variant="ghost"
               size="icon"
-              aria-label="User"
+              :aria-label="t('personal.profile.title')"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0"
             >
               <User class="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent class="w-56" align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{{
+              t("problem.layout.userAccount")
+            }}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <RouterLink to="/personal">
                 <DropdownMenuItem class="cursor-pointer">
                   <User class="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{{ t("personal.profile.title") }}</span>
                 </DropdownMenuItem>
               </RouterLink>
               <RouterLink to="/personal/solutions">
                 <DropdownMenuItem class="cursor-pointer">
                   <FileCode class="mr-2 h-4 w-4" />
-                  <span>Solutions</span>
+                  <span>{{ t("personal.solutions.title") }}</span>
                 </DropdownMenuItem>
               </RouterLink>
               <RouterLink to="/personal/submissions">
                 <DropdownMenuItem class="cursor-pointer">
                   <History class="mr-2 h-4 w-4" />
-                  <span>Submissions</span>
+                  <span>{{ t("personal.submissions.title") }}</span>
                 </DropdownMenuItem>
               </RouterLink>
             </DropdownMenuGroup>
@@ -244,13 +251,13 @@ const selectedLayout = computed({
             <RouterLink to="/personal/account">
               <DropdownMenuItem class="cursor-pointer">
                 <Settings class="mr-2 h-4 w-4" />
-                <span>Account Settings</span>
+                <span>{{ t("personal.account.title") }}</span>
               </DropdownMenuItem>
             </RouterLink>
             <DropdownMenuSeparator />
             <DropdownMenuItem class="text-rose-600 cursor-pointer">
               <LogOut class="mr-2 h-4 w-4" />
-              <span>Log out</span>
+              <span>{{ t("problem.layout.logout") }}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

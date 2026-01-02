@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (
@@ -72,7 +75,7 @@ const handleMouseUp = () => {
       <div
         class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold bg-white/50"
       >
-        Split Top
+        {{ t("problem.layout.splitTop") }}
       </div>
     </div>
 
@@ -83,7 +86,7 @@ const handleMouseUp = () => {
       <div
         class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold bg-white/50"
       >
-        Split Bottom
+        {{ t("problem.layout.splitBottom") }}
       </div>
     </div>
 
@@ -94,7 +97,7 @@ const handleMouseUp = () => {
       <div
         class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold bg-white/50 writing-mode-vertical"
       >
-        Split Left
+        {{ t("problem.layout.splitLeft") }}
       </div>
     </div>
 
@@ -105,7 +108,7 @@ const handleMouseUp = () => {
       <div
         class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold bg-white/50 writing-mode-vertical"
       >
-        Split Right
+        {{ t("problem.layout.splitRight") }}
       </div>
     </div>
 
@@ -116,7 +119,7 @@ const handleMouseUp = () => {
       <div
         class="absolute inset-0 flex items-center justify-center text-blue-600 font-bold"
       >
-        Add to Group
+        {{ t("problem.layout.addToGroup") }}
       </div>
     </div>
   </div>

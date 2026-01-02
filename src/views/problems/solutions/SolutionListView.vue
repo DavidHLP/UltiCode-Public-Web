@@ -33,6 +33,7 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   problemId?: number;
@@ -47,6 +48,7 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const route = useRoute();
+const { t } = useI18n();
 
 const search = ref("");
 const languageFilter = ref("all");
@@ -58,8 +60,8 @@ const sortOptions = computed(() =>
   props.sortOptions.length
     ? props.sortOptions
     : [
-        { label: "Most liked", value: "likes" },
-        { label: "Most recent", value: "newest" },
+        { label: t("problem.solutions.mostLiked"), value: "likes" },
+        { label: t("problem.solutions.mostRecent"), value: "newest" },
       ],
 );
 
@@ -135,7 +137,7 @@ const handleCreateSolution = () => {
     return;
   }
   if (!bestSubmission.value) {
-    toast.error("You must have an accepted submission to create a solution.");
+    toast.error(t("solution.messages.acceptedRequired"));
     return;
   }
   router.push({
@@ -179,7 +181,7 @@ onMounted(async () => {
           />
           <Input
             v-model="search"
-            placeholder="Search solutions"
+            :placeholder="t('problem.solutions.searchPlaceholder')"
             class="h-8 pl-8 text-xs"
           />
         </div>
@@ -189,7 +191,7 @@ onMounted(async () => {
           <DropdownMenuTrigger as-child>
             <Button variant="outline" size="sm" class="gap-1.5 text-xs">
               <ArrowDownAZ class="h-4 w-4" />
-              Sort
+              {{ t("common.actions.sort") }}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -222,7 +224,7 @@ onMounted(async () => {
             "
             @click="languageFilter = 'all'"
           >
-            All
+            {{ t("common.labels.all") }}
           </Badge>
           <Badge
             v-for="option in languageOptions.filter(
@@ -259,7 +261,7 @@ onMounted(async () => {
                 />
               </div>
               <span class="text-[11px] leading-tight">
-                You've already shared a solution for this problem.
+                {{ t("problem.solutions.alreadyShared") }}
               </span>
             </template>
             <template v-else-if="bestSubmission">
@@ -271,18 +273,16 @@ onMounted(async () => {
                 />
               </div>
               <span class="text-[11px] leading-tight">
-                Your most recent submission ran for more than
-                <span class="font-semibold text-green-600 dark:text-green-400"
-                  >{{
-                    bestSubmission.runtimePercentile?.toFixed(1) ?? 0
-                  }}%</span
-                >
-                of users
+                {{
+                  t("problem.solutions.runtimeBeats", {
+                    percent: bestSubmission.runtimePercentile?.toFixed(1) ?? 0,
+                  })
+                }}
               </span>
             </template>
             <template v-else>
               <span class="text-[11px] leading-tight text-muted-foreground">
-                Solve the problem to write a solution
+                {{ t("problem.solutions.solveToWrite") }}
               </span>
             </template>
           </div>
@@ -291,7 +291,11 @@ onMounted(async () => {
             @click="handleCreateSolution"
           >
             <PenLine class="h-2.5 w-2.5" />
-            {{ userSolution ? "Edit Solution" : "Write Solution" }}
+            {{
+              userSolution
+                ? t("problem.solutions.editSolution")
+                : t("problem.solutions.writeSolution")
+            }}
           </button>
         </div>
       </div>
@@ -319,10 +323,10 @@ onMounted(async () => {
             </EmptyMedia>
             <EmptyHeader>
               <p class="text-base font-semibold text-foreground">
-                No solutions yet
+                {{ t("problem.solutions.noSolutionsTitle") }}
               </p>
               <EmptyDescription>
-                Share your approach to help others understand this problem.
+                {{ t("problem.solutions.noSolutionsDesc") }}
               </EmptyDescription>
             </EmptyHeader>
           </EmptyContent>

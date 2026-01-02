@@ -24,6 +24,7 @@ import { fetchCurrentUserId, isAuthenticated } from "@/utils/auth";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "vue-router";
 import { Pencil, Trash2 } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   item: SolutionFeedItem;
@@ -34,6 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const { t } = useI18n();
 
 const authorInitial = computed(
   () => props.item.author.name.charAt(0)?.toUpperCase() ?? "?",
@@ -44,7 +46,7 @@ const topicLabel = computed(
     props.item.topicName ||
     props.item.topicTranslated ||
     props.item.topic ||
-    "topic",
+    t("forum.post.flair"),
 );
 
 const comments = ref<ForumComment[]>([]);
@@ -109,10 +111,10 @@ const handleCommentEdit = async (
   try {
     await updateSolutionComment(String(commentId), content);
     await loadComments();
-    toast.success("Comment updated");
+    toast.success(t("problem.solutions.commentUpdated"));
   } catch (error) {
     console.error("Failed to update comment", error);
-    toast.error("Failed to update comment");
+    toast.error(t("forum.messages.commentEditFailed"));
   }
 };
 
@@ -120,16 +122,16 @@ const handleCommentDelete = async (commentId: string | number) => {
   try {
     await deleteSolutionComment(String(commentId));
     await loadComments();
-    toast.success("Comment deleted");
+    toast.success(t("problem.solutions.commentDeleted"));
   } catch (error) {
     console.error("Failed to delete comment", error);
-    toast.error("Failed to delete comment");
+    toast.error(t("forum.messages.commentDeleteFailed"));
   }
 };
 
 const handleSolutionVote = async (voteType: 1 | -1) => {
   if (!isAuthenticated()) {
-    toast.error("Please log in to vote.");
+    toast.error(t("problem.solutions.loginToVote"));
     return;
   }
   try {
@@ -151,17 +153,15 @@ const handleEditSolution = () => {
 
 const handleDeleteSolution = async () => {
   if (!props.item.id || props.item.id === "follow-up") return;
-  const confirmed = window.confirm(
-    "Delete this solution? This action cannot be undone.",
-  );
+  const confirmed = window.confirm(t("problem.solutions.deleteConfirm"));
   if (!confirmed) return;
   try {
     await deleteSolution(props.item.id);
-    toast.success("Solution deleted");
+    toast.success(t("problem.solutions.solutionDeleted"));
     emit("deleted", props.item.id);
   } catch (error) {
     console.error("Failed to delete solution", error);
-    toast.error("Failed to delete solution");
+    toast.error(t("personal.messages.saveFailed"));
   }
 };
 
@@ -170,7 +170,7 @@ const handleCommentVote = async (
   voteType: 1 | -1,
 ) => {
   if (!isAuthenticated()) {
-    toast.error("Please log in to vote.");
+    toast.error(t("problem.solutions.loginToVote"));
     return;
   }
   try {
@@ -258,7 +258,7 @@ watch(
               @click="handleEditSolution"
             >
               <Pencil class="mr-1 h-3.5 w-3.5" />
-              Edit
+              {{ t("common.actions.edit") }}
             </Button>
             <Button
               variant="ghost"
@@ -267,7 +267,7 @@ watch(
               @click="handleDeleteSolution"
             >
               <Trash2 class="mr-1 h-3.5 w-3.5" />
-              Delete
+              {{ t("common.actions.delete") }}
             </Button>
           </div>
         </div>
@@ -328,11 +328,11 @@ watch(
           comments: {
             show: true,
             count: props.item.stats.comments,
-            text: 'Comments',
+            text: t('forum.comments.title'),
             icon: 'message-circle',
           },
-          share: { show: true, text: 'Share' },
-          save: { show: true, text: 'Save' },
+          share: { show: true, text: t('forum.actions.share') },
+          save: { show: true, text: t('forum.actions.save') },
         }"
         class="border-t pt-4"
         @vote="handleSolutionVote"
@@ -342,7 +342,9 @@ watch(
     <!-- Comments Section -->
     <div class="mt-4">
       <Separator class="mb-4" />
-      <h3 class="text-sm font-semibold mb-4">Comments</h3>
+      <h3 class="text-sm font-semibold mb-4">
+        {{ t("forum.comments.title") }}
+      </h3>
       <CommentThread
         :comments="comments"
         :is-locked="false"

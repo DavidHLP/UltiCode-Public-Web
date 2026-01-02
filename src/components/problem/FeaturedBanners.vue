@@ -13,6 +13,7 @@ import {
   ArrowUpDown,
 } from "lucide-vue-next";
 import type { LucideIcon } from "lucide-vue-next";
+import { useI18n } from "vue-i18n";
 
 type BannerTheme = {
   card: string;
@@ -28,6 +29,8 @@ type DisplayBanner = ProblemList & {
   icon: LucideIcon;
   theme: BannerTheme;
 };
+
+const { t } = useI18n();
 
 const CARD_BASE =
   "relative overflow-hidden border shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 h-full rounded-2xl";
@@ -110,10 +113,8 @@ const sortedBanners = computed(() => {
 const displayBanners = computed<DisplayBanner[]>(() =>
   sortedBanners.value.map((banner) => ({
     ...banner,
-    tag: banner.bannerTag ?? "Featured",
-    summary:
-      banner.description ??
-      "Curated sets to help you sharpen patterns and stay consistent.",
+    tag: banner.bannerTag ?? t("problem.banners.featuredDefault"),
+    summary: banner.description ?? t("problem.banners.curatedDefault"),
     icon: resolveIcon(banner.bannerIcon),
     theme: resolveTheme(banner.bannerTheme),
   })),
@@ -171,14 +172,16 @@ onMounted(async () => {
         </div>
         <p class="text-xl font-bold text-foreground">
           {{
-            hasError ? "Unable to load featured lists" : "No featured lists yet"
+            hasError
+              ? t("problem.banners.unableToLoad")
+              : t("problem.banners.noBanners")
           }}
         </p>
         <p class="text-sm text-muted-foreground mt-2 max-w-[300px]">
           {{
             hasError
-              ? "Please try again in a moment."
-              : "Featured problem lists will appear here once configured."
+              ? t("problem.banners.tryAgain")
+              : t("problem.banners.featuredListsConfigured")
           }}
         </p>
       </div>
@@ -229,12 +232,12 @@ onMounted(async () => {
                 class="text-xs font-medium text-muted-foreground flex items-center gap-1"
               >
                 <Sparkles class="w-3 h-3" :class="banner.theme.sparkle" />
-                {{ banner.problemCount }} Questions
+                {{ banner.problemCount }} {{ t("problem.banners.questions") }}
               </div>
               <div
                 class="flex items-center gap-1 text-xs font-semibold text-primary opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0"
               >
-                View List
+                {{ t("problem.banners.viewList") }}
                 <ArrowRight class="w-3.5 h-3.5" />
               </div>
             </div>

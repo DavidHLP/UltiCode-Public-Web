@@ -6,12 +6,14 @@ import { Calendar, Clock, PlayCircle, Users } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import type { ContestListItem } from "@/types/contest";
 import { formatDateTime } from "@/utils/date";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   contests: ContestListItem[];
 }>();
 
 const router = useRouter();
+const { t } = useI18n();
 const countdowns = ref<Map<string, string>>(new Map());
 const progress = ref<Map<string, number>>(new Map());
 let intervalId: number | null = null;
@@ -42,12 +44,7 @@ function formatCountdown(seconds: number): string {
 }
 
 function getContestTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    weekly: "Weekly Contest",
-    biweekly: "Biweekly Contest",
-    special: "Special Contest",
-  };
-  return labels[type] || type;
+  return t(`contest.types.${type}`);
 }
 
 function updateTimers() {
@@ -58,7 +55,7 @@ function updateTimers() {
     const startMs = new Date(contest.start_time).getTime();
 
     if (!endMs || Number.isNaN(startMs)) {
-      countdowns.value.set(contest.id, "Time TBD");
+      countdowns.value.set(contest.id, t("contest.status.tbd"));
       progress.value.set(contest.id, 0);
       return;
     }
@@ -73,13 +70,13 @@ function updateTimers() {
     progress.value.set(contest.id, percent);
     countdowns.value.set(
       contest.id,
-      remaining === 0 ? "Ended" : formatCountdown(remaining),
+      remaining === 0 ? t("contest.status.ended") : formatCountdown(remaining),
     );
   });
 }
 
 function getCountdown(contestId: string): string {
-  return countdowns.value.get(contestId) || "Loading...";
+  return countdowns.value.get(contestId) || t("common.status.loading");
 }
 
 function getProgress(contestId: string): number {
@@ -110,16 +107,18 @@ onUnmounted(() => {
   <section v-if="contests.length > 0" class="space-y-5">
     <div class="flex items-center justify-between">
       <div class="space-y-1">
-        <h2 class="text-2xl font-bold tracking-tight">Live Contests</h2>
+        <h2 class="text-2xl font-bold tracking-tight">
+          {{ t("contest.list.live") }}
+        </h2>
         <p class="text-sm text-muted-foreground">
-          Compete while the clock is running and climb the live board.
+          {{ t("contest.list.liveSubtitle") }}
         </p>
       </div>
       <div
         class="flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-rose-600"
       >
         <span class="h-2 w-2 rounded-full bg-rose-500 animate-pulse"></span>
-        Live
+        {{ t("contest.list.liveBadge") }}
       </div>
     </div>
 
@@ -155,7 +154,7 @@ onUnmounted(() => {
               <div
                 class="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
               >
-                Live Now
+                {{ t("contest.list.liveNow") }}
               </div>
             </div>
 
@@ -166,23 +165,28 @@ onUnmounted(() => {
               </div>
               <div class="flex items-center gap-2">
                 <Clock class="h-4 w-4" />
-                <span>Remaining: {{ getCountdown(contest.id) }}</span>
+                <span
+                  >{{ t("contest.list.remaining") }}
+                  {{ getCountdown(contest.id) }}</span
+                >
               </div>
               <div class="flex items-center gap-2">
                 <Users class="h-4 w-4" />
-                <span>
-                  {{
+                <span
+                  >{{
                     contest.participant_count || contest.participantCount || 0
                   }}
-                  participants
-                </span>
+                  {{ t("contest.detail.participants") }}</span
+                >
               </div>
               <div class="flex items-center gap-2">
                 <Clock class="h-4 w-4" />
-                <span>
-                  {{ contest.duration_minutes || contest.durationMinutes || 0 }}
-                  min
-                </span>
+                <span
+                  >{{
+                    contest.duration_minutes || contest.durationMinutes || 0
+                  }}
+                  {{ t("contest.time.min_short") }}</span
+                >
               </div>
             </div>
 
@@ -196,15 +200,19 @@ onUnmounted(() => {
               <div
                 class="flex items-center justify-between text-[10px] uppercase tracking-widest text-white/70"
               >
-                <span>Live Progress</span>
+                <span>{{ t("contest.list.liveProgress") }}</span>
                 <span>{{ Math.round(getProgress(contest.id)) }}%</span>
               </div>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="text-xs text-white/70">
-                Rated:
-                {{ (contest.isRated ?? contest.is_rated) ? "Yes" : "No" }}
+                {{ t("contest.list.rated") }}
+                {{
+                  (contest.isRated ?? contest.is_rated)
+                    ? t("common.labels.yes")
+                    : t("common.labels.no")
+                }}
               </div>
               <Button
                 size="sm"
@@ -217,7 +225,7 @@ onUnmounted(() => {
                 "
               >
                 <PlayCircle class="mr-2 h-4 w-4" />
-                Enter Contest
+                {{ t("contest.detail.enterContest") }}
               </Button>
             </div>
           </div>

@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { login } from "@/api/auth";
 import { setToken, setUserId } from "@/utils/auth";
 import { toast } from "vue-sonner";
@@ -20,8 +21,9 @@ const props = defineProps<{
   class?: HTMLAttributes["class"];
 }>();
 
+const { t } = useI18n();
 const router = useRouter();
-const email = ref("yuki_codes"); // Using 'username' field on backend but form calls it email. Now using empty default.
+const email = ref("yuki_codes");
 const password = ref("password123");
 const loading = ref(false);
 
@@ -29,19 +31,17 @@ async function handleSubmit(e: Event) {
   e.preventDefault();
   loading.value = true;
   try {
-    // Backend expects 'username', but UI says 'Email'.
-    // For this demo with mock auth, I'll send the value as 'username'.
     const res = await login({
       username: email.value,
       password: password.value,
     });
     setToken(res.access_token);
     setUserId(res.user.id);
-    toast.success("Logged in successfully");
+    toast.success(t("auth.messages.loginSuccess"));
     router.push("/");
   } catch (error) {
     console.error(error);
-    toast.error("Login failed");
+    toast.error(t("auth.messages.loginFailed"));
   } finally {
     loading.value = false;
   }
@@ -56,39 +56,45 @@ function handleGithubLogin() {
   <form :class="cn('flex flex-col gap-6', props.class)" @submit="handleSubmit">
     <FieldGroup>
       <div class="flex flex-col items-center gap-1 text-center">
-        <h1 class="text-2xl font-bold">Login to your account</h1>
+        <h1 class="text-2xl font-bold">{{ t("auth.login.title") }}</h1>
         <p class="text-muted-foreground text-sm text-balance">
-          Enter your email below to login to your account
+          {{ t("auth.login.subtitle") }}
         </p>
       </div>
       <Field>
-        <FieldLabel for="email"> Username </FieldLabel>
+        <FieldLabel for="email">{{ t("auth.login.username") }}</FieldLabel>
         <Input
           id="email"
           type="text"
           v-model="email"
-          placeholder="Enter your username"
+          :placeholder="t('auth.login.usernamePlaceholder')"
           required
         />
       </Field>
       <Field>
         <div class="flex items-center">
-          <FieldLabel for="password"> Password </FieldLabel>
+          <FieldLabel for="password">{{ t("auth.login.password") }}</FieldLabel>
           <a
             href="/forgot-password"
             class="ml-auto text-sm underline-offset-4 hover:underline"
           >
-            Forgot your password?
+            {{ t("auth.login.forgotPassword") }}
           </a>
         </div>
-        <Input id="password" type="password" v-model="password" required />
+        <Input
+          id="password"
+          type="password"
+          v-model="password"
+          :placeholder="t('auth.login.passwordPlaceholder')"
+          required
+        />
       </Field>
       <Field>
         <Button type="submit" :disabled="loading">
-          {{ loading ? "Logging in..." : "Login" }}
+          {{ loading ? t("auth.login.submitting") : t("auth.login.submit") }}
         </Button>
       </Field>
-      <FieldSeparator>Or continue with</FieldSeparator>
+      <FieldSeparator>{{ t("auth.login.orContinueWith") }}</FieldSeparator>
       <Field>
         <Button variant="outline" type="button" @click="handleGithubLogin">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -97,11 +103,11 @@ function handleGithubLogin() {
               fill="currentColor"
             />
           </svg>
-          Login with GitHub
+          {{ t("auth.login.loginWithGithub") }}
         </Button>
         <FieldDescription class="text-center">
-          Don't have an account?
-          <a href="/register">Sign up</a>
+          {{ t("auth.login.noAccount") }}
+          <a href="/register">{{ t("auth.login.signUp") }}</a>
         </FieldDescription>
       </Field>
     </FieldGroup>

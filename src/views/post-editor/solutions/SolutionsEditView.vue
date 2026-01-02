@@ -4,7 +4,7 @@
     <header class="flex h-14 flex-shrink-0 items-center border-b px-4">
       <Button variant="ghost" size="sm" class="gap-2" @click="handleGoBack">
         <ArrowLeft class="h-4 w-4" />
-        Back
+        {{ t("solution.editor.back") }}
       </Button>
       <div class="flex-1" />
       <span class="text-xs text-muted-foreground">
@@ -12,7 +12,11 @@
       </span>
       <Button size="sm" class="ml-4 gap-2" @click="handlePublish">
         <SendHorizonal class="h-4 w-4" />
-        {{ isEditMode ? "Update Solution" : "Publish Solution" }}
+        {{
+          isEditMode
+            ? t("solution.editor.update")
+            : t("solution.editor.publish")
+        }}
       </Button>
     </header>
 
@@ -24,7 +28,7 @@
           <div class="rounded-lg border bg-card p-3">
             <Input
               v-model="title"
-              placeholder="Enter title"
+              :placeholder="t('solution.editor.enterTitle')"
               class="rounded-none border-0 border-b bg-transparent px-0 text-base font-medium shadow-none focus-visible:ring-0"
             />
 
@@ -36,23 +40,25 @@
                   @click="showTopicPicker = !showTopicPicker"
                 >
                   <Tag class="h-4 w-4" />
-                  Topics
+                  {{ t("solution.editor.topics") }}
                 </button>
                 <div
                   v-if="showTopicPicker"
                   class="absolute left-0 top-10 z-50 w-80 rounded-md border border-border bg-card shadow-lg"
                 >
                   <div class="border-b border-border px-4 py-3">
-                    <h4 class="text-sm font-medium">Select Topics</h4>
+                    <h4 class="text-sm font-medium">
+                      {{ t("solution.editor.selectTopics") }}
+                    </h4>
                   </div>
 
                   <div
                     v-if="isLoadingTopics"
                     class="flex items-center justify-center py-8"
                   >
-                    <span class="text-sm text-muted-foreground"
-                      >Loading...</span
-                    >
+                    <span class="text-sm text-muted-foreground">{{
+                      t("solution.editor.loading")
+                    }}</span>
                   </div>
                   <div v-else-if="topicLoadError" class="py-8 text-center">
                     <p class="text-sm text-destructive">{{ topicLoadError }}</p>
@@ -62,7 +68,7 @@
                     class="py-8 text-center"
                   >
                     <p class="text-sm text-muted-foreground">
-                      No topics available
+                      {{ t("solution.editor.noTopics") }}
                     </p>
                   </div>
                   <div v-else class="max-h-64 overflow-y-auto">
@@ -118,7 +124,7 @@
               <div
                 class="flex items-center border-b bg-muted/30 px-3 py-2 text-xs font-medium text-muted-foreground"
               >
-                Preview
+                {{ t("solution.editor.preview") }}
               </div>
               <div class="flex-1 overflow-y-auto p-4">
                 <MarkdownView :content="editorContent" />
@@ -152,31 +158,33 @@ import { fetchSubmission, fetchBestSubmission } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import type { SolutionTopic } from "@/types/topic";
 import { fetchCurrentUserId } from "@/utils/auth";
+import { useI18n } from "vue-i18n";
 import "highlight.js/styles/atom-one-dark.css";
 
 import { MarkdownEdit, MarkdownView } from "@/components/markdown";
 
 const router = useRouter();
 const route = useRoute();
+const { t } = useI18n();
 
 const language = ref<string>("java");
 const title = ref("");
 
 // Default template content
-const defaultTemplate = `# Approach
+const defaultTemplate = `# ${t("solution.template.approach")}
 
-> What method do you use to solve this problem?
+> ${t("solution.template.approachHint")}
 
-# Solution
+# ${t("solution.template.solution")}
 
-> How do you apply these methods?
+> ${t("solution.template.solutionHint")}
 
-# Complexity
+# ${t("solution.template.complexity")}
 
-- Time complexity: $O(*)$
-- Space complexity: $O(*)$
+- ${t("solution.template.timeComplexity")}: $O(*)$
+- ${t("solution.template.spaceComplexity")}: $O(*)$
 
-# Code
+# ${t("solution.template.code")}
 
 \`\`\`java {group="solution"}
 class Solution {
@@ -235,7 +243,7 @@ const loadSolution = async (id: string) => {
     }
   } catch (error) {
     console.error("Failed to load solution", error);
-    toast.error("Failed to load solution");
+    toast.error(t("solution.messages.loadFailed"));
     router.back();
   }
 };
@@ -250,7 +258,7 @@ const initCreationFlow = async () => {
       submissionToUse = await fetchSubmission(submissionId);
     } catch (error) {
       console.error("Failed to fetch submission", error);
-      toast.error("Failed to fetch submission.");
+      toast.error(t("solution.messages.fetchSubmissionFailed"));
       router.back();
       return;
     }
@@ -269,9 +277,7 @@ const initCreationFlow = async () => {
   if (submissionToUse) {
     if (submissionToUse.status !== "Accepted") {
       if (submissionId) {
-        toast.error(
-          "You must have an Accepted submission to create a solution.",
-        );
+        toast.error(t("solution.messages.acceptedRequired"));
         router.push({
           name: "problem-detail",
           params: {
@@ -291,20 +297,20 @@ const initCreationFlow = async () => {
       const lang = submissionToUse.language.toLowerCase();
       language.value = lang;
       const code = submissionToUse.code;
-      initialMd = `# Approach
+      initialMd = `# ${t("solution.template.approach")}
 
-> What method do you use to solve this problem?
+> ${t("solution.template.approachHint")}
 
-# Solution
+# ${t("solution.template.solution")}
 
-> How do you apply these methods?
+> ${t("solution.template.solutionHint")}
 
-# Complexity
+# ${t("solution.template.complexity")}
 
-- Time complexity: $O(*)$
-- Space complexity: $O(*)$
+- ${t("solution.template.timeComplexity")}: $O(*)$
+- ${t("solution.template.spaceComplexity")}: $O(*)$
 
-# Code
+# ${t("solution.template.code")}
 
 \`\`\`${lang} {group="solution"}
 ${code}
@@ -353,7 +359,7 @@ const loadTopics = async () => {
     }
   } catch (error) {
     console.error("Failed to load solution topics", error);
-    topicLoadError.value = "Failed to load topics";
+    topicLoadError.value = t("solution.messages.loadTopicsFailed");
   } finally {
     isLoadingTopics.value = false;
   }
@@ -361,7 +367,9 @@ const loadTopics = async () => {
 
 const isDraftSaved = ref(true);
 const draftStatus = computed(() =>
-  isDraftSaved.value ? "Draft saved" : "Editing draft...",
+  isDraftSaved.value
+    ? t("solution.editor.draftSaved")
+    : t("solution.editor.editingDraft"),
 );
 
 const markDraftSaved = useDebounceFn(() => {
@@ -391,11 +399,11 @@ const removeTopic = (topicId: string) => {
 
 const handlePublish = async () => {
   if (!title.value.trim()) {
-    toast.error("Please enter a title");
+    toast.error(t("solution.messages.enterTitle"));
     return;
   }
   if (!editorContent.value.trim()) {
-    toast.error("Please enter some content");
+    toast.error(t("solution.messages.enterContent"));
     return;
   }
 
@@ -408,7 +416,7 @@ const handlePublish = async () => {
         language: language.value,
         tags: selectedTopicIds.value,
       });
-      toast.success("Solution updated successfully");
+      toast.success(t("solution.messages.updateSuccess"));
     } else {
       await createSolution(resolvedProblemId.value, {
         title: title.value,
@@ -416,7 +424,7 @@ const handlePublish = async () => {
         language: language.value,
         tags: selectedTopicIds.value,
       });
-      toast.success("Solution published successfully");
+      toast.success(t("solution.messages.publishSuccess"));
     }
 
     // Release draft saved status
@@ -436,7 +444,7 @@ const handlePublish = async () => {
     }
   } catch (error: unknown) {
     console.error("Failed to publish/update solution", error);
-    let message = "Failed to publish solution";
+    let message = t("solution.messages.publishFailed");
     if (axios.isAxiosError(error)) {
       message = error.response?.data?.message || message;
     }
@@ -454,7 +462,7 @@ const handlePublish = async () => {
           );
           const existing = response.items[0];
           if (existing) {
-            toast.info("Solution already exists. Redirecting to edit.");
+            toast.info(t("solution.messages.alreadyExists"));
             router.push({ name: "solution-edit", params: { id: existing.id } });
             return;
           }

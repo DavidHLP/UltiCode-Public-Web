@@ -22,6 +22,7 @@ import {
 import { toast } from "vue-sonner";
 import { isAuthenticated } from "@/utils/auth";
 import { MarkdownEdit, MarkdownView } from "@/components/markdown";
+import { useI18n } from "vue-i18n";
 import {
   ArrowLeft,
   SendHorizonal,
@@ -34,6 +35,7 @@ import {
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const isEditMode = computed(() => Boolean(route.params.postId));
 const isLoading = ref(true);
@@ -64,13 +66,13 @@ Share the background briefly.
 What are you looking for from the community?
 `;
 
-const flairOptions = [
-  { value: "discussion", label: "Discussion" },
-  { value: "question", label: "Question" },
-  { value: "announcement", label: "Announcement" },
-  { value: "showcase", label: "Showcase" },
-  { value: "hiring", label: "Hiring" },
-];
+const flairOptions = computed(() => [
+  { value: "discussion", label: t("forum.flairs.discussion") },
+  { value: "question", label: t("forum.flairs.question") },
+  { value: "announcement", label: t("forum.flairs.announcement") },
+  { value: "showcase", label: t("forum.flairs.showcase") },
+  { value: "hiring", label: t("forum.flairs.hiring") },
+]);
 
 function applyPost(post: ForumPost) {
   title.value = post.title || "";
@@ -95,7 +97,7 @@ async function loadData() {
       const postId = route.params.postId as string;
       const post = await fetchForumPost(postId);
       if (!post) {
-        toast.error("Post not found.");
+        toast.error(t("forum.messages.postNotFound"));
         return;
       }
       applyPost(post);
@@ -104,7 +106,7 @@ async function loadData() {
     }
   } catch (error) {
     console.error("Failed to load editor data", error);
-    toast.error("Failed to load editor data");
+    toast.error(t("forum.messages.loadFailed"));
   } finally {
     isLoading.value = false;
   }
@@ -112,11 +114,11 @@ async function loadData() {
 
 async function handleSave() {
   if (!isAuthenticated()) {
-    toast.error("Please log in to publish.");
+    toast.error(t("forum.messages.loginToPublish"));
     return;
   }
   if (!title.value.trim() || !excerpt.value.trim() || !communityId.value) {
-    toast.error("Please fill in the title, content, and community.");
+    toast.error(t("forum.messages.fillRequired"));
     return;
   }
   isSaving.value = true;
@@ -132,19 +134,19 @@ async function handleSave() {
     if (isEditMode.value) {
       const postId = route.params.postId as string;
       await updateForumPost(postId, payload);
-      toast.success("Post updated.");
+      toast.success(t("forum.messages.postUpdated"));
       router.push({ name: "forum-thread", params: { postId } });
     } else {
       const post = await createForumPost({
         ...payload,
         communityId: communityId.value,
       });
-      toast.success("Post published.");
+      toast.success(t("forum.messages.postCreated"));
       router.push({ name: "forum-thread", params: { postId: post.id } });
     }
   } catch (error) {
     console.error("Failed to save post", error);
-    toast.error("Failed to save post.");
+    toast.error(t("forum.messages.saveFailed"));
   } finally {
     isSaving.value = false;
   }
@@ -184,14 +186,16 @@ onMounted(loadData);
         @click="handleGoBack"
       >
         <ArrowLeft class="h-4 w-4" />
-        <span class="hidden sm:inline">Back</span>
+        <span class="hidden sm:inline">{{ t("forum.actions.back") }}</span>
       </Button>
 
       <Separator orientation="vertical" class="h-6" />
 
       <div class="flex items-center gap-2 flex-1">
         <h2 class="text-sm font-black uppercase tracking-widest text-primary">
-          {{ isEditMode ? "Edit Post" : "Create Post" }}
+          {{
+            isEditMode ? t("forum.post.editPost") : t("forum.post.createPost")
+          }}
         </h2>
       </div>
 
@@ -203,7 +207,11 @@ onMounted(loadData);
           @click="handleSave"
         >
           <SendHorizonal class="h-4 w-4" />
-          {{ isEditMode ? "Update" : "Publish" }}
+          {{
+            isEditMode
+              ? t("forum.post.updateButton")
+              : t("forum.post.publishButton")
+          }}
         </Button>
       </div>
     </header>
@@ -216,7 +224,7 @@ onMounted(loadData);
           <div class="max-w-5xl mx-auto w-full space-y-4">
             <Input
               v-model="title"
-              placeholder="Post Title"
+              :placeholder="t('forum.post.titlePlaceholder')"
               class="rounded-none border-0 border-b-2 border-transparent bg-transparent px-0 text-3xl font-black shadow-none focus-visible:ring-0 focus-visible:border-primary transition-all placeholder:text-muted-foreground/30 h-14"
             />
 
@@ -231,7 +239,7 @@ onMounted(loadData);
                   <SelectTrigger
                     class="w-[180px] h-7 border-0 bg-transparent shadow-none focus:ring-0 text-xs font-bold uppercase tracking-wider"
                   >
-                    <SelectValue placeholder="Community" />
+                    <SelectValue :placeholder="t('forum.post.community')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem
@@ -255,7 +263,7 @@ onMounted(loadData);
                   <SelectTrigger
                     class="w-[140px] h-7 border-0 bg-transparent shadow-none focus:ring-0 text-xs font-bold uppercase tracking-wider"
                   >
-                    <SelectValue placeholder="Flair" />
+                    <SelectValue :placeholder="t('forum.post.flair')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem
@@ -272,7 +280,7 @@ onMounted(loadData);
               <Input
                 v-if="flairType"
                 v-model="flairLabel"
-                placeholder="Custom Label"
+                :placeholder="t('forum.post.customLabel')"
                 class="h-9 w-[150px] text-xs font-bold rounded-full shadow-sm"
               />
 
@@ -284,7 +292,7 @@ onMounted(loadData);
                   @click="showTagPicker = !showTagPicker"
                 >
                   <Plus class="h-3.5 w-3.5" />
-                  Tags
+                  {{ t("forum.post.tags") }}
                 </Button>
                 <div
                   v-if="showTagPicker"
@@ -294,7 +302,7 @@ onMounted(loadData);
                     <h4
                       class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
                     >
-                      Select Post Tags
+                      {{ t("forum.post.selectTags") }}
                     </h4>
                   </div>
                   <div class="max-h-64 overflow-y-auto p-2 space-y-1">
@@ -356,7 +364,7 @@ onMounted(loadData);
               >
                 <span
                   class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-                  >Editor (Markdown)</span
+                  >{{ t("forum.post.editorMarkdown") }}</span
                 >
               </div>
               <div class="flex-1 overflow-hidden p-2">
@@ -375,13 +383,13 @@ onMounted(loadData);
               >
                 <span
                   class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-                  >Live Preview</span
+                  >{{ t("forum.post.livePreview") }}</span
                 >
               </div>
               <div class="flex-1 overflow-y-auto p-8 scrollbar-thin">
                 <div class="prose prose-sm dark:prose-invert max-w-none">
                   <h1 class="text-3xl font-black mb-6">
-                    {{ title || "Untilted Post" }}
+                    {{ title || t("forum.post.untitled") }}
                   </h1>
                   <MarkdownView :content="excerpt || defaultTemplate" />
                 </div>

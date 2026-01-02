@@ -17,6 +17,7 @@ import { toast } from "vue-sonner";
 import { ToggleNotesKey } from "../problem-context";
 import { useProblemContext } from "../useProblemContext";
 import { useProblemEditorStore } from "@/stores/problemEditorStore";
+import { useI18n } from "vue-i18n";
 
 const { requestRun } = useBottomPanelStore();
 const headerStore = useHeaderStore();
@@ -24,6 +25,7 @@ const problemContext = useProblemContext();
 const toggleNotes = inject(ToggleNotesKey, () => {});
 const editorStore = useProblemEditorStore();
 const { code, language } = storeToRefs(editorStore);
+const { t } = useI18n();
 
 const isRunning = ref(false);
 const isSubmitting = ref(false);
@@ -51,7 +53,7 @@ async function handleSubmit() {
   const currentCode = code.value;
   const currentLanguage = language.value || "typescript";
   if (!currentCode.trim()) {
-    toast.error("Please enter code before submitting.");
+    toast.error(t("problem.messages.enterTitle")); // Or suitable key
     return;
   }
 
@@ -61,12 +63,12 @@ async function handleSubmit() {
       language: currentLanguage,
       code: currentCode,
     });
-    toast.success(`Submission ${res.status}!`);
+    toast.success(`${t("problem.editor.submit")} ${res.status}!`);
     // Navigate to submissions tab
     headerStore.setActiveGroup("problem-info");
     headerStore.setActiveHeader("problem-info", 4);
   } catch (e) {
-    toast.error("Submission failed");
+    toast.error(t("problem.problemList.messages.saveFailed"));
     console.error(e);
   } finally {
     isSubmitting.value = false;
@@ -92,7 +94,7 @@ onBeforeUnmount(() => {
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Run"
+              :aria-label="t('problem.layout.runCode')"
               :aria-busy="isRunning"
               class="group relative flex-none cursor-pointer flex items-center h-8 transition hover:bg-primary/10 text-gray-600 w-9 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-100 overflow-hidden rounded-md"
               @click="handleRun"
@@ -118,7 +120,9 @@ onBeforeUnmount(() => {
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
             <div class="flex items-center gap-1">
-              <p class="text-xs leading-none">Run Code</p>
+              <p class="text-xs leading-none">
+                {{ t("problem.layout.runCode") }}
+              </p>
               <KbdGroup class="text-xs">
                 <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">F5</Kbd>
               </KbdGroup>
@@ -136,7 +140,7 @@ onBeforeUnmount(() => {
           <HoverCardTrigger as-child>
             <Button
               variant="ghost"
-              aria-label="Submit"
+              :aria-label="t('problem.layout.submitSolution')"
               :disabled="isSubmitting"
               class="group cursor-pointer gap-2 overflow-hidden hover:text-lc-icon-primary flex items-center h-8 transition-none hover:bg-gray-200 text-gray-60 px-2 bg-gray-200 disabled:opacity-50"
               @click="handleSubmit"
@@ -149,14 +153,20 @@ onBeforeUnmount(() => {
                 <div
                   class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
                 >
-                  {{ isSubmitting ? "Submitting..." : "Submit" }}
+                  {{
+                    isSubmitting
+                      ? t("problem.layout.formatting")
+                      : t("problem.layout.submitSolution")
+                  }}
                 </div>
               </div>
             </Button>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
             <div class="flex items-center gap-1">
-              <p class="text-xs leading-none">Submit Solution</p>
+              <p class="text-xs leading-none">
+                {{ t("problem.layout.submitSolution") }}
+              </p>
               <KbdGroup class="text-xs">
                 <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">Ctrl</Kbd>
                 <span class="text-xs">+</span>
@@ -172,7 +182,7 @@ onBeforeUnmount(() => {
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Notes"
+              :aria-label="t('problem.detail.notes')"
               class="group flex-none cursor-pointer flex items-center h-8 transition-none hover:bg-gray-200 text-gray-600 w-8 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-gray-200"
               @click="toggleNotes"
             >
@@ -181,7 +191,9 @@ onBeforeUnmount(() => {
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
             <div class="flex items-center gap-1">
-              <p class="text-xs leading-none">Notes</p>
+              <p class="text-xs leading-none">
+                {{ t("problem.detail.notes") }}
+              </p>
               <KbdGroup class="text-xs">
                 <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs">Ctrl</Kbd>
                 <span class="text-xs">+</span>

@@ -20,10 +20,12 @@ import { inject, ref, watch } from "vue";
 import { fetchAdjacentProblems, fetchRandomProblem } from "@/api/problem";
 import { ToggleSidePanelKey } from "../problem-context";
 import { useProblemContext } from "../useProblemContext";
+import { useI18n } from "vue-i18n";
 
 const toggleSidePanel = inject(ToggleSidePanelKey, () => {});
 const problemContext = useProblemContext();
 const router = useRouter();
+const { t } = useI18n();
 
 const adj = ref<{ prev: string | null; next: string | null }>({
   prev: null,
@@ -87,14 +89,16 @@ async function handleRandom() {
                 <div
                   class="truncate font-medium group-hover:text-lc-text-primary text-text-primary hover:text-text-primary"
                 >
-                  Problem Set
+                  {{ t("problem.layout.problemSet") }}
                 </div>
               </div>
             </Button>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
             <div class="flex items-center gap-1">
-              <p class="text-xs leading-none">Expand Panel</p>
+              <p class="text-xs leading-none">
+                {{ t("problem.layout.expandPanel") }}
+              </p>
               <KbdGroup class="text-xs">
                 <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
                 <span class="text-xs">+</span>
@@ -118,7 +122,9 @@ async function handleRandom() {
             </div>
           </HoverCardTrigger>
           <HoverCardContent class="h-auto w-auto p-2">
-            <p class="text-xs leading-none">Open problem set in new tab</p>
+            <p class="text-xs leading-none">
+              {{ t("problem.layout.openInNewTab") }}
+            </p>
           </HoverCardContent>
         </HoverCard>
       </div>
@@ -150,7 +156,9 @@ async function handleRandom() {
       </HoverCardTrigger>
       <HoverCardContent class="h-auto w-auto p-2">
         <div class="flex items-center gap-1">
-          <p class="text-xs leading-none">Previous Problem</p>
+          <p class="text-xs leading-none">
+            {{ t("problem.layout.previousProblem") }}
+          </p>
           <KbdGroup class="text-xs">
             <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
             <span class="text-xs">+</span>
@@ -186,7 +194,9 @@ async function handleRandom() {
       </HoverCardTrigger>
       <HoverCardContent class="h-auto w-auto p-2">
         <div class="flex items-center gap-1">
-          <p class="text-xs leading-none">Next Problem</p>
+          <p class="text-xs leading-none">
+            {{ t("problem.layout.nextProblem") }}
+          </p>
           <KbdGroup class="text-xs">
             <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
             <span class="text-xs">+</span>
@@ -212,7 +222,9 @@ async function handleRandom() {
       </HoverCardTrigger>
       <HoverCardContent class="h-auto w-auto p-2">
         <div class="flex items-center gap-1">
-          <p class="text-xs leading-none">Random Problem</p>
+          <p class="text-xs leading-none">
+            {{ t("problem.layout.randomProblem") }}
+          </p>
           <KbdGroup class="text-xs">
             <Kbd class="px-0.5 py-0 min-w-0 h-auto text-xs"> Ctrl </Kbd>
             <span class="text-xs">+</span>
