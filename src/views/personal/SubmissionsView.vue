@@ -1,15 +1,9 @@
 <script setup lang="ts">
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -135,159 +129,100 @@ onMounted(async () => {
       </Button>
     </div>
 
-    <Card
-      v-else-if="submissions.length > 0"
-      class="border shadow-sm overflow-hidden rounded-2xl"
-    >
-      <CardHeader class="pb-4 border-b">
-        <div class="flex items-center justify-between">
-          <div>
-            <CardTitle class="text-lg font-bold">{{
-              t("personal.submissions.recentAttempts")
-            }}</CardTitle>
-            <CardDescription>
-              {{
-                t("personal.submissions.latestSubmissions", {
-                  count: submissions.length,
-                })
-              }}
-            </CardDescription>
-          </div>
-          <Badge variant="secondary" class="rounded-full px-3">
-            {{
-              t("personal.submissions.totalSubmissions", {
-                count: submissions.length,
-              })
-            }}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent class="p-0">
-        <div class="overflow-x-auto">
-          <Table>
-            <TableHeader class="bg-muted/30">
-              <TableRow class="hover:bg-muted/30">
-                <TableHead
-                  class="w-[300px] font-semibold text-xs uppercase tracking-wider"
-                  >{{ t("personal.submissions.problem") }}</TableHead
+    <div v-else-if="submissions.length > 0">
+      <Table>
+        <TableCaption>{{
+          t("personal.submissions.latestSubmissions", {
+            count: submissions.length,
+          })
+        }}</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead class="w-[300px]">{{
+              t("personal.submissions.problem")
+            }}</TableHead>
+            <TableHead>{{ t("personal.submissions.status") }}</TableHead>
+            <TableHead>{{ t("personal.submissions.language") }}</TableHead>
+            <TableHead>{{ t("personal.submissions.runtime") }}</TableHead>
+            <TableHead>{{ t("personal.submissions.memory") }}</TableHead>
+            <TableHead class="text-right">{{
+              t("personal.submissions.submittedAt")
+            }}</TableHead>
+            <TableHead class="w-10"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow
+            v-for="submission in submissions"
+            :key="submission.id"
+            class="group hover:bg-muted/50 transition-colors"
+          >
+            <TableCell class="font-medium">
+              <div class="flex flex-col">
+                <RouterLink
+                  :to="`/problems/${submission.problem?.slug || ''}`"
+                  class="font-medium text-foreground hover:text-primary transition-colors"
                 >
-                <TableHead
-                  class="font-semibold text-xs uppercase tracking-wider"
-                  >{{ t("personal.submissions.status") }}</TableHead
+                  {{ submission.problem?.title || "Unknown Problem" }}
+                </RouterLink>
+                <span
+                  class="text-[10px] text-muted-foreground uppercase tracking-wider font-medium"
                 >
-                <TableHead
-                  class="font-semibold text-xs uppercase tracking-wider"
-                  >{{ t("personal.submissions.language") }}</TableHead
-                >
-                <TableHead
-                  class="font-semibold text-xs uppercase tracking-wider"
-                  >{{ t("personal.submissions.runtime") }}</TableHead
-                >
-                <TableHead
-                  class="font-semibold text-xs uppercase tracking-wider"
-                  >{{ t("personal.submissions.memory") }}</TableHead
-                >
-                <TableHead
-                  class="text-right font-semibold text-xs uppercase tracking-wider"
-                  >{{ t("personal.submissions.submittedAt") }}</TableHead
-                >
-                <TableHead class="w-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow
-                v-for="submission in submissions"
-                :key="submission.id"
-                class="group cursor-default hover:bg-muted/30 transition-colors border-b last:border-0"
+                  ID: {{ submission.id.substring(0, 8) }}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell>
+              <Badge
+                variant="outline"
+                class="gap-1.5 py-1 px-2 font-medium rounded-md border"
+                :class="getStatusColorClass(submission.status)"
               >
-                <TableCell>
-                  <div class="flex flex-col">
-                    <RouterLink
-                      :to="`/problems/${submission.problem?.slug || ''}`"
-                      class="font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {{ submission.problem?.title || "Unknown Problem" }}
-                    </RouterLink>
-                    <span
-                      class="text-[10px] text-muted-foreground uppercase tracking-wider font-medium"
-                    >
-                      ID: {{ submission.id.substring(0, 8) }}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    class="gap-1.5 py-1 px-2 font-medium rounded-md border"
-                    :class="getStatusColorClass(submission.status)"
-                  >
-                    <component
-                      :is="getStatusIcon(submission.status)"
-                      class="h-3.5 w-3.5"
-                    />
-                    {{ submission.status }}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="secondary"
-                    class="font-mono text-[10px] py-0 h-5"
-                  >
-                    {{ submission.language }}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div class="flex items-center gap-1.5 text-sm font-medium">
-                    {{ submission.runtime
-                    }}<span class="text-[10px] text-muted-foreground uppercase"
-                      >ms</span
-                    >
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div class="flex items-center gap-1.5 text-sm font-medium">
-                    {{ submission.memory
-                    }}<span class="text-[10px] text-muted-foreground uppercase"
-                      >mb</span
-                    >
-                  </div>
-                </TableCell>
-                <TableCell class="text-right">
-                  <div class="flex flex-col items-end">
-                    <span class="text-sm font-medium">{{
-                      new Date(submission.created_at).toLocaleDateString(locale)
-                    }}</span>
-                    <span class="text-[10px] text-muted-foreground">{{
-                      new Date(submission.created_at).toLocaleTimeString(
-                        locale,
-                        {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        },
-                      )
-                    }}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                    as-child
-                  >
-                    <RouterLink
-                      :to="`/problems/${submission.problem?.slug || ''}`"
-                    >
-                      <ChevronRight class="h-4 w-4" />
-                    </RouterLink>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                <component
+                  :is="getStatusIcon(submission.status)"
+                  class="h-3.5 w-3.5"
+                />
+                {{ submission.status }}
+              </Badge>
+            </TableCell>
+            <TableCell>
+              {{ submission.language }}
+            </TableCell>
+            <TableCell>
+              <div class="flex items-center gap-1.5 font-medium">
+                {{ submission.runtime
+                }}<span class="text-[10px] text-muted-foreground uppercase"
+                  >ms</span
+                >
+              </div>
+            </TableCell>
+            <TableCell>
+              <div class="flex items-center gap-1.5 font-medium">
+                {{ submission.memory
+                }}<span class="text-[10px] text-muted-foreground uppercase"
+                  >mb</span
+                >
+              </div>
+            </TableCell>
+            <TableCell class="text-right">
+              {{ new Date(submission.created_at).toLocaleDateString(locale) }}
+            </TableCell>
+            <TableCell>
+              <Button
+                variant="ghost"
+                size="icon"
+                class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                as-child
+              >
+                <RouterLink :to="`/problems/${submission.problem?.slug || ''}`">
+                  <ChevronRight class="h-4 w-4" />
+                </RouterLink>
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
 
     <div
       v-else

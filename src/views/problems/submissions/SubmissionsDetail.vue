@@ -7,7 +7,7 @@ import type {
   SubmissionRecord,
   SubmissionStatusMeta,
 } from "@/types/submission";
-import { Clock, Microchip } from "lucide-vue-next";
+import { Clock, Microchip, ArrowLeft } from "lucide-vue-next";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
 import { useI18n } from "vue-i18n";
@@ -27,6 +27,10 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const emit = defineEmits<{
+  (e: "back"): void;
+}>();
 
 const { t } = useI18n();
 
@@ -493,11 +497,21 @@ const handleWriteSolution = () => {
     <!-- Header -->
     <div class="flex w-full items-center justify-between gap-3">
       <div class="flex flex-1 flex-col items-start gap-0.5 overflow-hidden">
-        <div
-          class="flex flex-1 items-center gap-1.5 text-lg font-medium leading-tight"
-          :class="statusToneClass"
-        >
-          <span data-e2e-locator="submission-result">{{ statusLabel }}</span>
+        <div class="flex items-center gap-2 mb-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-8 w-8 rounded-full hover:bg-muted"
+            @click="emit('back')"
+          >
+            <ArrowLeft class="h-4 w-4" />
+          </Button>
+          <div
+            class="flex flex-1 items-center gap-1.5 text-lg font-medium leading-tight"
+            :class="statusToneClass"
+          >
+            <span data-e2e-locator="submission-result">{{ statusLabel }}</span>
+          </div>
         </div>
 
         <!-- Test cases info (only if not compile error) -->
