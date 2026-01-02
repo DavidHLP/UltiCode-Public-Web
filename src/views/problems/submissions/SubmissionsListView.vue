@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import type {
   SubmissionRecord,
   SubmissionStatusMeta,
@@ -8,7 +9,9 @@ import { Loader2, Inbox } from "lucide-vue-next";
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -21,137 +24,71 @@ import {
   EmptyHeader,
   EmptyMedia,
 } from "@/components/ui/empty";
-import { useI18n } from "vue-i18n";
 
 const props = defineProps<{
   submissions: SubmissionRecord[];
-  isLoading?: boolean;
-  statusMetaByKey?: Record<string, SubmissionStatusMeta>;
+  isLoading: boolean;
+  statusMetaByKey: Record<string, SubmissionStatusMeta>;
 }>();
 
 const emit = defineEmits<{
-  select: [submission: SubmissionRecord];
+  (e: "select", submission: SubmissionRecord): void;
 }>();
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 
-const statusClass = (status: SubmissionRecord["status"]) => {
-  const meta = props.statusMetaByKey?.[status];
+const decoratedSubmissions = computed(() => {
+  return props.submissions;
+});
+
+const statusClass = (status: string) => {
+  const meta = props.statusMetaByKey[status];
   const severity = meta?.severity ?? meta?.category;
   switch (severity) {
     case "success":
-      return "text-green-600 dark:text-green-400 font-medium";
+      return "text-green-600 dark:text-green-400";
     case "error":
-      return "text-red-600 dark:text-red-400 font-medium";
+      return "text-red-600 dark:text-red-400";
     case "warning":
-      return "text-amber-600 dark:text-amber-400 font-medium";
+      return "text-amber-600 dark:text-amber-400";
     case "info":
-      return "text-sky-600 dark:text-sky-400 font-medium";
-    case "pending":
-      return "text-sky-600 dark:text-sky-400 font-medium";
+      return "text-sky-600 dark:text-sky-400";
     default:
       return status === "Accepted"
-        ? "text-green-600 dark:text-green-400 font-medium"
-        : "text-red-600 dark:text-red-400 font-medium";
+        ? "text-green-600 dark:text-green-400"
+        : "text-red-600 dark:text-red-400";
   }
 };
 
-const dateFormatter = computed(
-  () =>
-    new Intl.DateTimeFormat(locale.value, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }),
-);
-
-const relativeFormatter = computed(
-  () =>
-    new Intl.RelativeTimeFormat(locale.value, {
-      numeric: "auto",
-    }),
-);
-
-const normalizeTimestamp = (value: string) => {
-  const timestamp = Date.parse(value);
-  return Number.isNaN(timestamp) ? null : timestamp;
-};
-
-const formatRelativeTime = (timestamp: number | null) => {
-  if (!timestamp) return t("problem.submissions.timeUnknown");
-  const diffSeconds = Math.round((timestamp - Date.now()) / 1000);
-  const absoluteDiff = Math.abs(diffSeconds);
-  const thresholds: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["year", 60 * 60 * 24 * 365],
-    ["month", 60 * 60 * 24 * 30],
-    ["week", 60 * 60 * 24 * 7],
-    ["day", 60 * 60 * 24],
-    ["hour", 60 * 60],
-    ["minute", 60],
-  ];
-  for (const [unit, seconds] of thresholds) {
-    if (absoluteDiff >= seconds) {
-      return relativeFormatter.value.format(
-        Math.round(diffSeconds / seconds),
-        unit,
-      );
-    }
-  }
-  return t("common.time.now");
-};
-
-const sortedSubmissions = computed(() =>
-  [...props.submissions].sort((a, b) => {
-    const tsA = normalizeTimestamp(a.submittedAt ?? a.created_at) ?? 0;
-    const tsB = normalizeTimestamp(b.submittedAt ?? b.created_at) ?? 0;
-    return tsB - tsA;
-  }),
-);
-
-const decoratedSubmissions = computed(() =>
-  sortedSubmissions.value.map((submission) => {
-    const timestamp = normalizeTimestamp(
-      submission.submittedAt ?? submission.created_at,
-    );
-    return {
-      ...submission,
-      formattedSubmitted: timestamp
-        ? dateFormatter.value.format(timestamp)
-        : submission.submittedAt,
-      relativeSubmitted: formatRelativeTime(timestamp),
-    };
-  }),
-);
-
-const handleSelect = (submission: SubmissionRecord) =>
+const handleSelect = (submission: SubmissionRecord) => {
   emit("select", submission);
+};
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div
-      v-if="isLoading"
-      class="flex items-center justify-center py-10 text-muted-foreground"
-    >
-      <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-      {{ t("problem.submissions.loading") }}
+  <div class="h-full">
+    <div v-if="isLoading" class="flex h-full items-center justify-center p-8">
+      <Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
     </div>
-
     <template v-else>
       <Table>
+        <TableCaption>{{
+          t("problem.submissions.noSubmissionsDesc")
+        }}</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead class="w-[140px]">{{
-              t("problem.submissions.status")
-            }}</TableHead>
-            <TableHead class="w-[140px]">{{
-              t("problem.submissions.language")
-            }}</TableHead>
-            <TableHead class="w-[120px] text-center">{{
-              t("problem.submissions.runtime")
-            }}</TableHead>
-            <TableHead class="w-[120px] text-center">{{
-              t("problem.submissions.memory")
-            }}</TableHead>
+            <TableHead class="w-[140px]">
+              {{ t("problem.submissions.status") }}
+            </TableHead>
+            <TableHead class="w-[140px]">
+              {{ t("problem.submissions.language") }}
+            </TableHead>
+            <TableHead class="w-[120px] text-center">
+              {{ t("problem.submissions.runtime") }}
+            </TableHead>
+            <TableHead class="w-[120px] text-center">
+              {{ t("problem.submissions.memory") }}
+            </TableHead>
             <TableHead>{{ t("problem.submissions.notes") }}</TableHead>
           </TableRow>
         </TableHeader>
@@ -161,19 +98,21 @@ const handleSelect = (submission: SubmissionRecord) =>
             <TableRow
               v-for="submission in decoratedSubmissions"
               :key="submission.id"
-              class="odd:bg-muted/30 even:bg-background hover:bg-muted/50 cursor-pointer"
+              class="cursor-pointer transition-colors hover:bg-muted/50"
               @click="handleSelect(submission)"
             >
-              <TableCell>
+              <TableCell class="font-medium">
                 <div :class="statusClass(submission.status)">
                   {{ submission.status }}
                 </div>
               </TableCell>
               <TableCell>{{ submission.language }}</TableCell>
-              <TableCell class="text-center">{{
-                submission.runtime
-              }}</TableCell>
-              <TableCell class="text-center">{{ submission.memory }}</TableCell>
+              <TableCell class="text-center">
+                {{ submission.runtime }}
+              </TableCell>
+              <TableCell class="text-center">
+                {{ submission.memory }}
+              </TableCell>
               <TableCell class="text-sm text-muted-foreground">
                 {{ submission.notes || "—" }}
               </TableCell>
@@ -200,6 +139,16 @@ const handleSelect = (submission: SubmissionRecord) =>
             </TableCell>
           </TableRow>
         </TableBody>
+        <TableFooter v-if="decoratedSubmissions.length">
+          <TableRow>
+            <TableCell colspan="4" class="text-sm font-medium">
+              {{ t("personal.profile.totalProblems") }}
+            </TableCell>
+            <TableCell class="text-center font-bold">
+              {{ decoratedSubmissions.length }}
+            </TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </template>
   </div>
