@@ -30,105 +30,113 @@ const { t } = useI18n();
         </div>
 
         <!-- Podium Visual -->
-        <div class="flex items-end justify-center gap-2 h-40 pt-4">
+        <div class="flex items-end justify-center gap-4 h-48 pt-4 pb-2">
           <!-- 2nd Place -->
           <div
-            class="flex flex-col items-center gap-2 w-1/3"
+            class="flex flex-col items-center gap-2 w-1/3 relative group cursor-pointer"
             v-if="rankings[1]"
           >
-            <div class="relative">
+            <div class="relative transition-transform duration-300 group-hover:-translate-y-1">
               <img
                 :src="
                   rankings[1].avatar ||
                   'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
                 "
-                class="w-12 h-12 rounded-full border-2 border-slate-300"
+                class="w-14 h-14 rounded-full border-4 border-slate-300 shadow-lg"
               />
               <div class="absolute -bottom-2 w-full text-center">
                 <span
-                  class="bg-slate-300 text-slate-800 text-[10px] px-1.5 rounded-full font-bold"
+                  class="bg-slate-300 text-slate-800 text-xs px-2 py-0.5 rounded-full font-black shadow-sm"
                   >2</span
                 >
               </div>
             </div>
-            <p class="text-xs font-medium truncate w-full">
+            <p class="text-xs font-bold truncate w-full text-slate-700 dark:text-slate-300 mt-1">
               {{ rankings[1].username }}
             </p>
             <RatingBadge :rating="rankings[1].rating" size="sm" />
             <div
-              class="h-20 w-full bg-gradient-to-t from-slate-200 to-slate-100 rounded-t-lg shadow-sm border-t border-slate-300/50"
-            ></div>
+              class="h-24 w-full bg-gradient-to-b from-slate-200 via-slate-100 to-white dark:from-slate-800 dark:to-slate-900 rounded-t-xl shadow-inner border-t border-slate-300/50 relative overflow-hidden"
+            >
+              <div class="absolute inset-0 bg-white/30 skew-y-12 opacity-50"></div>
+            </div>
           </div>
 
           <!-- 1st Place -->
           <div
-            class="flex flex-col items-center gap-2 w-1/3"
+            class="flex flex-col items-center gap-2 w-1/3 relative z-10 group cursor-pointer"
             v-if="rankings[0]"
           >
-            <div class="relative">
+            <div class="relative transition-transform duration-300 group-hover:-translate-y-2">
+              <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-3xl animate-bounce">👑</div>
               <img
                 :src="
                   rankings[0].avatar ||
                   'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
                 "
-                class="w-16 h-16 rounded-full border-2 border-yellow-400"
+                class="w-20 h-20 rounded-full border-4 border-yellow-400 shadow-xl ring-4 ring-yellow-400/20"
               />
-              <div class="absolute -bottom-2 w-full text-center">
+              <div class="absolute -bottom-3 w-full text-center">
                 <span
-                  class="bg-yellow-400 text-yellow-900 text-[10px] px-1.5 rounded-full font-bold"
+                  class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-sm px-2.5 py-0.5 rounded-full font-black shadow-md"
                   >1</span
                 >
               </div>
             </div>
             <p
-              class="text-xs font-medium truncate w-full font-bold text-yellow-600"
+              class="text-sm font-black truncate w-full text-yellow-600 dark:text-yellow-400 mt-1"
             >
               {{ rankings[0].username }}
             </p>
             <RatingBadge :rating="rankings[0].rating" size="sm" />
             <div
-              class="h-32 w-full bg-gradient-to-t from-yellow-100 to-yellow-50 rounded-t-lg shadow-md border-t border-yellow-300/50"
-            ></div>
+              class="h-36 w-full bg-gradient-to-b from-yellow-100 via-yellow-50 to-white dark:from-yellow-900/40 dark:to-slate-900 rounded-t-xl shadow-lg border-t border-yellow-300/50 relative overflow-hidden"
+            >
+               <div class="absolute inset-0 bg-white/40 skew-y-12 opacity-50"></div>
+               <div class="absolute bottom-0 w-full text-center pb-2 opacity-10 font-black text-4xl text-yellow-600">1</div>
+            </div>
           </div>
 
           <!-- 3rd Place -->
           <div
-            class="flex flex-col items-center gap-2 w-1/3"
+            class="flex flex-col items-center gap-2 w-1/3 relative group cursor-pointer"
             v-if="rankings[2]"
           >
-            <div class="relative">
+            <div class="relative transition-transform duration-300 group-hover:-translate-y-1">
               <img
                 :src="
                   rankings[2].avatar ||
                   'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
                 "
-                class="w-12 h-12 rounded-full border-2 border-orange-300"
+                class="w-14 h-14 rounded-full border-4 border-orange-300 shadow-lg"
               />
               <div class="absolute -bottom-2 w-full text-center">
                 <span
-                  class="bg-orange-300 text-orange-800 text-[10px] px-1.5 rounded-full font-bold"
+                  class="bg-orange-300 text-orange-800 text-xs px-2 py-0.5 rounded-full font-black shadow-sm"
                   >3</span
                 >
               </div>
             </div>
-            <p class="text-xs font-medium truncate w-full">
+            <p class="text-xs font-bold truncate w-full text-orange-700 dark:text-orange-300 mt-1">
               {{ rankings[2].username }}
             </p>
             <RatingBadge :rating="rankings[2].rating" size="sm" />
             <div
-              class="h-16 w-full bg-gradient-to-t from-orange-100 to-orange-50 rounded-t-lg shadow-sm border-t border-orange-300/50"
-            ></div>
+              class="h-16 w-full bg-gradient-to-b from-orange-100 via-orange-50 to-white dark:from-orange-900/30 dark:to-slate-900 rounded-t-xl shadow-inner border-t border-orange-300/50 relative overflow-hidden"
+            >
+              <div class="absolute inset-0 bg-white/30 skew-y-12 opacity-50"></div>
+            </div>
           </div>
         </div>
 
         <!-- Rest of List -->
-        <div class="space-y-3 pt-4 border-t">
+        <div class="space-y-1 pt-4 border-t">
           <div
             v-for="(user, index) in rankings.slice(3, 10)"
             :key="user.username"
-            class="flex items-center gap-3 p-1"
+            class="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
           >
-            <span class="text-xs font-bold w-4 text-muted-foreground">{{
+            <span class="text-xs font-bold w-6 text-center text-muted-foreground group-hover:text-foreground transition-colors">{{
               index + 4
             }}</span>
             <img
@@ -136,10 +144,10 @@ const { t } = useI18n();
                 user.avatar ||
                 'https://assets.leetcode.cn/aliyun-lc-upload/users/default_avatar.png'
               "
-              class="h-8 w-8 rounded-full bg-muted"
+              class="h-8 w-8 rounded-full bg-muted border border-border"
             />
             <div class="flex-1 min-w-0 text-left">
-              <p class="truncate text-sm font-medium">
+              <p class="truncate text-sm font-medium group-hover:text-primary transition-colors">
                 {{ user.username }}
               </p>
               <p class="text-xs text-muted-foreground">

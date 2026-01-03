@@ -76,13 +76,12 @@ const visiblePages = computed(() => {
 
     <!-- Contest List -->
     <div
-      class="flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm"
+      class="flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden"
     >
       <div
         v-for="(contest, index) in contests"
         :key="contest.id"
-        class="group flex items-center justify-between gap-4 p-3 transition-colors hover:bg-muted/50 cursor-pointer"
-        :class="{ 'border-b': index !== contests.length - 1 }"
+        class="group flex items-center justify-between gap-4 p-4 transition-all hover:bg-muted/40 cursor-pointer border-b last:border-0"
         @click="
           router.push({
             name: 'contest-detail',
@@ -90,28 +89,28 @@ const visiblePages = computed(() => {
           })
         "
       >
-        <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center gap-4 min-w-0">
           <!-- Icon Box -->
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground group-hover:text-foreground transition-colors"
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:scale-110 group-hover:shadow-md transition-all duration-300"
           >
-            <Trophy class="h-5 w-5" />
+            <Trophy class="h-6 w-6" />
           </div>
 
           <!-- Info -->
-          <div class="flex flex-col gap-0.5 min-w-0">
+          <div class="flex flex-col gap-1 min-w-0">
             <span
-              class="truncate text-sm font-medium leading-none group-hover:text-primary transition-colors"
+              class="truncate text-base font-bold leading-none group-hover:text-primary transition-colors"
             >
               {{ contest.title }}
             </span>
-            <div class="flex items-center gap-3 text-xs text-muted-foreground">
-              <span class="flex items-center gap-1">
-                <Calendar class="h-3 w-3" />
+            <div class="flex items-center gap-4 text-xs font-medium text-muted-foreground">
+              <span class="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">
+                <Calendar class="h-3.5 w-3.5" />
                 {{ formatDateTime(contest.start_time).split(" ")[0] }}
               </span>
-              <span class="flex items-center gap-1">
-                <Clock class="h-3 w-3" />
+              <span class="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">
+                <Clock class="h-3.5 w-3.5" />
                 {{ getDurationMinutes(contest.start_time, contest.end_time) }}
                 {{ t("contest.time.min_short") }}
               </span>
@@ -121,9 +120,9 @@ const visiblePages = computed(() => {
 
         <!-- Action -->
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
-          class="h-7 px-3 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10"
+          class="h-8 px-4 text-xs font-bold shadow-sm opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
           @click.stop
         >
           {{ t("contest.types.virtual") }}

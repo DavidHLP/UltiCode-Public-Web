@@ -457,26 +457,35 @@ function getCountryFlag(countryCode: string): string {
       </div>
 
       <Card
-        class="border-none shadow-lg text-white overflow-hidden rounded-2xl"
+        class="border-none shadow-lg text-white overflow-hidden rounded-2xl backdrop-blur-md relative"
         :class="statusCardClass"
       >
-        <CardContent class="p-6">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-black/10 rounded-full blur-3xl"></div>
+
+        <CardContent class="p-8 relative z-10">
           <div
             class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
           >
-            <div class="space-y-2">
+            <div class="space-y-3">
               <p
-                class="text-[10px] font-black uppercase tracking-[0.2em] text-white/70"
+                class="text-xs font-bold uppercase tracking-[0.2em] text-white/80"
               >
                 {{ t("contest.detail.contestStatus") }}
               </p>
               <div class="flex items-center gap-3">
                 <span
-                  class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest"
+                  class="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest backdrop-blur-sm border border-white/10"
                 >
                   <span
                     v-if="contest.status === 'running'"
-                    class="h-2 w-2 rounded-full bg-white animate-pulse"
+                    class="h-2 w-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_8px_2px_rgba(244,63,94,0.6)]"
+                  ></span>
+                  <span
+                    v-else-if="contest.status === 'upcoming'"
+                    class="h-2 w-2 rounded-full bg-emerald-400"
                   ></span>
                   {{
                     contest.status === "running"
@@ -486,16 +495,16 @@ function getCountryFlag(countryCode: string): string {
                         : t("contest.status.finished")
                   }}
                 </span>
-                <span v-if="statusHint" class="text-xs text-white/80">{{
+                <span v-if="statusHint" class="text-xs font-medium text-white/90">{{
                   statusHint
                 }}</span>
               </div>
-              <p class="text-2xl font-black md:text-3xl">
+              <p class="text-3xl font-black md:text-5xl tracking-tight drop-shadow-sm">
                 {{ statusLabel }}
               </p>
             </div>
-            <div class="text-left md:text-right">
-              <p class="text-xs uppercase tracking-widest text-white/70">
+            <div class="text-left md:text-right space-y-2">
+              <p class="text-xs font-bold uppercase tracking-widest text-white/70">
                 {{
                   contest.status === "running"
                     ? t("contest.virtual.timeRemaining")
@@ -505,11 +514,11 @@ function getCountryFlag(countryCode: string): string {
                 }}
               </p>
               <p
-                class="font-mono text-3xl font-black tracking-tight md:text-4xl"
+                class="font-mono text-4xl font-black tracking-tighter md:text-6xl tabular-nums drop-shadow-sm"
               >
                 {{ statusCountdown }}
               </p>
-              <p v-if="contestEndTime" class="text-xs text-white/70">
+              <p v-if="contestEndTime" class="text-xs font-medium text-white/60">
                 {{
                   contest.status === "finished"
                     ? t("contest.detail.endedAt")
@@ -520,25 +529,25 @@ function getCountryFlag(countryCode: string): string {
             </div>
           </div>
 
-          <div class="mt-5 h-2 rounded-full bg-white/20 overflow-hidden">
+          <div class="mt-8 h-3 rounded-full bg-black/20 overflow-hidden backdrop-blur-sm border border-white/5">
             <div
-              class="h-full bg-white/80 transition-all duration-500"
+              class="h-full bg-gradient-to-r from-white/80 to-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out"
               :style="{ width: `${statusProgress}%` }"
             ></div>
           </div>
 
           <div
-            class="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/80"
+            class="mt-6 flex flex-wrap items-center gap-6 text-xs font-medium text-white/80"
           >
-            <span class="flex items-center gap-2">
+            <span class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
               <Calendar class="h-4 w-4" />
               {{ formatDateTime(contest.start_time) }}
             </span>
-            <span v-if="contestEndTime" class="flex items-center gap-2">
+            <span v-if="contestEndTime" class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
               <Clock class="h-4 w-4" />
               {{ formatDateTime(contestEndTime) }}
             </span>
-            <span class="flex items-center gap-2">
+            <span class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
               <Users class="h-4 w-4" />
               {{ contest.participant_count || contest.participantCount || 0 }}
               {{ t("contest.detail.participants") }}
@@ -552,92 +561,95 @@ function getCountryFlag(countryCode: string): string {
       <!-- Virtual Contest Timer -->
       <VirtualContestTimer />
 
-      <!-- Contest Info Card -->
-      <Card
-        class="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/20"
-      >
-        <CardContent class="p-0">
-          <div
-            class="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 border-b md:border-b-0"
-          >
-            <div class="flex items-center gap-4 p-6">
+      <!-- Contest Info Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card class="border-none shadow-sm bg-gradient-to-br from-primary/5 via-primary/0 to-transparent hover:bg-primary/5 transition-colors">
+          <CardContent class="p-6 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
               <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary shadow-sm"
               >
-                <Calendar class="h-6 w-6" />
+                <Calendar class="h-5 w-5" />
               </div>
-              <div class="min-w-0">
-                <p
-                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-                >
-                  {{ t("contest.detail.startTime") }}
-                </p>
-                <p class="text-sm font-bold truncate">
-                  {{ formatDateTime(contest.start_time) }}
-                </p>
-              </div>
+              <p
+                class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+              >
+                {{ t("contest.detail.startTime") }}
+              </p>
             </div>
-            <div class="flex items-center gap-4 p-6">
+            <p class="text-base font-bold truncate pl-1">
+              {{ formatDateTime(contest.start_time) }}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card class="border-none shadow-sm bg-gradient-to-br from-amber-500/5 via-amber-500/0 to-transparent hover:bg-amber-500/5 transition-colors">
+          <CardContent class="p-6 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
               <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 shadow-sm"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 shadow-sm"
               >
-                <Clock class="h-6 w-6" />
+                <Clock class="h-5 w-5" />
               </div>
-              <div class="min-w-0">
-                <p
-                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-                >
-                  {{ t("contest.detail.duration") }}
-                </p>
-                <p class="text-sm font-bold truncate">
-                  {{ contest.duration_minutes || contest.durationMinutes || 0 }}
-                  {{ t("contest.time.min_short") }}
-                </p>
-              </div>
+              <p
+                class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+              >
+                {{ t("contest.detail.duration") }}
+              </p>
             </div>
-            <div class="flex items-center gap-4 p-6">
+            <p class="text-base font-bold truncate pl-1">
+              {{ contest.duration_minutes || contest.durationMinutes || 0 }}
+              {{ t("contest.time.min_short") }}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card class="border-none shadow-sm bg-gradient-to-br from-emerald-500/5 via-emerald-500/0 to-transparent hover:bg-emerald-500/5 transition-colors">
+          <CardContent class="p-6 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
               <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 shadow-sm"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 shadow-sm"
               >
-                <Users class="h-6 w-6" />
+                <Users class="h-5 w-5" />
               </div>
-              <div class="min-w-0">
-                <p
-                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-                >
-                  {{ t("contest.detail.participants") }}
-                </p>
-                <p class="text-sm font-bold truncate">
-                  {{
-                    contest.participant_count || contest.participantCount || 0
-                  }}
-                </p>
-              </div>
+              <p
+                class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+              >
+                {{ t("contest.detail.participants") }}
+              </p>
             </div>
-            <div class="flex items-center gap-4 p-6">
+            <p class="text-base font-bold truncate pl-1">
+              {{
+                contest.participant_count || contest.participantCount || 0
+              }}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card class="border-none shadow-sm bg-gradient-to-br from-blue-500/5 via-blue-500/0 to-transparent hover:bg-blue-500/5 transition-colors">
+          <CardContent class="p-6 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
               <div
-                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 shadow-sm"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 shadow-sm"
               >
-                <Trophy class="h-6 w-6" />
+                <Trophy class="h-5 w-5" />
               </div>
-              <div class="min-w-0">
-                <p
-                  class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-                >
-                  {{ t("contest.types.title") }}
-                </p>
-                <p class="text-sm font-bold truncate">
-                  {{
-                    (contest.isRated ?? contest.is_rated)
-                      ? t("contest.list.rated")
-                      : t("contest.types.unrated")
-                  }}
-                </p>
-              </div>
+              <p
+                class="text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+              >
+                {{ t("contest.types.title") }}
+              </p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <p class="text-base font-bold truncate pl-1">
+              {{
+                (contest.isRated ?? contest.is_rated)
+                  ? t("contest.list.rated")
+                  : t("contest.types.unrated")
+              }}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card
         v-if="contest.rules"

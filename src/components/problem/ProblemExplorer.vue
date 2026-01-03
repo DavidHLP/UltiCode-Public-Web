@@ -1,34 +1,16 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type { Problem } from "@/types/problem";
 
-import { computed, onMounted, ref, watch, type Ref, markRaw } from "vue";
+import { computed, onMounted, ref, watch, markRaw } from "vue";
 import {
   CheckCircle2,
   FileEdit,
-  Search,
-  ListFilter,
-  X,
-  ChevronDown,
   CircleDot,
+  Video,
+  Lock,
+  Trash2,
 } from "lucide-vue-next";
 import CheckIcon from "~icons/radix-icons/check";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import ProblemTable from "./ProblemTable.vue";
 import { fetchProblems, fetchRandomProblem } from "@/api/problem";
 import { toast } from "vue-sonner";
 import { fetchCurrentUserId } from "@/utils/auth";
@@ -36,6 +18,21 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 
 import type { ProblemExplorerProps } from "./type";
+import { PROBLEM_CATEGORIES } from "@/constants/problem-categories";
+
+import {
+  CategoryFilter,
+  DataTableToolbar,
+  TagFilter,
+  DataTable,
+  type ColumnDef,
+} from "@/components/common/data-table";
+import {
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -55,10 +52,6 @@ const problemsPerPage = 50;
 const numProblemsToShow = ref(problemsPerPage);
 const fallbackProblems = ref<Problem[]>([]);
 
-import { PROBLEM_CATEGORIES } from "@/constants/problem-categories";
-
-const categories = PROBLEM_CATEGORIES;
-
 const selectedCategory = ref(props.initialCategory || "all");
 
 watch(
@@ -69,10 +62,14 @@ watch(
   },
 );
 
-function selectCategory(cat: string) {
-  selectedCategory.value = cat;
-  void loadProblems();
-}
+// Map categories for generic component
+const categoryOptions = computed(() =>
+  PROBLEM_CATEGORIES.map((cat) => ({
+    label: t("problem.categories." + cat.value),
+    value: cat.value,
+    icon: cat.icon,
+  })),
+);
 
 const loadProblems = async () => {
   try {
@@ -110,10 +107,20 @@ const enrichedProblems = computed(() => {
   return enriched;
 });
 
-// 搜索变化时，重置展示数量
-watch(searchQuery, () => {
-  numProblemsToShow.value = problemsPerPage;
-});
+// Watch filters to reset pagination
+watch(
+  [
+    searchQuery,
+    selectedTags,
+    selectedStatus,
+    selectedDifficulty,
+    showPremium,
+    selectedCategory,
+  ],
+  () => {
+    numProblemsToShow.value = problemsPerPage;
+  },
+);
 
 const filteredProblems = computed(() => {
   return enrichedProblems.value.filter((p) => {
@@ -166,6 +173,41 @@ const displayedProblems = computed(() => {
   }));
 });
 
+const columns = computed<ColumnDef[]>(() => {
+  const cols: ColumnDef[] = [
+    {
+      key: "status",
+      header: t("problem.table.status"),
+      class: "w-[50px] text-center p-0",
+      headerClass: "w-[50px] text-center",
+    },
+    { key: "title", header: t("problem.table.title") },
+    {
+      key: "acceptance",
+      header: t("problem.table.acceptance"),
+      class: "w-[120px] text-center",
+      headerClass: "w-[120px] text-center",
+    },
+    {
+      key: "difficulty",
+      header: t("problem.table.difficulty"),
+      class: "w-[100px] text-center",
+      headerClass: "w-[100px] text-center",
+    },
+  ];
+
+  if (props.editable) {
+    cols.push({
+      key: "actions",
+      header: t("problem.table.actions"),
+      class: "w-[80px] text-center",
+      headerClass: "w-[80px] text-center",
+    });
+  }
+
+  return cols;
+});
+
 const allTags = computed(() => {
   const tags = new Set<string>();
   enrichedProblems.value.forEach((p) => p.tags.forEach((t) => tags.add(t)));
@@ -184,48 +226,47 @@ const otherTags = computed(() =>
   allTags.value.filter((t) => !popularTags.value.includes(t)),
 );
 
-function toggleStatusSolved(checked: boolean) {
-  toggleFilter(selectedStatus, "solved", checked);
-}
-function toggleStatusAttempted(checked: boolean) {
-  toggleFilter(selectedStatus, "attempted", checked);
-}
-function toggleStatusTodo(checked: boolean) {
-  toggleFilter(selectedStatus, "todo", checked);
-}
-function toggleDifficultyEasy(checked: boolean) {
-  toggleFilter(selectedDifficulty, "Easy", checked);
-}
-function toggleDifficultyMedium(checked: boolean) {
-  toggleFilter(selectedDifficulty, "Medium", checked);
-}
-function toggleDifficultyHard(checked: boolean) {
-  toggleFilter(selectedDifficulty, "Hard", checked);
-}
-function togglePremiumFree(checked: boolean) {
-  togglePremiumFilter(false, checked);
-}
-function togglePremiumPremium(checked: boolean) {
-  togglePremiumFilter(true, checked);
-}
+const activeFilterCount = computed(() => {
+  return (
+    selectedStatus.value.length +
+    selectedDifficulty.value.length +
+    (showPremium.value !== null ? 1 : 0)
+  );
+});
 
-function toggleFilter(
-  targetArray: Ref<string[]>,
-  item: string,
-  checked: boolean,
-) {
-  const currentItems = targetArray.value;
-  const isPresent = currentItems.includes(item);
+const hasActiveFilters = computed(() => {
+  return (
+    !!searchQuery.value ||
+    selectedTags.value.length > 0 ||
+    selectedStatus.value.length > 0 ||
+    selectedDifficulty.value.length > 0 ||
+    showPremium.value !== null
+  );
+});
 
-  if (checked && !isPresent) {
-    targetArray.value = [...currentItems, item];
-  } else if (!checked && isPresent) {
-    targetArray.value = currentItems.filter((i) => i !== item);
+function toggleStatus(value: string, checked: boolean) {
+  if (checked) {
+    if (!selectedStatus.value.includes(value)) {
+      selectedStatus.value = [...selectedStatus.value, value];
+    }
+  } else {
+    selectedStatus.value = selectedStatus.value.filter((s) => s !== value);
   }
-  numProblemsToShow.value = problemsPerPage;
 }
 
-function togglePremiumFilter(value: boolean, checked: boolean) {
+function toggleDifficulty(value: string, checked: boolean) {
+  if (checked) {
+    if (!selectedDifficulty.value.includes(value)) {
+      selectedDifficulty.value = [...selectedDifficulty.value, value];
+    }
+  } else {
+    selectedDifficulty.value = selectedDifficulty.value.filter(
+      (d) => d !== value,
+    );
+  }
+}
+
+function togglePremium(value: boolean, checked: boolean) {
   if (checked) {
     showPremium.value = value;
   } else {
@@ -233,16 +274,6 @@ function togglePremiumFilter(value: boolean, checked: boolean) {
       showPremium.value = null;
     }
   }
-  numProblemsToShow.value = problemsPerPage;
-}
-
-function toggleTag(tag: string) {
-  const index = selectedTags.value.indexOf(tag);
-  toggleFilter(selectedTags, tag, index === -1);
-}
-
-function isTagSelected(tag: string) {
-  return selectedTags.value.includes(tag);
 }
 
 function clearFilters() {
@@ -255,7 +286,6 @@ function clearFilters() {
 }
 
 async function pickOne() {
-  // Pick from current filtered problems if available
   const currentProblems = filteredProblems.value;
   if (currentProblems.length > 0) {
     const randomIndex = Math.floor(Math.random() * currentProblems.length);
@@ -266,7 +296,6 @@ async function pickOne() {
     return;
   }
 
-  // Fallback to fetch random from backend if no filtered problems
   try {
     const problem = await fetchRandomProblem();
     if (problem) {
@@ -285,6 +314,40 @@ function loadMore() {
     numProblemsToShow.value += problemsPerPage;
   }
 }
+
+const difficultyClass = (difficulty: Problem["difficulty"]) => {
+  switch (difficulty) {
+    case "Easy":
+      return "text-emerald-600";
+    case "Medium":
+      return "text-amber-600";
+    case "Hard":
+      return "text-red-600";
+    default:
+      return "";
+  }
+};
+
+const formatAcceptance = (value: number | string | undefined | null) => {
+  if (value === undefined || value === null) return "-";
+  const num = Number(value);
+  return isNaN(num) ? "-" : `${num.toFixed(1)}%`;
+};
+
+const goToDetail = (slug: string) => {
+  router.push({ name: "problem-detail", params: { slug } });
+};
+
+const handleRowClick = (problem: Problem) => {
+  if (problem && problem.slug) {
+    goToDetail(problem.slug);
+  }
+};
+
+const handleRemove = (e: Event, problem: Problem) => {
+  e.stopPropagation();
+  emit("remove", problem);
+};
 </script>
 
 <template>
@@ -292,286 +355,231 @@ function loadMore() {
     <slot name="header" />
 
     <div class="space-y-4">
-      <!-- Category Toggles -->
-      <div class="flex flex-wrap gap-2 mb-2">
-        <button
-          v-for="cat in categories"
-          :key="cat.name"
-          @click="selectCategory(cat.value)"
-          class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200"
-          :class="
-            selectedCategory === cat.value
-              ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm ring-1 ring-black/5 dark:ring-white/10'
-              : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50'
-          "
-        >
-          <div
-            class="p-1 rounded bg-white dark:bg-zinc-950 shadow-sm"
-            :class="
-              selectedCategory === cat.value ? 'text-primary' : 'text-zinc-400'
+      <CategoryFilter
+        :categories="categoryOptions"
+        v-model="selectedCategory"
+      />
+
+      <DataTableToolbar
+        v-model="searchQuery"
+        :placeholder="t('problem.list.searchPlaceholder')"
+        :filter-label="t('problem.explorer.filters')"
+        :active-filter-count="activeFilterCount"
+        :show-clear="hasActiveFilters"
+        :clear-label="
+          t('common.actions.clear') + ' ' + t('problem.explorer.filters')
+        "
+        @clear="clearFilters"
+      >
+        <template #filters>
+          <DropdownMenuLabel>{{
+            t("problem.explorer.status")
+          }}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            :checked="selectedStatus.includes('solved')"
+            @click="
+              () => toggleStatus('solved', !selectedStatus.includes('solved'))
             "
           >
-            <component :is="cat.icon" class="w-3 h-3" />
-          </div>
-          {{ t("problem.categories." + cat.value) }}
-        </button>
-      </div>
-
-      <!-- Controls Bar -->
-      <div
-        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-      >
-        <!-- Left: Search -->
-        <div class="relative w-full max-w-md">
-          <Search
-            class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-          />
-          <Input
-            v-model="searchQuery"
-            :placeholder="t('problem.list.searchPlaceholder')"
-            class="pl-9 h-10 rounded-full"
-          />
-        </div>
-
-        <!-- Right: Actions -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button
-                variant="outline"
-                class="h-10 gap-2 border-dashed rounded-full"
-              >
-                <ListFilter class="h-4 w-4" />
-                {{ t("problem.explorer.filters") }}
-                <Badge
-                  v-if="
-                    selectedStatus.length +
-                      selectedDifficulty.length +
-                      (showPremium !== null ? 1 : 0) >
-                    0
-                  "
-                  variant="secondary"
-                  class="ml-1 h-5 px-1 text-[10px] rounded-full"
-                >
-                  {{
-                    selectedStatus.length +
-                    selectedDifficulty.length +
-                    (showPremium !== null ? 1 : 0)
-                  }}
-                </Badge>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="w-56" align="end">
-              <DropdownMenuLabel>{{
-                t("problem.explorer.status")
-              }}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                :checked="selectedStatus.includes('solved')"
-                @click="
-                  () => toggleStatusSolved(!selectedStatus.includes('solved'))
-                "
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.status.solved") }}
-                  <CheckIcon
-                    v-if="selectedStatus.includes('solved')"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                :checked="selectedStatus.includes('attempted')"
-                @click="
-                  () =>
-                    toggleStatusAttempted(!selectedStatus.includes('attempted'))
-                "
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.status.attempted") }}
-                  <CheckIcon
-                    v-if="selectedStatus.includes('attempted')"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                :checked="selectedStatus.includes('todo')"
-                @click="
-                  () => toggleStatusTodo(!selectedStatus.includes('todo'))
-                "
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.status.todo") }}
-                  <CheckIcon
-                    v-if="selectedStatus.includes('todo')"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>{{
-                t("problem.explorer.difficulty")
-              }}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                :checked="selectedDifficulty.includes('Easy')"
-                @click="
-                  () =>
-                    toggleDifficultyEasy(!selectedDifficulty.includes('Easy'))
-                "
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.difficulty.easy") }}
-                  <CheckIcon
-                    v-if="selectedDifficulty.includes('Easy')"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                :checked="selectedDifficulty.includes('Medium')"
-                @click="
-                  () =>
-                    toggleDifficultyMedium(
-                      !selectedDifficulty.includes('Medium'),
-                    )
-                "
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.difficulty.medium") }}
-                  <CheckIcon
-                    v-if="selectedDifficulty.includes('Medium')"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                :checked="selectedDifficulty.includes('Hard')"
-                @click="
-                  () =>
-                    toggleDifficultyHard(!selectedDifficulty.includes('Hard'))
-                "
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.difficulty.hard") }}
-                  <CheckIcon
-                    v-if="selectedDifficulty.includes('Hard')"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>{{
-                t("problem.explorer.premium")
-              }}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                :checked="showPremium === false"
-                @click="() => togglePremiumFree(!(showPremium === false))"
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.explorer.free") }}
-                  <CheckIcon
-                    v-if="showPremium === false"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                :checked="showPremium === true"
-                @click="() => togglePremiumPremium(!(showPremium === true))"
-              >
-                <span class="flex items-center w-full">
-                  {{ t("problem.explorer.premium") }}
-                  <CheckIcon
-                    v-if="showPremium === true"
-                    class="ml-auto h-4 w-4"
-                  />
-                </span>
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+            <span class="flex items-center w-full">
+              {{ t("problem.status.solved") }}
+              <CheckIcon
+                v-if="selectedStatus.includes('solved')"
+                class="ml-auto h-4 w-4"
+              />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            :checked="selectedStatus.includes('attempted')"
+            @click="
+              () =>
+                toggleStatus('attempted', !selectedStatus.includes('attempted'))
+            "
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.status.attempted") }}
+              <CheckIcon
+                v-if="selectedStatus.includes('attempted')"
+                class="ml-auto h-4 w-4"
+              />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            :checked="selectedStatus.includes('todo')"
+            @click="
+              () => toggleStatus('todo', !selectedStatus.includes('todo'))
+            "
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.status.todo") }}
+              <CheckIcon
+                v-if="selectedStatus.includes('todo')"
+                class="ml-auto h-4 w-4"
+              />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>{{
+            t("problem.explorer.difficulty")
+          }}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            :checked="selectedDifficulty.includes('Easy')"
+            @click="
+              () =>
+                toggleDifficulty('Easy', !selectedDifficulty.includes('Easy'))
+            "
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.difficulty.easy") }}
+              <CheckIcon
+                v-if="selectedDifficulty.includes('Easy')"
+                class="ml-auto h-4 w-4"
+              />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            :checked="selectedDifficulty.includes('Medium')"
+            @click="
+              () =>
+                toggleDifficulty(
+                  'Medium',
+                  !selectedDifficulty.includes('Medium'),
+                )
+            "
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.difficulty.medium") }}
+              <CheckIcon
+                v-if="selectedDifficulty.includes('Medium')"
+                class="ml-auto h-4 w-4"
+              />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            :checked="selectedDifficulty.includes('Hard')"
+            @click="
+              () =>
+                toggleDifficulty('Hard', !selectedDifficulty.includes('Hard'))
+            "
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.difficulty.hard") }}
+              <CheckIcon
+                v-if="selectedDifficulty.includes('Hard')"
+                class="ml-auto h-4 w-4"
+              />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>{{
+            t("problem.explorer.premium")
+          }}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            :checked="showPremium === false"
+            @click="() => togglePremium(false, !(showPremium === false))"
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.explorer.free") }}
+              <CheckIcon v-if="showPremium === false" class="ml-auto h-4 w-4" />
+            </span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            :checked="showPremium === true"
+            @click="() => togglePremium(true, !(showPremium === true))"
+          >
+            <span class="flex items-center w-full">
+              {{ t("problem.explorer.premium") }}
+              <CheckIcon v-if="showPremium === true" class="ml-auto h-4 w-4" />
+            </span>
+          </DropdownMenuCheckboxItem>
+        </template>
+        <template #actions>
           <Button variant="outline" class="h-10 rounded-full" @click="pickOne">
             {{ t("problem.explorer.pickOne") }}
           </Button>
+        </template>
+      </DataTableToolbar>
 
-          <Button
-            v-if="
-              searchQuery ||
-              selectedTags.length ||
-              selectedStatus.length ||
-              selectedDifficulty.length ||
-              showPremium !== null
-            "
-            variant="ghost"
-            size="icon"
-            class="h-10 w-10 rounded-full"
-            @click="clearFilters"
-            :aria-label="
-              t('common.actions.clear') + ' ' + t('problem.explorer.filters')
-            "
-          >
-            <X class="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <!-- Tags Section -->
-      <Collapsible class="w-full space-y-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <Badge
-            v-for="tag in popularTags"
-            :key="tag"
-            :variant="isTagSelected(tag) ? 'default' : 'outline'"
-            class="cursor-pointer px-3 py-1 hover:bg-primary/80 hover:text-primary-foreground transition-colors rounded-md"
-            :class="{
-              'bg-primary text-primary-foreground hover:bg-primary/90':
-                isTagSelected(tag),
-            }"
-            @click="toggleTag(tag)"
-          >
-            {{ tag }}
-          </Badge>
-          <CollapsibleTrigger as-child>
-            <Button
-              variant="ghost"
-              size="sm"
-              class="gap-1 h-7 text-xs text-muted-foreground hover:text-foreground rounded-full"
-            >
-              {{ t("problem.explorer.showMoreTags") }}
-              <ChevronDown class="h-3 w-3" />
-            </Button>
-          </CollapsibleTrigger>
-        </div>
-        <CollapsibleContent class="animate-slide-down">
-          <div class="flex flex-wrap gap-2 pt-2">
-            <Badge
-              v-for="tag in otherTags"
-              :key="tag"
-              variant="outline"
-              class="cursor-pointer px-2.5 py-0.5 text-[11px] font-normal border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors rounded-md"
-              :class="{
-                'bg-zinc-900 text-zinc-50 border-zinc-900 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900':
-                  isTagSelected(tag),
-              }"
-              @click="toggleTag(tag)"
-            >
-              {{ tag }}
-            </Badge>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      <TagFilter
+        v-model="selectedTags"
+        :popular-tags="popularTags"
+        :other-tags="otherTags"
+        :show-more-label="t('problem.explorer.showMoreTags')"
+      />
     </div>
 
-    <ProblemTable
-      :displayed-problems="displayedProblems"
-      :num-problems-to-show="numProblemsToShow"
-      :total-filtered-problems="totalFilteredProblems"
-      :editable="props.editable"
+    <DataTable
+      :data="displayedProblems"
+      :columns="columns"
+      :has-more="numProblemsToShow < totalFilteredProblems"
+      :empty-label="t('problem.table.noResults')"
+      :empty-description="t('problem.table.tryAdjusting')"
+      :loading-label="t('problem.table.loadingMore')"
       @load-more="loadMore"
-      @remove="(problem) => emit('remove', problem)"
-    />
+      @row-click="handleRowClick"
+    >
+      <template #cell-status="{ item: problem }">
+        <div class="flex justify-center items-center">
+          <component
+            :is="(problem as any).statusIcon"
+            v-if="(problem as any).statusIcon"
+            class="h-5 w-5"
+            :class="{
+              'text-emerald-600': (problem as any).status === 'solved',
+            }"
+          />
+        </div>
+      </template>
+
+      <template #cell-title="{ item: problem }">
+        <div class="flex items-center gap-2">
+          <span class="truncate"
+            >{{ (problem as any).id }}. {{ (problem as any).title }}</span
+          >
+          <a
+            v-if="(problem as any).hasSolution"
+            href="#"
+            class="no-underline hover:no-underline text-muted-foreground hover:text-foreground"
+            @click.stop
+          >
+            <Video class="h-4 w-4" />
+          </a>
+          <Lock
+            v-if="(problem as any).isPremium"
+            class="h-4 w-4 text-amber-500"
+          />
+        </div>
+      </template>
+
+      <template #cell-acceptance="{ item: problem }">
+        {{
+          formatAcceptance(
+            (problem as any).acceptanceRate ?? (problem as any).acceptance_rate,
+          )
+        }}
+      </template>
+
+      <template #cell-difficulty="{ item: problem }">
+        <span :class="difficultyClass((problem as any).difficulty)">
+          {{
+            t("problem.difficulty." + (problem as any).difficulty.toLowerCase())
+          }}
+        </span>
+      </template>
+
+      <template #cell-actions="{ item: problem }">
+        <Button
+          variant="ghost"
+          size="icon"
+          class="h-8 w-8 text-muted-foreground hover:text-destructive rounded-full"
+          @click="(e: MouseEvent) => handleRemove(e, problem as Problem)"
+        >
+          <Trash2 class="h-4 w-4" />
+        </Button>
+      </template>
+    </DataTable>
   </section>
 </template>

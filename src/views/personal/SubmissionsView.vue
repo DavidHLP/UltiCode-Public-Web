@@ -1,37 +1,82 @@
 <script setup lang="ts">
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { fetchUserSubmissions } from "@/api/submission";
 import type { SubmissionRecord } from "@/types/submission";
 import {
-  ListX,
   CheckCircle2,
   XCircle,
   Clock,
   ChevronRight,
   ExternalLink,
   Loader2,
+  ListX,
 } from "lucide-vue-next";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { Button } from "@/components/ui/button";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { useI18n } from "vue-i18n";
 import PersonalPageHeader from "./components/PersonalPageHeader.vue";
 import PersonalPageShell from "./components/PersonalPageShell.vue";
+import {
+  DataTable,
+  DataTableToolbar,
+  type ColumnDef,
+} from "@/components/common/data-table";
 
 const { t, locale } = useI18n();
+const router = useRouter();
 const submissions = ref<SubmissionRecord[]>([]);
 const loading = ref(true);
 const hasUser = ref(false);
+const searchQuery = ref("");
+
+const filteredSubmissions = computed(() => {
+  if (!searchQuery.value) return submissions.value;
+  const query = searchQuery.value.toLowerCase();
+  return submissions.value.filter(
+    (s) =>
+      s.problem?.title.toLowerCase().includes(query) ||
+      s.id.toLowerCase().includes(query),
+  );
+});
+
+const columns = computed<ColumnDef[]>(() => [
+  {
+    key: "problem",
+    header: t("personal.submissions.problem"),
+    class: "w-[300px]",
+    headerClass: "w-[300px]",
+  },
+  {
+    key: "status",
+    header: t("personal.submissions.status"),
+  },
+  {
+    key: "language",
+    header: t("personal.submissions.language"),
+  },
+  {
+    key: "runtime",
+    header: t("personal.submissions.runtime"),
+  },
+  {
+    key: "memory",
+    header: t("personal.submissions.memory"),
+  },
+  {
+    key: "created_at",
+    header: t("personal.submissions.submittedAt"),
+    class: "text-right",
+    headerClass: "text-right",
+  },
+  {
+    key: "actions",
+    header: "",
+    class: "w-10",
+    headerClass: "w-10",
+  },
+]);
 
 const getStatusIcon = (status: SubmissionRecord["status"]) => {
   switch (status) {
@@ -74,6 +119,12 @@ const getStatusColorClass = (status: SubmissionRecord["status"]) => {
       return "text-sky-500 bg-sky-500/10 border-sky-500/20";
     default:
       return "text-amber-500 bg-amber-500/10 border-amber-500/20";
+  }
+};
+
+const handleRowClick = (submission: SubmissionRecord) => {
+  if (submission.problem?.slug) {
+    router.push(`/problems/${submission.problem.slug}`);
   }
 };
 
@@ -129,121 +180,116 @@ onMounted(async () => {
       </Button>
     </div>
 
-    <div v-else-if="submissions.length > 0">
-      <Table>
-        <TableCaption>{{
-          t("personal.submissions.latestSubmissions", {
-            count: submissions.length,
-          })
-        }}</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead class="w-[300px]">{{
-              t("personal.submissions.problem")
-            }}</TableHead>
-            <TableHead>{{ t("personal.submissions.status") }}</TableHead>
-            <TableHead>{{ t("personal.submissions.language") }}</TableHead>
-            <TableHead>{{ t("personal.submissions.runtime") }}</TableHead>
-            <TableHead>{{ t("personal.submissions.memory") }}</TableHead>
-            <TableHead class="text-right">{{
-              t("personal.submissions.submittedAt")
-            }}</TableHead>
-            <TableHead class="w-10"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow
-            v-for="submission in submissions"
-            :key="submission.id"
-            class="group hover:bg-muted/50 transition-colors"
-          >
-            <TableCell class="font-medium">
-              <div class="flex flex-col">
-                <RouterLink
-                  :to="`/problems/${submission.problem?.slug || ''}`"
-                  class="font-medium text-foreground hover:text-primary transition-colors"
-                >
-                  {{ submission.problem?.title || "Unknown Problem" }}
-                </RouterLink>
-                <span
-                  class="text-[10px] text-muted-foreground uppercase tracking-wider font-medium"
-                >
-                  ID: {{ submission.id.substring(0, 8) }}
-                </span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <Badge
-                variant="outline"
-                class="gap-1.5 py-1 px-2 font-medium rounded-md border"
-                :class="getStatusColorClass(submission.status)"
-              >
-                <component
-                  :is="getStatusIcon(submission.status)"
-                  class="h-3.5 w-3.5"
-                />
-                {{ submission.status }}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              {{ submission.language }}
-            </TableCell>
-            <TableCell>
-              <div class="flex items-center gap-1.5 font-medium">
-                {{ submission.runtime
-                }}<span class="text-[10px] text-muted-foreground uppercase"
-                  >ms</span
-                >
-              </div>
-            </TableCell>
-            <TableCell>
-              <div class="flex items-center gap-1.5 font-medium">
-                {{ submission.memory
-                }}<span class="text-[10px] text-muted-foreground uppercase"
-                  >mb</span
-                >
-              </div>
-            </TableCell>
-            <TableCell class="text-right">
-              {{ new Date(submission.created_at).toLocaleDateString(locale) }}
-            </TableCell>
-            <TableCell>
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                as-child
-              >
-                <RouterLink :to="`/problems/${submission.problem?.slug || ''}`">
-                  <ChevronRight class="h-4 w-4" />
-                </RouterLink>
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
+    <div v-else class="space-y-4">
+      <DataTableToolbar
+        v-model="searchQuery"
+        :placeholder="
+          t('personal.submissions.searchPlaceholder', 'Search submissions...')
+        "
+        :show-clear="!!searchQuery"
+        @clear="searchQuery = ''"
+      />
 
-    <div
-      v-else
-      class="flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed border-muted/50 bg-muted/5 text-center px-6"
-    >
-      <div
-        class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
+      <DataTable
+        :data="filteredSubmissions"
+        :columns="columns"
+        :has-more="false"
+        @row-click="handleRowClick"
       >
-        <ListX class="h-8 w-8 text-muted-foreground/50" />
-      </div>
-      <h3 class="text-xl font-bold">
-        {{ t("personal.submissions.noSubmissions") }}
-      </h3>
-      <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
-        {{ t("personal.submissions.noSubmissionsDesc") }}
-      </p>
-      <Button class="rounded-full px-8 h-10 font-bold" as-child>
-        <RouterLink to="/problemset">{{
-          t("personal.submissions.startSolving")
-        }}</RouterLink>
-      </Button>
+        <template #cell-problem="{ item }">
+          <div class="flex flex-col">
+            <span
+              class="font-medium text-foreground hover:text-primary transition-colors"
+            >
+              {{
+                (item as SubmissionRecord).problem?.title || "Unknown Problem"
+              }}
+            </span>
+            <span
+              class="text-[10px] text-muted-foreground uppercase tracking-wider font-medium"
+            >
+              ID: {{ (item as SubmissionRecord).id.substring(0, 8) }}
+            </span>
+          </div>
+        </template>
+
+        <template #cell-status="{ item }">
+          <Badge
+            variant="outline"
+            class="gap-1.5 py-1 px-2 font-medium rounded-md border"
+            :class="getStatusColorClass((item as SubmissionRecord).status)"
+          >
+            <component
+              :is="getStatusIcon((item as SubmissionRecord).status)"
+              class="h-3.5 w-3.5"
+            />
+            {{ (item as SubmissionRecord).status }}
+          </Badge>
+        </template>
+
+        <template #cell-language="{ item }">
+          {{ (item as SubmissionRecord).language }}
+        </template>
+
+        <template #cell-runtime="{ item }">
+          <div class="flex items-center gap-1.5 font-medium">
+            {{ (item as SubmissionRecord).runtime
+            }}<span class="text-[10px] text-muted-foreground uppercase"
+              >ms</span
+            >
+          </div>
+        </template>
+
+        <template #cell-memory="{ item }">
+          <div class="flex items-center gap-1.5 font-medium">
+            {{ (item as SubmissionRecord).memory
+            }}<span class="text-[10px] text-muted-foreground uppercase"
+              >mb</span
+            >
+          </div>
+        </template>
+
+        <template #cell-created_at="{ item }">
+          {{
+            new Date((item as SubmissionRecord).created_at).toLocaleDateString(
+              locale,
+            )
+          }}
+        </template>
+
+        <template #cell-actions>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="h-8 w-8 text-muted-foreground hover:text-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <ChevronRight class="h-4 w-4" />
+          </Button>
+        </template>
+
+        <template #empty>
+          <div
+            class="flex flex-col items-center justify-center py-24 rounded-2xl border-2 border-dashed border-muted/50 bg-muted/5 text-center px-6"
+          >
+            <div
+              class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-4"
+            >
+              <ListX class="h-8 w-8 text-muted-foreground/50" />
+            </div>
+            <h3 class="text-xl font-bold">
+              {{ t("personal.submissions.noSubmissions") }}
+            </h3>
+            <p class="mb-8 mt-2 max-w-[300px] text-sm text-muted-foreground">
+              {{ t("personal.submissions.noSubmissionsDesc") }}
+            </p>
+            <Button class="rounded-full px-8 h-10 font-bold" as-child>
+              <RouterLink to="/problemset">{{
+                t("personal.submissions.startSolving")
+              }}</RouterLink>
+            </Button>
+          </div>
+        </template>
+      </DataTable>
     </div>
   </PersonalPageShell>
 </template>
