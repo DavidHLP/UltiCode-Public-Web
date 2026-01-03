@@ -36,7 +36,9 @@ const { t } = useI18n();
             class="flex flex-col items-center gap-2 w-1/3 relative group cursor-pointer"
             v-if="rankings[1]"
           >
-            <div class="relative transition-transform duration-300 group-hover:-translate-y-1">
+            <div
+              class="relative transition-transform duration-300 group-hover:-translate-y-1"
+            >
               <img
                 :src="
                   rankings[1].avatar ||
@@ -51,14 +53,18 @@ const { t } = useI18n();
                 >
               </div>
             </div>
-            <p class="text-xs font-bold truncate w-full text-slate-700 dark:text-slate-300 mt-1">
+            <p
+              class="text-xs font-bold truncate w-full text-slate-700 dark:text-slate-300 mt-1"
+            >
               {{ rankings[1].username }}
             </p>
             <RatingBadge :rating="rankings[1].rating" size="sm" />
             <div
               class="h-24 w-full bg-gradient-to-b from-slate-200 via-slate-100 to-white dark:from-slate-800 dark:to-slate-900 rounded-t-xl shadow-inner border-t border-slate-300/50 relative overflow-hidden"
             >
-              <div class="absolute inset-0 bg-white/30 skew-y-12 opacity-50"></div>
+              <div
+                class="absolute inset-0 bg-white/30 skew-y-12 opacity-50"
+              ></div>
             </div>
           </div>
 
@@ -67,8 +73,14 @@ const { t } = useI18n();
             class="flex flex-col items-center gap-2 w-1/3 relative z-10 group cursor-pointer"
             v-if="rankings[0]"
           >
-            <div class="relative transition-transform duration-300 group-hover:-translate-y-2">
-              <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-3xl animate-bounce">👑</div>
+            <div
+              class="relative transition-transform duration-300 group-hover:-translate-y-2"
+            >
+              <div
+                class="absolute -top-6 left-1/2 -translate-x-1/2 text-3xl animate-bounce"
+              >
+                👑
+              </div>
               <img
                 :src="
                   rankings[0].avatar ||
@@ -92,8 +104,14 @@ const { t } = useI18n();
             <div
               class="h-36 w-full bg-gradient-to-b from-yellow-100 via-yellow-50 to-white dark:from-yellow-900/40 dark:to-slate-900 rounded-t-xl shadow-lg border-t border-yellow-300/50 relative overflow-hidden"
             >
-               <div class="absolute inset-0 bg-white/40 skew-y-12 opacity-50"></div>
-               <div class="absolute bottom-0 w-full text-center pb-2 opacity-10 font-black text-4xl text-yellow-600">1</div>
+              <div
+                class="absolute inset-0 bg-white/40 skew-y-12 opacity-50"
+              ></div>
+              <div
+                class="absolute bottom-0 w-full text-center pb-2 opacity-10 font-black text-4xl text-yellow-600"
+              >
+                1
+              </div>
             </div>
           </div>
 
@@ -102,7 +120,9 @@ const { t } = useI18n();
             class="flex flex-col items-center gap-2 w-1/3 relative group cursor-pointer"
             v-if="rankings[2]"
           >
-            <div class="relative transition-transform duration-300 group-hover:-translate-y-1">
+            <div
+              class="relative transition-transform duration-300 group-hover:-translate-y-1"
+            >
               <img
                 :src="
                   rankings[2].avatar ||
@@ -117,14 +137,18 @@ const { t } = useI18n();
                 >
               </div>
             </div>
-            <p class="text-xs font-bold truncate w-full text-orange-700 dark:text-orange-300 mt-1">
+            <p
+              class="text-xs font-bold truncate w-full text-orange-700 dark:text-orange-300 mt-1"
+            >
               {{ rankings[2].username }}
             </p>
             <RatingBadge :rating="rankings[2].rating" size="sm" />
             <div
               class="h-16 w-full bg-gradient-to-b from-orange-100 via-orange-50 to-white dark:from-orange-900/30 dark:to-slate-900 rounded-t-xl shadow-inner border-t border-orange-300/50 relative overflow-hidden"
             >
-              <div class="absolute inset-0 bg-white/30 skew-y-12 opacity-50"></div>
+              <div
+                class="absolute inset-0 bg-white/30 skew-y-12 opacity-50"
+              ></div>
             </div>
           </div>
         </div>
@@ -136,9 +160,10 @@ const { t } = useI18n();
             :key="user.username"
             class="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
           >
-            <span class="text-xs font-bold w-6 text-center text-muted-foreground group-hover:text-foreground transition-colors">{{
-              index + 4
-            }}</span>
+            <span
+              class="text-xs font-bold w-6 text-center text-muted-foreground group-hover:text-foreground transition-colors"
+              >{{ index + 4 }}</span
+            >
             <img
               :src="
                 user.avatar ||
@@ -147,7 +172,9 @@ const { t } = useI18n();
               class="h-8 w-8 rounded-full bg-muted border border-border"
             />
             <div class="flex-1 min-w-0 text-left">
-              <p class="truncate text-sm font-medium group-hover:text-primary transition-colors">
+              <p
+                class="truncate text-sm font-medium group-hover:text-primary transition-colors"
+              >
                 {{ user.username }}
               </p>
               <p class="text-xs text-muted-foreground">

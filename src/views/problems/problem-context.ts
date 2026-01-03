@@ -5,6 +5,7 @@ import type { ProblemRunResult } from "@/types/test-results";
 export interface ProblemContext {
   problem: Ref<ProblemDetail | null>;
   runResult: Ref<ProblemRunResult | null>;
+  contestId: Ref<string | null>;
 }
 
 export const ProblemContextKey: InjectionKey<ProblemContext> =

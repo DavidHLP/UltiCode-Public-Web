@@ -72,6 +72,13 @@ const slug = computed(() => {
   const resolved = Array.isArray(slugParam) ? slugParam[0] : slugParam;
   return resolved ?? null;
 });
+const contestId = computed(() => {
+  const contestParam = route.query.contestId;
+  if (Array.isArray(contestParam)) {
+    return contestParam[0] ?? null;
+  }
+  return typeof contestParam === "string" ? contestParam : null;
+});
 const { problem, runResult } = useProblemDetail(slug);
 
 onMounted(() => {
@@ -80,7 +87,7 @@ onMounted(() => {
 
 // --- Context Provider ---
 // Provide problem and runResult to connector components
-provide(ProblemContextKey, { problem, runResult });
+provide(ProblemContextKey, { problem, runResult, contestId });
 
 // --- Connector Components ---
 // These wrappers adapt the injected context to the specific props required by the views
@@ -126,13 +133,16 @@ const ConnectedSolutionsView = defineComponent({
 
 const ConnectedSubmissionsView = defineComponent({
   setup() {
-    const { problem } = useProblemContext();
+    const { problem, contestId } = useProblemContext();
     return () =>
       problem.value
         ? h(
             "div",
             { class: "px-1 py-2" },
-            h(SubmissionsView, { problemId: problem.value.id }),
+            h(SubmissionsView, {
+              problemId: problem.value.id,
+              contestId: contestId.value ?? undefined,
+            }),
           )
         : h(
             "div",

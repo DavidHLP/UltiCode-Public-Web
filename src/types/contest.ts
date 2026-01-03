@@ -4,6 +4,8 @@
 
 export type ContestStatus = "upcoming" | "running" | "finished";
 export type ContestType = "weekly" | "biweekly" | "special";
+export type ContestScoringMode = "SCORE" | "ICPC";
+export type ContestTieBreaker = "LAST_SOLVE_TIME" | "TOTAL_ATTEMPTS" | "NONE";
 export type ContestParticipantStatus =
   | "REGISTERED"
   | "STARTED"
@@ -99,6 +101,9 @@ export interface ContestListItem {
   start_time: string;
   duration_minutes: number;
   status: ContestStatus;
+  penalty_per_wrong?: number;
+  scoring_mode?: ContestScoringMode;
+  tie_breaker?: ContestTieBreaker;
   registered_count: number;
   participant_count: number;
   is_rated: boolean;
@@ -117,6 +122,9 @@ export interface ContestListItem {
   participantCount?: number;
   canRegister?: boolean;
   canStart?: boolean;
+  penaltyPerWrong?: number;
+  scoringMode?: ContestScoringMode;
+  tieBreaker?: ContestTieBreaker;
 }
 
 export interface ContestProblemSummary {
@@ -125,6 +133,7 @@ export interface ContestProblemSummary {
   problem_id: number;
   problem_index: string;
   score: number;
+  penalty_per_wrong?: number;
   solved_count: number;
   submission_count: number;
   // Problem details
@@ -137,6 +146,7 @@ export interface ContestProblemSummary {
   problemId?: number;
   solvedCount?: number;
   submissionCount?: number;
+  penaltyPerWrong?: number;
 }
 
 export interface ContestDetail extends ContestListItem {
@@ -180,6 +190,7 @@ export interface ProblemResultEntry {
   isSolved: boolean;
   score: number;
   attempts: number;
+  wrongAttempts?: number;
   solveTime: number | null;
   penaltyTime: number;
 }
@@ -191,6 +202,9 @@ export interface ContestRankingEntry {
   avatar: string | null;
   totalScore: number;
   totalPenalty: number;
+  finishTime?: number | null;
+  finish_time?: number | null;
+  totalAttempts?: number;
   solvedCount: number;
   ratingBefore: number;
   ratingAfter: number;
@@ -199,8 +213,7 @@ export interface ContestRankingEntry {
   problemResults: ProblemResultEntry[];
   // Legacy aliases
   score?: number;
-  finish_time?: string;
-  finishTime?: string;
+  total_attempts?: number;
   country?: string;
 }
 

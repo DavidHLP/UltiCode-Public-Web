@@ -10,11 +10,13 @@ import {
   fetchProblemSubmissions,
   fetchSubmissionStatuses,
 } from "@/api/submission";
+import { fetchContestProblemSubmissions } from "@/api/contest";
 import { fetchCurrentUserId } from "@/utils/auth";
 import { problemHooks } from "@/hooks/problem-hooks";
 
 const props = defineProps<{
   problemId: number;
+  contestId?: string;
 }>();
 
 const submissions = ref<SubmissionRecord[]>([]);
@@ -57,10 +59,9 @@ const loadSubmissions = async () => {
     userId,
   });
   try {
-    submissions.value = await fetchProblemSubmissions(
-      props.problemId,
-      userId || undefined,
-    );
+    submissions.value = props.contestId
+      ? await fetchContestProblemSubmissions(props.contestId, props.problemId)
+      : await fetchProblemSubmissions(props.problemId, userId || undefined);
     await problemHooks.emit("problem:submissions:load:after", {
       problemId: props.problemId,
       userId,
@@ -80,7 +81,7 @@ const loadSubmissions = async () => {
 };
 
 watch(
-  () => props.problemId,
+  () => [props.problemId, props.contestId],
   () => {
     selectedSubmissionId.value = null;
     void Promise.all([loadStatusMeta(), loadSubmissions()]);

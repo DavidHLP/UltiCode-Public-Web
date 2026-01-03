@@ -6,7 +6,7 @@ import type {
 import type { ProblemRunResult } from "@/types/test-results";
 
 // Helper to map backend snake_case to frontend camelCase
-function mapSubmission(sub: unknown): SubmissionRecord {
+export function mapSubmission(sub: unknown): SubmissionRecord {
   if (!sub || typeof sub !== "object") return sub as SubmissionRecord;
   const s = sub as Record<string, unknown>;
   return {

@@ -79,7 +79,7 @@ const visiblePages = computed(() => {
       class="flex flex-col rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden"
     >
       <div
-        v-for="(contest, index) in contests"
+        v-for="contest in contests"
         :key="contest.id"
         class="group flex items-center justify-between gap-4 p-4 transition-all hover:bg-muted/40 cursor-pointer border-b last:border-0"
         @click="
@@ -104,12 +104,18 @@ const visiblePages = computed(() => {
             >
               {{ contest.title }}
             </span>
-            <div class="flex items-center gap-4 text-xs font-medium text-muted-foreground">
-              <span class="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">
+            <div
+              class="flex items-center gap-4 text-xs font-medium text-muted-foreground"
+            >
+              <span
+                class="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md"
+              >
                 <Calendar class="h-3.5 w-3.5" />
                 {{ formatDateTime(contest.start_time).split(" ")[0] }}
               </span>
-              <span class="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">
+              <span
+                class="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md"
+              >
                 <Clock class="h-3.5 w-3.5" />
                 {{ getDurationMinutes(contest.start_time, contest.end_time) }}
                 {{ t("contest.time.min_short") }}

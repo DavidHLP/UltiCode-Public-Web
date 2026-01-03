@@ -17,6 +17,7 @@ import {
 import { toast } from "vue-sonner";
 import { Clock, Trophy } from "lucide-vue-next";
 import { useI18n } from "vue-i18n";
+import { formatPenaltyTime } from "@/utils/date";
 
 const contestStore = useContestStore();
 const { t } = useI18n();
@@ -163,7 +164,7 @@ onUnmounted(() => {
           >
           <span
             >{{ t("contest.ranking.penalty") }}:
-            {{ session.total_penalty || 0 }}</span
+            {{ formatPenaltyTime(session.total_penalty ?? 0) }}</span
           >
         </div>
       </div>

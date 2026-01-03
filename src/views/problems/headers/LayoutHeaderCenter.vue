@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { onBeforeUnmount, ref, inject } from "vue";
+import { computed, onBeforeUnmount, ref, inject } from "vue";
 import { Play, CloudUpload, StickyNote } from "lucide-vue-next";
 import {
   HoverCard,
@@ -13,6 +13,7 @@ import { useBottomPanelStore } from "../test/test";
 import { useHeaderStore } from "@/stores/headerStore";
 import { storeToRefs } from "pinia";
 import { createSubmission } from "@/api/submission";
+import { submitContestProblem } from "@/api/contest";
 import { toast } from "vue-sonner";
 import { ToggleNotesKey } from "../problem-context";
 import { useProblemContext } from "../useProblemContext";
@@ -22,6 +23,7 @@ import { useI18n } from "vue-i18n";
 const { requestRun } = useBottomPanelStore();
 const headerStore = useHeaderStore();
 const problemContext = useProblemContext();
+const contestId = computed(() => problemContext.contestId.value);
 const toggleNotes = inject(ToggleNotesKey, () => {});
 const editorStore = useProblemEditorStore();
 const { code, language } = storeToRefs(editorStore);
@@ -59,10 +61,15 @@ async function handleSubmit() {
 
   isSubmitting.value = true;
   try {
-    const res = await createSubmission(prob.id, {
-      language: currentLanguage,
-      code: currentCode,
-    });
+    const res = contestId.value
+      ? await submitContestProblem(contestId.value, prob.id, {
+          language: currentLanguage,
+          code: currentCode,
+        })
+      : await createSubmission(prob.id, {
+          language: currentLanguage,
+          code: currentCode,
+        });
     toast.success(`${t("problem.editor.submit")} ${res.status}!`);
     // Navigate to submissions tab
     headerStore.setActiveGroup("problem-info");

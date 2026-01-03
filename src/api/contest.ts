@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiDelete } from "@/utils/request";
+import { mapSubmission } from "@/api/submission";
 import type {
   ContestListItem,
   ContestDetail,
@@ -12,6 +13,7 @@ import type {
   RatingHistoryEntry,
   PaginatedResult,
 } from "@/types/contest";
+import type { SubmissionRecord } from "@/types/submission";
 
 function toNumber(value: unknown): number | undefined {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -32,6 +34,13 @@ function mapContestListItem(data: unknown): ContestListItem {
   const durationMinutes = toNumber(
     contest.duration_minutes ?? contest.durationMinutes,
   );
+  const penaltyPerWrong = toNumber(
+    contest.penalty_per_wrong ?? contest.penaltyPerWrong,
+  );
+  const scoringMode = (contest.scoring_mode ??
+    contest.scoringMode) as ContestListItem["scoring_mode"];
+  const tieBreaker = (contest.tie_breaker ??
+    contest.tieBreaker) as ContestListItem["tie_breaker"];
   const endTimeRaw = (contest.end_time ?? contest.endTime) as
     | string
     | undefined;
@@ -54,12 +63,21 @@ function mapContestListItem(data: unknown): ContestListItem {
     start_time: startTime ?? (contest.start_time as string | undefined),
     duration_minutes:
       durationMinutes ?? (contest.duration_minutes as number | undefined),
+    penalty_per_wrong:
+      penaltyPerWrong ?? (contest.penalty_per_wrong as number | undefined),
+    scoring_mode:
+      scoringMode ?? (contest.scoring_mode as ContestListItem["scoring_mode"]),
+    tie_breaker:
+      tieBreaker ?? (contest.tie_breaker as ContestListItem["tie_breaker"]),
     startTime,
     endTime,
     end_time: endTime ?? (contest.end_time as string | undefined),
     durationMinutes,
     type: (contest.contest_type ?? contest.type) as ContestListItem["type"],
     isRated,
+    penaltyPerWrong,
+    scoringMode,
+    tieBreaker,
     registeredCount: toNumber(
       contest.registered_count ?? contest.registeredCount,
     ),
@@ -78,17 +96,23 @@ function mapContestListItem(data: unknown): ContestListItem {
 function mapContestProblem(data: unknown): ContestProblemSummary {
   if (!data || typeof data !== "object") return data as ContestProblemSummary;
   const problem = data as Record<string, unknown>;
+  const penaltyPerWrong = toNumber(
+    problem.penalty_per_wrong ?? problem.penaltyPerWrong,
+  );
   return {
     ...problem,
     problemIndex: (problem.problem_index ?? problem.problemIndex) as
       | string
       | undefined,
     problemId: toNumber(problem.problem_id ?? problem.problemId),
+    penalty_per_wrong:
+      penaltyPerWrong ?? (problem.penalty_per_wrong as number | undefined),
     solvedCount: toNumber(problem.solved_count ?? problem.solvedCount),
     submissionCount: toNumber(
       problem.submission_count ?? problem.submissionCount,
     ),
     acceptanceRate: toNumber(problem.acceptance_rate ?? problem.acceptanceRate),
+    penaltyPerWrong,
   } as ContestProblemSummary;
 }
 
@@ -315,22 +339,7 @@ export interface ContestSubmissionDto {
   code: string;
 }
 
-export interface ContestSubmissionResult {
-  id: string;
-  problem_id: number;
-  user_id: string;
-  language: string;
-  status: string;
-  runtime: number | null;
-  memory: number | null;
-  created_at: string;
-  contest_info: {
-    time_from_start: number;
-    problem_index: string;
-    score: number;
-    is_accepted: boolean;
-  };
-}
+export type ContestSubmissionResult = SubmissionRecord;
 
 /**
  * Submit code for a contest problem
@@ -340,10 +349,11 @@ export async function submitContestProblem(
   problemId: number,
   dto: ContestSubmissionDto,
 ): Promise<ContestSubmissionResult> {
-  return apiPost<ContestSubmissionResult>(
+  const response = await apiPost<unknown>(
     `/contest/${contestId}/problems/${problemId}/submissions`,
     dto,
   );
+  return mapSubmission(response) as ContestSubmissionResult;
 }
 
 /**
@@ -353,7 +363,8 @@ export async function fetchContestProblemSubmissions(
   contestId: string,
   problemId: number,
 ): Promise<ContestSubmissionResult[]> {
-  return apiGet<ContestSubmissionResult[]>(
+  const data = await apiGet<unknown[]>(
     `/contest/${contestId}/problems/${problemId}/submissions`,
   );
+  return data.map((item) => mapSubmission(item) as ContestSubmissionResult);
 }

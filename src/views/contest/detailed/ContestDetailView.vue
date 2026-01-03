@@ -34,6 +34,7 @@ import {
   Lock,
 } from "lucide-vue-next";
 import { useI18n } from "vue-i18n";
+import { formatPenaltyTime } from "@/utils/date";
 
 const route = useRoute();
 const contestStore = useContestStore();
@@ -192,20 +193,6 @@ function formatCountdown(totalSeconds: number): string {
   return `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
     .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-}
-
-function formatPenaltyTime(totalSeconds: number): string {
-  const seconds = Math.max(0, Math.floor(totalSeconds));
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  }
-  return `${minutes}:${secs.toString().padStart(2, "0")}`;
 }
 
 function getContestEndTimeMs(): number | null {
@@ -461,9 +448,15 @@ function getCountryFlag(countryCode: string): string {
         :class="statusCardClass"
       >
         <!-- Background Pattern -->
-        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
-        <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-black/10 rounded-full blur-3xl"></div>
+        <div
+          class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"
+        ></div>
+        <div
+          class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"
+        ></div>
+        <div
+          class="absolute -bottom-24 -left-24 w-64 h-64 bg-black/10 rounded-full blur-3xl"
+        ></div>
 
         <CardContent class="p-8 relative z-10">
           <div
@@ -495,16 +488,22 @@ function getCountryFlag(countryCode: string): string {
                         : t("contest.status.finished")
                   }}
                 </span>
-                <span v-if="statusHint" class="text-xs font-medium text-white/90">{{
-                  statusHint
-                }}</span>
+                <span
+                  v-if="statusHint"
+                  class="text-xs font-medium text-white/90"
+                  >{{ statusHint }}</span
+                >
               </div>
-              <p class="text-3xl font-black md:text-5xl tracking-tight drop-shadow-sm">
+              <p
+                class="text-3xl font-black md:text-5xl tracking-tight drop-shadow-sm"
+              >
                 {{ statusLabel }}
               </p>
             </div>
             <div class="text-left md:text-right space-y-2">
-              <p class="text-xs font-bold uppercase tracking-widest text-white/70">
+              <p
+                class="text-xs font-bold uppercase tracking-widest text-white/70"
+              >
                 {{
                   contest.status === "running"
                     ? t("contest.virtual.timeRemaining")
@@ -518,7 +517,10 @@ function getCountryFlag(countryCode: string): string {
               >
                 {{ statusCountdown }}
               </p>
-              <p v-if="contestEndTime" class="text-xs font-medium text-white/60">
+              <p
+                v-if="contestEndTime"
+                class="text-xs font-medium text-white/60"
+              >
                 {{
                   contest.status === "finished"
                     ? t("contest.detail.endedAt")
@@ -529,7 +531,9 @@ function getCountryFlag(countryCode: string): string {
             </div>
           </div>
 
-          <div class="mt-8 h-3 rounded-full bg-black/20 overflow-hidden backdrop-blur-sm border border-white/5">
+          <div
+            class="mt-8 h-3 rounded-full bg-black/20 overflow-hidden backdrop-blur-sm border border-white/5"
+          >
             <div
               class="h-full bg-gradient-to-r from-white/80 to-white shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out"
               :style="{ width: `${statusProgress}%` }"
@@ -539,15 +543,22 @@ function getCountryFlag(countryCode: string): string {
           <div
             class="mt-6 flex flex-wrap items-center gap-6 text-xs font-medium text-white/80"
           >
-            <span class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
+            <span
+              class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5"
+            >
               <Calendar class="h-4 w-4" />
               {{ formatDateTime(contest.start_time) }}
             </span>
-            <span v-if="contestEndTime" class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
+            <span
+              v-if="contestEndTime"
+              class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5"
+            >
               <Clock class="h-4 w-4" />
               {{ formatDateTime(contestEndTime) }}
             </span>
-            <span class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5">
+            <span
+              class="flex items-center gap-2 bg-black/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/5"
+            >
               <Users class="h-4 w-4" />
               {{ contest.participant_count || contest.participantCount || 0 }}
               {{ t("contest.detail.participants") }}
@@ -563,7 +574,9 @@ function getCountryFlag(countryCode: string): string {
 
       <!-- Contest Info Cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card class="border-none shadow-sm bg-gradient-to-br from-primary/5 via-primary/0 to-transparent hover:bg-primary/5 transition-colors">
+        <Card
+          class="border-none shadow-sm bg-gradient-to-br from-primary/5 via-primary/0 to-transparent hover:bg-primary/5 transition-colors"
+        >
           <CardContent class="p-6 flex flex-col gap-4">
             <div class="flex items-center gap-3">
               <div
@@ -583,7 +596,9 @@ function getCountryFlag(countryCode: string): string {
           </CardContent>
         </Card>
 
-        <Card class="border-none shadow-sm bg-gradient-to-br from-amber-500/5 via-amber-500/0 to-transparent hover:bg-amber-500/5 transition-colors">
+        <Card
+          class="border-none shadow-sm bg-gradient-to-br from-amber-500/5 via-amber-500/0 to-transparent hover:bg-amber-500/5 transition-colors"
+        >
           <CardContent class="p-6 flex flex-col gap-4">
             <div class="flex items-center gap-3">
               <div
@@ -604,7 +619,9 @@ function getCountryFlag(countryCode: string): string {
           </CardContent>
         </Card>
 
-        <Card class="border-none shadow-sm bg-gradient-to-br from-emerald-500/5 via-emerald-500/0 to-transparent hover:bg-emerald-500/5 transition-colors">
+        <Card
+          class="border-none shadow-sm bg-gradient-to-br from-emerald-500/5 via-emerald-500/0 to-transparent hover:bg-emerald-500/5 transition-colors"
+        >
           <CardContent class="p-6 flex flex-col gap-4">
             <div class="flex items-center gap-3">
               <div
@@ -619,14 +636,14 @@ function getCountryFlag(countryCode: string): string {
               </p>
             </div>
             <p class="text-base font-bold truncate pl-1">
-              {{
-                contest.participant_count || contest.participantCount || 0
-              }}
+              {{ contest.participant_count || contest.participantCount || 0 }}
             </p>
           </CardContent>
         </Card>
 
-        <Card class="border-none shadow-sm bg-gradient-to-br from-blue-500/5 via-blue-500/0 to-transparent hover:bg-blue-500/5 transition-colors">
+        <Card
+          class="border-none shadow-sm bg-gradient-to-br from-blue-500/5 via-blue-500/0 to-transparent hover:bg-blue-500/5 transition-colors"
+        >
           <CardContent class="p-6 flex flex-col gap-4">
             <div class="flex items-center gap-3">
               <div
@@ -767,6 +784,7 @@ function getCountryFlag(countryCode: string): string {
                           :to="{
                             name: 'problem-detail',
                             params: { slug: problem.slug },
+                            query: { contestId },
                           }"
                           class="text-base font-bold hover:text-primary transition-colors"
                         >
@@ -824,6 +842,7 @@ function getCountryFlag(countryCode: string): string {
                           $router.push({
                             name: 'problem-detail',
                             params: { slug: problem.slug },
+                            query: { contestId },
                           })
                         "
                       >
@@ -943,8 +962,12 @@ function getCountryFlag(countryCode: string): string {
                         class="font-mono text-xs font-bold text-muted-foreground"
                       >
                         {{
-                          entry.finish_time ||
-                          formatPenaltyTime(entry.totalPenalty ?? 0)
+                          formatPenaltyTime(
+                            entry.finishTime ??
+                              entry.finish_time ??
+                              entry.totalPenalty ??
+                              0,
+                          )
                         }}
                       </span>
                     </TableCell>

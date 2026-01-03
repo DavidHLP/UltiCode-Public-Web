@@ -30,6 +30,13 @@ export interface SubmissionTestRecord {
   memory: number;
 }
 
+export interface ContestSubmissionInfo {
+  time_from_start: number;
+  problem_index: string;
+  score: number;
+  is_accepted: boolean;
+}
+
 export interface SubmissionRecord {
   id: string;
   problem_id: number;
@@ -61,4 +68,5 @@ export interface SubmissionRecord {
     title: string;
     slug: string;
   };
+  contest_info?: ContestSubmissionInfo;
 }
