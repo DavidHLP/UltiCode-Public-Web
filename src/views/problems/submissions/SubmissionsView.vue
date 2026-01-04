@@ -15,11 +15,7 @@ import {
   fetchCurrentUserId,
   isAuthenticated as checkAuthenticated,
 } from "@/utils/auth";
-import { useI18n } from "vue-i18n";
-import { toast } from "vue-sonner";
 import { problemHooks } from "@/hooks/problem-hooks";
-
-const { t } = useI18n();
 
 const props = defineProps<{
   problemId: number;
