@@ -29,6 +29,7 @@ const props = defineProps<{
   submissions: SubmissionRecord[];
   isLoading: boolean;
   statusMetaByKey: Record<string, SubmissionStatusMeta>;
+  isAuthenticated?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -63,6 +64,13 @@ const statusClass = (status: string) => {
 const handleSelect = (submission: SubmissionRecord) => {
   emit("select", submission);
 };
+
+const showLoginPrompt = computed(
+  () =>
+    props.isAuthenticated === false &&
+    !props.isLoading &&
+    props.submissions.length === 0,
+);
 </script>
 
 <template>
@@ -70,10 +78,31 @@ const handleSelect = (submission: SubmissionRecord) => {
     <div v-if="isLoading" class="flex h-full items-center justify-center p-8">
       <Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
     </div>
+    <template v-else-if="showLoginPrompt">
+      <Empty
+        class="flex h-full items-center justify-center border-none bg-transparent px-6 py-8"
+      >
+        <EmptyContent>
+          <EmptyMedia variant="icon">
+            <Inbox class="h-10 w-10 text-muted-foreground" />
+          </EmptyMedia>
+          <EmptyHeader>
+            <p class="text-base font-semibold text-foreground">
+              {{ t("problem.submissions.loginRequired") }}
+            </p>
+            <EmptyDescription>
+              {{ t("problem.submissions.loginToViewSubmissions") }}
+            </EmptyDescription>
+          </EmptyHeader>
+        </EmptyContent>
+      </Empty>
+    </template>
     <template v-else>
       <Table>
         <TableCaption>{{
-          t("problem.submissions.noSubmissionsDesc")
+          decoratedSubmissions.length
+            ? t("problem.submissions.noSubmissionsDesc")
+            : ""
         }}</TableCaption>
         <TableHeader>
           <TableRow>

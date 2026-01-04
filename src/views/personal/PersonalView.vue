@@ -106,7 +106,7 @@ onMounted(async () => {
     if (!userId) return;
     const [userData, userSubmissions, userStats] = await Promise.all([
       fetchUserProfile(userId),
-      fetchUserSubmissions(userId),
+      fetchUserSubmissions(),
       fetchUserStats(userId),
     ]);
 

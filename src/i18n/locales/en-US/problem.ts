@@ -337,6 +337,8 @@ export default {
     notes: "Notes",
     noSubmissionsTitle: "No submissions yet",
     noSubmissionsDesc: "Run or submit your solution to populate this list.",
+    loginRequired: "Login Required",
+    loginToViewSubmissions: "Please log in to view your submissions.",
     timeUnknown: "time unknown",
     submittedAt: "submitted at",
     allTestsPassed: "All test cases passed",

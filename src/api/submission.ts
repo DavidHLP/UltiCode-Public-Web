@@ -39,12 +39,8 @@ function mapSubmissionStatus(meta: unknown): SubmissionStatusMeta {
 
 export async function fetchProblemSubmissions(
   problemId: number,
-  userId?: string,
 ): Promise<SubmissionRecord[]> {
-  const query = userId ? `?userId=${userId}` : "";
-  const data = await apiGet<unknown[]>(
-    `/problems/${problemId}/submissions${query}`,
-  );
+  const data = await apiGet<unknown[]>(`/problems/${problemId}/submissions`);
   return data.map(mapSubmission);
 }
 
@@ -62,10 +58,8 @@ export async function fetchBestSubmission(
   return mapSubmission(data);
 }
 
-export async function fetchUserSubmissions(
-  userId: string,
-): Promise<SubmissionRecord[]> {
-  const data = await apiGet<unknown[]>(`/submissions?userId=${userId}`);
+export async function fetchUserSubmissions(): Promise<SubmissionRecord[]> {
+  const data = await apiGet<unknown[]>(`/submissions`);
   return data.map(mapSubmission);
 }
 
@@ -129,12 +123,9 @@ export async function runSubmission(
     testCases: testCases.length > 0 ? testCases : undefined,
   });
 }
-export async function fetchDailyActivity(
-  year?: number,
-  userId?: string,
-): Promise<string[]> {
+export async function fetchDailyActivity(year?: number): Promise<string[]> {
   const params = new URLSearchParams();
   if (year) params.append("year", year.toString());
-  if (userId) params.append("userId", userId);
-  return apiGet<string[]>(`/submissions/calendar?${params.toString()}`);
+  const query = params.toString();
+  return apiGet<string[]>(`/submissions/calendar${query ? `?${query}` : ""}`);
 }

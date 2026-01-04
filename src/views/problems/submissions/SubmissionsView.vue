@@ -11,8 +11,15 @@ import {
   fetchSubmissionStatuses,
 } from "@/api/submission";
 import { fetchContestProblemSubmissions } from "@/api/contest";
-import { fetchCurrentUserId } from "@/utils/auth";
+import {
+  fetchCurrentUserId,
+  isAuthenticated as checkAuthenticated,
+} from "@/utils/auth";
+import { useI18n } from "vue-i18n";
+import { toast } from "vue-sonner";
 import { problemHooks } from "@/hooks/problem-hooks";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   problemId: number;
@@ -41,6 +48,8 @@ const statusMetaByKey = computed<Record<string, SubmissionStatusMeta>>(() => {
   );
 });
 
+const isAuthenticated = computed(() => checkAuthenticated());
+
 const loadStatusMeta = async () => {
   if (statusMeta.value.length) return;
   try {
@@ -52,6 +61,11 @@ const loadStatusMeta = async () => {
 };
 
 const loadSubmissions = async () => {
+  if (!checkAuthenticated()) {
+    isLoading.value = false;
+    submissions.value = [];
+    return;
+  }
   isLoading.value = true;
   const userId = fetchCurrentUserId();
   await problemHooks.emit("problem:submissions:load:before", {
@@ -61,7 +75,7 @@ const loadSubmissions = async () => {
   try {
     submissions.value = props.contestId
       ? await fetchContestProblemSubmissions(props.contestId, props.problemId)
-      : await fetchProblemSubmissions(props.problemId, userId || undefined);
+      : await fetchProblemSubmissions(props.problemId);
     await problemHooks.emit("problem:submissions:load:after", {
       problemId: props.problemId,
       userId,
@@ -110,6 +124,7 @@ const handleBack = () => {
       v-else
       :submissions="submissions"
       :is-loading="isLoading"
+      :is-authenticated="isAuthenticated"
       :status-meta-by-key="statusMetaByKey"
       @select="handleSelect"
     />

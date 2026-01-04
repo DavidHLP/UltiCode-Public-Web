@@ -133,7 +133,7 @@ onMounted(async () => {
     const userId = fetchCurrentUserId();
     if (!userId) return;
     hasUser.value = true;
-    submissions.value = await fetchUserSubmissions(userId);
+    submissions.value = await fetchUserSubmissions();
   } catch (e) {
     console.error("Failed to load submissions", e);
   } finally {

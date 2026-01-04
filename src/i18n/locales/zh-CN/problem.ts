@@ -328,6 +328,8 @@ export default {
     notes: "备注",
     noSubmissionsTitle: "暂无提交记录",
     noSubmissionsDesc: "运行或提交你的代码以填充此列表。",
+    loginRequired: "需要登录",
+    loginToViewSubmissions: "请登录以查看你的提交记录。",
     timeUnknown: "时间未知",
     submittedAt: "提交于",
     allTestsPassed: "所有测试用例均已通过",
